@@ -1,7 +1,68 @@
-/* Some overrides from default bootstrap styles */
+/* define(blue, color, "Items backgrounds", #2C3742) */
+/* define(textColor, color, "Text color", #777) */
+/* define(bodyBackground, color, "Body background", #fff) */
+/* define(fontSize, dimension, "Global font size", 12px) */
+/* define(titleColor, color, "Color of title", #337ab7) */
+/* define(colorMuted, color, "Text color muted", #777) */
+/* define(colorPrimary, color, "Text color primary", #337ab7) */
+/* define(colorSuccess, color, "Text color success", #3c763d) */
+/* define(colorInfo, color, "Text color info", #31708f) */
+/* define(colorWarning, color, "Text color warning", #8a6d3b) */
+/* define(colorDanger, color, "Text color danger", #a94442) */
+/* define(bgPrimary, color, "background color primary", #337ab7) */
+/* define(bgSuccess, color, "background color success", #dff0d8) */
+/* define(bgInfo, color, "background color info", #d9edf7) */
+/* define(bgWarning, color, "background color warning", #fcf8e3) */
+/* define(bgDanger, color, "background color danger", #f2dede) */
 
+body{
+    background: @bodyBackground;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    position: fixed;
+    width: 100%;	
+	font-size: @fontSize;
+	color : @textColor;
+	font-family: "Open Sans", Arial;
+}
+
+/* Some overrides from default bootstrap styles */
 h1,h2,h3,h4,h5,h6{
 	font-weight: normal;
+}
+
+.text-muted{ color: @colorMuted;}
+.text-primary{ color: @colorPrimary;}
+.text-success{ color: @colorSuccess;}
+.text-info{ color: @colorInfo;}
+.text-warning{ color: @colorWarning;}
+.text-danger{ color: @colorDanger;}
+
+.bg-primary{ background: @bgPrimary;}
+.bg-success{ background: @bgSuccess;}
+.bg-info{ background: @bgInfo;}
+.bg-warning{ background: @bgWarning;}
+.bg-danger{ background: @bgDanger;}
+
+.alert-success{ background: @bgSuccess; color: @colorSuccess;}
+.alert-info{ background: @bgInfo; color: @colorInfo;}
+.alert-warning{ background: @bgWarning; color: @colorWarning;}
+.alert-danger{ background: @bgDanger; color: @colorDanger;}
+
+.btn{
+	font-size: inherit;
+}
+
+.btn-default{
+	background: #333;
+	border-color: #777;
+	color: white;
+}
+
+.btn-default:hover{
+	background: #555;
+	color: white;
 }
 
 /* COMPONENTS */
@@ -16,35 +77,12 @@ h1,h2,h3,h4,h5,h6{
 	background-color: rgb(104, 163, 213);
 }
 
-/* alerts */
-.alert [class^="icon-"], 
-.alert [class*=" icon-"] {
-	font-size: 27px;
-	position: relative;
-	top: 4px;
-	margin-bottom: 8px;
-	margin-right: 17px;
-	display: inline-block;
-	color: #f1c359;
-}
-.alert-success [class^="icon-"], 
-.alert-success [class*=" icon-"] {
-	color: #81ad53;
-}
-.alert-info [class^="icon-"], 
-.alert-info [class*=" icon-"] {
-	color: #4993c6;
-}
-.alert-error [class^="icon-"], 
-.alert-error [class*=" icon-"] {
-	color: #d5393e;
-}
-
 
 /* code*/
 code {
 	color: rgb(78, 153, 223);
 }
+
 
 /*---------------------------------------------------------------------------*/
 /*------------------------------- FORMS -------------------------------------*/
@@ -54,39 +92,22 @@ button,
 select,
 textarea {
   font-family: "Open Sans", Arial;
+  outline-style: none;
 }
 input[type="text"],
 input[type="password"],
+select,
 textarea {	
 	font-size: 13px;	
 	box-shadow: inset 0 0px 1px rgba(0, 0, 0, 0.075);
 	border-radius: 4px;
+    border: 1px solid #ddd;
+    height: 30px;
+    /*line-height: 30px;*/
 }
-.inline-input input[type="text"],
-.inline-input input[type="password"],
-input[type="text"].inline-input,
-input[type="password"].inline-input {
-	background: none;
-	border-top: 0 none;
-	border-left: 0 none;
-	border-right: 0 none;
-	border-bottom: 1px solid #d0dde9;
-	border-radius: 0;
-	box-shadow: none;
-	border-color: #dee3ea;
-}
-.inline-input input[type="text"]:focus,
-.inline-input input[type="password"]:focus,
-input[type="text"].inline-input:focus,
-input[type="password"].inline-input:focus {
-	box-shadow: none;
-	border-color: #5d6a80;
-}
-.inline-input input[type="text"]:hover,
-.inline-input input[type="password"]:hover,
-input[type="text"].inline-input:hover,
-input[type="password"].inline-input:hover {
-	border-color: #959fb0;
+
+textarea{
+	height: auto;
 }
 
 input[type="text"]:focus,
@@ -96,15 +117,14 @@ textarea:focus{
 	-webkit-box-shadow: inset 0 0px 1px rgba(0, 0, 0, 0.075), 0 0 4px rgba(82, 168, 236, 0.6);
 	   -moz-box-shadow: inset 0 0px 1px rgba(0, 0, 0, 0.075), 0 0 4px rgba(82, 168, 236, 0.6);
 			box-shadow: inset 0 0px 1px rgba(0, 0, 0, 0.075), 0 0 4px rgba(82, 168, 236, 0.6);
-
-	/*-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 4px rgba(82, 168, 236, 0.6);
-	   -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 4px rgba(82, 168, 236, 0.6);
-			box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 4px rgba(82, 168, 236, 0.6);*/
 }
 
 input[type="file"] {
-	font-size: 12px;
-	line-height: 12px;
+	display: inline-block;	
+}
+
+input[type="radio"]{
+	margin-right: 4px;
 }
 
 input[disabled], textarea[disabled], input[readonly], textarea[readonly] {
@@ -132,6 +152,47 @@ textarea::-webkit-input-placeholder {
   font-size: 12px;
 }
 
+label{
+	font-weight: normal;	
+	vertical-align: top;
+}
+
+label.required:after{
+	content: "*";
+	color: @colorDanger;
+}
+
+fieldset{
+	border : 1px solid @colorPrimary;
+	box-shadow: none;
+}
+
+legend{
+	color: @colorPrimary;
+	border: none;
+	background: none;
+	margin-left: 15px;
+	text-align: left;
+	display: inline;
+	width: auto;
+	padding: 0 5px;
+}
+
+/* FORMS LAYOUT */
+form > table{
+	width: 100%;
+}
+
+form > table > tbody > tr > td{
+	width: 50%;
+	vertical-align: top;
+}
+
+
+.form-input-wrap{
+    padding: 5px;    
+}
+
 
 /* PREPEND & APPEND INPUT */
 .input-append input, 
@@ -148,6 +209,21 @@ textarea::-webkit-input-placeholder {
 	font-size: 13px;
 }
 
+.input-radio-wrapper{
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.input-radio-list{
+	list-style-type: none;
+	padding-left: 0;
+}
+
+.input-radio-horizontal li{
+	float: left;
+	margin-right: 8px;
+}
+
 /* NAVBAR */
 
 .navbar-inverse {
@@ -157,14 +233,14 @@ textarea::-webkit-input-placeholder {
 	border-radius: 0px;
 	border-bottom: 1px solid #191e23;
 
-	background: #2c3742; /* Old browsers */
-	background: -moz-linear-gradient(top,  #2c3742 0%, #28303a 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#2c3742), color-stop(100%,#28303a)); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(top,  #2c3742 0%,#28303a 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(top,  #2c3742 0%,#28303a 100%); /* Opera 11.10+ */
-	background: -ms-linear-gradient(top,  #2c3742 0%,#28303a 100%); /* IE10+ */
-	background: linear-gradient(to bottom,  #2c3742 0%,#28303a 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2c3742', endColorstr='#28303a',GradientType=0 ); /* IE6-9 */
+	background: #2C3742; /* Old browsers */
+	background: -moz-linear-gradient(top,  #2C3742 0%, #28303a 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#2C3742), color-stop(100%,#28303a)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #2C3742 0%,#28303a 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #2C3742 0%,#28303a 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #2C3742 0%,#28303a 100%); /* IE10+ */
+	background: linear-gradient(to bottom,  #2C3742 0%,#28303a 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2C3742', endColorstr='#28303a',GradientType=0 ); /* IE6-9 */
 }
 .navbar-inverse .btn-navbar {
 	float: left;
@@ -200,6 +276,10 @@ textarea::-webkit-input-placeholder {
 .navbar-inverse .mobile-menu .nav > li > a {
 	color: #fff;
 	border-left: 0px;
+}
+
+.dropdown-menu{
+	font-size: 1em;
 }
 .dropdown-menu > li > a:hover,
 .dropdown-menu > li > a:focus,
@@ -338,19 +418,13 @@ table th span.line{
 	height: 10px;
 }
 
+
+
 /*------------------------ Main layout ----------------------*/
-body{
-    /*background: rgb(31,37,39);    */
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    position: fixed;
-    width: 100%;
-	font-size: 12px;
-}
+
 
 #main-menu, #footer{        
-    background: #2c3742;
+    background: @blue;
     color: #d6d6d6;
     width: 100%;
     border: none;
@@ -361,6 +435,11 @@ body{
     top: 0;
     height: 30px;
     margin-bottom: 5px;
+}
+
+#main-menu .application-logo{
+	width: 30px;
+	height: 30px;
 }
 #main-menu .main-menu-title{
     background: none;
@@ -389,7 +468,7 @@ body{
 #main-content{
     position: relative;
     width: 100%;        
-    height: 95%;
+  	height: calc(100% - 60px);
 }
 
 .add-tab-button{
@@ -400,14 +479,18 @@ body{
 
 #main-nav-tabs{
     height: 20px;
-    width: 100%;
-	overflow: hidden;
+    width: 100%;	
 }
 #main-nav-tabs .main-tab-title{	
 	border: 1px solid #DDD;	
+	border-bottom: none;
+	background: #eee;
+	height: 20px;
+	margin-right: 2px;
 }
 #main-nav-tabs .main-tab-title.active{	
-	background: #eee;
+	background: @bodyBackground;
+	color: black;	
 }
 #main-nav-tabs .main-tab-title > a{
 	padding: 0 10px;
@@ -421,18 +504,21 @@ body{
 
 #main-nav-tabs .main-tab-title > .main-tabs-close{
 	float: right;
-	margin: 0 5px;
+	margin: 2px 3px;;
 	padding: 0;
 }
 
 
-#main-tabs-content{
-    height: 95%;
+#main-tab-content{
+    height: 100%;
     width: 100%;
+	overflow: auto;
 }
-.main-tab-pane{
-	padding: 10px;
+
+.tab-pane{
+    padding: 10px;
 }
+
 /** Border radius **/
 .corner-all{
     border-radius: 4px;
@@ -466,6 +552,12 @@ body{
     border-bottom-right-radius : 4px;
 }
 
+/*--------------------- Tabs content --------------------*/
+.main-tab-pane .page-title{
+	color: @titleColor;
+	text-align: center;
+	margin: 5px 0;
+}
 
 /*--------------------- Links -------------------------*/
 a, a:active, a:hover, a:visited, a:focus{
@@ -473,6 +565,7 @@ a, a:active, a:hover, a:visited, a:focus{
     text-decoration: none;    
 }
 
+/*-------------------- Advert message ------------------*/
 #advert-message{
     position: fixed;
     width: 50%;
@@ -490,6 +583,236 @@ a, a:active, a:hover, a:visited, a:focus{
     right: 0;
 }
 
+/*-------------------- Dialog box ---------------------*/
 .modal-dialog{    
     margin-top: 15%;
+}
+
+/*-------------------- Lists -----------------------------*/
+.list-forced-result{
+	display:none;
+}
+
+.list{
+    width: 100%;
+    color: @textColor;
+    border-collapse: collapse;
+}
+	
+.list td {
+    text-align: left;
+    padding: 3px 5px 2px 5px;
+	height: 4em;
+}
+
+.list td .fa{
+	margin: 3px;
+	border : 1px solid #EEE;
+	box-shadow: 1px 1px 1px #999 ;
+	cursor: pointer;
+	border-radius: 3px;
+	padding: 0.2em 0.25em;
+	background: @bodyBackground;
+}
+		
+.list th{
+    text-align: left;    
+    padding-left: 5px;
+    padding-right: 5px;
+}
+	
+/*** The icon to sort the list ***/
+.list-title-label{
+    margin-right: 15px;    
+}
+.list-sort-column{
+    background: transparent;
+    border: none;
+    font-size: 13px;
+    opacity: 0.5;
+}
+.list-sort-column:hover{
+    opacity: 1;
+}
+    
+.list-sort-column.list-sort-active{
+    color: @colorSuccess;
+    opacity: 1;
+}
+    
+/*** The search icon ***/
+.list-go-search{
+    background: none;
+    border: none;
+    top: 3px;
+    font-size: 15px;    
+}
+
+.list-search-input{
+    width: 150px;
+    padding-right: 15px;
+}
+
+.clean-search{
+    font-size: 15px;
+    margin-left: -15px;
+}
+
+/** The search field ***/
+.list-search-input.not-empty {
+    background-color: @bgInfo;
+    color: @colorInfo;
+}	
+
+.list-line{
+    height: 30px;
+    color: @colorText;    
+}
+
+.list-line:hover{
+    background: #f5fafc;
+    color: #6e829B;
+}
+
+.list-line.selected{
+    backround: #2C3742;
+    color: white;
+}
+    
+.list-cell-clickable{
+    cursor: pointer;
+}
+	
+
+/*** Tha navigation table ***/
+.list-navigation{
+    width: auto;
+    font-size: inherit;
+}
+	
+.list-max-lines{
+	width: 50px;        
+	border : none;
+}	
+	
+.list-navigation td{
+    background-color: transparent;
+    border-right: 1px solid lightgrey;
+    border-left: 1px solid lightgrey;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+	
+.list-navigation .line-by-page-label{
+    margin-left: 5px;
+}
+	
+.list-previous-page, .list-next-page{
+    font-size: 15px;    
+}
+
+input[type="text"].list-page-number{
+    width: 30px;
+    text-align: center;
+    margin-top: 7px;   
+    border: none;
+
+}
+
+/*------ Login page ---------*/
+#login-page{
+	top : 50%;
+	margin-top: -125px;
+	height: 250px;
+	background: rgba(255,255,255,0.8);	
+	box-shadow: 0 0px 10px #AAA;
+}
+
+/*------------ Loading -------------------*/
+#loading{
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 500;
+	padding: 25% 50%;
+	background: rgba(128,128,128,0.5);
+	color: white;
+}
+
+/*----------------- Application lgoo ------------------*/
+.logo-thumbnail{
+
+}
+
+.logo-icon{
+
+}
+
+.logo-normal{
+
+}
+
+.logo-big{
+
+}
+
+/*------------------- Templates ------------------------------*/
+.template{
+	display: none;
+}
+
+.box{
+    border-radius: 4px;
+    border: 1px solid #777;    
+    margin: 5px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+	background: #fff;
+}
+
+/*----------------------- Icons -----------------------------*/
+p .fa{
+	margin-right: 7px;
+}
+
+
+/*----------------------- Boxes -----------------------------*/
+.box{
+    border-radius: 4px;
+    border: 1px solid #777;    
+    margin: 5px;
+    height: 100%;    
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    background: #fff;
+}
+
+.box .box-header{
+    background: @titleColor;        
+    font-size: 1.2em;
+    color: white;    
+    padding-left: 5px;
+}
+
+.box .box-header .box-icon{
+    margin-right: 10px;
+}
+
+.box .box-content{
+    padding: 5px;
+}
+
+
+/*----------------------- Error tooltips -------------------*/
+.tooltip.input-error{
+	
+}
+
+.tooltip.input-error .tooltip-inner{
+	background: @bgDanger;
+	color: @colorDanger;
+}
+
+.tooltip.input-error .tooltip-arrow{
+	border-right-color: @bgDanger;
 }

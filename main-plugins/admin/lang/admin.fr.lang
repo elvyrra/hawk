@@ -1,0 +1,40 @@
+; plugin = "admin"
+; language = "fr"
+
+
+profile-question-form-general-legend = "Données générales"
+profile-question-form-name-label = "Nom du champ"
+profile-question-form-type-label = "Type de champ"
+profile-question-form-type-text = "Champ texte"
+profile-question-form-type-textarea = "Texte libre"
+profile-question-form-type-checkbox = "Case à cocher"
+profile-question-form-type-radio = "Boutons radio"
+profile-question-form-type-select = "Boîte de sélection"
+profile-question-form-type-datetime = "Champ date"
+profile-question-form-type-file = "Image"
+profile-question-form-displayInRegister-label = "Afficher à l'inscription"
+profile-question-form-displayInProfile-label = "Afficher sur le profil"
+
+profile-question-form-parameters-legend = "Paramètres du champ"
+profile-question-form-required-label = "Champ obligatoire"
+profile-question-form-label-label = "Label à afficher"
+profile-question-form-label-description = "(Apparaîtra dans les formulaires)"
+profile-question-form-options-label = "Liste des valeurs possibles"
+profile-question-form-options-description = "(Une valeur par ligne)"
+profile-question-form-minDate-label = Date minimale
+profile-question-form-maxDate-label = Date maximale
+
+profile-question-form-translation-description = "Pour les champs suivants, si vous souhaitez proposer votre application dans plusieurs langues, il vous faudra traduire ces données dans la gestion des traductions"
+
+user-form-general-legend = "Données générales"
+user-form-username-label = "Pseudo"
+user-form-email-label = "Email"
+user-form-roleId-label = "Rôle"
+user-form-profile-legend = "Profil"
+user-form-deactivate-btn = "Désactiver"
+user-form-activate-btn = "Activer"
+user-form-unsuspend-btn = "Réhabiliter"
+user-form-suspend-btn = "Suspendre"
+user-form-title = "Fiche utilisateur"
+
+

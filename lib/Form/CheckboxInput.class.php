@@ -11,26 +11,17 @@
  *
  *
  **********************************************************************/
-class CheckboxInput extends Input{
+class CheckboxInput extends FormInput{
 	const TYPE = "checkbox";
 	public function __toString(){	
-		if($this->value)
-			$this->custom = array("checked" => "true");	
+		if($this->value){
+			$this->checked = true;
+		}
 	    return parent::__toString();
 	}
 	
 	public function dbvalue(){	
-        if(!$this->dataType)
-            $this->dataType = "bool";
-        
-		$val = $this->value === null ? false : true;
-		switch($this->dataType){
-			case "bool" :
-			case "boolean" :
-				return $val;
-			case "int" :
-				return (int) $val;			
-		}        
+        return isset($_POST[$this->name]) ? 1 : 0;		
 	}
 }
 /******************* (C) COPYRIGHT 2014 ELVYRRA SAS *********************/

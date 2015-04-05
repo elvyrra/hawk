@@ -1,0 +1,60 @@
+$("#admin-users-tabs")
+
+
+.on("click", ".delete-user", function(){
+	if(confirm(Lang.get('admin.user-delete-confirmation'))){
+		$.get(mint.getUri('remove-user', {username : $(this).data("user")}), function(){
+			mint.lists["admin-users-list"].refresh();
+		});
+	}
+})
+
+.on("click", ".lock-user, .unlock-user", function(){
+	$.get(mint.getUri('activate-user', {username : $(this).data("user"), value : $(this).hasClass("lock-user") ? 0 : 1}), function(){
+		mint.lists["admin-users-list"].refresh();
+	});
+})
+
+.on("click", ".delete-role", function(){
+	if(confirm(Lang.get("roles.delete-role-confirmation"))){
+		$.get(mint.getUri("delete-role", {roleId : $(this).data("role")}), function(){
+			mint.load(mint.getUri("list-roles"), {selector : "#admin-roles-tab"});
+		});
+	}
+})
+
+.on("change", ".set-default-role", function(){	
+	mint.load(mint.getUri("list-roles") + "?setdefault=" + $(this).attr("value") , {selector : "#admin-roles-tab"});
+})
+
+.on("change","#user-filter-form", function(){
+	$("#admin-users-tab").load(mint.getUri("list-users") + "?user_filter_display=" + $("#user-filter-form [name='display']:checked").val());
+});
+
+$("#dialogbox")
+
+.on("change", "#user-form input[type='file']", function(event){
+	debugger;
+	event.preventDefault();
+	var items = event.target.files;			
+	var blob = items[0];		
+	
+	mint.forms["user-form"].inputs[$(this).attr('name')].removeError();
+	if(blob && /^image\//.test(blob.type)) {
+		/*** The loaded logo is well an image and it size is lower than 2MB ***/
+		var reader = new FileReader();
+		reader.onload = function(e){						
+			/*** Display directly the result ***/
+			var image = e.target.result;
+			var mime = blob.type;
+			
+			$(this).next(".profile-image").attr('src', image);
+			
+		}.bind(this);
+		reader.readAsDataURL(blob);
+	}
+	else{
+		$(this).val(null);
+		mint.forms["user-form"].inputs[$(this).attr('name')].addError(Lang.get("admin.user-form-image-format-error"));
+	}
+});

@@ -20,12 +20,5 @@ class ThemeManager{
     
     public static function setSelected($name){
         Options::set('main.selectedTheme', $name);        
-    }
-    
-    public function getView($template){
-        $file = self::getSelected()->getView($template);
-        if(!is_file($file))
-            $file = self::get(self::DEFAULT_THEME)->getView($template);
-        return $file;
-    }
+    }   
 }

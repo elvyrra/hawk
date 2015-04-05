@@ -15,7 +15,7 @@
  * To be treated, an object must be an array. 
  * To be displayed, an object must be a json string
  * */
-class ObjectInput extends Input{ 
+class ObjectInput extends FormInput{ 
 	const TYPE="text";
 	
     public function __toString(){
@@ -27,9 +27,9 @@ class ObjectInput extends Input{
         return parent::__toString();
     }   
 	
-	public function dbvalue(){
-		//return json_decode($this->value, true);
-	}
+	// public function dbvalue(){
+		// return json_decode($this->value, true);
+	// }
 }
 
 /******************* (C) COPYRIGHT 2014 ELVYRRA SAS *********************/

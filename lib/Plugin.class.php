@@ -12,10 +12,21 @@
  *
  **********************************************************************/
 class Plugin{
+	const TABLE = "Plugin";
 	private $name;
 	private $rootDir;
 	
 	private static $mainPlugins = array('main', 'install', 'admin');
+	
+	/*	 
+	 * Create a plugin instance from it configuration
+	 * @param {String} $name - The plugin name, correspongin to the directory name
+	 */
+	private function __construct($name){		
+		$this->config = array();
+		$this->name = $name;
+		$this->rootDir = (in_array($this->name, self::$mainPlugins) ? MAIN_PLUGINS_DIR : PLUGINS_DIR) . '/' . $this->name . '/';
+	}
 	
 	/*
 	 * public static Plugin getInstanceFromManifest(string $filename, array $data = array())
@@ -27,35 +38,51 @@ class Plugin{
 	
 	public static function current(){
 		$trace = debug_backtrace()[0]['file'];
-		$plugin_dir = dirname($trace);
-		$name = basename($plugin_dir);
+		if(strpos($trace, PLUGINS_DIR) !== false){
+			$dir = str_replace(PLUGINS_DIR, '', $trace);
+		}
+		elseif(strpos($trace, MAIN_PLUGINS_DIR) !== false){
+			$dir = str_replace(MAIN_PLUGINS_DIR, '', $trace);
+		}
+		else{
+			return null;
+		}
+		list($name) = explode(DIRECTORY_SEPARATOR, $dir);		
 		
 		return new Plugin($name);
 	}
 	
-	/*
-	 * public __construct(array $conf)
-	 * Create a plugin instance from it configuration
-	 */
-	public function __construct($name){		
-		$this->config = array();
-		$this->name = $name;
-		$this->rootDir = (in_array($this->name, self::$mainPlugins) ? MAIN_PLUGINS_DIR : PLUGINS_DIR) . '/' . $this->name . '/';
+	public static function getAll(){
+		$plugins = array();
+		foreach(array(MAIN_PLUGINS_DIR, PLUGINS_DIR) as $dir){
+			foreach(glob($dir . '*') as $name){
+				$plugins[] = new Plugin($name);
+			}
+		}
+		
+		return $plugins;
 	}
+	
+	public static function getActivePlugins(){
+		return DB::get(MAINDB)->select(array(
+			'from' => self::TABLE,
+			'where' => 'active = 1',
+			'return' => __CLASS__,
+		));
+	}
+	
+	public static function getMainPlugins(){
+		return array_map(function($name){ return new self($name); }, self::$mainPlugins);
+	}
+	
+	
 	
 	/*
 	 * Get the configuration from the database	 
 	 */
 	public function getConfig(){
-		if(!isset($this->config)){					
-			$options = DB::get(MAINDB)->select(array(
-				'table' => 'Options',
-				'condition' => 'plugin = :plugin',
-				'binds' => array('plugin' => $plugin),				
-			));
-			foreach($options as $option){
-				$this->config[$option['key']] = $options['value'];
-			}
+		if(!isset($this->config)){								
+			$this->config = Option::getPluginOptions($this->name);			
 		}
 		
 		return $this->config;
@@ -63,6 +90,10 @@ class Plugin{
 	
 	public function getRootDir(){
 		return $this->rootDir;
+	}
+	
+	public function getStartFile(){
+		return $this->getRootDir() . 'start.php';
 	}
 	
 	public function getControllersDir(){
@@ -78,7 +109,11 @@ class Plugin{
 	}
 	
 	public function getViewsDir(){
-		return $this->rootDir . 'views/';
+		return $this->rootDir . 'views/';	
+	}
+	
+	public function getView($view){
+		return $this->getViewsDir() . $view;
 	}
 	
 	public function getStaticDir(){
@@ -109,12 +144,16 @@ class Plugin{
 		return $this->rootDir . 'lang/';
 	}
 	
+	public function isInstalled(){
+		return (bool) DB::get(MAINDB)->count(self::TABLE, 'name = :name', array('name' => $this->name));
+	}
+	
 	public function isActive(){
 		return (bool) DB::get(MAINDB)->select(array(
-			'table' => 'Plugin',
-			'condition' => 'name = :name',
-			'binds' => array('name' => $this->name),
 			'fields' => array('active'),
+			'from' => 'Plugin',
+			'where' => 'name = :name',
+			'binds' => array('name' => $this->name),
 			'return' => DB::RETURN_OBJECT,
 			'one' => true
 		))->active;
@@ -139,5 +178,11 @@ class Plugin{
 	
 	public function uninstall(){
 		Db::get(MAINDB)->delete("Plugin", 'name = :name', array('name' => $this->name));
+	}
+	
+	public function importLanguageFiles(){
+		foreach(glob($this->getLangDir().'*') as $file){
+			Language::importFile($file);
+		}		
 	}
 }

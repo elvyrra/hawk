@@ -1,9 +1,11 @@
 <?php
 
 require INCLUDES_DIR . 'constants.php';
-require INCLUDES_DIR . 'functions.php';
 require INCLUDES_DIR . 'autoload.php';
 require INCLUDES_DIR . 'config.php';
+require INCLUDES_DIR . 'functions.php';
+require INCLUDES_DIR . 'error_handler.php';
+
 
 define("ROOT_URL", Conf::get('rooturl') . '/');
 
@@ -23,6 +25,7 @@ if(Conf::has('db')){
 define('SESSION_SYSTEM', Conf::get('session.system'));
 
 /*** Constants depending to the options ***/
+Option::getPluginOptions('main');
 define("LANGUAGE", Option::get('main.language'));
     
 /*** Timezone ***/
@@ -33,8 +36,8 @@ date_default_timezone_set(TIMEZONE);
 define('THEMES_ROOT_URL', ROOT_URL . 'themes/');
 define('PLUGINS_ROOT_URL', ROOT_URL . 'plugins/');
 
-define('UPLOADS_ROOT_URL', ROOT_URL . 'uploads/');
-define('UPLOADS_PLUGINS_URL', UPLOADS_ROOT_URL . 'plugins/');
-define('UPLOADS_THEMES_URL', UPLOADS_ROOT_URL . 'themes/');
+define('USERFILES_ROOT_URL', ROOT_URL . 'userfiles/');
+define('USERFILES_PLUGINS_URL', USERFILES_ROOT_URL . 'plugins/');
+define('USERFILES_THEMES_URL', USERFILES_ROOT_URL . 'themes/');
 
 ?>

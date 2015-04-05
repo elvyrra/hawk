@@ -1,0 +1,53 @@
+; plugin = "language"
+; language = "fr"
+
+lang-page-name= "Gestion des langues"
+new-key = "Nouvelle traduction"
+new-lang = "Nouvelle langue"
+import-btn = "Importer un fichier"
+export-btn = "Exporter en fichier"
+
+lang-list-tag-label = "Tag ISO"
+lang-list-label-label = "Label"
+lang-list-active-label = "Active ?"
+lang-list-isDefault-label = "Langue par défaut ?"
+lang-list-actions-label = "Actions"
+see-translations = "Voir les traductions"
+see-missing-keys = "{missing} traductions manquantes"
+
+edit-lang-form-title = "Edition de la langue"
+add-lang-form-title = "Ajout d'une nouvelle langue"
+
+lang-form-tag-label = "Tag ISO (2 caractères)"
+lang-form-label-label = "Label"
+lang-form-import-label = "Sélectionnez les fichiers à importer"
+
+import-form-title = "Importer des fichiers de langue"
+import-file-format-error = "Le format du fichier à importer n'est pas valide"
+
+key-form-add-title = "Nouvelle traduction"
+key-form-edit-title = "Edition de la traduction"
+key-form-plugin-label = "Plugin"
+key-form-key-label = "Clé de langue"
+key-already-exists = "Cette clé de langue existe déjà."
+
+key-list-plugin-label = "Plugin"
+key-list-key-label = "Clé de langue"
+key-list-default-translation-label = "Traduction ({tag})"
+key-list-translation-label = "Traduction ({tag})"
+key-list-edit-btn = "Editer la clé de langue"
+key-list-delete-btn = "Supprimer la clé de langue"
+
+filter-filters-legend = "Filtres"
+filter-language-label = "Choisir la langue"
+filter-language-edit = "Editer la langue"
+filter-language-delete = "Supprimer la langue"
+filter-keys-label = "Afficher : "
+filter-keys-missing = "Les traductions manquantes"
+filter-keys-all = "Toute les traductions"
+
+update-keys-success = "Traductions enregistrées"
+update-keys-error = "Une erreur est survenue pendant l'enregitrement des traductions"
+
+confirm-delete-lang = "Si vous supprimez cette langue, toutes les traductions dans cette langue seront perdues. Voulez-vous continuer ?"
+confirm-delete-key = "Voulez-vous vraiment supprimer cette clé de langue ?"

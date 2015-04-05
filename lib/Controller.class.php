@@ -19,7 +19,7 @@ class Controller{
 	const BEFORE_ACTION = 'before';
     const AFTER_ACTION = 'after';
 	
-	public function __construct($param){
+	public function __construct($param = array()){
 		$this->dbo = DB::get('main');
 		foreach($param as $key => $value){
 			$this->$key = $value;
@@ -27,8 +27,8 @@ class Controller{
 		$this->theme = ThemeManager::getSelected();
 	}
 	
-	public static function getInstance($param){
-		return new self($param);		
+	public static function getInstance($param = array()){
+		return new static($param);		
 	}
 	
 	public function _call($method){
@@ -36,15 +36,22 @@ class Controller{
 		EventManager::trigger(new Event(get_called_class() . '.' . $method . '.' . self::BEFORE_ACTION, array('controller' => $this)));
 		
 		/*** Call the controller method ***/
-		$dom = new DOMQuery($this->$method());
+		//$dom = new DOMQuery($this->$method());
+		$dom = phpQuery::newDocument($this->$method());
 				
-		/*** Load the widgets after calling the controller method ***/
+		/*** Load the widgets after calling the controller method ***/		
 		$event = new Event(get_called_class() . '.' . $method . '.' . self::AFTER_ACTION, array('controller' => $this, 'result' => $dom));
 		EventManager::trigger($event);
 		
 		$dom = $event->getData('result');
 		
-		return $dom->save();
+		return $dom->htmlOuter();
+	}
+
+	public function addCss($url){
+		Widget::add(Router::getCurrentAction(), Controller::AFTER_ACTION, function($event) use($url){
+			pq("*:last")->after("<link rel='stylesheet' property='stylesheet' type='text/css' href='$url' />");
+		});
 	}
 }
 /******************* (C) COPYRIGHT 2014 ELVYRRA SAS *********************/

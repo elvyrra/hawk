@@ -16,11 +16,7 @@ class Event{
         return $prop ? $this->data[$prop] : $this->data;        
     }
     
-    public function addData($prop, $value){
+    public function setData($prop, $value){
         $this->data[$prop] = $value;
-    }
-    
-    public function setData($array){
-        $this->data = $array;        
     }   
 }

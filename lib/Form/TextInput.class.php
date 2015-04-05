@@ -11,7 +11,7 @@
  *
  *
  **********************************************************************/
-class TextInput extends Input{	
+class TextInput extends FormInput{	
     const TYPE = "text";
 }
 

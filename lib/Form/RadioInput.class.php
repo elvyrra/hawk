@@ -11,8 +11,12 @@
  *
  *
  **********************************************************************/
-class RadioInput extends Input{	
+class RadioInput extends FormInput{	
 	const TYPE = "radio";
+
+	public 	$display = '',
+			$layout = 'horizontal';
+
 }
 
 /******************* (C) COPYRIGHT 2014 ELVYRRA SAS *********************/

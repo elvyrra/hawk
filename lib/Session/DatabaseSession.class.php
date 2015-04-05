@@ -25,8 +25,8 @@ class DatabaseSession implements SessionHandlerInterface{
     public function read($session_id){
         $this->table = 'Session';
         $line = $this->db->select(array(
-            'table' => $this->table,
-            'condition' => 'id = :id',
+            'from' => $this->table,
+            'where' => 'id = :id',
             'binds' => array('id' => $session_id),
             'one' => true
         ));

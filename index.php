@@ -1,5 +1,4 @@
 <?php
-
 /*** Initialize the application ***/
 define('ROOT_DIR', __DIR__ . '/');
 define('INCLUDES_DIR', ROOT_DIR . 'includes/');
@@ -15,17 +14,16 @@ if(!empty($sessionInterface)){
 }
 
 /*** Initialize the plugins ***/
-$dirs = array(PLUGINS_DIR, MAIN_PLUGINS_DIR);
-foreach($dirs as $dir){
-	foreach(glob($dir.'*/start.php') as $file)
-		include $file;
+$plugins = array_merge(Plugin::getMainPlugins(), Plugin::getActivePlugins());
+foreach($plugins as $plugin){	
+	if(is_file($plugin->getStartFile())){
+		include $plugin->getStartFile();
+	}
 }
-
-/*** Load the theme ***/
-$theme = ThemeManager::getSelected();
 
 /*** Compute the routage ***/
 Router::route();
+//debug(Router::getRoutes());
 
 /*** Save the autoload cache ***/
 Autoload::saveCache();

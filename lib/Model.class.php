@@ -1,81 +1,148 @@
 <?php
 
-abstract class Model{
+class Model{
 	// The name of the table containing the data of the model
 	protected static $tablename;
-	protected static $primaryColumn = 'id';
-	
+	protected static $primaryColumn;
+    	
 	const DBNAME = MAINDB;
 	protected $dbvars = array();
-	
-	public function __construct(){
+    
+	public function __construct($data = array()){
+        foreach($data as $key => $value){
+            $this->$key = $value;
+        }
+        
 		foreach(get_object_vars($this) as $key => $value){
 			if($key != 'dbvars'){
 				$this->dbvars[] = $key;
 			}
 		}
-	}
-    
-    public static function getAll(){
-        return DB::get(static::DBNAME)->select(array(
-			'table' => static::$tablename,
-            'return' => get_called_class(),
-        ));
+        
+        $this->dbo = DB::get(static::DBNAME);
     }
     
-    public static function getById($id){
-		return self::getByArray(array(static::$primaryColumn => $id));
+
+    /**
+     * Get all the elements of the table 
+     * @return {array} - A list of Models
+     */
+    public static function getAll($index = null, $fields = array(), $order = array()){        
+        return self::getListByExample(new DBExample(array()), $index, $fields, $order);
+    }
+    
+
+    /**
+     * Get a model instance by Id
+     * @param {int} $id - The id of the instance to get
+     * @param {array} $fields - The fields to set in the instance
+     * @return {Model} - The model with the id
+     */
+    public static function getById($id, $fields = array()){
+        $example = new DBExample(array(static::$primaryColumn => $id));        
+		return self::getByExample($example, $fields);
+	}
+    
+
+
+	public static function getByExample(DBExample $example, $fields = array()){
+        return DB::get(static::DBNAME)->select(array(
+            'fields' => $fields,
+            'from' => static::$tablename,
+            'where' => $example,
+            'return' => get_called_class(),
+            'one' => true,
+        ));        
 	}
 	
-	public static function getByCondition($condition, $binds){
-		return DB::get(static::DBNAME)->select(array(
-			'table' => static::$tablename,
-			'condition' => $condition,
-			'binds' => $binds,
-			'one' => true,
-			'return' => get_called_class()
-		));	
-	}
 	
-	public static function getListByCondition($condition, $binds, $index = ''){		
+
+    public static function getListByExample(DBExample $example, $index = null, $fields = array(), $order = array()){
 		return DB::get(static::DBNAME)->select(array(
-			'table' => static::$tablename,
-			'condition' => $condition,
-			'binds' => $binds,
-			'return' => get_called_class(),
+            'fields' => $fields,
+			'from' => static::$tablename,
+			'where' => $example,
             'index' => $index,
-		));
+			'return' => get_called_class(),
+            'orderby' => $order
+		));        
 	}
 	
-	public static function getByArray($array){
-		$condition = DB::get(static::DBNAME)->parse($array, $binds);
-		return self::getByCondition($condition, $binds);
-	}
 	
-	public static function getListByArray($array, $index = ''){
-		$condition = DB::get(static::DBNAME)->parse($array, $binds);
-		return self::getListByArray($condition, $binds, $index);		
-	}
 	
-	public function save(){
-		$id = static::$primaryColumn;
-		$insert = array();
+    public static function countElementsByExample(DBExample $example, $group = array()){
+		return DB::get(static::DBNAME)->count(static::$tablename, $example, array(), self::$primaryColumn, $group);
+	}
+    
+    
+
+
+
+    private function prepareDatabaseData(){
+        $insert = array();
 		foreach($this->dbvars as $key){
-			$insert[$key] = $this->$key;
+            $insert[$key] = $this->$key;    
 		}
-		if(! isset($this->$id)){
-			$this->$id = DB::get(static::DBNAME)->insert(static::$tablename, $insert);
+        
+        return $insert;
+    }
+    
+    
+
+
+	public function save(){
+		
+		$insert = $this->prepareDatabaseData();
+        $onduplicate = implode(', ', array_map(function($key){
+			if($key == static::$primaryColumn){
+				return "`$key`=LAST_INSERT_ID(`$key`)";
+			}
+			else{
+            	return "`$key` = VALUES(`$key`)";
+			}
+        }, array_keys($insert)));
+        
+		if(!isset($insert[static::$primaryColumn])){
+			$key = static::$primaryColumn;
+			$onduplicate .= ", `$key`=LAST_INSERT_ID(`$key`)";
 		}
-		else{
-			DB::get(static::DBNAME)->update(static::$tablename, "$id = :id", $insert, array('id' => $this->$id));
-		}
+        
+        $lastid = $this->dbo->insert(static::$tablename, $insert, '', $onduplicate);
+        if($lastid){
+            $id = static::$primaryColumn;
+            $this->$id = $lastid;
+        }
 	}
+    
+
+
+    public function addIfNotExists(){
+        $id = static::$primaryColumn;
+		$insert = $this->prepareDatabaseData();
+        
+        $lastid = $this->dbo->insert(static::$tablename, $insert, 'IGNORE');
+        if($lastid){
+            $this->$id = $lastid;
+        }
+    }
+
+
+
+    public function update(){
+        $update = $this->prepareDatabaseData();
+        $id = static::$primaryColumn;
+        $this->dbo->update(static::$tablename, new DBExample(array($id => $this->$id)), $update);
+    }
 	
+
+
 	public function delete(){
 		$id = static::$primaryColumn;
-		return DB::get(static::DBNAME)->delete(static::$tablename, "$id = :id", array($id => $this->$id));
+		return $this->dbo->delete(static::$tablename, new DBExample(array($id => $this->$id)));
 	}
 	
+
+
 	public function getData(){
 		$data = array();
 		foreach($this->dbvars as $key){
@@ -83,4 +150,59 @@ abstract class Model{
 		}
 		return $data;
 	}
+    
+
+
+
+    public function set($field, $value = null){
+        if(is_array($field) && $value === null){
+            foreach($field as $key => $value){
+                $this->set($key, $value);
+            }
+        }
+        else{
+            $this->$field = $value;
+            $this->dbvars[] = $field;
+        }
+    }
+    
+
+
+    public static function getTable(){
+        return static::$tablename;
+    }
+    
+
+
+    public static function getPrimaryColumn(){
+        return static::$primaryColumn;
+    }
+    
+
+
+
+    public function getPrimaryValues(){
+        $cols = array();
+        $result = array();
+        if(is_array(static::getPrimaryColumn())){
+            $cols = static::$primaryColumn;
+        }
+        else{
+            $cols = array(static::$primaryColumn);
+        }
+        
+        foreach($cols as $col){
+            $result[$col] = $this->$col;
+        }
+        
+        return $result;
+    }
+
+    public static function setTable($table){
+        static::$tablename = $table;
+    }
+    
+    public static function setPrimaryColumn($primaryColumn){
+        static::$primaryColumn = $primaryColumn;
+    }
 }

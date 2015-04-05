@@ -20,7 +20,7 @@ class EmailInput extends TextInput{
 	public function check(&$form = null){		
 		if(parent::check($form)){			
 			if(!empty($this->compare) && $form){			
-				if(	($form->data[$this->compare] != $this->value)) {
+				if(	($form->getData($this->compare) != $this->value)) {
 					$form->errors[$this->errorAt] = Lang::get("form.email-comparison");
 					return false;
 				}

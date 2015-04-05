@@ -12,52 +12,42 @@
  *
  **********************************************************************/
 class Lang{
-	const DEFAULT_LANGUAGE = 'fr';	
+	const DEFAULT_LANGUAGE = 'en';
 	public static $langs = array(); // This array contains all textdomains
 	
-	/*____________________________________________________________________
-                  
-                        Load a text domain
-    ____________________________________________________________________*/
-    public static function load($plugin, $filename, $once = false){		
-        if(!$once || !isset(self::$langs[$plugin])){			
-            $fullpath = $filename . '.' . self::DEFAULT_LANGUAGE . '.lang';
-			
-			// load the keys of the default language
-			$cache = new FileCache($fullpath, 'lang', 'php');
-			
-			if($cache->isCached()){
-				// Use the cache file to avoid to parse ini file
-				self::$langs[$plugin] = include $cache->get();
-			}			
-			else{
-				// Parse the ini file containing language keys
-				self::$langs[$plugin] = parse_ini_file($fullpath);
-				
-				// register the parsed file in cache
-				$cache->set('<?php return '.var_export(self::$langs[$plugin], true).";");				
+	/**
+	 * Load a language file 
+	 */
+	public static function load(){
+		$plugins = func_get_args();
+		
+		foreach($plugins as $plugin){
+			if(!isset(self::$langs[$plugin])){
+				/*
+				 * First Load the default language
+				 */
+				$defaultLangFile = CACHE_LANG_DIR . $plugin . '.' . self::DEFAULT_LANGUAGE . '.php';
+				if(NO_CACHE || !is_file($defaultLangFile)){
+					Language::getByTag(self::DEFAULT_LANGUAGE)->generateCacheFiles();
+				}
+
+				if(is_file($defaultLangFile)){
+					self::$langs[$plugin] = include $defaultLangFile;
+				}
+
+				if(LANGUAGE !== self::DEFAULT_LANGUAGE){
+					$langFile = CACHE_LANG_DIR . $plugin . '.' . LANGUAGE . '.php';
+
+					if(NO_CACHE || !is_file($langFile)){
+						Language::getByTag(LANGUAGE)->generateCacheFiles();
+					}
+
+					if(is_file($langFile)){
+						self::$langs[$plugin] = include $langFile;
+					}
+				}
 			}
-            if(LANGUAGE != self::DEFAULT_LANGUAGE){
-				// load the keys of the asked language
-				$fullpath = $filename . '.' . LANGUAGE . '.lang';
-				$cache = new FileCache($fullpath, 'lang', 'php');
-				if(basename($fullpath) == "global..php")
-					debug(LANGUAGE);
-				if($cache->isCached()){
-					// Use the cache file to avoid to parse ini file
-					$language = include $cache->get();
-					self::$langs[$plugin] = array_merge_recursive(self::$langs[$plugin], $language);
-				}
-				else{
-					// Parse the ini file containing language keys
-					$language = parse_ini_file($fullpath);
-				    self::$langs[$plugin] = array_merge_recursive(self::$langs[$plugin], $language);
-					
-					// Put the parsed array in the cache file
-					$cache->set('<?php return '.var_export($language, true).";");	
-				}
-            }
-        }
+		}
 	}
 	
 	
@@ -74,6 +64,10 @@ class Lang{
     ____________________________________________________________________*/
     public static function get($langKey, $param = array(), $number = 0){
 		list($plugin, $key) = explode('.', $langKey);
+
+		if(!isset(self::$langs[$plugin])){
+			self::load($plugin);
+		}
         
 		// get the label(s)
 		$labels = isset(self::$langs[$plugin][$key]) ? self::$langs[$plugin][$key] : null;
@@ -103,5 +97,18 @@ class Lang{
             return $langKey;
         }
     }
- 
+	
+	public static function addKeysToJavascript(){
+		$keys = func_get_args();
+		Widget::add(Router::getCurrentAction(), Controller::AFTER_ACTION, function($event) use($keys){
+			
+			$script = "";
+			foreach($keys as $key){
+				list($plugin, $langKey) = explode(".", $key);
+				$script .= "Lang.set('$key', '" . addcslashes(self::get($key), "'") . "');";
+			}
+			
+			pq("*:first")->before("<script type='text/javascript'> $script </script>");			
+		});		
+	}
 }

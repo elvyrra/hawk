@@ -15,57 +15,89 @@ class ItemList{
 	/*** Class constants ***/	
 	private $TEMPLATE_DIR;
 	
+	const DEFAULT_MODEL = 'GenericModel';
+	const ALL_LINES = 'all';
+	
+	/*** Instance default values ***/
+	public 	$controls = array(),
+			$fields = array(),
+			$searches = array(),
+			$sorts = array(),
+			$binds = array(),
+			$lines = 20,
+			$page = 1,
+			$checkbox = false,
+			$action,
+			$model = self::DEFAULT_MODEL,
+			$emptyMessage;
+	private $dbo;
+			
 	/*______________________________________________________________________
 	
 		CONTRUCTOR : INIT THE ATTRIBUTES AND THE DATA IN THE DATABASE
 	______________________________________________________________________*/
 	public function __construct($params){
-		/*** Default values ***/
-		$this->buttons = array();
-		$this->fields = array();
-		$this->emptyMessage = Lang::get('no-result', 'list');
-		$this->searches = array();
-        $this->sort = array();        
-        $this->linesNumber = 20;
-        $this->pageNumber = '1';
-		$this->filter = array();		
-		$this->file = $_SERVER['REQUEST_URI'];
-		$this->TEMPLATE_DIR = TEMPLATE_DIR ."/ItemList";
+		/*** Default values ***/		
+		$this->emptyMessage = Lang::get('main.list-no-result');
+		$this->action = $_SERVER['REQUEST_URI'];		
 		
 		/*** Get the values from the parameters array **/
 		foreach($params as $key => $value)
 			$this->$key = $value;
 		
-		/*** initialize buttons ***/
-		foreach($this->buttons as &$button){
+		$model = $this->model;
+		
+		
+		if(!isset($this->reference)){
+			$this->reference = $model::getPrimaryColumn();			
+		}
+		$this->refAlias = is_array($this->reference) ? reset($this->reference) : $this->reference;
+		$this->refField = is_array($this->reference) ? reset(array_keys($this->reference)) : $this->reference;
+		
+		$model::setPrimaryColumn($this->refField);
+		if(isset($this->table)){
+			$model::setTable($this->table);
+		}
+		// if($model === self::DEFAULT_MODEL){
+		// 	$model::setTable($this->table);
+		// 	$model::setPrimaryColumn($this->refField);
+		// }
+		
+		$this->dbo= DB::get($model::DBNAME);
+		$this->table = $model::getTable();
+		
+		/*** initialize controls ***/
+		foreach($this->controls as &$button){
 			switch($button['template']){				
 				case "refresh" :
 					$button = array(
 						"icon" => "refresh", 						
-						"onclick" => "page.lists['$this->id'].refresh();"
+						"onclick" => "mint.lists['$this->id'].refresh();"
 					);
 				break;
 			}
 		}
 		
-      	/*** Get the filters sent by POST ***/
-		if(isset($_POST['searches'])) $this->searches = json_decode($_POST['searches'],true);		
-        if(isset($_POST['sort'])) $this->sort = json_decode($_POST['sort'],true);        
-		if(isset($_POST['filter'])) $this->filter = json_decode($_POST['filter'],true);
-        if(isset($_POST['linesNumber'])) $this->linesNumber = $_POST['linesNumber'];
-        if(isset($_POST['pageNumber'])) $this->pageNumber = $_POST['pageNumber'];                
-        
-		/*** Set the default sort ****/
-		if(empty($this->sort) && $params['sort'])
-			$this->sort = $params['sort'];
+		/*** Get the filters sent by POST or registered in COOKIES ***/
+		$parameters = array('searches', 'sorts', 'lines', 'page');
+		$cookie = isset($_COOKIE["list-{$this->id}"]) ? json_decode($_COOKIE["list-$this->id"], true) : array();
 		
-		/*** Set the default search ***/
-		if(empty($this->search) && $params['search'])
-			$this->search = $params['search'];
+		foreach($parameters as $name){
+			if(isset($cookie[$name])){
+				$this->$name = $cookie[$name];
+			}
 			
-		/*** Set the number of the first result ***/
-		$this->start = ($this->pageNumber-1) * $this->linesNumber;  
-       
+			if(isset($_POST[$name])){
+				$this->$name = json_decode($_POST[$name],true);
+			}
+			
+			// to register in cookie the current filters
+			$cookie[$name] = $this->$name;
+		}
+		
+		// register the filters in cookie for future list call
+		setcookie("list-{$this->id}", json_encode($cookie), time() + 365 * 24 * 3600, '/');		
+        
 		/*______________________________________________________________________
 	
 					Get the data to display on the database
@@ -79,104 +111,141 @@ class ItemList{
 	_____________________________________________________________________*/
 	public function get(){		
 	    $this->displayedColumns = 0;
-		if(isset($_POST["set-$this->id"])){			
-	        $this->force = is_array($_POST["set-$this->id"]) ? $_POST["set-$this->id"] : array();
-	        $this->recordNumber = count($this->force);			
-				
-	        if($this->linesNumber != "all"){
-				if($this -> pageNumber > ceil($this->recordNumber / $this->linesNumber) && $this->pageNumber > 1){
-					$this -> pageNumber= (ceil($this->recordNumber / $this->linesNumber) > 0) ? ceil($this->recordNumber / $this->linesNumber) : 1;
-					$this -> start = ($this->pageNumber - 1) * $this->linesNumber;  
-				}
-	        	$this->results = array_slice($this->force, $this->start, $this->linesNumber);
-	        }
-			else
-				$this->results = $this->force;
-			
-			foreach($this->fields as $fieldId => &$field){
-				$field['search'] = false;
-				$field['sort'] = false;
-				if(!$field['hidden'] && !($_GET['print'] && $field['pdf']=== false)){
-					$this->displayedColumns ++;
-				}
-			}
-	        return true;
+		if(isset($_POST["set-$this->id"])){
+			$this->force = is_array($_POST["set-$this->id"]) ? $_POST["set-$this->id"] : array();
+	        return $this->getFromArray($this->force);
 	    }			
-	    elseif($this->database){
-			$fields = array();
-			$conditions = $this->condition ? array($this->condition) : array();		
-			$binds = !empty($this->binds) ? $this->binds : array();
-			$referenceAlias = preg_replace('/^\w+\.(\w+)$/', '$1', $this->reference);
-			
-			/*** Prepare the fields to research ***/
-			/* First, insert the reference if not in the fields **/
-			if($this->getFieldByName($this->reference) == null)
-				array_push($this->fields , array('field' => $this->reference, 'name' => $referenceAlias, "hidden" => true));
-
-			
-			foreach($this->fields as $fieldId => &$field){
-				if(!isset($field['field']))
-					$field['field'] = $field['name'];
-				if(!$field['independant']){					
-					if($field['field'] == $field['name'])
-						$fields[] = $field['field'];
-					else
-						$fields[$field['field']] = $field['name'];							
-				}
-				/*** Get the pattern condition ***/		
-				if($pattern = addslashes($this->searches[$field['name']])){
-					$key = uniqid();
-					$conditions[] = $field['field'] . " LIKE :$key";
-					$binds[$key] = "%$pattern%";
-				}
-
-				/*** Get the number of displayed columns ***/
-				if(!$field['hidden']){
-					$this->displayedColumns ++;
-				}
-			}
-			if(!empty($this->checkbox))
-				$this->displayedColumns++;
-
-			$condition = implode(" AND ",$conditions);			       		
-			try{
-				/** Get the number of records in the database **/      
-				$this->recordNumber = $this->database->count($this->table, $condition, $binds, "", $this->group);
-
-				/*** Get the number of the page ***/
-				if($this->linesNumber != "all")
-					if($this -> pageNumber > ceil($this->recordNumber / $this->linesNumber) && $this->pageNumber > 1){
-						$this -> pageNumber= (ceil($this->recordNumber / $this->linesNumber) > 0) ? ceil($this->recordNumber / $this->linesNumber) : 1;
-						$this -> start = ($this->pageNumber-1) * $this->linesNumber;  
-					}		
-
-				/*** Get the data from the database ***/
-				
-				$request = array(
-					"table" => $this->table,
-					"fields" => $fields,
-					'binds' => $binds,
-					"condition" => $condition,
-					"sort" => $this->sort,
-					"group" => $this->group,
-					"limit" => ($this->linesNumber === "all") ? "" : "$this->start, $this->linesNumber",
-					'index' => $referenceAlias
-				);
-
-				$this->results = $this->database->select($request);
-				return true;
-			}
-			catch(DatabaseException $e){
-				exit($e->getMessage());
-			}  
+	    else{
+			return $this->getFromDatabase();
 		}
-		else
-			return false;
+	}
+	
+	private function getFromDatabase(){
+		$fields = array();
+				
+		$where = array();
+		if(!empty($this->filter)){
+			if($this->filter instanceof DBExample){
+				$where[] = $this->filter->parse($this->binds);				
+			}
+			elseif(is_array($this->filter)){
+				$where[] = $this->filter[0];
+				$this->binds = $this->filter[1];
+			}
+			else{
+				$where[] = $this->filter;
+			}
+		} 		
+			
+		
+		/* insert the reference if not present in the fields **/
+		if(!isset($this->fields[$this->refAlias])){
+			$this->fields[$this->refAlias] = array(
+				'field' => $this->refField,
+				'hidden' => true
+			);
+		}
+		
+		/*** Prepare the fields to research ***/
+		$searches = array();
+		foreach($this->fields as $name => &$field){
+			if(!$field['independant']){
+				if(!isset($field['field'])){
+					$field['field'] = $name;
+				}
+				$fields[$this->dbo->formatField($field['field'])] = $this->dbo->formatField($name);
+				
+				/*** Get the pattern condition ***/			
+				if($pattern = $this->searches[$name]){
+					$where[] = DBExample::make(array($field['field'] => array('$like' => "%$pattern%")), $this->binds);
+				}	
+			}
+
+			/*** Get the number of displayed columns ***/
+			if(!$field['hidden']){
+				$this->displayedColumns ++;
+			}
+		}
+		if($this->checkbox){
+			$this->displayedColumns++;
+		}
+
+		try{
+			$where = implode(" AND ", $where);
+			$model = $this->model;			
+			$this->recordNumber = $this->dbo->count($this->table, $where, $this->binds, $this->refField, $this->group);
+			
+			/*** Get the number of the page ***/
+			if($this->lines == self::ALL_LINES){
+				$this->lines = $this->recordNumber;
+			}
+			if($this->page > ceil($this->recordNumber / $this->lines) && $this->page > 1){
+				$this->page= (ceil($this->recordNumber / $this->lines) > 0) ? ceil($this->recordNumber / $this->lines) : 1;					
+			}
+			$this->start = ($this->page-1) * $this->lines;  
+
+			/*** Get the data from the database ***/
+			$request = array(
+				'fields' => $fields,
+				'from' => $this->table,
+				'where' => $where,
+				'binds' => $this->binds,
+				'orderby' => $this->sort,
+				'group' => $this->group,
+				'limit' => "$this->start, $this->lines",
+				'index' => $this->refAlias,
+				'return' => $this->model
+			);
+
+			$this->results = $this->dbo->select($request);
+			
+			return true;
+		}
+		catch(DatabaseException $e){
+			exit(DEBUG_MODE ? $e->getMessage() : Lang::get('main.list-error'));
+		}  
+	}
+	
+	/**
+	 * Get the data of the list from a given array
+	 */
+	private function getFromArray($data){
+		foreach($this->fields as $name => &$field){
+			if(!$field['hidden']){
+				$this->displayedColumns ++;
+			}
+			
+			if($pattern = $this->searches[$name]){
+				$data = array_filter($data, function($line) use($pattern, $name){
+					return stripos($line[$name], $pattern) !== false;
+				});
+			}
+			
+			if($sort = $this->sorts[$name]){				 
+				usort($data, function($a, $b) use($sort, $name){
+					if($sort > 0){
+						return $a[$name] < $b[$name];
+					}
+					else{
+						return $b[$name] < $a[$name];
+					}
+				});
+			}
+		}
+				
+		$this->recordNumber = count($data);			
+		
+		if($this->page > ceil($this->recordNumber / $this->lines) && $this->page > 1){
+			$this->page = (ceil($this->recordNumber / $this->lines) > 0) ? ceil($this->recordNumber / $this->lines) : 1;				
+		}
+		$this->start = ($this->page - 1) * $this->lines;  
+		$this->results = array_slice(array_map(function($line){ return (object)$line; }, $data), $this->start, $this->lines);
+		
+		return true;
 	}
 	
 	public function set($data){
-		$_POST["set-$this->id"] = $data;
-		$this->get();
+		$this->getFromArray($data);
 	}
 	
 	/*_____________________________________________________________________
@@ -185,39 +254,54 @@ class ItemList{
 	_____________________________________________________________________*/
 	public function __toString(){
 		// get the total number of pages
-        $pages = (ceil($this->recordNumber / $this->linesNumber) > 0) ? ceil($this->recordNumber / $this->linesNumber) : 1;
+        $pages = (ceil($this->recordNumber / $this->lines) > 0) ? ceil($this->recordNumber / $this->lines) : 1;
 		
 		/*** At least one result to display ***/
 		$display = array();
+		$param = array();
 		if(is_array($this->results)){
 			foreach($this->results as $id => $line){
 				$display[$id] = array();
-				foreach($this->fields as $field){
-					$name = $field['name'];
+				$param[$id] = array();
+
+				if($this->selected == $id){
+					$param[$id]['class'] = 'selected ';
+				}
+				if($this->lineClass){
+					$function = $this->lineClass;
+					$param[$id]['class'] .= $function($line);
+				}
+
+				foreach($this->fields as $name => $field){
 					$display[$id][$name] = array();
 
-					foreach(array("title", "onclick", "style", 'unit', 'class', 'display') as $prop){
+					foreach(array('title', 'href', 'onclick', 'style', 'unit', 'class', 'display', 'target') as $prop){
 						if(isset($field[$prop])){
-							if(is_callable($field[$prop]))
-								$field[$prop] = $field[$prop]($line[$field['name']], $field, $line);
-
+							if(is_callable($field[$prop])){
+								$field[$prop] = $field[$prop]($line->$name, $field, $line);
+							}
 							$display[$id][$name][$prop] = $field[$prop];
 						}						
 					}
-					$display[$id][$name]['class'] .= " list-cell-$this->id-{$field['name']} ".
-							(isset($field['onclick']) ? " list-cell-clickable " : "").
-							(isset($this->selected) && $this->selected !== false && $this->selected == $id  ? " ui-state-active " : "");
+					$display[$id][$name]['class'] .= " list-cell-$this->id-$name ";
+					if(isset($field['onclick']) || isset($field['href'])){
+						$display[$id][$name]['class'] .= " list-cell-clickable";
+					}							 
 							
-					if($field['hidden'])
+					if($field['hidden']){
 						$display[$id][$name]['style'] = 'display:none';
-					if(!isset($display[$id][$name]['display']))
-						$display[$id][$name]['display'] = $line[$field['name']];
+					}
+						
+					if(!isset($display[$id][$name]['display'])){
+						$display[$id][$name]['display'] = $line->$name;
+					}
 				}
 			}
 		}
-		return View::makestr(ThemeManager::getView("item-list.tpl"), array(			
+		return View::make(Plugin::get('main')->getView("item-list.tpl"), array(			
 			'list' => $this,
 			'display' => $display,
+			'linesParameters' => $param,
 			'pages' => $pages
 		));		
 	}	

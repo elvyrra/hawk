@@ -18,7 +18,7 @@ class Request{
     }
     
     public static function clientIp(){
-        if ($_SERVER['HTTP_X_FORWARDED_FOR']){        
+        if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
             // L'utilisateur est derrière un proxy qui accepte le header HTTP_X_FORWARDED_FOR
             if ( ! preg_match('![0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}!', $_SERVER['HTTP_X_FORWARDED_FOR']) ){
                 // Le format renvoyé par HTTP_X_FORWARDED_FOR n'est pas correct

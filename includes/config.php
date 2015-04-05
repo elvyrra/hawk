@@ -27,11 +27,14 @@ if(defined('CONFIG_MODE') && CONFIG_MODE){
 	include ROOT_DIR . 'config/' . CONFIG_MODE . '.php';
 }
 
-if(!defined('DEBUG_MODE'))
+if(!defined('DEBUG_MODE')){
 	define('DEBUG_MODE', false);
+}
 
-if(!defined('DEV_MODE'))
+if(!defined('DEV_MODE')){
 	define('DEV_MODE', false);
+}
 
-if(!defined('APP_VERSION'))
+if(!defined('APP_VERSION')){
 	define('APP_VERSION', '0.1');
+}

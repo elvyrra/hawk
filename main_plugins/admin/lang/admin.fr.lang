@@ -1,7 +1,0 @@
-settings-page-name = "Paramètres de l'application"
-settings-page-description = "Définissez ici les paramètres principaux du fonctionnement de votre application"
-
-settings-main-legend = "Configuration générale"
-settings-title-label = "Titre de l'application"
-settings-language-label = "Langue"
-settings-timezone-label = "Fuseau horaire"

@@ -22,7 +22,7 @@ class Session{
 		if(empty($_SESSION['user']['id'])){
 			$_SESSION['user']['id'] = 0;
 		}
-		self::$user = UserModel::getById($_SESSION['user']['id']);
+		self::$user = User::getById($_SESSION['user']['id']);
 		return self::$user;
 	}
 	
@@ -48,6 +48,10 @@ class Session{
 			self::$logged = self::getUser() && self::getUser()->isConnected();
 		}
 		return self::$logged;
+	}
+
+	public static function isAllowed($action){
+		return self::getUser()->isAllowed($action);
 	}
 }
 

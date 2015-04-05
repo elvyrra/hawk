@@ -11,15 +11,18 @@
  *
  *
  **********************************************************************/
-class FileInput extends Input{	
+class FileInput extends FormInput{	
 	const TYPE = "file";
 	const INDEPENDANT = true;
+
+	public 	$multiple = false;
 	
 	public function check(&$form = null){
 		if(empty($this->errorAt))
 			$this->errorAt = $this->name;
-			
-		if($this->required && empty($_FILES[$this->name])){
+		
+		$basename = preg_replace("/^(\w+)(\[.*)?$/", "$1", $this->name);
+		if($this->required && empty($_FILES[$basename])){
 			$form->errors[$this->errorAt] = Lang::get('form.required-field');
 			return false;
 		}

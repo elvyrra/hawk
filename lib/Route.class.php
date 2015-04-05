@@ -13,6 +13,7 @@
  **********************************************************************/
 class Route{
 	private $data = array();
+	private $auth = array();
 	
 	public function __construct($url, $param){
 		$this->url = $url;
@@ -22,17 +23,18 @@ class Route{
 		
 		$this->args = array();
 		$this->originalUrl = $this->url;		
-		$this->url = preg_replace_callback("/\{(\w+)\}/", function($match){
+		$this->url = preg_replace_callback("/\{(\w+)\}/", function($match){			
 			$this->args[] = $match[1];
-			return "(" . $this->where[$match[1]] . ")";
+			$where = $this->where[$match[1]] ? $this->where[$match[1]] : '.*?';
+			return "(" . $where . ")";
 		}, $this->url);
 	}
 	
 	public function match($uri){
 		if(preg_match("~^{$this->url}/?$~i", $uri, $m)){
-			// The URL match, let's test the filters to access this URL are OK				
+			// The URL match, let's test the filters to access this URL are OK					
 			foreach(array_slice($m, 1) as $i => $var){
-				$this->setData($this->args[$i - 1], $var);
+				$this->setData($this->args[$i], $var);
 			}				
 			return true;
 				
@@ -49,5 +51,18 @@ class Route{
 	
 	public function setData($key, $value){
 		$this->data[$key] = $value;
+	}
+	
+	public function getAction(){
+		return $this->action;
+	}
+	
+	public function isAuthValid(){
+		foreach($this->auth as $auth){
+			if(!$auth){
+				return false;
+			}				
+		}	
+		return true;
 	}
 }

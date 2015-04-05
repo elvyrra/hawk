@@ -21,6 +21,10 @@ class Response{
         header("Content-type: application/javascript");
         self::$type = 'script';
     }
+
+    public static function getType(){
+        return self::$type;
+    }
       
     
 	public static function end(){
@@ -31,7 +35,7 @@ class Response{
             default :
                 echo self::$content;
             break;
-        }
+        }		
         exit;
     }
 	

@@ -11,7 +11,7 @@
  *
  *
  **********************************************************************/
-class HtmlInput extends Input{
+class HtmlInput extends FormInput{
 	const TYPE = 'html';
 	const INDEPENDANT = true;
 	const NO_LABEL = true;
@@ -20,6 +20,6 @@ class HtmlInput extends Input{
 		return true;
 	}
 	
-	public function dbvalue($data,$format){ return;}
+	public function dbvalue($data,$format){ return $data;}
 }
 /******************* (C) COPYRIGHT 2014 ELVYRRA SAS *********************/

@@ -11,17 +11,11 @@
  *
  *
  **********************************************************************/
-class IntegerInput extends NumberInput{	
-	public function check(&$form = null){				
-		if(parent::check($form)){
-			if(!empty($this->value) && !preg_match('/^\d*$/',$this->value)){
-				$form->errors[$this->errorAt] = Lang::get('form.integer-format');
-				return false;
-			}			
-			return true;
-		}	
-		else
-			return false;
+class IntegerInput extends NumberInput{
+	public function __construct($param){
+		parent::__construct($param);
+		
+		$this->pattern = "^\d*$";
 	}
 	
 	public function dbvalue(){

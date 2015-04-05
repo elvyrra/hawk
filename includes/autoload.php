@@ -2,9 +2,15 @@
 class Autoload{
     private static $cache = array();
     private static $cacheFile;
-    
-    public static function load($classname){
-        self::$cacheFile = CACHE_DIR . 'autoload-cache.php';
+	
+	public static function load($classname){
+		$definedClasses = include __DIR__ . "/autoload-predefined.php";
+		if(isset($definedClasses[$classname])){
+			include $definedClasses[$classname];
+			return true;
+		}
+		
+        self::$cacheFile = CACHE_DIR . 'autoload-cache.php';		
         
         if(is_file(self::$cacheFile) && empty(self::$cache)){
             self::$cache = include self::$cacheFile;            
@@ -17,7 +23,6 @@ class Autoload{
         $extensions = array(
             'Controller' => '.ctrl.php',
             'Widget' => '.widget.php',
-            'Model' => '.model.php',        
         );
         
         if(preg_match('/^(\w+)(' . implode('|', array_keys($extensions)) . ')$/', $classname, $match)){

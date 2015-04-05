@@ -5,6 +5,11 @@ class ViewPluginText extends ViewPlugin{
         $data = $this->params;
         unset($data['key']);
         
-        return Lang::get($this->key, $data, $this->number);
+        if(empty($this->number)){
+        	return Lang::get($this->key, $data);	
+        }
+        else{
+        	return Lang::get($this->key, $data, $this->number);
+        }
     }
 }

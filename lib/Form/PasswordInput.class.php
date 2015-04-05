@@ -11,9 +11,13 @@
  *
  *
  **********************************************************************/
-class PasswordInput extends Input{
+class PasswordInput extends FormInput{
 	const TYPE = "password";
 	
+	public 	$get = false,
+			$decrypt = false,
+			$encrypt = false;
+			
 	public function __construct($param){
 		parent::__construct($param);
 		$this->pattern = "^.{6,}$";
@@ -29,24 +33,30 @@ class PasswordInput extends Input{
 		if(parent::check($form)){
 			// Check the confirmation password
 			if(!empty($this->compare) && $form){			
-				if(	$this->value != $form->data[$this->compare]){
+				if(	$this->value != $form->getData($this->compare)){
 					$form->errors[$this->errorAt] = Lang::get('form.password-comparison');
 					return false;
 				}
 			}
 			// Check the password value in the database
 			elseif(!empty($this->value) && $this->check && $form){
-			    $check_field = is_boolean($this->check) ? $this->field : $this->check;
+			    $checkField = is_boolean($this->check) ? $this->field : $this->check;
 				
-				if(!$form->database->count($form->table, $form->condition . " AND $check_field = :$check_field", array_merge($form->binds, array($check_field => $this->dbvalue())))){
+				$example = new DBExample(array(
+					$form->reference,
+					$checkField => $this->dbvalue()
+				));
+				$model = $form->model;
+				if($model::getByExample($example)){
 					$form->errors[$this->errorAt] = Lang::get('form.invalid-password');
 					return false;
 				}		
 			}
 			return true;
 		}
-		else
+		else{
 			return false;
+		}
 	}
 	
 	public function dbvalue(){		

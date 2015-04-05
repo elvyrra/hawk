@@ -8,11 +8,11 @@ class EventManager{
     public static function on($name, $action, $order = self::ORDER_LAST ){
         switch($order){
             case self::ORDER_FIRST:
-                $key = min(array_keys(self::$events[$name])) - 1;
+                $key = empty(self::$events[$name]) ? 0 : min(array_keys(self::$events[$name])) - 1;
                 break;
         
             case self::ORDER_LAST :
-                $key = max(array_keys(self::$events[$name])) + 1;
+                $key = empty(self::$events[$name]) ? 1 : max(array_keys(self::$events[$name])) + 1;
                 break;
             
             default :
@@ -29,7 +29,7 @@ class EventManager{
         $name = $event->getName();
         if(isset(self::$events[$name])){
             ksort(self::$events[$name]);
-            foreach(self::$events[$name] as $action){
+            foreach(self::$events[$name] as $action){				
                 $action($event);
             }
         }

@@ -16,8 +16,6 @@ class View{
 	private $file, $content, $data, $type;
 	private $cached = false;
 	
-	const CACHE_NO_USE = false;
-	const CACHE_USE = true;
 	const PLUGINS_VIEW = 'view-plugins/';
 	
 	/*_______________________________________________________
@@ -26,7 +24,10 @@ class View{
 	    @param : 
 	        o string $selector : HTML code or filename to load a template
 	_______________________________________________________*/
-	public function __construct($file, $cache = self::CACHE_USE){
+	public function __construct($file, $cache = null){
+		if($cache === null){
+			$cache = !NO_CACHE;
+		}
 		/*** The selector can be a filename or a plain/html text ***/
 		if(!is_file($file)){
 			throw new ViewException(ViewException::TYPE_FILE_NOT_FOUND, $file);
@@ -101,7 +102,7 @@ class View{
 		
 		// Parse plugins nodes		
 		$pattern = "#\{(\w+)((\s+\w+\=(['\"])(.*?)\\4)*)\s*\}#";
-		$this->phpcode = preg_replace_callback($pattern, function($matches){
+		$this->phpcode = preg_replace_callback($pattern, function($matches){			
 			$component = $matches[1];
 			
 			try{			
@@ -140,7 +141,7 @@ class View{
 		return ob_get_clean();
 	}	
 	
-	public static function make($file, $data = array(), $cache = self::CACHE_USE ){
+	public static function make($file, $data = array(), $cache = null ){
 		$view = new self($file, $cache);
 		$view->set($data);
 		return $view->display();

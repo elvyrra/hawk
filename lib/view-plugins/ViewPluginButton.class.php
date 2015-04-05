@@ -1,6 +1,13 @@
 <?php
 
 class ViewPluginButton extends ViewPlugin{
+	public function __construct($params = array()){
+		if(isset($params['data'])){
+			$params = $params['data'];
+		}
+		parent::__construct($params);
+	}
+	
 	public function display(){
 		return View::make(ThemeManager::getSelected()->getView('button.tpl'), array(
 			'class' => $this->class,

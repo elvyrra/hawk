@@ -1,9 +1,19 @@
-<Files ./conf.json>
-	Order Allow,Deny
-	Deny from all
-</Files>
+<FilesMatch "^.*\.(php|tpl|json)$">
+  	Order  allow,deny
+  	Deny   from All	
+</FilesMatch>
+
+<FilesMatch "^index\.php$">
+  	Order  allow,deny
+  	Allow   from All	
+</FilesMatch>
+
+AuthName "Mint"
+AuthType Basic
+AuthUserFile /var/www/beaver/.htpasswd
+Require valid-user
 
 RewriteEngine on
-
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.*)$ index.php [L]
+

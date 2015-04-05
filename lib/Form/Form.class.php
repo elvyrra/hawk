@@ -11,7 +11,6 @@
  *
  *
  **********************************************************************/
-
 class Form{
     const DEFAULT_TYPE = "text";
 	const NO_CHECK = false;
@@ -25,105 +24,42 @@ class Form{
 	
 	const STATUS_SUCCESS = 'success';
 	const STATUS_ERROR = 'error';
+	const STATUS_CHECK_ERROR = 'check-error';
+	
+	const HTTP_CODE_SUCCESS = 200;
+	const HTTP_CODE_CHECK_ERROR = 412;
+	const HTTP_CODE_ERROR = 424;
 	
 	const ACTION_REGISTER = 'register';
 	const ACTION_DELETE = 'delete';
+
+	const DEFAULT_MODEL = "GenericModel";
 	
-	// Default properties values 
-	public $method = 'post';
-	public $ajax = true;
-	public $returns = array(), $errors = array();
-	public $dbaction = self::ACTION_REGISTER;
+	// Default properties values
+	public	$type = 'json',
+			$method = 'post',
+			$model = self::DEFAULT_MODEL,
+			$labelWidth = '150px',
+			$status = null,
+			$columns = 1,
+			$ajax = true,
+			$binds = array(),
+			$returns = array(),
+			$errors = array(),
+			$class = '',			
+			$target = '',
+			$autocomplete = true,
+			$title = '',
+			$enctype = '',
+			$fields = array(),
+			$dbaction = self::ACTION_REGISTER;
+	private $example = null;
 	
-	/*
-     * 
-     * Constructeur. Le constructeur prend en paramètre un tableau de données pour construire le formulaire.
-     * Le tableau de paramètres contient les données suivantes :
-     * id => le nom du formulaire (apprataîtra dans l'attribut id)
-     * method => 'get' ou 'post'
-	 * type => 'json', 'ajax', 'raw', default 'json'
-	 * columns
-     * action
-     * enctype (optionnel) : pour les formulaires d'upload
-     * database : instance de base de données MySQLClient
-     * table : table ou jointure de tables concernées par le formulaire
-     * reference : Permet de définir l'élément de la base à traiter, sous la forme array('field1' => 'value1', 'field2' => 'value2')
-     * autoincrement : Si true, alors la clé primaire sera auto incrémentée (uniquement pour MongoDB)     
-	 * onadd : Callback exécuté si l'ajout de l'élément réussit
-	 * onupdate : callback exécuté si la mise à jour de l'élément réussit
-	 * ondelete : callback exécuté si la suppression de l'élément réussit	 
-     * fieldsets : un tableau contenant les paramètres des champs du formulaire, découpés dans les fielsets du formulaire	 
-     * 
-     * Le champs fields a la structure suivante :
-     * 'fieldsets' => array(
-     *      'fieldset1' => array(
-     *          'legend' => "Identité de l'utilisateur",
-     *          'nofieldset' => true, // si true, n'affiche pas le fieldset, default false         
-     *          'fields' => array
-     *              'name1' => array(
-     *                  'field' => 'surname',
-     *                  'type' => '{text|select|textarea|checkbox|radio|password|...}',
-     *                  'label' => 'Nom',
-     *                  'pattern' => '{regex à respecter, optionnel}',
-     *                  'required' => {true|false},
-     *                  'readonly' => {true|false},
-     *                  'disabled' => {true|false},
-     *                  'placeholder' => 'Tapez votre nom',
-     *                  'maxlength' => 100,
-     *                  'title' => 'Le nom de l\'utilisateur',
-     *                  'errorAt' => 'name2', // le champ sur lequel l'erreur doit être affichée si mal saisie (pour le cas des input hiddens par exemple),
-     *                  'before' => 'html à afficher avant le champ',
-     *                  'after' => 'html à afficher après le champ',
-     *                  'nl' => true | false, // Indique si on insère le champ dans une nouvelle ligne, default true,
-     *                  'displayed' => true | false, // indique si le champ doit êter affiché ou non, default true
-     *                  'independant' => true | false, // indique si le champ est indépendant de la base de données (récupéré depuis un variable par exemple), default false
-     *                  'insert' => true | false, // indique si le champ doit être inséré en base (false par exemple dans le cas d'un CONCAT), default true
-     *                  'default' => valeur par défaut du champ, par exemple pour les formulaire de nouvel élément, pas encore rempli
-     *              ),
-     *          ...
-     *          )
-     *      ),
-     * 
-     *      'fieldset2 => array( 
-     *          ...
-     *      ),
-     * 
-     *      'submits' => array(
-     *          'fields' => array(
-     *              'valid' => array(
-     *                  'field' => 'valid',
-     *                  'type' => 'submit',
-     *                  'value' => 'Enregistrer'
-     *              ),
-     *          
-     *              'cancel' => array(
-     *                  'field' => 'cancel',
-     *                  'type' => 'button', 
-     *                  'onclick' => "location='../'",
-     *                  'value' => 'Annuler'
-     *              ),
-     * 
-     *              'delete' => array(
-     *                  'field' => 'delete',
-     *                  'type' => 'delete',
-     *                  '
-     *              ),
-     *          )
-     *      )
-     *  )
-     */
 	public function __construct($param){
 		/*
 		 * Default values
 		 */
-		$this->type = "json";
-		$this->method = "post";
-		$this->action = $_SERVER['REQUEST_URI'];
-		$this->status = null;
-		$this->columns = 1;
-		$this->labelWidth = '150px';
-		$this->binds = array();
-		$this->database = DB::get(MAINDB);
+		$this->action = $_SERVER['REQUEST_URI'];		
 				
         Lang::load('form', Plugin::get('main')->getLangDir().'form');	
 		
@@ -131,125 +67,191 @@ class Form{
         foreach($param as $key => $value){
             $this->$key = $value;
         }
-        
-		if(!empty($this->reference)){
-			$this->condition = $this->database->parse($this->reference, $this->binds);			
-		}
 		
-		if(!isset($this->new))
-			$this->new = empty($this->binds) || empty($this->table) || !$this->database->count($this->table, $this->condition, $this->binds);
-        
-        // Get the fields in the "fields" instance property, and add the default values for the fieldsets and fields
-        $this->fields = array();
-		$this->aliases = array();
-        foreach($this->fieldsets as $name => &$fieldset){            
-            if($name == '_submits')
-				// The fieldset containint the submit buttons does'nt have a fieldset tag                
-                $fieldset['nofieldset'] = true;
-				
-			foreach($fieldset as $key => &$field){
-				if($field instanceof Input){									
-					if(defined(get_class($field).'::INDEPENDANT')){
-						// This field is independant from the database
-						$field->independant = true;
-					}
-					
-					if(defined(get_class($field).'::NO_LABEL')){                    
-						// This field cannot have any label
-						unset($field->label);
-					}
-					
-					$labelWidth = $this->labelWidth;
-					if(isset($fieldset['labelWidth']))
-						$labelWidth = $fieldset['labelWidth'];
-					if(isset($field->labelWidth))
-						$labelWidth = $field->labelWidth;
-					$field->labelWidth = $labelWidth;
-					
-					if($name == '_submits' && !isset($field->nl))                    
-						// A field in this fieldset cannot return to the new line
-						$field->nl = false;
+		if(isset($this->model) && isset($this->reference)){
+			$model = $this->model;				
+			$this->example = new DBExample($this->reference);
+			$this->object = $model::getByExample($this->example);				
+		}
+		else{
+			$this->object = null;
+		}		
+
+		$this->new = $this->object === null;
+		
+
+		// Get the fields in the "fields" instance property, and add the default values for the fieldsets and fields
+		$this->groups = $this->fieldsets;
+		$this->fieldsets = array();
+        if(!empty($this->groups)){
+	        foreach($this->groups as $name => &$fieldset){
+	            $inputs = array();
+	            $params = array();
+	            foreach($fieldset as $key => &$field){
+					if($field instanceof FormInput){									
+						if(defined(get_class($field).'::INDEPENDANT')){
+							// This field is independant from the database
+							$field->independant = true;
+						}
 						
-					$this->fields[$field->name] = &$field;
-					$this->aliases[$field->field] = $field->name;
-				}
-            }            
+						if(defined(get_class($field).'::NO_LABEL')){                    
+							// This field cannot have any label
+							unset($field->label);
+						}
+						
+						$labelWidth = $this->labelWidth;
+						if(isset($fieldset['labelWidth'])){
+							$labelWidth = $fieldset['labelWidth'];
+						}
+						if(isset($field->labelWidth)){
+							$labelWidth = $field->labelWidth;
+						}
+						$field->labelWidth = $labelWidth;
+						
+						if($name == '_submits' && !isset($field->nl)){                   
+							// A field in this fieldset cannot return to the new line
+							$field->nl = false;
+						}
+							
+						$this->fields[$field->name] = &$field;					
+						$inputs[$field->name] = &$field;
+					}
+					else{
+						$params[$key] = $field;
+					}
+	            }
+	            $this->fieldsets[$name] = new FormFieldset($this, $name, $inputs, $params);
+	        }
         }
-        
 		// get the data of the form to display or register
         $this->reload();		
 	}
 	
-	/*
-	 * Prototype: public function get(){
-	 * Description : Get the data of the form, from database or post or get
-	 */
-	public function get($database = false){
-		$result = array();
-		if(! $this->submitted() || $database){            
-			// No data was submitted, we get the data in the database
-			
-			foreach($this->fields as $alias => $field){					
-				if(isset($field->default))
-					$result[$field->name] = $field->default;					
-			}				
-            
-            if(!$this->new){
-				// The form is related to an existing element, we get the data from the database
-                $fields = array();
-                foreach($this->fields as $alias => $field){                    
-                    if(!$field->independant)
-                        $fields[$field->field] = $field->name;
-                }
-                $result = array_merge($result, $this->database->select(array(
-                    'table' => $this->table,
-                    'condition' => $this->condition,
-					'binds' => $this->binds,
-					'group' => $this->group,
-                    'fields' => $fields,
-                    'one' => true
-                )));
-            }
-        }
-        else{
-            // Le formulaire a été soumis, on récupère les données envoyées par GET ou POST
-            $entry = $this->method == 'get' ? $_GET : $_POST;
-            foreach($this->fields as $field){
-				if(! $field instanceof ButtonInput)
-					$result[$field->name] = $entry[$field->name];
-            }
-        }		
-		return $result;
-	}
-	
-	public function getData($prop = ""){
-		return $prop ? $this->data[$prop] : $this->data;
-	}
-	
-	/*
-	 * Prototype: public function set($field, $value)
-	 * Description: Force the value of a field in the form
-	 */
-	public function set($data, $prefix = null){
-		foreach($data as $key => $value){
-			$field = $prefix ? $prefix."[$key]" : $key;
-			if(isset($this->fields[$field])){
-				$this->fields[$field]->set($value);
-				$this->data[$field] = $value;
+	public function getFromInput(){		
+		$input = file_get_contents("php://input");
+		if(!empty($input)){
+			preg_match("/^(\-{6}\w+)/i", $input, $m);
+			$boundary = $m[1];
+			$input = str_replace($boundary . '--', '', $input);
+			$data = preg_split('/'.$boundary.'\r?\n/is', $input, -1, PREG_SPLIT_NO_EMPTY);
+			$_POST = array();
+			$_FILES = array();
+			foreach($data as $field){			
+				if(preg_match('/^Content\-Disposition\: form\-data; name="(.+?)"; filename="(.+)"\r?\nContent\-Type: (.+?)\r?\n\r?\n(.*?)\r?\n$/is', $field, $match)){								
+					$name = $match[1];
+					$filename = $match[2];
+					$mime = $match[3];
+					$content = $match[4];
+					$tmpname = uniqid('/tmp/');
+					file_put_contents($tmpname, $content);
+					if(preg_match('/^(\w+)\[(.*)\]$/', $name, $m)){
+						if(!isset($_FILES[$m[1]]))
+							$_FILES[$m[1]] = array();
+						if(empty($m[2])){
+							$_FILES[$m[1]]['name'][] = $filename;
+							$_FILES[$m[1]]['type'][] = $mime;
+							$_FILES[$m[1]]['tmp_name'][] = $tmpname;
+							$_FILES[$m[1]]['error'][] = UPLOAD_ERR_OK;
+							$_FILES[$m[1]]['size'][] = filesize($tmpname);
+						}
+						else{
+							$_FILES[$m[1]]['name'][$m[2]] = $filename;
+							$_FILES[$m[1]]['type'][$m[2]] = $mime;
+							$_FILES[$m[1]]['tmp_name'][$m[2]] = $tmpname;
+							$_FILES[$m[1]]['error'][$m[2]] = UPLOAD_ERR_OK;
+							$_FILES[$m[1]]['size'][$m[2]] = filesize($tmpname);
+						}
+					}
+					else{
+						$_FILES[$name]['name'] = $filename;
+						$_FILES[$name]['type'] = $mime;
+						$_FILES[$name]['tmp_name'] = $tmpname;
+						$_FILES[$name]['error'] = UPLOAD_ERR_OK;
+						$_FILES[$name]['size'] = filesize($tmpname);
+					}
+				}
+				elseif(preg_match('/^Content\-Disposition\: form\-data; name="(.+?)"\r?\n\r?\n(.*?)\r?\n$/is', $field, $match)){				
+					$name = $match[1];
+					$value = $match[2];				
+					if(preg_match('/^(\w+)\[(.*)\]$/', $name, $m)){
+						if(!isset($_POST[$m[1]]))
+							$_POST[$m[1]] = array();
+						if(empty($m[2])){
+							$_POST[$m[1]][] = $value;
+						}
+						else{
+							$_POST[$m[1]][$m[2]] = $value;
+						}
+					}
+					else{
+						$_POST[$name] = $value;
+					}
+				}
 			}
-			elseif(is_array($value)){
-				$this->set($value, $field);
-			}
-			
-		}	
+		}
 	}
 	
 	/*
 	 * Prototype: public function reload()
 	 * Description: Reload the data of the form
 	 */
-	public function reload(){
-        $this->set($this->get());
+	public function reload($database = false, $data = array()){
+        if($this->upload){
+			$this->getFromInput();
+		}
+		
+		// Set default value
+		$data = array();
+		foreach($this->fields as $name => $field){					
+			if(isset($field->default)){
+				$data[$name] = $field->default;
+			}
+
+			if(!$this->submitted() && isset($this->object->$name)){
+				$data[$name] = $this->object->$name;
+			}			
+		}
+
+		if($this->submitted()){
+			$entry = $this->method == 'get' ? $_GET : $_POST;
+			foreach($entry as $name => $value){
+				$data[$name] = $value;				
+			}
+		}
+
+		// Set the value in all inputs instances		
+		$this->set($data);		
+	}
+	
+	/*
+	 * Prototype: public function set($field, $value)
+	 * Description: Force the value of a field in the form
+	 */
+	public function set($data, $prefix = ''){
+		foreach($data as $key => $value){
+			$field = $prefix ? $prefix."[$key]" : $key;
+			if(isset($this->fields[$field])){
+				$this->fields[$field]->set($value);				
+			}
+			elseif(is_array($value)){
+				$this->set($value, $field);
+			}
+			
+		}
+	}
+	
+	public function getData($name = null){
+		if($name){
+			return $this->fields[$name]->value;
+		}
+		else{
+			$result = array();
+			foreach($this->fields as $name => $field){
+				$result[$name] = $field->value;
+			}
+			
+			return $result;
+		}
 	}
 	
 	/*
@@ -258,16 +260,16 @@ class Form{
 	 */
 	public function addInput($fieldset, $input){
 		$labelWidth = $this->labelWidth;
-		if(isset($this->fieldsets[$fieldset]['labelWidth']))
-			$labelWidth = $this->fieldsets[$fieldset]['labelWidth'];
-		if(isset($input->labelWidth))
+		if(isset($this->fieldsets[$fieldset]->labelWidth)){
+			$labelWidth = $this->fieldsets[$fieldset]->labelWidth;
+		}
+		if(isset($input->labelWidth)){
 			$labelWidth = $input->labelWidth;
+		}
 		$input->labelWidth = $labelWidth;
-					
-		$this->fieldsets[$fieldset][] = $input;
-		$id = array_search($input, $this->fieldsets[$fieldset]);
-		$this->fields[$input->name] = &$this->fieldsets[$fieldset][$id];
-		$this->aliases[$input->field] = $input->name;
+
+		$this->fieldsets[$fieldset]->inputs[$input->name] = $input;		
+		$this->fields[$input->name] = &$input;
 	}
 	
 	
@@ -276,8 +278,11 @@ class Form{
      * Description : Détermine si le formulaire a été soumis ou non
      */
     public function submitted(){
+    	if(Request::method() == "delete"){
+    		return self::ACTION_DELETE;
+    	}
         $entry = $this->method == 'get' ? $_GET : $_POST;
-		return isset($entry['_FORM_ACTION_']) ? $entry['_FORM_ACTION_'] : false;        
+		return isset($entry['_FORM_ACTION_']) ? $entry['_FORM_ACTION_'] : null;        
     }  
 	
 	/*
@@ -287,7 +292,7 @@ class Form{
 	 * @return : string
 	 */
 	public function wrap($content){
-		return View::make(ThemeManager::getSelected()->getView('form/form.tpl'), array(
+		return View::make(Plugin::get('main')->getView('form/form.tpl'), array(
 			'form' => $this,
 			'content' => $content
 		));
@@ -300,15 +305,15 @@ class Form{
 	 * @return : string
 	 */
 	public function display(){
-		$fieldsets = array();		
-		foreach($this->fieldsets as $name => $fieldset){
-			$fieldsets[$name] = $this->displayFieldset($name);
-		}		
+		// $fieldsets = array();		
+		// foreach($this->fieldsets as $name => $fieldset){
+		// 	$fieldsets[$name] = $this->displayFieldset($name);
+		// }		
 		
-		$content = View::make(ThemeManager::getSelected()->getView('form/form-content.tpl') , array(
+		$content = View::make(Plugin::get('main')->getView('form/form-content.tpl') , array(
 			'form' => $this,
 			'fields' => $fields,
-			'fieldsets' => $fieldsets,
+			'fieldsets' => $this->fieldsets,
 			'column' => 0		
 		));
 		return $this->wrap($content);
@@ -327,9 +332,10 @@ class Form{
 	 * @param: string $blockname, the name of the fieldset
 	 */
 	public function displayFieldset($fieldset){
-		$fields = array();		
+		$fields = array();
+		
 		foreach($this->fieldsets[$fieldset] as &$field){
-			if($field instanceof Input){
+			if($field instanceof FormInput){
 				$fields[] = &$field;
 			}
 		}
@@ -338,7 +344,7 @@ class Form{
 			$fields[count($fields) - 1]->last = true;
 		}
 		
-        return View::make(ThemeManager::getSelected()->getView('form/form-fieldset.tpl'), array(
+        return View::make(Plugin::get('main')->getView('form/form-fieldset.tpl'), array(
             'form' => $this,
             'fieldset' => $this->fieldsets[$fieldset],
             'name' => $fieldset,
@@ -370,9 +376,10 @@ class Form{
 		
 		if(!empty($this->errors)){
 			$this->status = self::STATUS_ERROR;
-			if($exit)
+			if($exit){
 				/*** The form check failed ***/
-				$this->response(self::STATUS_ERROR, Lang::get('form.error-fill'));
+				$this->response(self::STATUS_CHECK_ERROR, Lang::get('form.error-fill'));
+			}
 			else{
 				$this->addReturn('message', Lang::get('form.error-fill'));
 				return false;
@@ -389,50 +396,61 @@ class Form{
 	 * @param : $exit, if true, exit the script when finished
 	 */
 	public function register($exit = self::EXIT_JSON, $success = "", $error = ""){			
-		$insert = array();
-		foreach($this->fields as $alias => $field){								
-			/* Determine if we have to insert this field in the set of inserted values
-			 * A field can't be inserted if :
-			 * 	it type is in the independant types
-			 * 	the field is defined as independant
-			 * 	the fiels is defined as no insert			
-			 */			
-			if(!$field->independant && $field->insert !== false && !$field->disabled){
-				/*** Insert the field value in the set ***/				
-				$insert[$field->field] = $field->dbvalue();
-			}									
-		}
-		
-		$this->dbaction = self::ACTION_REGISTER;
 		try{
-			if($this->new){
-				/*** Add a new record in the database ***/
-				$id = $this->database->insert($this->table, $insert); /*** Return the Id of the new record ***/
+			$this->dbaction = self::ACTION_REGISTER;
+			
+			
+			if($this->model == self::DEFAULT_MODEL || !$this->reference){
+				throw new Exception("The method register of the class Form can be called only if model and reference properties are set");
+			}
+			if(!$this->object){
+				$model = $this->model; 
+				$this->object = new $model();
+			}
+			$this->object->set($this->reference);
+						
+			foreach($this->fields as $name => $field){								
+				/* Determine if we have to insert this field in the set of inserted values
+				 * A field can't be inserted if :
+				 * 	it type is in the independant types
+				 * 	the field is defined as independant
+				 * 	the fiels is defined as no insert			
+				 */			
+				if(!$field->independant && $field->insert !== false && !$field->disabled){
+					/*** Insert the field value in the set ***/						
+					$this->object->set($name, $field->dbvalue());
+				}									
+			}
+
+						
+			if(!$this->new){							
+				$this->object->update();
 			}
 			else{
-				/*** Update the record defined by the reference ***/				
-				$this->database->update($this->table, $this->condition, $insert, $this->binds);
+				$this->object->save();
 			}
+			
+			
+			$id = $this->object->getPrimaryColumn();
+			
 			$this->addReturn(array(
-				'primary' => $id,
+				'primary' => $this->object->$id,
 				'action' => self::ACTION_REGISTER,
 				'new' => $this->new
 			));	
 			$this->status = self::STATUS_SUCCESS;
-			if(isset($this->onregister) && is_callable($this->onregister)){
-				$function = $this->register;
-				$function();
-			}
 			
-			if($exit)
+			if($exit){
 				// output the response
 				$this->response(self::STATUS_SUCCESS, $success ? $success : Lang::get('form.success-register'));
-			return true;	
+			}
+			return $this->object->$id;	
 		}
 		catch(DatabaseException $e){				
 			$this->status = self::STATUS_ERROR;			
-			if($exit)
+			if($exit){
 				$this->response(self::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : ($error ? $error : Lang::get('form.error-register')));
+			}
 			throw $e;
 		}	
 	}        
@@ -444,27 +462,40 @@ class Form{
 	 * @param : $exit, if true, exit the script after delete
 	 */
 	public function delete($exit = self::EXIT_JSON, $success = "", $error = ""){
-		$result = array();
-		$this->dbaction = self::ACTION_DELETE;
-		try{		
-			$this->database->delete($this->table, $this->condition, $this->binds);
-			$test = true;
+		try{
+			$this->dbaction = self::ACTION_DELETE;
+
+			if($this->model == self::DEFAULT_MODEL || !$this->reference){
+				throw new Exception("The method delete of the class Form can be called only if model and reference properties are set");
+			}
+			
+			$model = $this->model;
+			$object = $model::getByExample($this->example);
+			
+			if(!$object){
+				throw new Exception("This object instance cannot be removed : No such object");
+			}
+			
+			$object->delete();
+			$id = $object->getPrimaryColumn();
+			
 			$this->addReturn(array(
-				'primary' => count($this->reference) == 1 ? $this->reference[0] : array_values($this->reference),
-				'action' => $this->dbaction
+				'primary' => $object->$id,
+				'action' => self::ACTION_DELETE
 			));
 			$this->status = self::STATUS_SUCCESS;
-			if(isset($this->ondelete) && is_callable($this->ondelete))
-				$this->ondelete();
+			
 			if($exit){
 				$this->response(self::STATUS_SUCCESS, $success ? $success : Lang::get('form.success-delete'));
 			}
-			return true;
+			return $object->$id;
 		}
 		catch(DatabaseException $e){		
 			$this->status = self::STATUS_ERROR;
-			if($exit)
-				$this->response(self::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : ($error ? $error : Lang::get('form.error-delete')));	
+			
+			if($exit){
+				$this->response(self::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : ($error ? $error : Lang::get('form.error-delete')));
+			}
 			throw $e;
 		}
 	}
@@ -495,19 +526,33 @@ class Form{
 	 * Description: return the response to the client
 	 */ 
 	public function response($status, $message = ''){
-		// Return the status of the form submission
-		$this->addReturn('status', $status);
-				
-		if($this->nomessage)
-			// Return no message
-			$this->addReturn('nomessage', true);
-		else
-			// Return the message to display
-			$this->addReturn('message', $message ? $message : Lang::get('form.'.$status.'-'.$this->dbaction));
+		$response = array();
+		switch($status){
+			case self::STATUS_SUCCESS :
+				// The form has been submitted correctly
+				http_response_code(self::HTTP_CODE_SUCCESS);
+				if(! $this->nomessage){
+					$response['message'] = $message ? $message : Lang::get('form.'.$status.'-'.$this->dbaction);
+				}
+				$response['data'] = $this->returns;				
+				break;
 			
-		$this->returns = array('errors' => $this->errors, 'data' => $this->returns);
+			case self::STATUS_CHECK_ERROR :
+				// An error occured while checking field syntaxes
+				http_response_code(self::HTTP_CODE_CHECK_ERROR);
+				$response['message'] = $message ? $message : Lang::get('form.'.$status.'-'.$this->dbaction);
+				$response['errors'] = $this->errors;			
+				break;
+			
+			case self::STATUS_ERROR :
+			default :
+				http_response_code(self::HTTP_CODE_ERROR);
+				$response['message'] = $message ? $message : Lang::get('form.'.$status.'-'.$this->dbaction);
+				$response['errors'] = $this->errors;
+				break;
+		}
 		
-		Response::set(json_encode($this->returns, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_NUMERIC_CHECK));
+		Response::set(json_encode($response, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_NUMERIC_CHECK));
 		Response::end();
 	}
 	
@@ -516,11 +561,14 @@ class Form{
 	 * Description: Generic treatment of the form
 	 */ 
 	public function treat($exit = self::EXIT_JSON){
-		if($this->submitted() == self::ACTION_DELETE)
+		if($this->submitted() == self::ACTION_DELETE){
 			return $this->delete($exit);
-		else
-			if($this->check($exit))
+		}
+		else{
+			if($this->check($exit)){
 				return $this->register($exit);		
+			}
+		}
 	}	
 }
 /******************* (C) COPYRIGHT 2014 ELVYRRA SAS *********************/

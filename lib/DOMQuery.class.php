@@ -11,19 +11,35 @@
  */
 
 class DOMQuery{
+	public static $instance;
+	
     public function __construct($data) {
-        $this->dom = new DOMDocument();
-        @$this->dom->loadHTML($data);
+        $this->dom = new DOMDocument();	
+		$this->dom->preserveWhiteSpace = false;
+        $content = $this->dom->createDocumentFragment();
+        $content->appendXML($data);
+        @$this->dom->append($content);
         $this->xpath = new DOMXpath($this->dom);
+		self::$instance = $this;
     }
+	
+	public static function getInstance(){
+		if(isset(self::$instance)){
+			return self::$instance;
+		}
+		else{
+			throw new DOMQueryException(DOMQueryException::NO_INSTANCE);
+		}
+	}
   
     public function find($selector) {
+		$this->selector = $selector;		
         $elements = $this->xpath->evaluate($this->selectorToXpath($selector));
         return new DOMQueryResult($elements);
     }
     
     public function save(){
-        return $this->dom->saveHTML();
+        return str_replace('<?xml encoding="' . ENCODING . '">', '', $this->dom->saveHTML());
     }
     
     private function selectorToXpath($selector) {
@@ -81,17 +97,63 @@ class DOMQuery{
         // ' '
         $selector = implode('/descendant::', $selectors);
         $selector = 'descendant-or-self::' . $selector;
-        return $selector;
+        return $selector;    
     }
 }
 
 class DOMQueryResult{
-    private $nodes;
+    public $nodes;
+	public $length;
     
     public function __construct(DOMNodeList $nodes){
         $this->nodes = $nodes;
+		$this->length = $this->nodes->length;
     }
+	
+	private function apply($function){
+		foreach($this->nodes as $node){
+			$function($node);
+		}
+		return $this;
+	}
+	
+	/** 
+	 * Find sub elements
+	 * @param String $selector, the "sub selector" to find elements
+	 */
+	public function find($selector){
+		$instance = DomQuery::getInstance();
+		return $instance->find($instance->selector . " " . $selector);
+	}
+	
+	/**
+	 * Filter the found elements
+	 * @param string $selector, the selector to filter the results
+	 */
+	public function filter($selector){
+		$instance = DomQuery::getInstance();
+		return $instance->find($instance->selector . $selector);
+	}
+	
+	/**
+	 * Get the x th element of the result set
+	 * @param int $index, the index of the element to get
+	 * @return DOMNode
+	 */
+	public function get($index){
+		return $this->nodes->get($index);
+	}
     
+	public function first(){
+        return new self(new DOMNodeList($this->nodes->item(0)));
+		//return $this->filter(':first-child');
+	}
+	
+	public function last(){
+        return new self(new DOMNodeList($this->nodes->item($this->nodes->length - 1)));
+		//return $this->filter(':last-child');		
+	}
+	
     /**
      * Set or get the html content of the ndoes
      * @param String $html the content to insert. If not set, returns the html content of the first node   
@@ -99,25 +161,34 @@ class DOMQueryResult{
     public function html($html = null){
         if($html === null){
             // Get the html content of the first node
-            return $this->nodes->length ? $this->nodes->item(0)->ownerDocument->saveHTML($this->nodes->item(0)) : '';
+            if(!$this->length){
+				return '';
+			}
+			
+			$html = ""; 
+			$firstNode = $this->nodes->item(0);
+			$children  = $firstNode->childNodes;
+
+			foreach ($children as $child) { 
+				$html .= $firstNode->ownerDocument->saveHTML($child);
+			}			
+			return trim($html);
         }
         else{
-            // Set the html content of all nodes
-            foreach($this->nodes as $node){
-                // Delete the current content of the node
-                foreach($node->childNodes as $child){
-                    $node->removeChild($child);
-                }
+			// Set HTML content 						
+			return $this->apply(function($node) use($html){				
+				// Delete the current content of the node	
+				while($node->childNodes->length){
+					$node->removeChild($node->firstChild);
+				}                
                 
                 // Add the new content
                 $f = $node->ownerDocument->createDocumentFragment();
                 $f->appendXML($html);
-                $node->appendChild($f);
-            }
-            
-            return $this;
+                $node->appendChild($f);				
+			});            
         }
-    }
+    }	
     
     /**
      * Set or get the text content of the ndoes
@@ -126,21 +197,21 @@ class DOMQueryResult{
 	public function text($text = null){
         if($text == null){
             // Get the text content of the first node
-            return $this->nodes->length ? $this->nodes->item(0)->textContent : '';
+            return $this->length ? trim($this->nodes->item(0)->textContent) : '';
         }
         else{
-            // Set the text content of all nodes
-            foreach($this->nodes as $node){                
-                // Delete the current content of the node
-                foreach($node->childNodes as $child){
-                    $node->removeChild($child);
-                }
+			// Set the text content of all nodes
+			return $this->apply(function($node) use($text){
+				// Delete the current content of the node	
+				while($node->childNodes->length){
+					$node->removeChild($node->firstChild);
+				}  
                 
                 // Add the new text content to the node
                 $t = $node->ownerDocument->createTextNode($text);            
                 $node->appendChild($t);
-            }
-            return $this;
+				
+			});            
         }
     }
     
@@ -149,13 +220,11 @@ class DOMQueryResult{
      * @param String $html the content to append     
      */
 	public function append($html){
-        foreach($this->nodes as $node){
-            $f = $node->ownerDocument->createDocumentFragment();
+        return $this->apply(function($node) use($html){
+			$f = $node->ownerDocument->createDocumentFragment();
             $f->appendXML($html);
-            $node->appendChild($f);
-        }
-        
-        return $this;
+            $node->appendChild($f);	
+		});		
     }
     
     /**
@@ -163,7 +232,7 @@ class DOMQueryResult{
      * @param String $html the content to prepend     
      */
 	public function prepend($html){
-        foreach($this->nodes as $node){            
+		return $this->apply(function($node) use($html){        
             $f = $node->ownerDocument->createDocumentFragment();
             $f->appendXML($html);
             
@@ -171,10 +240,7 @@ class DOMQueryResult{
                 $node->insertBefore($f, $node->childNodes->item(0));
             else
                 $node->appendChild($f);
-        }
-        
-        return $this;
-        
+        });
     }
     
     /**
@@ -182,7 +248,7 @@ class DOMQueryResult{
      * @param String $html the content to insert right after     
      */
 	public function after($html){
-        foreach($this->nodes as $node){            
+		return $this->apply(function($node) use($html){        
             $f = $node->ownerDocument->createDocumentFragment();
             $f->appendXML($html);
             
@@ -192,9 +258,7 @@ class DOMQueryResult{
             else{
                 $node->parentNode->appendChild($f);
             }
-        }
-        
-        return $this;
+        });
     }
     
     /**
@@ -202,23 +266,21 @@ class DOMQueryResult{
      * @param String $html the content to insert right before
      */
 	public function before($html){
-        foreach($this->nodes as $node){            
+		return $this->apply(function($node) use($html){	
             $f = $node->ownerDocument->createDocumentFragment();
             $f->appendXML($html);
             
             $node->parentNode->insertBefore($f, $node);
-        }
-        
-        return $this;            
+        });
     }
 	
     /**
      * Remove nodes     
      */    
 	public function remove(){
-        foreach($this->nodes as $node){                        
+        $this->apply(function($node){
             $node->parentNode->removeChild($node);
-        }
+        });
     }
     
     /**
@@ -229,15 +291,8 @@ class DOMQueryResult{
 	public function attr($prop, $value = null){
         if($value == null && is_string($prop)){
             // Get the value of the attribute of the first node
-            if($this->nodes->length){
-                $node = $this->nodes->item(0);
-                $attribute = $node->attributes->getNamesItem($prop);
-                if($attribute !== null){
-                    return $attribute->nodeValue;
-                }
-                else{
-                    return '';
-                }
+            if($this->length){
+                return $this->nodes->item(0)->getAttribute($prop);                
             }
             else{
                 return '';
@@ -245,7 +300,7 @@ class DOMQueryResult{
         }
         else{
             // Set the attribute(s) value(s) to the nodes
-            foreach($this->nodes as $node){                
+            return $this->apply(function($node) use($prop, $value){
                 if(is_array($prop)){
                     // Set multiple
                     foreach($prop as $key => $val){
@@ -255,8 +310,115 @@ class DOMQueryResult{
                 else{
                     $node->setAttribute($prop, $value);
                 }
-            }
-            return $this;
+            });
         }
-    }    
+    } 
+
+	/**
+	 * Add class to the node 
+	 */
+	public function addClass($classes){			
+		$nodeClass = $this->attr('class');
+		if($nodeClass){
+			$classes = explode(" ", $classes);
+			foreach($classes as $class){
+				if(!preg_match("#\b$class\b#", $classes)){
+					$nodeClass .= " $class";
+				}
+			}
+			return $this->attr('class', $nodeClass);		
+		}
+		else{
+			return $this->attr('class', $classes);
+		}
+	}
+	
+	/**
+	 * Remove a class to the node
+	 */
+	public function removeClass($classes){
+		$classes = explode(" ", $classes);
+		$nodeClass = $this->attr('class');
+		foreach($classes as $class){
+			$nodeClass = preg_replace("#\b$class\b#", "", $nodeClass);
+		}
+		return $this->attr('class', $nodeClass);
+	}
+	
+	/**
+	 * Add css property to a node
+	 */
+	public function css($prop, $value = null){
+		$css = $this->attr('style');
+		$reg = "#\b($prop)\s*\:\s*(.+?)\s*(\;|$)#";
+		
+		if($value == null && is_string($prop)){
+			// Get the css property of the first node			
+			if(preg_match($reg, $css, $matches)){				
+				return $matches[2];
+			}
+			else{
+				return '';
+			}
+		}
+		else{
+			// Set the css properties to the nodes
+			$this->apply(function($node) use($prop, $value){
+				if(is_array($prop)){
+					foreach($prop as $key => $value){
+						$this->css($key, $value);
+					}
+				}
+				else{
+					$insert = "$prop: $value;";
+					if($css){
+						if(preg_match($reg, $css, $matches)){
+							debug('ici');
+							$css = preg_replace($reg, $insert, $css);
+						}
+						else{
+							debug('la');
+							$css .= ($css{strlen($css) - 1} == ';' ? '' : ';') . $insert;
+						}
+					}
+					else{
+						$css = $insert;
+					}
+					return $this->attr('style', $css);
+				}				
+			});
+		}
+	}
+	
+	public function hide(){
+		$this->css('display', 'none');
+	}
+	
+	public function show(){
+		$this->css('display', 'block');
+	}
+	
+	public function outerHtml(){
+		// Get the html content of the first node
+		if(!$this->length){
+			return '';
+		}
+			
+		return $this->nodes->item(0)->ownerDocument->saveHTML($this->nodes->item(0));						
+	}
+	
+	
+}
+
+class DOMQueryException extends Exception{
+	const NO_INSTANCE = 1;
+	public function __construct($code){
+		switch($code){
+			case self::NO_INSTANCE :
+				$message = "No DOMQuery instance is created yet";
+			break;
+		}
+		
+		parent::__construct($message, $code);
+	}
 }
