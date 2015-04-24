@@ -1,4 +1,5 @@
 /* define(blue, color, "Items backgrounds", #2C3742) */
+/* define(backgroundImage, file, "Background image", none) */
 /* define(textColor, color, "Text color", #777) */
 /* define(bodyBackground, color, "Body background", #fff) */
 /* define(fontSize, dimension, "Global font size", 12px) */
@@ -16,7 +17,7 @@
 /* define(bgDanger, color, "background color danger", #f2dede) */
 
 body{
-    background: @bodyBackground;
+    background: @bodyBackground url(@backgroundImage);        
     margin: 0;
     padding: 0;
     height: 100%;
@@ -52,6 +53,7 @@ h1,h2,h3,h4,h5,h6{
 
 .btn{
 	font-size: inherit;
+	margin-top: 5px;
 }
 
 .btn-default{
@@ -93,6 +95,7 @@ select,
 textarea {
   font-family: "Open Sans", Arial;
   outline-style: none;
+  color: #777;
 }
 input[type="text"],
 input[type="password"],
@@ -120,7 +123,20 @@ textarea:focus{
 }
 
 input[type="file"] {
-	display: inline-block;	
+	display: none;
+}
+
+.input-file-invitation {
+	padding: 6px 12px;
+	border-radius: 0;
+}
+
+.input-file-invitation .file-chosen-icon{
+	visibility: hidden;
+}
+
+.input-file-invitation.file-chosen .file-chosen-icon{
+	visibility: visible;
 }
 
 input[type="radio"]{
@@ -154,7 +170,8 @@ textarea::-webkit-input-placeholder {
 
 label{
 	font-weight: normal;	
-	vertical-align: top;
+	vertical-align: middle;
+	margin: 0;
 }
 
 label.required:after{
@@ -190,7 +207,7 @@ form > table > tbody > tr > td{
 
 
 .form-input-wrap{
-    padding: 5px;    
+    margin: 5px;    
 }
 
 
@@ -456,6 +473,10 @@ table th span.line{
     background-color: rgba(25, 31, 36,0.6);
 }
 
+#main-menu .dropdown-menu li i.fa{
+	width: 20px;	
+}
+
 #footer{
     position: fixed;
     left: 0;
@@ -606,13 +627,9 @@ a, a:active, a:hover, a:visited, a:focus{
 }
 
 .list td .fa{
-	margin: 3px;
-	border : 1px solid #EEE;
-	box-shadow: 1px 1px 1px #999 ;
+	margin: 3px;	
 	cursor: pointer;
-	border-radius: 3px;
 	padding: 0.2em 0.25em;
-	background: @bodyBackground;
 }
 		
 .list th{
@@ -741,6 +758,34 @@ input[type="text"].list-page-number{
 	color: white;
 }
 
+#loading > .fa {
+	margin-left: -0.5em;
+  	margin-bottom: 15px;
+}
+
+#loading-bar{
+	width: 200px;
+	margin-left: -100px;
+	height: 5px;
+	display: block;
+	background: #eee;
+	border-radius: 5px;
+}
+
+#loading-bar:not(.progressing){
+	display:none;
+}
+
+#loading-purcentage{
+	width: 0%;
+	background: @colorSuccess;
+	height: 100%;
+	display: block;
+	border-radius: 5px;
+	transition: width 200ms;
+}
+
+
 /*----------------- Application lgoo ------------------*/
 .logo-thumbnail{
 
@@ -763,14 +808,6 @@ input[type="text"].list-page-number{
 	display: none;
 }
 
-.box{
-    border-radius: 4px;
-    border: 1px solid #777;    
-    margin: 5px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-	background: #fff;
-}
-
 /*----------------------- Icons -----------------------------*/
 p .fa{
 	margin-right: 7px;
@@ -784,7 +821,7 @@ p .fa{
     margin: 5px;
     height: 100%;    
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-    background: #fff;
+    /*background: #fff;*/
 }
 
 .box .box-header{
@@ -802,6 +839,10 @@ p .fa{
     padding: 5px;
 }
 
+.box input[type=text], .box input[type=pasword], .box textarea, .box select{
+    width: 100%;
+}
+
 
 /*----------------------- Error tooltips -------------------*/
 .tooltip.input-error{
@@ -815,4 +856,20 @@ p .fa{
 
 .tooltip.input-error .tooltip-arrow{
 	border-right-color: @bgDanger;
+}
+
+/*------------------- Manage themes page -----------------------*/
+#manage-themes-page .theme-item{
+	position: relative;
+}
+
+#manage-themes-page .theme-item .icons{
+	position: absolute;
+	top : 5px;
+	right: 5px;
+	display: none;
+}
+
+#manage-themes-page .theme-item:hover .icons{
+	display: block;
 }

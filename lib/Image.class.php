@@ -80,9 +80,9 @@ class PngImage extends Image{
 	
 	public function compress($rate, $filename){
 		$fs = $this->createResource();
-		$compression = round(9 / 100 * $rate);
+		$compression = ceil(-8 / 100 * $rate + 9);
 		$this->save($fs, $filename, $compression);
-		return new self($filename);
+		return Image::getInstance($filename);
 	}
 }
 
@@ -99,7 +99,7 @@ class JpegImage extends Image{
 		$fs = $this->createResource();
 		$quality = 100 - $rate;
 		$this->save($fs, $filename, $quality);
-		return new self($filename);
+		return Image::getInstance($filename);
 	}
 }
 
@@ -115,7 +115,7 @@ class GifImage extends Image{
 	public function compress($rate, $filename){
 		$fs = $this->createResource();		
 		$this->save($fs, $filename);
-		return new self($filename);
+		return Image::getInstance($filename);
 	}
 }
 

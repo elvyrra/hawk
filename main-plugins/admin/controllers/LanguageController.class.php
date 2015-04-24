@@ -32,7 +32,7 @@ class LanguageController extends Controller{
 		return LeftSidebarTab::make(array(
 			'icon' => 'flag',
 			'title' => Lang::get('language.lang-page-name'),			
-			'page' => $this->editKeys($filters),
+			'page' => $this->compute('editKeys'),
 			'script' => array(
 				'src' => Plugin::current()->getJsUrl() . 'languages.js',
 			),
@@ -54,19 +54,18 @@ class LanguageController extends Controller{
 		
 		$form = new Form(array(
 			'id' => 'edit-keys-form',
-			'action' => Router::getUri('LanguageController.editKeys'),			
+			'action' => Router::getUri('save-language-keys'),			
 			'fieldsets' => array(
 				'form' => array(
 					'nofieldset' => true,
 					
 					new HtmlInput(array(
-						'value' => $this->listKeys($filters)
+						'value' => $this->compute('listKeys')
 					))
 				)
 			),
 			'onsuccess' => 'mint.lists["language-key-list"].refresh();'
 		));
-		
 		if(!$form->submitted()){
 			return $form;
 		}
@@ -96,7 +95,7 @@ class LanguageController extends Controller{
 
 	public function keyForm($keyId){
 		$param = array(
-			'id' => 'edit-lang-key-form',
+			'id' => 'edit-lang-key-form-' . $keyId,
 			'model' => 'LanguageKey',
 			'action' => Router::getUri('LanguageController.editKey', array('keyId' => $keyId)),
 			'reference' => array('id' => $keyId),
@@ -135,7 +134,7 @@ class LanguageController extends Controller{
 					)),
 				),
 			),
-			'onsuccess' => ($keyId ? 'mint.dialog("close");' : 'mint.forms["edit-lang-key-form"].reset();') . 'mint.lists["language-key-list"].refresh();' 
+			'onsuccess' => ($keyId ? 'mint.dialog("close");' : 'mint.forms["edit-lang-key-form-0"].reset();') . 'mint.lists["language-key-list"].refresh();' 
 		);
 
 		$translations = LanguageKey::getById($keyId) ? LanguageKey::getById($keyId)->getTranslations() : array();
@@ -158,7 +157,6 @@ class LanguageController extends Controller{
 	 * Edit one translation key
 	 */
 	public function editKey(){	
-		
 		$form = $this->keyForm($this->keyId);
 		if(!$form->submitted()){
 			return View::make($this->theme->getView('dialogbox.tpl'), array(
@@ -174,7 +172,6 @@ class LanguageController extends Controller{
 				if($form->check()){
 					try{
 						$keyId = $form->register(Form::NO_EXIT);
-						
 						foreach($_POST['translation'] as $tag => $translation){
 							if(!empty($translation)){
 								$tr = new LanguageTranslation();
@@ -272,7 +269,7 @@ class LanguageController extends Controller{
 					'search' => false,
 					'sort' => false,
 					'display' => function($value, $field, $line){
-						return "<span class='fa fa-pencil text-primary edit-key' title='" . Lang::get('language.key-list-edit-btn') . "' data-key='$line->id'></span>
+						return "<span class='fa fa-pencil text-primary edit-key' title='" . Lang::get('language.key-list-edit-btn') . "' href='" . Router::getUri('edit-language-key', array('keyId' => $line->id)) . "' target='dialog' ></span>
 								<span class='fa fa-close text-danger delete-key' title='" . Lang::get('language.key-list-delete-btn') . "' data-key='$line->id'></span>";						
 					}
 				),

@@ -1,6 +1,6 @@
 /* define(blue, color, "Items backgrounds", #2C3742) */
-/* define(textColor, color, "Text color", #777) */
-/* define(bodyBackground, color, "Body background", #fff) */
+/* define(textColor, color, "Text color", #fff) */
+/* define(bodyBackground, color, "Body background", #333) */
 /* define(fontSize, dimension, "Global font size", 12px) */
 /* define(titleColor, color, "Color of title", #337ab7) */
 /* define(colorMuted, color, "Text color muted", #777) */
@@ -16,14 +16,14 @@
 /* define(bgDanger, color, "background color danger", #f2dede) */
 
 body{
-    background: #fff;
+    background: @bodyBackground;
     margin: 0;
     padding: 0;
     height: 100%;
     position: fixed;
     width: 100%;	
-	font-size: 12px;
-	color : #777;
+	font-size: @fontSize;
+	color : @textColor;
 	font-family: "Open Sans", Arial;
 }
 
@@ -32,23 +32,23 @@ h1,h2,h3,h4,h5,h6{
 	font-weight: normal;
 }
 
-.text-muted{ color: #777;}
-.text-primary{ color: #337ab7;}
-.text-success{ color: #3c763d;}
-.text-info{ color: #31708f;}
-.text-warning{ color: #8a6d3b;}
-.text-danger{ color: #a94442;}
+.text-muted{ color: @colorMuted;}
+.text-primary{ color: @colorPrimary;}
+.text-success{ color: @colorSuccess;}
+.text-info{ color: @colorInfo;}
+.text-warning{ color: @colorWarning;}
+.text-danger{ color: @colorDanger;}
 
-.bg-primary{ background: #337ab7;}
-.bg-success{ background: #dff0d8;}
-.bg-info{ background: #d9edf7;}
-.bg-warning{ background: #fcf8e3;}
-.bg-danger{ background: #f2dede;}
+.bg-primary{ background: @bgPrimary;}
+.bg-success{ background: @bgSuccess;}
+.bg-info{ background: @bgInfo;}
+.bg-warning{ background: @bgWarning;}
+.bg-danger{ background: @bgDanger;}
 
-.alert-success{ background: #dff0d8; color: #3c763d;}
-.alert-info{ background: #d9edf7; color: #31708f;}
-.alert-warning{ background: #fcf8e3; color: #8a6d3b;}
-.alert-danger{ background: #f2dede; color: #a94442;}
+.alert-success{ background: @bgSuccess; color: @colorSuccess;}
+.alert-info{ background: @bgInfo; color: @colorInfo;}
+.alert-warning{ background: @bgWarning; color: @colorWarning;}
+.alert-danger{ background: @bgDanger; color: @colorDanger;}
 
 .btn{
 	font-size: inherit;
@@ -159,16 +159,16 @@ label{
 
 label.required:after{
 	content: "*";
-	color: #a94442;
+	color: @colorDanger;
 }
 
 fieldset{
-	border : 1px solid #337ab7;
+	border : 1px solid @colorPrimary;
 	box-shadow: none;
 }
 
 legend{
-	color: #337ab7;
+	color: @colorPrimary;
 	border: none;
 	background: none;
 	margin-left: 15px;
@@ -424,7 +424,7 @@ table th span.line{
 
 
 #main-menu, #footer{        
-    background: #2C3742;
+    background: @blue;
     color: #d6d6d6;
     width: 100%;
     border: none;
@@ -489,7 +489,7 @@ table th span.line{
 	margin-right: 2px;
 }
 #main-nav-tabs .main-tab-title.active{	
-	background: #fff;
+	background: @bodyBackground;
 	color: black;	
 }
 #main-nav-tabs .main-tab-title > a{
@@ -554,7 +554,7 @@ table th span.line{
 
 /*--------------------- Tabs content --------------------*/
 .main-tab-pane .page-title{
-	color: #337ab7;
+	color: @titleColor;
 	text-align: center;
 	margin: 5px 0;
 }
@@ -595,7 +595,7 @@ a, a:active, a:hover, a:visited, a:focus{
 
 .list{
     width: 100%;
-    color: #777;
+    color: @textColor;
     border-collapse: collapse;
 }
 	
@@ -612,7 +612,7 @@ a, a:active, a:hover, a:visited, a:focus{
 	cursor: pointer;
 	border-radius: 3px;
 	padding: 0.2em 0.25em;
-	background: #fff;
+	background: @bodyBackground;
 }
 		
 .list th{
@@ -636,7 +636,7 @@ a, a:active, a:hover, a:visited, a:focus{
 }
     
 .list-sort-column.list-sort-active{
-    color: #3c763d;
+    color: @colorSuccess;
     opacity: 1;
 }
     
@@ -660,8 +660,8 @@ a, a:active, a:hover, a:visited, a:focus{
 
 /** The search field ***/
 .list-search-input.not-empty {
-    background-color: #d9edf7;
-    color: #31708f;
+    background-color: @bgInfo;
+    color: @colorInfo;
 }	
 
 .list-line{
@@ -763,14 +763,6 @@ input[type="text"].list-page-number{
 	display: none;
 }
 
-.box{
-    border-radius: 4px;
-    border: 1px solid #777;    
-    margin: 5px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-	background: #fff;
-}
-
 /*----------------------- Icons -----------------------------*/
 p .fa{
 	margin-right: 7px;
@@ -784,11 +776,10 @@ p .fa{
     margin: 5px;
     height: 100%;    
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-    background: #fff;
 }
 
 .box .box-header{
-    background: #337ab7;        
+    background: @titleColor;        
     font-size: 1.2em;
     color: white;    
     padding-left: 5px;
@@ -802,6 +793,10 @@ p .fa{
     padding: 5px;
 }
 
+.box input[type=text], .box input[type=pasword], .box textarea, .box select{
+    width: 100%;
+}
+
 
 /*----------------------- Error tooltips -------------------*/
 .tooltip.input-error{
@@ -809,10 +804,30 @@ p .fa{
 }
 
 .tooltip.input-error .tooltip-inner{
-	background: #f2dede;
-	color: #a94442;
+	background: @bgDanger;
+	color: @colorDanger;
 }
 
 .tooltip.input-error .tooltip-arrow{
-	border-right-color: #f2dede;
+	border-right-color: @bgDanger;
+}
+
+/*------------------- Manage themes page -----------------------*/
+#manage-themes-page .theme-item{
+	position: relative;
+}
+
+#manage-themes-page .theme-item .icons{
+	position: absolute;
+	top : 5px;
+	right: 5px;
+	display: none;
+}
+
+#manage-themes-page .theme-item:hover .icons{
+	display: block;
+}
+
+#manage-themes-page .theme-item.selected{
+	border: 5px solid @colorSuccess;
 }

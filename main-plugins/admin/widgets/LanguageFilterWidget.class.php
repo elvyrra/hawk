@@ -19,6 +19,7 @@ class LanguageFilterWidget extends Widget{
 						'name' => 'tag',
 						'options'  => $languages,
 						'default' => $filters['tag'],
+						'style' => 'width: 80%; margin-right: 5px;',
 						'label' => Lang::get('language.filter-language-label'),
 						'after' => '<span class="fa fa-pencil text-primary edit-lang" title="'. Lang::get('language.filter-language-edit') . '"></span>
 									<span class="fa fa-close text-danger delete-lang" title="'. Lang::get('language.filter-language-delete') . '"></span>'									

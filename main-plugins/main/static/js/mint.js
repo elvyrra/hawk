@@ -50,6 +50,7 @@ App.prototype.require = function(scripts, callback){
 		s.type = "text/javascript";
 		s.src = src;		
 		s.onload = function(){ 
+			this.scripts[src] = 1;
 			this.require(scripts, callback);
 		}.bind(this);
 		document.getElementsByTagName("head")[0].appendChild(s);
@@ -134,6 +135,15 @@ App.prototype.init = function(){
 		
 		.on('click', ".main-tabs-close", function(){
 			self.tabset.remove($(this).data('tab'));
+		})
+
+		.on("change", ":file", function(event){
+			if(event.currentTarget.files.length){
+				$(this).next(".input-file-invitation").removeClass("btn-default").addClass("file-chosen btn-success");				
+			}
+			else{
+				$(this).next(".input-file-invitation").removeClass("file-chosen btn-success").addClass("btn-default");
+			}
 		});
 		
 		window.onpopstate = function(event){
@@ -153,16 +163,46 @@ App.prototype.init = function(){
 
 		this.loading = {
 			start : function(){
-				if(!$("#loading").length)
-					$("body").append("<div id='loading'><span class='fa fa-spinner fa-spin fa-5x'></span></div>");
 				$('#loading').show();
 			},
+
+			progress : function(purcentage){
+				$("#loading-purcentage").css("width", purcentage+"%");
+				if(purcentage){
+					$("#loading-bar").addClass("progressing");
+				}
+				else{
+					$("#loading-bar").removeClass("progressing");	
+				}
+			},	
 			
 			stop : function(){
 				$('#loading').hide();
+				this.progress(0);
 			}
 		};
 	}.bind(this));
+
+	this.xhr = function(){
+		var xhr = new window.XMLHttpRequest();
+        xhr.upload.addEventListener("progress", function(evt) {
+            if (evt.lengthComputable) {
+                var percentComplete = parseInt(evt.loaded / evt.total * 100);
+                //Do something with upload progress here
+                window.mint.loading.progress(percentComplete);
+            }
+        });	 
+
+        xhr.addEventListener("progress", function(evt) {
+	        if (evt.lengthComputable) {
+	            var percentComplete = parseInt(evt.loaded / evt.total * 100);
+                //Do something with upload progress here
+                window.mint.loading.progress(percentComplete);
+        	}
+       	}, false);       
+
+        return xhr;
+	}.bind(this);
 };
 
 
@@ -213,6 +253,7 @@ App.prototype.load = function(url, data){
 		/*** DETERMINE THE NODE THAT WILL BE LOADED THE PAGE ***/			
 		if($(options.selector).length){
 			$.ajax({
+				xhr : this.xhr,
 				url : url, 
 				type : options.post ? 'post' : 'get',
 				data : options.post
@@ -239,9 +280,9 @@ App.prototype.load = function(url, data){
 					history.pushState({}, '', "#!" + url);
 				}
 
-				if(options.callback){
-			        /*** A callback has been asked ****/
-					options.callback();
+				if(options.onload){
+			        /*** A 'onload' callback has been asked ****/
+					options.onload();
 				}
 			}.bind(this))
 

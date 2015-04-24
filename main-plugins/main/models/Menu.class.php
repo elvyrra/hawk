@@ -4,40 +4,64 @@
 class Menu extends Model{
 	protected static $tablename = "Menu";
 	protected static $primaryColumn = "id";
+
+	public function __construct($data = array()){
+		parent::__construct($data);
+
+		$this->label = Lang::get($this->labelKey);
+	}
 		
-	public static function getVisibleMenus($user = null){
-		if($user == null)
+	public static function getAvailableMenus($user = null){
+		if($user == null){
 			$user = Session::getUser();
+		}
 		
-		$sql = 'SELECT M.*
-				FROM ' . self::$tablename . ' M RIGHT JOIN MenuVisibility V ON V.menuId = M.id
-				WHERE V.roleId = :roleId AND V.visible = 1
-				ORDER BY `order` ASC';
+		$menuItems = MenuItem::getAvailableItems();
+
+		$menus = self::getAll(self::$primaryColumn, array(), array('order' => DB::SORT_ASC));
+
+		foreach($menuItems as $item){
+			$menus[$item->menuId]->visibleItems[] = $item;
+		}
 		
-		return DB::get(self::DBNAME)->query($sql, array('roleId' => $user->roleId), array('return' => __CLASS__));
+		$menus = array_filter($menus, function($menu){
+			return count($menu->visibleItems) > 0;
+		});
+
+		return $menus;
+	}
+
+	public static function getByName($name){
+		return self::getByExample(new DBExample(array('name' => $name)));
 	}
 	
-	public function getVisibleItems($user = null){
-		if($user == null)
-			$user = Session::getUser();
-			
-		if(!isset($this->visibleItems)){
-			
-			$sql = 'SELECT M.*
-					FROM ' . MenuItem::$tablename . ' M RIGHT JOIN MenuItemVisibility V ON V.menuId = M.id
-					WHERE 	M.menuId = :id AND
-							V.roleId = :roleId AND
-							V.visible = 1
-					ORDER BY `order` ASC';
-			$this->visibleItems = DB::get(self::DBNAME)->query($sql, array('id' => $this->id, 'roleId' => $user->roleId), array('return' => 'MenuItem'));
+	public static function add($name, $labelKey, $order = -1){
+		if($order === -1){
+			$order = DB::get(self::DBNAME)->select(array(
+				'from' => self::$tablename,
+				'orderby' => array('order' => DB::SORT_DESC),
+				'one' => true,
+			))->order + 1;
 		}
-		return $this->visibleItems;
+		else{
+			// First update the menus which order is greater than the one you want to include
+			$sql = 'UPDATE ' . self::$tablename . ' SET order=order + 1  WHERE order >= :order';
+			DB::get(self::DBNAME)->query($sql, array('order' => $order));
+		}
+
+		// Insert the menu
+		$menu = parent::add(array(
+			'name' => $name, 
+			'labelKey' => $labelKey,
+			'order' => $order
+		));	
+
+		return $menu;
 	}
-	
-	public function getItems(){
-		if(! isset($this->items)){
-			$this->items = MenuItem::getListByExample(new DBExample(array('menuId' => $this->id)), 'id');
-		}
-		return $this->items;
+
+	public function addItem($data){
+		$data['menuId'] = $this->id;
+
+		MenuItem::add($data);
 	}
 }

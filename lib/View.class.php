@@ -24,10 +24,7 @@ class View{
 	    @param : 
 	        o string $selector : HTML code or filename to load a template
 	_______________________________________________________*/
-	public function __construct($file, $cache = null){
-		if($cache === null){
-			$cache = !NO_CACHE;
-		}
+	public function __construct($file){
 		/*** The selector can be a filename or a plain/html text ***/
 		if(!is_file($file)){
 			throw new ViewException(ViewException::TYPE_FILE_NOT_FOUND, $file);
@@ -36,17 +33,13 @@ class View{
 		$this->file = $file;
 		
 		$this->fileCache = new FileCache($this->file, 'views', 'php');			
-		if($this->fileCache->isCached()){
-			/*** The cached file exists and is earlier than the source we can load it ***/				
-			$this->phpcode = file_get_contents($this->fileCache->get());
-		}
-		else{
+		if(! $this->fileCache->isCached()){
 			$this->content = file_get_contents($file);				
 			$this->parse();
-			if($cache){
-				$this->fileCache->set($this->phpcode);					
-			}
-		}			
+			$this->fileCache->set($this->content);
+		}
+		
+		$this->include = $this->fileCache->get();
 	}
 	
 	public function set($data = array()){
@@ -67,29 +60,29 @@ class View{
 			{if(...)} => if(...) :
 			{elseif(...)} => elseif(...) :
 			{else} => else :
-			{endif} => endif;
+			{/if} => endif;
 			{for(...)} => for(...) :
-			{endfor} => endfor;
+			{/for} => endfor;
 			{foreach(...)} => foreach(...) :
-			{endforeach} => endforeach;
+			{/foreach} => endforeach;
 			{while(...))} => while(...) :
-			{endwhile} => endwhile;
+			{/while} => endwhile;
 			{{ ... }} => echo ... ;
 			{include ...} => include ...;
 	_______________________________________________________*/
 	private function parse(){
-		$this->phpcode = $this->content;	
+		$this->content = $this->content;	
 
 		// Import sub templates
 		$reg = "#\{\s*import\s*([\"'])(.+?)\\1\s*\}#is";
-		while(preg_match($reg, $this->phpcode)){			
-			$this->phpcode = preg_replace_callback($reg, function($m){
+		while(preg_match($reg, $this->content)){			
+			$this->content = preg_replace_callback($reg, function($m){
 				$file = $m[2]{0} == '/' ? ROOT_DIR : dirname(realpath($this->file)) . '/' . $m[2];
 				
 				$view = new View($file);
 				return "<?php include '" . $view->fileCache->get() . "'; ?>";
 			
-			} , $this->phpcode);
+			} , $this->content);
 		}
 		
 		// Parse PHP Structures
@@ -98,11 +91,11 @@ class View{
 			"#\{\/(if|for|foreach|while)\s*\}#is" => "<?php end$1; ?>", // structures ends
 			"#\{{2}\s*(.+?)\}{2}#is" => "<?php echo $1; ?>" // echo
 		);		
-		$this->phpcode = preg_replace(array_keys($replaces), $replaces, $this->phpcode);
+		$this->content = preg_replace(array_keys($replaces), $replaces, $this->content);
 		
 		// Parse plugins nodes		
 		$pattern = "#\{(\w+)((\s+\w+\=(['\"])(.*?)\\4)*)\s*\}#";
-		$this->phpcode = preg_replace_callback($pattern, function($matches){			
+		$this->content = preg_replace_callback($pattern, function($matches){			
 			$component = $matches[1];
 			
 			try{			
@@ -121,7 +114,7 @@ class View{
 			catch(Exception $e){
 				return $matches[0];
 			}
-		}, $this->phpcode);
+		}, $this->content);
 		
 		return $this;
 	}
@@ -133,11 +126,12 @@ class View{
 	public function display(){
 		extract($this->data);
 		ob_start();
-		$result = eval(' ?>' . $this->phpcode);
-		$errors = error_get_last();
-		if($result === false && !empty($errors)){
-			throw new ViewException(ViewException::TYPE_EVAL, $this->file, error_get_last());
+		try{
+			include $this->fileCache->getFile();
 		}
+		catch(Exception $e){
+			throw new ViewException(ViewException::TYPE_EVAL, $this->file, $e);
+		}		
 		return ob_get_clean();
 	}	
 	
@@ -152,7 +146,7 @@ class ViewException extends Exception{
 	const TYPE_FILE_NOT_FOUND = 1;
 	const TYPE_EVAL = 2;
 	
-	public function __construct($type, $file, $message = ""){
+	public function __construct($type, $file, $previous){
 		$code = $type;
 		switch($type){
 			case self::TYPE_FILE_NOT_FOUND:
@@ -160,7 +154,11 @@ class ViewException extends Exception{
 			break;
 			
 			case self::TYPE_EVAL:
-				$message = "An error occured while building the view from file $file : " . implode(PHP_EOL, $message);
+				$trace = array_map(function($t){
+					return $t['file'] . ':' . $t['line'];
+				}, $previous->getTrace());
+
+				$message = "An error occured while building the view from file $file : " . $previous->getMessage() . PHP_EOL . implode(PHP_EOL, $trace);
 			break;
 		}
 		

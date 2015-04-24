@@ -5,6 +5,7 @@ class ColorInput extends FormInput{
 	
 	public function __toString(){
 		$this->type = "text";
+
 		return parent::__toString();
 	}
 }

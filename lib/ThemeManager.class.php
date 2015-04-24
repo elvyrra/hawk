@@ -1,24 +1,32 @@
 <?php
 
 class ThemeManager{
-    private static $instances;
+    private static $themes;
     const DEFAULT_THEME = 'mint';
     
     public static function get($name = ''){
         if(empty($name))
             $name = self::DEFAULT_THEME;
             
-        if(!isset($instances[$name])){
-            self::$instances[$name] = new Theme($name);
+        if(!isset($themes[$name])){
+            self::$themes[$name] = new Theme($name);
         }
-        return self::$instances[$name];
+        return self::$themes[$name];
     }
     
     public function getSelected(){
-        return self::get(Option::get('main.selectedTheme'));
+        return self::get(Option::get('main.selected-theme'));
     }
     
     public static function setSelected($name){
-        Options::set('main.selectedTheme', $name);        
-    }   
+        Option::set('main.selected-theme', $name);        
+    }  
+
+    public static function getAll(){        
+        foreach(glob(THEMES_DIR . '*') as $theme){
+            self::get(basename($theme));
+        }
+
+        return self::$themes;
+    } 
 }

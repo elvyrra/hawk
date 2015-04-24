@@ -71,14 +71,16 @@ class AdminController extends Controller{
 						'name' => 'logo',
 						'label' => Lang::get('admin.settings-logo-label'),
 						'after' => Option::get('main.logo') ? '<img src="/userfiles/plugins/main/'.Option::get('main.logo').'" height="50" width="50" />' : '',
-						'maxSize' => 200000
+						'maxSize' => 200000,
+						'extensions' => array('gif', 'png', 'jpg', 'jpeg')
 					)),
 					
 					new FileInput(array(
 						'name' => 'favicon',
 						'label' => Lang::get('admin.settings-favicon-label'),
 						'after' => Option::get('main.favicon') ? '<img src="/userfiles/plugins/main/'.Option::get('main.favicon').'" height="50" width="50" />' : '',
-						'maxSize' => 20000
+						'maxSize' => 20000,
+						'extensions' => array('gif', 'png', 'jpg', 'jpeg')
 					))
 				),
 				
@@ -235,27 +237,31 @@ class AdminController extends Controller{
 							}
 							Option::set($name, $field->dbvalue());					
 						}
-						else{
-							if(!empty($_FILES[$name])){						
-								try{
-									$image = Image::getInstance($_FILES[$name]['tmp_name']);							
-									while($image->getFileSize() > $field->maxSize){
+						else{				
+
+							$upload = Upload::getInstance($name);						
+							if($upload){							
+								try{									
+									$file = $upload->getFile();
+
+									$image = Image::getInstance($file->tmpFile);										
+									while($image->getFileSize() > $field->maxSize){										
 										// Compress the image
-										$rate = floor($field->maxSize / $image->getFileSize() * 100);
-										$image = $image->compress($rate, $image->getFilename());
+										$file->tmpFile = dirname($file->tmpFile) . '/' . uniqid();
+										$image = $image->compress(50, $file->tmpFile);
 									}
-									
-									$filename = uniqid() . $image->getExtension();							
-									$dir = USERFILES_PLUGINS_DIR . '/main/';
+
+									$basename = uniqid() . '.' . $file->extension;
+									$dir = Plugin::get('main')->getUserfilesDir();
 									if(!is_dir($dir)){
 										mkdir($dir, 0755);
 									}
-									rename($image->getFilename(), $dir . $filename);
-									
+									$upload->move($file, $dir, $basename);	
+
 									// remove the old image
-									unlink($dir . Option::get("main.$name"));
+									@unlink($dir . Option::get("main.$name"));
 									
-									Option::set("main.$name", $filename);
+									Option::set("main.$name", $basename);
 								}
 								catch(ImageException $e){
 									$form->error($prop, Lang::get('form.image-format'));

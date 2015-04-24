@@ -1,6 +1,6 @@
 <div class="row">
 	<div class="col-md-6 col-md-offset-3">
-		{{ $form->displayFieldSet('_submits') }}
+		{{ $form->fieldsets['_submits'] }}
 		{{ $list }}
 	</div>
 </div>

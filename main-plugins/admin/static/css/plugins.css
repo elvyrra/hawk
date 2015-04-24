@@ -1,0 +1,13 @@
+.list-cell-available-plugins-list-controls button{
+    margin-right: 3px;
+}
+
+.list-cell-available-plugins-list-description {
+    position: relative;
+}
+
+.list-cell-available-plugins-list-description .meta-data{
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+}

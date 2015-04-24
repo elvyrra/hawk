@@ -42,11 +42,11 @@ class ItemList{
 		$this->action = $_SERVER['REQUEST_URI'];		
 		
 		/*** Get the values from the parameters array **/
-		foreach($params as $key => $value)
+		foreach($params as $key => $value){
 			$this->$key = $value;
+		}
 		
 		$model = $this->model;
-		
 		
 		if(!isset($this->reference)){
 			$this->reference = $model::getPrimaryColumn();			
@@ -58,11 +58,6 @@ class ItemList{
 		if(isset($this->table)){
 			$model::setTable($this->table);
 		}
-		// if($model === self::DEFAULT_MODEL){
-		// 	$model::setTable($this->table);
-		// 	$model::setPrimaryColumn($this->refField);
-		// }
-		
 		$this->dbo= DB::get($model::DBNAME);
 		$this->table = $model::getTable();
 		
@@ -111,11 +106,10 @@ class ItemList{
 	_____________________________________________________________________*/
 	public function get(){		
 	    $this->displayedColumns = 0;
-		if(isset($_POST["set-$this->id"])){
-			$this->force = is_array($_POST["set-$this->id"]) ? $_POST["set-$this->id"] : array();
-	        return $this->getFromArray($this->force);
-	    }			
-	    else{
+		if(!empty($this->data) && is_array($this->data)){
+	    	return $this->getFromArray($this->data);
+	    }
+	    elseif($this->model && $this->table){
 			return $this->getFromDatabase();
 		}
 	}
@@ -253,57 +247,62 @@ class ItemList{
 		DISPLAY THE LIST (WITH OR WITHOUT NAVIGATION BAR)
 	_____________________________________________________________________*/
 	public function __toString(){
-		// get the total number of pages
-        $pages = (ceil($this->recordNumber / $this->lines) > 0) ? ceil($this->recordNumber / $this->lines) : 1;
-		
-		/*** At least one result to display ***/
-		$display = array();
-		$param = array();
-		if(is_array($this->results)){
-			foreach($this->results as $id => $line){
-				$display[$id] = array();
-				$param[$id] = array();
+		try{
+			// get the total number of pages
+	        $pages = (ceil($this->recordNumber / $this->lines) > 0) ? ceil($this->recordNumber / $this->lines) : 1;
+			
+			/*** At least one result to display ***/
+			$display = array();
+			$param = array();
+			if(is_array($this->results)){
+				foreach($this->results as $id => $line){
+					$display[$id] = array();
+					$param[$id] = array();
 
-				if($this->selected == $id){
-					$param[$id]['class'] = 'selected ';
-				}
-				if($this->lineClass){
-					$function = $this->lineClass;
-					$param[$id]['class'] .= $function($line);
-				}
-
-				foreach($this->fields as $name => $field){
-					$display[$id][$name] = array();
-
-					foreach(array('title', 'href', 'onclick', 'style', 'unit', 'class', 'display', 'target') as $prop){
-						if(isset($field[$prop])){
-							if(is_callable($field[$prop])){
-								$field[$prop] = $field[$prop]($line->$name, $field, $line);
-							}
-							$display[$id][$name][$prop] = $field[$prop];
-						}						
+					if($this->selected == $id){
+						$param[$id]['class'] = 'selected ';
 					}
-					$display[$id][$name]['class'] .= " list-cell-$this->id-$name ";
-					if(isset($field['onclick']) || isset($field['href'])){
-						$display[$id][$name]['class'] .= " list-cell-clickable";
-					}							 
+					if($this->lineClass){
+						$function = $this->lineClass;
+						$param[$id]['class'] .= $function($line);
+					}
+
+					foreach($this->fields as $name => $field){
+						$display[$id][$name] = array();
+
+						foreach(array('title', 'href', 'onclick', 'style', 'unit', 'class', 'display', 'target') as $prop){
+							if(isset($field[$prop])){
+								if(is_callable($field[$prop])){
+									$field[$prop] = $field[$prop]($line->$name, $field, $line);
+								}
+								$display[$id][$name][$prop] = $field[$prop];
+							}						
+						}
+						$display[$id][$name]['class'] .= " list-cell-$this->id-$name ";
+						if(isset($field['onclick']) || isset($field['href'])){
+							$display[$id][$name]['class'] .= " list-cell-clickable";
+						}							 
+								
+						if($field['hidden']){
+							$display[$id][$name]['style'] = 'display:none';
+						}
 							
-					if($field['hidden']){
-						$display[$id][$name]['style'] = 'display:none';
-					}
-						
-					if(!isset($display[$id][$name]['display'])){
-						$display[$id][$name]['display'] = $line->$name;
+						if(!isset($display[$id][$name]['display'])){
+							$display[$id][$name]['display'] = $line->$name;
+						}
 					}
 				}
 			}
+			return View::make(Plugin::get('main')->getView("item-list.tpl"), array(			
+				'list' => $this,
+				'display' => $display,
+				'linesParameters' => $param,
+				'pages' => $pages
+			));
 		}
-		return View::make(Plugin::get('main')->getView("item-list.tpl"), array(			
-			'list' => $this,
-			'display' => $display,
-			'linesParameters' => $param,
-			'pages' => $pages
-		));		
+		catch(Exception $e){
+			exception_handler($e);
+		}
 	}	
 	
 	/*_____________________________________________________________________

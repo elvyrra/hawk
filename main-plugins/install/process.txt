@@ -10,4 +10,4 @@
 6. Insérer les roles Guest et Admin
 7. Insérer l'utilsateur guest en id=0, et le premier utilisateur de rôle admin
 8. Insérer le lient entre le role Admin et la permission admin.manage
-
+9. Si fichier package.json fourni, installation des différents plugins et thèmes

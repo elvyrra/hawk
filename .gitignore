@@ -1,3 +1,5 @@
 cache
 logs
 uploads
+plugins/**
+userfiles

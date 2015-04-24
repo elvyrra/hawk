@@ -23,10 +23,6 @@ $(".delete-lang").click(function(){
  */
 $("#language-manage-page")
 
-.on("click", ".edit-key", function(){	
-	mint.dialog(mint.getUri('edit-language-key', {keyId : $(this).data('key')}));
-})
-
 /**
  * Delete a translation key
  */

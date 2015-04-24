@@ -38,4 +38,9 @@ class Option{
 			'value' => $value
 		));
 	}
+
+	public function delete($name){
+		list($plugin, $key) = explode('.', $name);
+		DB::get(MAINDB)	->delete('Option', new DBExample(array('plugin' => $plugin, 'key' => $key)));
+	}
 }

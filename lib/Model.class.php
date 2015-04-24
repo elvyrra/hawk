@@ -115,6 +115,14 @@ class Model{
 	}
     
 
+    public static function add($data){
+        $class = get_called_class();
+        $instance = new $class($data);
+        $instance->save();
+
+        return $instance;
+    }
+
 
     public function addIfNotExists(){
         $id = static::$primaryColumn;

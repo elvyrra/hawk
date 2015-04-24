@@ -40,6 +40,10 @@ class FileCache{
 	public function get(){		
 		return is_file($this->cache_file) ? realpath($this->cache_file) : false;
 	}
+
+	public function getFile(){
+		return $this->get();
+	}
 	
 	/**
 	 * Save the cache content

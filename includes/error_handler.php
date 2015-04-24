@@ -42,8 +42,7 @@ if(ini_get('display_errors')){
 
 	}, E_USER_ERROR | E_USER_WARNING);
 
-
-	set_exception_handler(function($e){
+	function exception_handler($e){
 		$param = array(
 			'level' => 'error',
 			'icon' => 'excalamation-circle',
@@ -59,5 +58,6 @@ if(ini_get('display_errors')){
 			echo View::make(Plugin::get('main')->getView('error.tpl'), $param);
 		}
 		exit;
-	});
+	}
+	set_exception_handler('exception_handler');
 }

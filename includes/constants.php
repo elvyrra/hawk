@@ -14,6 +14,7 @@
 
 /*** Constant paths ***/
 define('LIB_DIR', ROOT_DIR . 'lib/');
+define('CUSTOM_LIB_DIR', ROOT_DIR . 'custom-lib/');
 define('VIEWS_DIR', 'views/');
 define('MAIN_PLUGINS_DIR', ROOT_DIR . 'main-plugins/');
 define('PLUGINS_DIR', ROOT_DIR . 'plugins/');

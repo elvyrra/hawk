@@ -2,15 +2,16 @@
 class Autoload{
     private static $cache = array();
     private static $cacheFile;
+
+    private static $searchDirectories = array(
+        LIB_DIR,
+        PLUGINS_DIR, 
+        MAIN_PLUGINS_DIR,
+        CUSTOM_LIB_DIR
+    );
 	
 	public static function load($classname){
-		$definedClasses = include __DIR__ . "/autoload-predefined.php";
-		if(isset($definedClasses[$classname])){
-			include $definedClasses[$classname];
-			return true;
-		}
-		
-        self::$cacheFile = CACHE_DIR . 'autoload-cache.php';		
+		self::$cacheFile = CACHE_DIR . 'autoload-cache.php';		
         
         if(is_file(self::$cacheFile) && empty(self::$cache)){
             self::$cache = include self::$cacheFile;            
@@ -19,24 +20,10 @@ class Autoload{
             include self::$cache[$classname];
             return true;
         }
-        $dirs = array(PLUGINS_DIR, MAIN_PLUGINS_DIR, LIB_DIR);
-        $extensions = array(
-            'Controller' => '.ctrl.php',
-            'Widget' => '.widget.php',
-        );
-        
-        if(preg_match('/^(\w+)(' . implode('|', array_keys($extensions)) . ')$/', $classname, $match)){
-            $ext = $extensions[$match[2]];
-            $base = $match[1];
-        }
-        else{
-            $ext = '.class.php';
-            $base = $classname;
-            $dirs = array_reverse($dirs);
-        }
-        
-        foreach($dirs as $dir){
-            exec("find $dir -type f -name '{$base}{$ext}'", $files, $return);
+
+        $filename = "$classname.class.php";
+        foreach(self::$searchDirectories as $dir){
+            exec("find $dir -type f -name '$filename'", $files, $return);
             if(empty($return) && !empty($files)){                
                 include $files[0];
                 self::$cache[$classname] = $files[0];

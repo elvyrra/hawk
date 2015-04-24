@@ -22,6 +22,13 @@
 
 <div class="modal fade" id="dialogbox"></div>
 
+<div id='loading'>
+	<span class='fa fa-spinner fa-spin fa-5x'></span>
+	<div id="loading-bar">
+		<span id='loading-purcentage'></span>
+	</div>
+</div>
+
 <div class="template" id="tab-title-template">
 	<li role="presentation" class="main-tab-title corner-top" id="main-tab-title-@@id" data-tab="@@id">
 		<a href="#main-tab-@@id" aria-controls="main-tab-@@id" role="tab" data-toggle="tab"></a>
@@ -44,7 +51,7 @@
 			if ($.pages[i]) {						
 				mint.load($.pages[i], {
 					newtab : true,
-					callback : function(){
+					onload : function(){
 						$.openLastTab(++i);
 					}
 				});

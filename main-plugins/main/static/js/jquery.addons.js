@@ -92,6 +92,22 @@
 		}
 		return true;	
 	};	
+
+	$.delete = function(url, data, callback, type){
+	  	if ( $.isFunction(data) ){
+			type = type || callback,
+		        callback = data,
+		        data = {};
+		}
+		 
+		return $.ajax({
+		    url: url,
+		    type: 'delete',
+		    success: callback,
+		    data: data,
+		    dataType: type
+		});
+	};
 })(jQuery);
 
 /******************* (C) COPYRIGHT 2014 ELVYRRA SAS *********************/

@@ -102,7 +102,7 @@
 				</tr>
 			{/foreach}
 		{else}
-			<tr><td class="list-no-result" colspan="{{ $list->displayedColumns }}"><center class="text-error"> {{ $list->emptyMessage }} </center></td></tr>
+			<tr><td class="list-no-result" colspan="100%"><center class="text-error"> {{ $list->emptyMessage }} </center></td></tr>
 		{/if}
 	</table>
 </div>

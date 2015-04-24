@@ -35,6 +35,9 @@ class Language extends Model{
 		
 		
 		$ini = parse_ini_string($tmp, true);
+		if(!is_dir(CACHE_DIR . 'lang')){
+			mkdir(CACHE_DIR . 'lang', 0755);
+		}
 		foreach($ini as $plugin => $translations){
 			file_put_contents(CACHE_DIR . 'lang/' . $plugin . '.' . $this->tag . '.php', '<?php return ' . var_export($translations, true) . ';');
 		}

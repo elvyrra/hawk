@@ -18,11 +18,9 @@
 		<link rel="stylesheet" href="{{ $mainCssDir }}bootstrap-datepicker.min.css" />
 		
 		<!-- Base CSS file of the theme -->
-		<link rel="stylesheet" href="{{ $themeBaseCss }}" />
+		<link rel="stylesheet" id="theme-base-stylesheet" href="{{ $themeBaseCss }}" />
 		<!-- Customized file of the theme -->
-		{if($themeCustomCss)}
-			<link rel="stylesheet" href="{{ $themeCustomCss }}" />
-		{/if}
+		<link rel="stylesheet" id="theme-custom-stylesheet" href="{{ $themeCustomCss }}" />
 				
 		<script type="text/javascript" id="main-js-script" src="{{ $mainJsDir }}mint.js"></script>
 		

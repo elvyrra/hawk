@@ -31,7 +31,7 @@ class Controller{
 		return new static($param);		
 	}
 	
-	public function _call($method){
+	public function compute($method){
 		/*** Load widgets before calling the controller method ***/
 		EventManager::trigger(new Event(get_called_class() . '.' . $method . '.' . self::BEFORE_ACTION, array('controller' => $this)));
 		
@@ -51,6 +51,12 @@ class Controller{
 	public function addCss($url){
 		Widget::add(Router::getCurrentAction(), Controller::AFTER_ACTION, function($event) use($url){
 			pq("*:last")->after("<link rel='stylesheet' property='stylesheet' type='text/css' href='$url' />");
+		});
+	}
+
+	public function addJavaScript($url){
+		Widget::add(Router::getCurrentAction(), Controller::AFTER_ACTION, function($event) use($url){
+			pq("*:last")->after("<script type='text/javascript' src='$url'></script>");
 		});
 	}
 }

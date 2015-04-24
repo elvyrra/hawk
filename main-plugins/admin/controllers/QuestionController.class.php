@@ -274,7 +274,7 @@ class QuestionController extends Controller{
 			}
 			else{
 				if($form->submitted() == "delete"){
-					$this->delete();					
+					$this->compute('delete');					
 
 					$form->response(Form::STATUS_SUCCESS);
 				}

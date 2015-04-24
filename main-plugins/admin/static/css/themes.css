@@ -1,0 +1,44 @@
+#manage-themes-page .theme-item .icons{
+	float: right;	
+	display: none;
+}
+
+#manage-themes-page .theme-item:hover .icons{
+	display: block;
+}
+
+
+#manage-themes-page .theme-item{
+	position: relative;
+	width: 220px;
+	height: 220px;
+}
+
+#manage-themes-page .theme-item .theme-preview{
+    height: auto;
+    width: 200px;
+    margin: auto;
+}
+
+#manage-themes-page .theme-media-item{
+	width: 180px;
+}
+
+#manage-themes-page .media-image-preview{
+	width: 150px;
+}
+
+#theme-css-edit{
+	display: block;	
+	position: absolute;
+	width: 100%;
+	height: 80%;
+}
+
+.delete-theme-media{
+	visibility: hidden
+}
+
+.theme-media-item:hover .delete-theme-media{
+	visibility: visible;
+}

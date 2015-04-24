@@ -67,6 +67,10 @@ class Form{
         foreach($param as $key => $value){
             $this->$key = $value;
         }
+
+        if(!in_array($this->columns, array(1,2,3,4,6,12))){
+        	$this->columns = 1;
+        }
 		
 		if(isset($this->model) && isset($this->reference)){
 			$model = $this->model;				
@@ -305,11 +309,6 @@ class Form{
 	 * @return : string
 	 */
 	public function display(){
-		// $fieldsets = array();		
-		// foreach($this->fieldsets as $name => $fieldset){
-		// 	$fieldsets[$name] = $this->displayFieldset($name);
-		// }		
-		
 		$content = View::make(Plugin::get('main')->getView('form/form-content.tpl') , array(
 			'form' => $this,
 			'fields' => $fields,
@@ -323,34 +322,13 @@ class Form{
 	 * Description : Overload lagic method __toString
 	 */
 	public function __toString(){
-		return $this->display();
+		try{
+			return $this->display();
+		}
+		catch(Exception $e){
+			exception_handler($e);
+		}
 	}
-	
-	/*
-	 * Display a fieldset
-	 * Prototype : public function displayFieldset($blockname)
-	 * @param: string $blockname, the name of the fieldset
-	 */
-	public function displayFieldset($fieldset){
-		$fields = array();
-		
-		foreach($this->fieldsets[$fieldset] as &$field){
-			if($field instanceof FormInput){
-				$fields[] = &$field;
-			}
-		}
-		if(!empty($fields)){
-			$fields[0]->first = true;
-			$fields[count($fields) - 1]->last = true;
-		}
-		
-        return View::make(Plugin::get('main')->getView('form/form-fieldset.tpl'), array(
-            'form' => $this,
-            'fieldset' => $this->fieldsets[$fieldset],
-            'name' => $fieldset,
-			'fields' => $fields
-        ));
-    }
 	
 	/*
      * Prototype : public function displayInput($fieldset, $field)

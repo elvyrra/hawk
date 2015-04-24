@@ -22,9 +22,20 @@ class FileInput extends FormInput{
 			$this->errorAt = $this->name;
 		
 		$basename = preg_replace("/^(\w+)(\[.*)?$/", "$1", $this->name);
-		if($this->required && empty($_FILES[$basename])){
+		$upload = Upload::getInstance($basename);
+		if($this->required && !$upload){
 			$form->errors[$this->errorAt] = Lang::get('form.required-field');
 			return false;
+		}
+
+		$filenames = $_FILES[$basename]['name'];
+		if($upload && $this->extensions){			
+			foreach($upload->getFiles() as $file){				
+				if(!in_array($file->extension, $this->extensions)){
+					$form && $form->errors[$this->errorAt] = Lang::get('form.invalid-file-extension');
+					return false;
+				}
+			}
 		}
 		return true;		
 	}

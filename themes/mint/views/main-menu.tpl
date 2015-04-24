@@ -1,23 +1,23 @@
 <div id="main-menu">	
 	{if($logo)}
-		<img class="application-logo" src="{{ $logo }}" />
+		<img class="application-logo pull-left" src="{{ $logo }}" />
 	{/if}
 	{foreach($menus as $menu)}
-		{if(!empty($menu->items))}
-			<div class="dropdown" id="main-menu-{{ $menu->id }}">
-				<div class="dropdown-toggle main-menu-title" type="button" id="main-menu-title-{{ $menu->id }}" data-toggle="dropdown" aria-expanded="true">
-					{text key="{$menu->labelKey}"}
-					<i class="fa fa-caret-down"></i>
-				</div>
-				<ul class="dropdown-menu" role="menu" aria-labelledby="main-menu-title-{{ $menu->id }}" id="main-menu-items-{{ $menu->id }}">
-					{foreach($menu->items as $item)}
-						<li role="presentation" id="main-menu-item-{{ $item->id }}">
-							<a role="menuitem" tabindex="-1" href="{uri action="{$item->action}"}">{text key="{$item->labelKey}"}</a>
-						</li>					
-					{/foreach}					
-				</ul>
+		<div class="dropdown pull-left" id="main-menu-{{ $menu->id }}">
+			<div class="dropdown-toggle main-menu-title" type="button" id="main-menu-title-{{ $menu->id }}" data-toggle="dropdown" aria-expanded="true">
+				{{ $menu->label }}
+				<i class="fa fa-caret-down"></i>
 			</div>
-		{/if}		
+			<ul class="dropdown-menu" role="menu" aria-labelledby="main-menu-title-{{ $menu->id }}" id="main-menu-items-{{ $menu->id }}">
+				{foreach($menu->visibleItems as $item)}
+					<li role="presentation" id="main-menu-item-{{ $item->id }}">							
+						<a role="menuitem" href="{uri action="{$item->action}"}" {if(!empty($item->target))} target="{{ $item->target }}" {/if}> 
+							{{ $item->label }}
+						</a>
+					</li>					
+				{/foreach}					
+			</ul>
+		</div>
 	{/foreach}
 	
 	{if(Session::logged())}
@@ -29,8 +29,10 @@
 					<i class="fa fa-caret-down"></i>
 				</div>
 				<ul class="dropdown-menu" role="menu" aria-labelledby="main-menu-title-admin">
-					{foreach($adminMenu as $item)}
-						<li role="presentation"><a role="menuitem" tabindex="-1" href="{{ $item['url'] }}" {if(!empty($item['target']))}target="{{ $item['target'] }}"{/if} >{{ $item['label'] }}</a></li>
+					{foreach($adminMenu as $item)}						
+						<li role="presentation">							
+							<a role="menuitem" href="{{ $item['url'] }}" {if(!empty($item['target']))}target="{{ $item['target'] }}"{/if} ><i class="fa fa-{{ $item['icon'] }}"></i>{{ $item['label'] }}</a>
+						</li>
 					{/foreach}
 				</ul>
 			</div>
@@ -44,8 +46,8 @@
 			</div>
 			<ul class="dropdown-menu" role="menu" aria-labelledby="main-menu-title-user">
 				{foreach($userMenu as $item)}
-					<li role="presentation">
-						<a role="menuitem" tabindex="-1" href="{{ $item['url'] }}" {if(!empty($item['class']))}class="{{ $item['class'] }}"{/if} {if(!empty($item['target']))}target="{{ $item['target'] }}"{/if} >{{ $item['label'] }}</a>
+					<li role="presentation">						
+						<a role="menuitem" href="{{ $item['url'] }}" {if(!empty($item['class']))}class="{{ $item['class'] }}"{/if} {if(!empty($item['target']))}target="{{ $item['target'] }}"{/if} ><i class="fa fa-{{ $item['icon'] }}"></i>{{ $item['label'] }}</a>
 					</li>					
 				{/foreach}					
 			</ul>

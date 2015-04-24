@@ -24,7 +24,7 @@ Conf::set(array(
 ));
 
 if(defined('CONFIG_MODE') && CONFIG_MODE){
-	include ROOT_DIR . 'config/' . CONFIG_MODE . '.php';
+	include ROOT_DIR . 'etc/' . CONFIG_MODE . '.php';
 }
 
 if(!defined('DEBUG_MODE')){

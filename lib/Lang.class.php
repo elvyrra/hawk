@@ -17,6 +17,8 @@ class Lang{
 	
 	/**
 	 * Load a language file 
+	 * @param {string} $plugin1 - The first plugin to load
+	 * @param {string} $plugin2 - ...
 	 */
 	public static function load(){
 		$plugins = func_get_args();
@@ -49,8 +51,12 @@ class Lang{
 			}
 		}
 	}
-	
-	
+
+
+	/**
+	 * Check if a language key exists 
+	 * @param {String} $langKey - the key to check existence
+	 */
 	public static function exists($langKey){
 		list($plugin, $key) = explode('.', $langKey);
         
@@ -58,10 +64,13 @@ class Lang{
 		return isset(self::$langs[$plugin][$key]);
 	}
     
-    /*____________________________________________________________________
-                  
-                        Return a key translation
-    ____________________________________________________________________*/
+    /**
+     * get the translation of a language key in the current language
+     * @param {String} $langKey - The key to get the translation
+     * @param {Array} $param - On associative array containing the variables value in the translation
+     * @param {mixed} $number - A number describing the singular or plural version of the translation
+     * @return {String} - The translation
+     */
     public static function get($langKey, $param = array(), $number = 0){
 		list($plugin, $key) = explode('.', $langKey);
 
@@ -98,6 +107,12 @@ class Lang{
         }
     }
 	
+
+	/**
+	 * Add language keys to Javascript
+	 * @param {String} $key1 - The first key
+	 * @param {String} $key2 .....
+	 */
 	public static function addKeysToJavascript(){
 		$keys = func_get_args();
 		Widget::add(Router::getCurrentAction(), Controller::AFTER_ACTION, function($event) use($keys){

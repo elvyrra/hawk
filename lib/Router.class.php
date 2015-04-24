@@ -73,6 +73,10 @@ class Router{
 	public static function post($name, $url, $param){
 		self::add('post', $name, $url, $param);
 	}
+
+	public static function delete($name, $url, $param){
+		self::add('delete', $name, $url, $param);
+	}
 	
 	public static function any($name, $url, $param){
 		self::add('any', $name, $url, $param);		
@@ -89,7 +93,7 @@ class Router{
 	                // call a controller method
 					$controller = new $classname($route->getData());                              
 	                
-					Response::set($controller->_call($method));
+					Response::set($controller->compute($method));
 				}
 				else{					
 					http_response_code(403);

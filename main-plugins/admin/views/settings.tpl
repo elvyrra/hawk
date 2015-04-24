@@ -1,4 +1,4 @@
-{{ $form->displayFieldset('_submits') }}
+{{ $form->fieldsets['_submits'] }}
 
 <div role="tabpanel" id="settings-form-tabs">	
 	<ul class="nav nav-tabs" role="tablist">
@@ -10,10 +10,10 @@
 	
 	<!-- Tab panes -->
 	<div class="tab-content">
-		<div role="tabpanel" class="tab-pane" id="settings-form-tab-main">{{ $form->displayFieldset('main') }}</div>
-		<div role="tabpanel" class="tab-pane" id="settings-form-tab-home">{{ $form->displayFieldset('home') }}</div>
-		<div role="tabpanel" class="tab-pane" id="settings-form-tab-users">{{ $form->displayFieldset('users') }}</div>
-		<div role="tabpanel" class="tab-pane" id="settings-form-tab-email">{{ $form->displayFieldset('email') }}</div>
+		<div role="tabpanel" class="tab-pane" id="settings-form-tab-main">{{ $form->fieldsets['main'] }}</div>
+		<div role="tabpanel" class="tab-pane" id="settings-form-tab-home">{{ $form->fieldsets['home'] }}</div>
+		<div role="tabpanel" class="tab-pane" id="settings-form-tab-users">{{ $form->fieldsets['users'] }}</div>
+		<div role="tabpanel" class="tab-pane" id="settings-form-tab-email">{{ $form->fieldsets['email'] }}</div>
 	</div>			  
 </div>
 

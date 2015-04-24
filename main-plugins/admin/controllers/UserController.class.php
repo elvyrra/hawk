@@ -8,9 +8,9 @@ class UserController extends Controller{
 	 */
 	public function index(){
 		$tabs = array(
-			'users' => $this->listUsers(),
-			'roles' => RoleController::getInstance()->listRoles(),
-			'questions' => QuestionController::getInstance()->listQuestions()
+			'users' => $this->compute('listUsers'),
+			'roles' => RoleController::getInstance()->compute('listRoles'),
+			'questions' => QuestionController::getInstance()->compute('listQuestions')
 		);
 
 		$this->addCss(Plugin::current()->getCssUrl(). "users.css");

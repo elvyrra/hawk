@@ -40,6 +40,10 @@ var Form = function(id, fields){
 
 
 
+/**
+ * Check the dat of the form
+ * @return {bool} - true if the form data is correct, false else
+ */
 Form.prototype.check = function(){
 	var valid = true;
 	for(var name in this.inputs){
@@ -71,7 +75,10 @@ Form.prototype.displayErrors = function(errors){
 
 Form.prototype.setActivity = function(activity){
 	this.activity = activity;
-	this.node.attr('method', activity);
+
+	if(self.name === "delete"){
+		this.node.attr('method', activity);
+	}
 };
 
 Form.prototype.submit = function(){		
@@ -83,11 +90,18 @@ Form.prototype.submit = function(){
 		mint.loading.start();
 		
 		/**** Send a POST Ajax request to submit the form ***/
+		var data = this.node.serializeObject();
+		if(this.activity){
+			data['_FORM_ACTION_'] = this.activity;
+		}
+
+		
 		$.ajax({
+			xhr : mint.xhr,
 			url : this.action,
 			type : this.method,
 			dataType : 'json',
-			data : this.upload ? new FormData(this.node.get(0)) : this.node.serialize(), /*** Send all the data contained in the form ***/
+			data : this.upload ? new FormData(this.node.get(0)) : data, /*** Send all the data contained in the form ***/
 			processData : ! this.upload
 		})
 		.done(function(results, code, xhr){

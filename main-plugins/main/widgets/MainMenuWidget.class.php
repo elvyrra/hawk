@@ -14,12 +14,8 @@ class MainMenuWidget extends Widget{
 		}
 		else{
 			// Get the menus 
-			$menus = Menu::getVisibleMenus($user);
-			
-			foreach($menus as $menu){
-				// Get the menu items
-				$menu->getVisibleItems();
-			}
+			$menus = Menu::getAvailableMenus($user);
+
 			
 			// Trigger an event to add or remove menus from plugins 
 			$event = new Event(self::EVENT_AFTER_GET_MENUS, array(
@@ -33,19 +29,23 @@ class MainMenuWidget extends Widget{
 		if(Session::logged()){
 			$userMenu = array(
 				'myProfile' => array(
+					'icon' => 'user',
 					'url' => Router::getUri('UserProfileController.display', array('userId' => $user->id)),
 					'label' => Lang::get('main.menu-my-profile'),
 				),
 				'editProfile' => array(
+					'icon' => 'pencil',
 					'url' => Router::getUri('UserProfileController.edit', array('userId' => $user->id)),
 					'label' => Lang::get('main.menu-edit-profile'),
 				),	
 				'change-password' => array(
+					'icon' => 'lock',
 					'url' => Router::getUri('UserPorfileController.changePassword'),
 					'label' => Lang::get('main.menu-change-password'),
 					'target' => 'dialog',
 				),
 				'logout' => array(
+					'icon' => 'sign-out',
 					'url' => Router::getUri('LoginController.logout'),
 					'label' => Lang::get('main.menu-logout'),
 					'class' => 'real-link'
@@ -61,6 +61,7 @@ class MainMenuWidget extends Widget{
 				$adminMenu = array();
 				if($user->isAllowed('admin.all')){
 					$adminMenu['settings'] = array(
+						'icon' => 'cog',
 						'url' => Router::getUri('AdminController.settings'),
 						'label' => Lang::get('main.menu-admin-settings-title'),
 					);
@@ -68,33 +69,38 @@ class MainMenuWidget extends Widget{
 				
 				if($user->isAllowed('admin.users') || $user->isAllowed('admin.all')){
 					$adminMenu['users'] = array(
-						'url' => Router::getUri('UserController.index'),
+						'icon' => 'users',
+						'url' => Router::getUri('manage-users'),
 						'label' => Lang::get('main.menu-admin-users-title'),
 					);
 
 					$adminMenu['permissions'] = array(
-						'url' => Router::getUri('PermissionController.index'),
+						'icon' => 'ban',
+						'url' => Router::getUri('permissions'),
 						'label' => Lang::get('main.menu-admin-roles-title'),
 					);
 				}
 					
 				if($user->isAllowed('admin.themes') || $user->isAllowed('admin.all')){
 					$adminMenu['display'] = array(
-						'url' => Router::getUri('DisplayController.index'),
+						'icon' => 'paint-brush',
+						'url' => Router::getUri('manage-themes'),
 						'label' => Lang::get('main.menu-admin-display-title'),
 					);
 				}
 					
 				if($user->isAllowed('admin.all')){
 					$adminMenu['plugins'] = array(
-						'url' => Router::getUri('PluginController.index'),
+						'icon' => 'plug',
+						'url' => Router::getUri('manage-plugins'),
 						'label' => Lang::get('main.menu-admin-plugins-title'),
 					);
 				}
 				
 				if($user->isAllowed('admin.languages') || $user->isAllowed('admin.all')){
 					$adminMenu['language'] = array(
-						'url' => Router::getUri('LanguageController.index'),
+						'icon' => 'flag',
+						'url' => Router::getUri('manage-languages'),
 						'label' => Lang::get('main.menu-admin-language-title')
 					);
 				}
