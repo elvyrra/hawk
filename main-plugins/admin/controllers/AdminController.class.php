@@ -166,7 +166,6 @@ class AdminController extends Controller{
 						'name' => 'main.stmp-host',
 						'default' => Option::get('main.smtp-host'),
 						'label' => Lang::get('admin.settings-smtp-host-label'),						
-						'nl' => false,
 					)),
 					
 					new IntegerInput(array(
@@ -174,7 +173,8 @@ class AdminController extends Controller{
 						'default' => Option::get('main.smpt-port'),
 						'label' => ':',
 						'labelWidth' => 'auto',
-						'class' => 'small-input'
+						'size' => 4,
+						'nl' => false
 					)),
 					
 					new TextInput(array(

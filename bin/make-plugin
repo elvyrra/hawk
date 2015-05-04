@@ -1,0 +1,61 @@
+#!/usr/bin/php
+
+<?php
+
+if(empty($argv[1])){
+    echo "Please give the name of the plugin";
+    exit;
+}
+
+$name = $argv[1];
+$dir= __DIR__ . '/../plugins/' . $name ;
+
+
+// make plugin structure
+`mkdir $dir`;
+`mkdir $dir/controllers`;
+`mkdir $dir/models`;
+`mkdir $dir/classes`;
+`mkdir $dir/views`;
+`mkdir $dir/static`;
+`mkdir $dir/widgets`;
+`touch $dir/start.php`;
+`touch $dir/manifest.json`;
+
+// Construct the manifest.json file
+$installerClass = str_replace(' ', '', ucwords(str_replace(array('-', '.', '_'), ' ', $name))) . 'Installer';
+$conf = array(
+    'title' => $name,
+    'description' => $name,
+    'version' => '0.1',
+    'author' => '',
+    'installer' => $installerClass,
+    'dependencies' => array()
+);
+
+file_put_contents($dir . '/manifest.json', json_encode($conf, JSON_PRETTY_PRINT));
+
+// Construct the installer class file
+$installerContent = 
+'<?php
+class ' . $installerClass.' extends PluginInstaller{
+
+    public function install(){
+        
+    }
+
+    public function uninstall(){
+        
+    }
+
+    public function activate(){
+        
+    }
+
+    public function deactivate(){
+        
+    }
+}
+';
+
+file_put_contents($dir . '/classes/' . $installerClass . '.class.php', $installerContent);
