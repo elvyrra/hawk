@@ -38,10 +38,10 @@ class Menu extends Model{
 	public static function add($name, $labelKey, $order = -1){
 		if($order === -1){
 			$order = DB::get(self::DBNAME)->select(array(
-				'from' => self::$tablename,
-				'orderby' => array('order' => DB::SORT_DESC),
+				'fields' => array('MAX(`order`) + 1' => 'newOrder'),
+				'from' => self::$tablename,				
 				'one' => true,
-			))->order + 1;
+			))->newOrder;
 		}
 		else{
 			// First update the menus which order is greater than the one you want to include

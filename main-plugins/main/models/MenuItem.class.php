@@ -36,13 +36,17 @@ class MenuItem extends Model{
 	}
 
 	public static function add($data){
+		if(!isset($data['menuId'])){
+			throw new Exception("To add a new menu item, you must give the menuId in the item parameters");
+		}
+
 		if(!isset($data['order']) || $data['order'] === -1){
 			$data['order'] = DB::get(self::DBNAME)->select(array(
+				'fields' => array('MAX(`order`) + 1' => 'newOrder')
 				'from' => self::$tablename,
-				'where' => new DBExample(array('menuId' => $data['menuId'])),
-				'orderby' => array('order' => DB::SORT_DESC),
+				'where' => new DBExample(array('menuId' => $data['menuId'])),				
 				'one' => true,
-			))->order + 1;
+			))->newOrder;
 		}
 		else{
 			// First update the items which order is greater than the one you want to include
