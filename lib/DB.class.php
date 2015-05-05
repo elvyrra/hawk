@@ -209,7 +209,7 @@ class DB{
 		Select a database
 	_____________________________________________________________________________*/
     public function selectDb($dbname){
-        $this->query('use :dbname', array('dbname' => $dbname));
+        return $this->query('use ' . $dbname);
     }
 	
 	/*_____________________________________________________________________________
