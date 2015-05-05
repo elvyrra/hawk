@@ -44,6 +44,9 @@ class DB{
 		foreach($data as $key => $value){
 			$this->$key = $value;
 		}
+		if(strpos($this->host, ':') !== false){
+			list($this->host, $this->port) = explode(':', $this->host, 2);
+		}
 		try	{
 			$dns = "mysql:host=$this->host";
 			if(!empty($this->dbname)){
