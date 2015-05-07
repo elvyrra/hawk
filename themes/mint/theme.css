@@ -1,4 +1,5 @@
-/* define(blue, color, "Items backgrounds", #2C3742) */
+/* define(headerBackground, color, "Header and footer backgrounds", #333) */
+/* define(headerColor, color, "Header and footer font color", #d6d6d6) */
 /* define(backgroundImage, file, "Background image", none) */
 /* define(textColor, color, "Text color", #777) */
 /* define(bodyBackground, color, "Body background", #fff) */
@@ -441,8 +442,8 @@ table th span.line{
 
 
 #main-menu, #footer{        
-    background: @blue;
-    color: #d6d6d6;
+    background: @headerBackground;
+    color: @headerColor;
     width: 100%;
     border: none;
 }

@@ -115,7 +115,7 @@ Form.prototype.submit = function(){
 		})
 		
 		.fail(function(xhr, code, err){			
-			if(xhr.status === 200 && code === "parsererror"){
+			if(code === "parsererror"){
 				self.displayErrorMessage(xhr.responseText);
 			}
 			else{
