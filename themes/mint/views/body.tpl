@@ -63,11 +63,12 @@
 		$(window).load(function(){							
 			{if(!$canAccessApplication)}
 				$("#main-menu-login-btn a").click();
+				mint.loading.stop();
 			{else}
 				if($.pages){
 					$.openLastTab(0);
 				}
-				else{
+				else{					
 					mint.tabset.push();
 				}
 			{/if}
