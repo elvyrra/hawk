@@ -20,23 +20,26 @@
 
 
 <script type="text/javascript">
+
 	$("#settings-form-tabs .nav a:first").tab('show');
 	
-	$("#settings-form [name='main[home-page-type]']").change(function(){
+	$("#settings-form [name='main.home-page-type']").change(function(){
 		if($(this).is(':checked')){
-			if ($(this).val() == 'default') {
-				$("#home-page-html").parent().slideUp();
+			if ($(this).val() == 'custom') {
+				$("#home-page-html").parent().slideDown();
+				$("#home-page-item").parent().slideUp();
 			}
 			else{
-				$("#home-page-html").parent().slideDown();
+				$("#home-page-html").parent().slideUp();
+				$("#home-page-item").parent().slideDown();
 			}
 		}
 	}).trigger('change');
 	
-	$("#settings-form [name='users[open-register]']").change(function(){
-		nodes = $("#settings-form").find("[name='users[confirm-register-email]'], [name='users[confirm-register-terms]']");
+	$("#settings-form [name='main.open-register']").change(function(){
+		var nodes = $("#settings-form").find("[name='main.confirm-register-email'], [name='main.confirm-register-terms']");
 		if($(this).is(':checked')){
-			if ($(this).val() == 'off') {
+			if ($(this).val() == '0') {
 				nodes.parent().slideUp();
 			}
 			else{

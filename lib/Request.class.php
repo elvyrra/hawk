@@ -42,4 +42,8 @@ class Request{
         // le header HTTP_X_FORWARDED_FOR n'est pas supporté par le proxy de l'utilisateur ou aucune adresse non locale n'a été trouvée
         return $_SERVER['REMOTE_ADDR'];
     }
+
+    public function redirect($url){
+        header("Location: " . Router::getUri($url));
+    }
 }

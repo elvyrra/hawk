@@ -68,7 +68,7 @@ class MainController extends Controller{
 					Option::get('main.home-page-html');			
 		}
 		else{
-			return View::make(Plugin::current()->getViewsDir() . 'new-tab.tpl');
+			Request::redirect(Option::get('main.home-page-item'));
 		}
 	}
 	

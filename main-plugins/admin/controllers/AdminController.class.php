@@ -24,7 +24,15 @@ class AdminController extends Controller{
 			$roles[$role->id] = Lang::get("roles.role-$role->id-label");
 		}
 
-		
+		$menus = Menu::getAvailableMenus($user);
+
+		$menuItems = array();
+		foreach($menus as $menu){
+			foreach($menu->visibleItems as $item){
+				$menuItems[$item->action] = $menu->label . " &gt; " . $item->label;
+			}
+		}
+
 		$param = array(
 			'id' => 'settings-form',
 			'upload' => true,
@@ -90,8 +98,9 @@ class AdminController extends Controller{
 					new RadioInput(array(
 						'name' => 'main.home-page-type',
 						'options' => array(
-							'default' => Lang::get('admin.settings-home-page-type-default'),
+							// 'default' => Lang::get('admin.settings-home-page-type-default'),
 							'custom' => Lang::get('admin.settings-home-page-type-custom'),
+							'page' => Lang::get('admin.settings-home-page-type-page'),
 						),
 						'default' => Option::get('main.home-page-type') ? Option::get('main.home-page-type') : 'default',
 						'label' => Lang::get('admin.settings-home-page-type-label'),
@@ -103,6 +112,13 @@ class AdminController extends Controller{
 						'id' => 'home-page-html',
 						'label' => Lang::get('admin.settings-home-page-html-label'),
 						'default' => Option::get('main.home-page-html'),
+					)),
+
+					new SelectInput(array(
+						'name' => 'main.home-page-item',
+						'id' => 'home-page-item',
+						'label' => Lang::get('admin.settings-home-page-item-label'),
+						'options' => $menuItems
 					)),
 					
 					new CheckboxInput(array(
