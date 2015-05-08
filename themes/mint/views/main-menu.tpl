@@ -11,7 +11,7 @@
 			<ul class="dropdown-menu" role="menu" aria-labelledby="main-menu-title-{{ $menu->id }}" id="main-menu-items-{{ $menu->id }}">
 				{foreach($menu->visibleItems as $item)}
 					<li role="presentation" id="main-menu-item-{{ $item->id }}">							
-						<a role="menuitem" href="{uri action="{$item->action}"}" {if(!empty($item->target))} target="{{ $item->target }}" {/if}> 
+						<a role="menuitem" href="{uri action="{$item->action}"}" {if(!empty($item->target))} target="{{ $item->target ? $item->target : 'newtab' }}" {/if}> 
 							{{ $item->label }}
 						</a>
 					</li>					
@@ -31,7 +31,7 @@
 				<ul class="dropdown-menu" role="menu" aria-labelledby="main-menu-title-admin">
 					{foreach($adminMenu as $item)}						
 						<li role="presentation">							
-							<a role="menuitem" href="{{ $item['url'] }}" {if(!empty($item['target']))}target="{{ $item['target'] }}"{/if} ><i class="fa fa-{{ $item['icon'] }}"></i>{{ $item['label'] }}</a>
+							<a role="menuitem" href="{{ $item['url'] }}" target="{{ $item['target'] ? $item['target'] : 'newtab' }}" ><i class="fa fa-{{ $item['icon'] }}"></i>{{ $item['label'] }}</a>
 						</li>
 					{/foreach}
 				</ul>
@@ -47,7 +47,7 @@
 			<ul class="dropdown-menu" role="menu" aria-labelledby="main-menu-title-user">
 				{foreach($userMenu as $item)}
 					<li role="presentation">						
-						<a role="menuitem" href="{{ $item['url'] }}" {if(!empty($item['class']))}class="{{ $item['class'] }}"{/if} {if(!empty($item['target']))}target="{{ $item['target'] }}"{/if} ><i class="fa fa-{{ $item['icon'] }}"></i>{{ $item['label'] }}</a>
+						<a role="menuitem" href="{{ $item['url'] }}" {if(!empty($item['class']))}class="{{ $item['class'] }}"{/if} target="{{ $item['target'] ? $item['target'] : 'newtab' }}" ><i class="fa fa-{{ $item['icon'] }}"></i>{{ $item['label'] }}</a>
 					</li>					
 				{/foreach}					
 			</ul>

@@ -230,13 +230,10 @@ App.prototype.load = function(url, data){
 		if(url != this.getUri('MainController.newTab')){				
 			for(var i in this.tabset.tabs){
 				if (this.tabset.tabs[i].url == url) {						
-					if (i == this.tabset.getActiveTab().id) {
-						break;
-					}
-					else{
+					if (i !== this.tabset.getActiveTab().id) {
 						this.tabset.activateTab(i);
-						return false;
 					}
+					return false;
 				}
 			}
 		}

@@ -1,0 +1,96 @@
+#!/usr/bin/php
+
+<?php
+define('PLUGINS_DIR', __DIR__ . '/../plugins/');
+$parameters = array(
+    'name' => array(
+        'question' => 'What is the name of the plugin (authorized caracters : alphanumeric, "-", "_") :',
+        'regex' => '/^[\w\-]+$/'
+    ),
+
+    'title' => array(
+        'question' => 'Give a short title to the plugin :',
+        'regex' => '/^.+$/'
+    ),
+
+    'description' => array(
+        'question' => 'Description :',
+        'regex' => '/^.*$/'
+    ),
+
+    'version' => array(
+        'question' => 'Version (default : 0.1) :',
+        'regex' => '/^.*$/'
+    ),
+
+    'author' => array(
+        'question' => 'Author :',
+        'regex' => '/^.*$/'        
+    ),
+);
+
+foreach($parameters as $param => $options){
+    // Get the plugin name
+    do{
+        echo $options['question'];
+        $$param = trim(fgets(STDIN));
+        if($param == 'name' && is_dir(PLUGINS_DIR . $$param)){
+            echo "\033[0;31mThis plugin name already exists, please choose another name\n\033[0m";
+            $$param = '';
+        }
+    }
+    while(!preg_match($options['regex'], $$param));
+}
+
+$dir = PLUGINS_DIR . $name ;
+
+
+// make plugin structure
+`mkdir $dir`;
+`mkdir $dir/controllers`;
+`mkdir $dir/models`;
+`mkdir $dir/classes`;
+`mkdir $dir/views`;
+`mkdir $dir/static`;
+`mkdir $dir/widgets`;
+`touch $dir/start.php`;
+`touch $dir/manifest.json`;
+
+// Construct the manifest.json file
+$installerClass = str_replace(' ', '', ucwords(str_replace(array('-', '_'), ' ', $name))) . 'Installer';
+
+$conf = array(
+    'title' => $title,
+    'description' => $description,
+    'version' => $version ? $version : '0.1',
+    'author' => $author,
+    'installer' => $installerClass,
+    'dependencies' => array()
+);
+
+file_put_contents($dir . '/manifest.json', json_encode($conf, JSON_PRETTY_PRINT));
+
+// Construct the installer class file
+$installerContent = 
+'<?php
+class ' . $installerClass.' extends PluginInstaller{
+
+    public function install(){
+        
+    }
+
+    public function uninstall(){
+        
+    }
+
+    public function activate(){
+        
+    }
+
+    public function deactivate(){
+        
+    }
+}
+';
+
+file_put_contents($dir . '/classes/' . $installerClass . '.class.php', $installerContent);

@@ -31,6 +31,7 @@ class Lang{
 		
 		foreach($plugins as $plugin){
 			if(!isset(self::$langs[$plugin])){
+				self::$langs[$plugin] = array();
 				/*
 				 * First Load the default language
 				 */
