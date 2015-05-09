@@ -2,7 +2,7 @@
 
 class Permission extends Model{
 	protected static $tablename = "Permission";
-	protected static $primeryColumn = "id";
+	protected static $primaryColumn = "id";
 	
 	const ALL_PRIVILEGES_ID = 1;
 
