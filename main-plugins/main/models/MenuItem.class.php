@@ -46,6 +46,7 @@ class MenuItem extends Model{
 				'from' => self::$tablename,
 				'where' => new DBExample(array('menuId' => $data['menuId'])),				
 				'one' => true,
+				'return' => DB::RETURN_OBJECT
 			))->newOrder;
 		}
 		else{

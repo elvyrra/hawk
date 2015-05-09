@@ -41,6 +41,7 @@ class Menu extends Model{
 				'fields' => array('MAX(`order`) + 1' => 'newOrder'),
 				'from' => self::$tablename,				
 				'one' => true,
+				'return' => DB::RETURN_OBJECT
 			))->newOrder;
 		}
 		else{
