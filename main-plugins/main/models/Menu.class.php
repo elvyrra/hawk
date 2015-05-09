@@ -38,7 +38,7 @@ class Menu extends Model{
 	public static function add($name, $labelKey, $order = -1){
 		if($order === -1){
 			$order = DB::get(self::DBNAME)->select(array(
-				'fields' => array('MAX(`order`) + 1' => 'newOrder'),
+				'fields' => array('COALESCE(MAX(`order`), 0) + 1' => 'newOrder'),
 				'from' => self::$tablename,				
 				'one' => true,
 				'return' => DB::RETURN_OBJECT

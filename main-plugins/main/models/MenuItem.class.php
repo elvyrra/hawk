@@ -42,7 +42,7 @@ class MenuItem extends Model{
 
 		if(!isset($data['order']) || $data['order'] === -1){
 			$data['order'] = DB::get(self::DBNAME)->select(array(
-				'fields' => array('MAX(`order`) + 1' => 'newOrder'),
+				'fields' => array('COALESCE(MAX(`order`), 0) + 1' => 'newOrder'),
 				'from' => self::$tablename,
 				'where' => new DBExample(array('menuId' => $data['menuId'])),				
 				'one' => true,
