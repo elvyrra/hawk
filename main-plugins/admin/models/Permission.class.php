@@ -22,7 +22,7 @@ class Permission extends Model{
 
 	public function add($name, $default = 1, $availableForGuest = 0){
 		list($plugin, $key) = explode('.', $name);
-		$persmission = parent::add(array(
+		$permission = parent::add(array(
 			'plugin' => $plugin,
 			'key' => $key,
 			'availableForGuest' => $availableForGuest
@@ -37,5 +37,7 @@ class Permission extends Model{
 				'value' => $value
 			));
 		}
+
+		return $permission;
 	}
 }
