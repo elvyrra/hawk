@@ -20,7 +20,17 @@ class Permission extends Model{
 		return $groups;
 	}
 
-	public function add($name, $default = 1, $availableForGuest = 0){
+	public static function getPluginPermissions($plugin){
+		return self::getListByExample(new DBExample(array('plugin' => $plugin)));
+	}
+
+	public static function getByName($name){
+		list($plugin, $key) = explode('.', $name);
+
+		return self::getByExample(new DBExample(array('plugin' => $plugin, 'key' => $key)));
+	}
+
+	public static function add($name, $default = 1, $availableForGuest = 0){
 		list($plugin, $key) = explode('.', $name);
 		$permission = parent::add(array(
 			'plugin' => $plugin,
