@@ -35,7 +35,7 @@ class Permission extends Model{
 		$permission = parent::add(array(
 			'plugin' => $plugin,
 			'key' => $key,
-			'availableForGuest' => $availableForGuest
+			'availableForGuests' => $availableForGuest
 		));
 
 		$roles = Role::getAll();
