@@ -123,6 +123,10 @@ class Router{
 	public static function getCurrentAction(){
 		return isset(self::$currentRoute) ? self::$currentRoute->action : '';
 	}
+
+	public function getCurrentController(){
+		return Controller::$currentController;
+	}
 	
 	// Generate a route from a given controller method and its arguments	
 	public static function getUri($method = '', $args= array()){

@@ -120,6 +120,8 @@ class Model{
         $instance = new $class($data);
         $instance->save();
 
+        EventManager::trigger(new Event(strtolower($class).'.added', array('data' => $data)));
+
         return $instance;
     }
 
@@ -146,7 +148,11 @@ class Model{
 
 	public function delete(){
 		$id = static::$primaryColumn;
-		return $this->dbo->delete(static::$tablename, new DBExample(array($id => $this->$id)));
+		$deleted = $this->dbo->delete(static::$tablename, new DBExample(array($id => $this->$id)));
+
+        EventManager::trigger(new Event(strtolower($class).'.deleted', array('object' => $this)));
+
+        return $deleted;
 	}
 	
 

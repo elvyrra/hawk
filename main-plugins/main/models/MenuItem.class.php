@@ -55,7 +55,7 @@ class MenuItem extends Model{
 			DB::get(self::DBNAME)->query($sql, array('order' => $order, 'menuId' => $data['menuId']));
 		}
 
-		// Insert the menu
+		// Insert the menu item
 		$menu = parent::add($data);	
 
 		return $menu;

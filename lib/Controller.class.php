@@ -15,6 +15,7 @@
 class Controller{	
 	private $widgets;
 	public $response;
+	public static $currentController = null;
 	
 	const BEFORE_ACTION = 'before';
     const AFTER_ACTION = 'after';
@@ -25,6 +26,7 @@ class Controller{
 			$this->$key = $value;
 		}	
 		$this->theme = ThemeManager::getSelected();
+		self::$currentController = $this;
 	}
 	
 	public static function getInstance($param = array()){
@@ -54,10 +56,22 @@ class Controller{
 		});
 	}
 
+	public function addCssInline($style){
+		Widget::add(Router::getCurrentAction(), Controller::AFTER_ACTION, function($event) use($style){
+			pq("*:last")->after("<style type='text/css'>$style</style>");
+		});
+	}
+
 	public function addJavaScript($url){
 		Widget::add(Router::getCurrentAction(), Controller::AFTER_ACTION, function($event) use($url){
 			pq("*:last")->after("<script type='text/javascript' src='$url'></script>");
 		});
+	}
+
+	public function addJavaScriptInline($script){
+		Widget::add(Router::getCurrentAction(), Controller::AFTER_ACTION, function($event) use($script){
+			pq("*:last")->after("<script type='text/javascript'>$script</script>");
+		});	
 	}
 }
 /******************* (C) COPYRIGHT 2014 ELVYRRA SAS *********************/

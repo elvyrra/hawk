@@ -86,6 +86,10 @@ Router::auth(Request::isAjax() && Session::logged(), function(){
 		// Definitively remove a plugin
 		Router::get('delete-plugin', '/admin/plugins/{plugin}/remove', array('where' => array('plugin' => '[a-zA-Z0-9\-_.]+'), 'action' => 'PluginController.delete'));
 
+		EventManager::on('menuitem.added menu.added menu.deleted menuitem.deleted', function($event){
+            Router::getCurrentController()->addJavaScriptInline('advertMenuChanged()');
+        });
+
 	});
 
 	

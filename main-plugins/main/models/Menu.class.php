@@ -57,6 +57,8 @@ class Menu extends Model{
 			'order' => $order
 		));	
 
+		EventManager::trigger(new Event('menu.added', array('name' => $name, 'title' => Lang::get($labelKey))));
+
 		return $menu;
 	}
 

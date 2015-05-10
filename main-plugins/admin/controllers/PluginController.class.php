@@ -139,10 +139,10 @@ class PluginController extends Controller{
         );
         
         $list = new ItemList($param);
+        Lang::addKeysToJavaScript("admin.plugins-advert-menu-changed");
+
         return $list;        
     }
-
-
 
 
     /**

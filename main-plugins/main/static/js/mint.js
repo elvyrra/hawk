@@ -233,7 +233,7 @@ App.prototype.load = function(url, data){
 					if (i !== this.tabset.getActiveTab().id) {
 						this.tabset.activateTab(i);
 					}
-					return false;
+					// return false;
 				}
 			}
 		}

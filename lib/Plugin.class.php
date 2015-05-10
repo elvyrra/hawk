@@ -338,7 +338,7 @@ class Plugin{
 			'active' => 0
 		), 'IGNORE');
 
-		$this->getInstallerInstance()->install();
+		$this->getInstallerInstance()->install();		
 	}
 	
 
