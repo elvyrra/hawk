@@ -6,9 +6,13 @@ class ViewPluginAccordion extends ViewPlugin{
 			$this->id = uniqid();
 		}
 
-		foreach($this->panels as &$panel){
+		foreach($this->panels as $name => &$panel){
 			if(!$panel['id']){
 				$panel['id'] = uniqid();
+			}
+
+			if(!isset($this->selected)){
+				$this->selected = $name;
 			}
 		}
 
