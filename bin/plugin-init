@@ -53,6 +53,7 @@ $dir = PLUGINS_DIR . $name ;
 `mkdir $dir/views`;
 `mkdir $dir/static`;
 `mkdir $dir/widgets`;
+`mkdir $dir/lang`;
 `touch $dir/start.php`;
 `touch $dir/manifest.json`;
 

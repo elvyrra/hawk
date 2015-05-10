@@ -399,7 +399,7 @@ class DB{
     }
 	
 	public static function formatField($str){
-		return preg_replace_callback('/(\w+)(\.(\w+))?/', function($m){ return "`{$m[1]}`".(isset($m[2]) && isset($m[3]) ? ".`{$m[3]}`" : "");}, $str);
+		return preg_replace_callback('/^(\w+)(\.(\w+))?$/', function($m){ return "`{$m[1]}`".(isset($m[2]) && isset($m[3]) ? ".`{$m[3]}`" : "");}, $str);
 	}
 	
 	public static function escape($str){		
