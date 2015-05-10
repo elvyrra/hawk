@@ -48,9 +48,11 @@ List.prototype.display = function(force){
         data: data,
         cache : false,
         success:function(response){            
-            self.wrapper.html(response);
-        },
-        error:function(XMLHttpRequest,textStatus, errorThrown){
+        	var node = this.target ? $(this.target) : this.wrapper;
+            node.html(response);
+        }.bind(this),
+        
+        error:function(xhr, status, err){
             mint.advert("error", Lang.get("main.refresh-list-error"));
         }
     });

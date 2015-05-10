@@ -110,6 +110,7 @@
 	mint.lists["{{ $list->id }}"] = new List({
 		id : "{{ $list->id }}",
 		action : "{{ $list->action }}",
+		target : "{{ $list->target }}",
 		lines : {{ $list->lines }},
 		page : {{ $list->page }},
 		sorts : {{ json_encode($list->sorts,JSON_HEX_QUOT | JSON_HEX_APOS | JSON_FORCE_OBJECT) }},
