@@ -68,6 +68,10 @@ class User extends Model{
 	}
 	
 	public function isAllowed($action){
+		if($this->roleId == Role::ADMIN_ROLE_ID){
+			return true;
+		}
+		
 		$this->getPermissions();
 		if(strpos($action, '.') !== false){
 			list($plugin, $command) = explode('.', $action);
