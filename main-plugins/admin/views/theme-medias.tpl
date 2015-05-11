@@ -6,7 +6,7 @@
 	<div class="col-md-10">
 		{foreach($medias as $catname => $category)}
 			<div class="row">
-				<h3> <i class="fa fa-{{ $category['icon'] }}"></i> {{ Lang::get('admin.theme-medias-category-' . $catname . '-title') }} </h3>
+				<h3> <i class="fa fa-{{ $category['icon'] }}"></i> {text key="{'admin.theme-medias-category-' . $catname . '-title'}" }</h3>
 				<hr />
 				{if(!empty($category['files']))}
 					{foreach($category['files'] as $file)}

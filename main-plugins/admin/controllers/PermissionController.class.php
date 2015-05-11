@@ -10,7 +10,7 @@ class PermissionController extends Controller{
 		foreach($data as $value){
 			$values[$value->permissionId][$value->roleId] = $value->value;
 		}
-		$roles = $this->roleId ? array(Role::getById($this->roleId)) : Role::getAll(null, array(), array(), true);
+		$roles = $this->roleId ? array(Role::getById($this->roleId)) : Role::getAll(null, array(), array(), Option::get('main.allow-guest') ? true : false);
 
 		$param = array(
 			'id' => 'permissions-form',
