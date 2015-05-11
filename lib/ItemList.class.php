@@ -58,7 +58,11 @@ class ItemList{
 		if(isset($this->table)){
 			$model::setTable($this->table);
 		}
-		$this->dbo= DB::get($model::DBNAME);
+		if(isset($this->dbname)){
+			$model::setDbName($this->dbname);
+		}
+		
+		$this->dbo= DB::get($model::getDbName());
 		$this->table = $model::getTable();
 		
 		/*** initialize controls ***/

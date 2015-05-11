@@ -32,7 +32,7 @@ class User extends Model{
 						INNER JOIN Permission P ON RP.permissionId = P.id						
 						INNER JOIN User U ON U.roleId = RP.roleId
 					WHERE U.id = :id AND RP.value=1';
-			$permissions = DB::get(self::DBNAME)->query($sql, array('id' => $this->id), array('return' => DB::RETURN_OBJECT));
+			$permissions = DB::get(self::$dbname)->query($sql, array('id' => $this->id), array('return' => DB::RETURN_OBJECT));
 			$this->permissions = array();			
 			foreach($permissions as $permission){
 				$this->permissions[$permission->plugin][$permission->key] = 1;
@@ -46,7 +46,7 @@ class User extends Model{
 					FROM ' . ProfileQuestionValue::getTable()  . ' V INNER JOIN ' . ProfileQuestion::getTable() . ' Q ON V.question = Q.name
 					WHERE V.userId = :id';
 
-			$data = DB::get(self::DBNAME)->query($sql, array('id' => $this->id), array('return' => DB::RETURN_ARRAY, 'index' => 'name'));			
+			$data = DB::get(self::$dbname)->query($sql, array('id' => $this->id), array('return' => DB::RETURN_ARRAY, 'index' => 'name'));			
 			$this->profile = array_map(function($v){ return $v['value']; }, $data);
 		}		
 		return $prop ? $this->profile[$prop] : $this->profile;

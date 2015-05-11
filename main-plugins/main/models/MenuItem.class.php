@@ -11,7 +11,7 @@ class MenuItem extends Model{
 	}
 	
 	public static function getByName($name, $menuName){
-		return DB::get(self::DBNAME)->select(array(
+		return DB::get(self::$dbname)->select(array(
 			'fields' => array('M.*'),
 			'from' => self::$tablename . ' MI INNER JOIN ' . Menu::getTable() . ' M ON MI.menuId = M.id',
 			'where' => new DBExample(array('M.name' => $menuName, 'MI.name' => $name)),
@@ -32,7 +32,7 @@ class MenuItem extends Model{
 				WHERE (U.id = :userId AND RP.value = 1) OR I.permissionId = 0
 				ORDER BY menuId ASC, `order` ASC';
 		
-		return DB::get(self::DBNAME)->query($sql, array('userId' => $user->id), array('return' => __CLASS__));	
+		return DB::get(self::$dbname)->query($sql, array('userId' => $user->id), array('return' => __CLASS__));	
 	}
 
 	public static function add($data){
@@ -41,7 +41,7 @@ class MenuItem extends Model{
 		}
 
 		if(!isset($data['order']) || $data['order'] === -1){
-			$data['order'] = DB::get(self::DBNAME)->select(array(
+			$data['order'] = DB::get(self::$dbname)->select(array(
 				'fields' => array('COALESCE(MAX(`order`), 0) + 1' => 'newOrder'),
 				'from' => self::$tablename,
 				'where' => new DBExample(array('menuId' => $data['menuId'])),				
@@ -52,7 +52,7 @@ class MenuItem extends Model{
 		else{
 			// First update the items which order is greater than the one you want to include
 			$sql = 'UPDATE ' . self::$tablename . ' SET  `order` = `order` + 1  WHERE menuId = :menuId AND `order` >= :order';
-			DB::get(self::DBNAME)->query($sql, array('order' => $order, 'menuId' => $data['menuId']));
+			DB::get(self::$dbname)->query($sql, array('order' => $order, 'menuId' => $data['menuId']));
 		}
 
 		// Insert the menu item

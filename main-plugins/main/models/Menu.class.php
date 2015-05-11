@@ -37,7 +37,7 @@ class Menu extends Model{
 	
 	public static function add($name, $labelKey, $order = -1){
 		if($order === -1){
-			$order = DB::get(self::DBNAME)->select(array(
+			$order = DB::get(self::$dbname)->select(array(
 				'fields' => array('COALESCE(MAX(`order`), 0) + 1' => 'newOrder'),
 				'from' => self::$tablename,				
 				'one' => true,
@@ -47,7 +47,7 @@ class Menu extends Model{
 		else{
 			// First update the menus which order is greater than the one you want to include
 			$sql = 'UPDATE ' . self::$tablename . ' SET order=order + 1  WHERE order >= :order';
-			DB::get(self::DBNAME)->query($sql, array('order' => $order));
+			DB::get(self::$dbname)->query($sql, array('order' => $order));
 		}
 
 		// Insert the menu

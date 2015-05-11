@@ -4,6 +4,7 @@ class Model{
 	// The name of the table containing the data of the model
 	protected static $tablename;
 	protected static $primaryColumn;
+    protected static $dbname = MAINDB;
     	
 	const DBNAME = MAINDB;
 	protected $dbvars = array();
@@ -19,7 +20,7 @@ class Model{
 			}
 		}
         
-        $this->dbo = DB::get(static::DBNAME);
+        $this->dbo = DB::get(static::$dbname);
     }
     
 
@@ -46,7 +47,7 @@ class Model{
 
 
 	public static function getByExample(DBExample $example, $fields = array()){
-        return DB::get(static::DBNAME)->select(array(
+        return DB::get(static::$dbname)->select(array(
             'fields' => $fields,
             'from' => static::$tablename,
             'where' => $example,
@@ -58,7 +59,7 @@ class Model{
 	
 
     public static function getListByExample(DBExample $example, $index = null, $fields = array(), $order = array()){
-		return DB::get(static::DBNAME)->select(array(
+		return DB::get(static::$dbname)->select(array(
             'fields' => $fields,
 			'from' => static::$tablename,
 			'where' => $example,
@@ -71,7 +72,7 @@ class Model{
 	
 	
     public static function countElementsByExample(DBExample $example, $group = array()){
-		return DB::get(static::DBNAME)->count(static::$tablename, $example, array(), self::$primaryColumn, $group);
+		return DB::get(static::$dbname)->count(static::$tablename, $example, array(), self::$primaryColumn, $group);
 	}
     
     
@@ -191,6 +192,11 @@ class Model{
     public static function getPrimaryColumn(){
         return static::$primaryColumn;
     }
+
+
+    public static function getDbName(){
+        return static::$dbname;
+    }
     
 
 
@@ -218,5 +224,9 @@ class Model{
     
     public static function setPrimaryColumn($primaryColumn){
         static::$primaryColumn = $primaryColumn;
+    }
+
+    public static function setDbName($name){
+        static::$dbname = $name;
     }
 }
