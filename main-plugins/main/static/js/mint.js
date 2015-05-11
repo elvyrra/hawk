@@ -94,24 +94,25 @@ App.prototype.init = function(){
 		
 		this.tabset = new Tabset();
 		var self = this;
-		$("body").on('click', '[href]:not(.real-link):not([href^="#"])', function(e){
-			var url = $(this).attr('href');
+		$("body").on('click', '[href]:not(.real-link):not([href^="#"])', function(event){
+			var node = $(event.currentTarget);
+			var url = $(node).attr('href');
 			if (url.match(/^javascript\:/)) {
 				return true;
 			}
 			
-			e.preventDefault();		
+			event.preventDefault();		
 			var data = {};
 			
-			switch($(this).attr('target')) {
+			switch($(node).attr('target')) {
 				case 'newtab' :
 					// Load the page in a new tab of the application
 					data = {newtab : true};
-					self.load(url, data);
+					this.load(url, data);
 					break;
 				
 				case 'dialog' :
-					self.dialog(url);
+					this.dialog(url);
 					break;
 				
 				case '_blank' :
@@ -121,30 +122,31 @@ App.prototype.init = function(){
 				case undefined :
 				case '' :
 					// Open the url in the current application tab
-					self.load(url);
+					this.load(url);
 					break;
 				
 				default :
 					// Open the url in a given DOM node, represented by it CSS selector
-					self.load(url, {selector : $(this).attr('target')});
+					this.load(url, {selector : $(node).attr('target')});
 					break;
 			}	
 			
 			// return false;
-		})
+		}.bind(this))
 		
-		.on('click', ".main-tabs-close", function(){
-			self.tabset.remove($(this).data('tab'));
-		})
+		.on('click', ".main-tabs-close", function(event){
+			this.tabset.remove($(event.currentTarget).data('tab'));
+		}.bind(this))
 
 		.on("change", ":file", function(event){
-			if(event.currentTarget.files.length){
-				$(this).next(".input-file-invitation").removeClass("btn-default").addClass("file-chosen btn-success");				
+			var node = event.currentTarget;
+			if(node.files.length){
+				$(node).next(".input-file-invitation").removeClass("btn-default").addClass("file-chosen btn-success");				
 			}
 			else{
-				$(this).next(".input-file-invitation").removeClass("file-chosen btn-success").addClass("btn-default");
+				$(node).next(".input-file-invitation").removeClass("file-chosen btn-success").addClass("btn-default");
 			}
-		});
+		}.bind(this));
 		
 		window.onpopstate = function(event){
 			event.preventDefault();
@@ -332,10 +334,15 @@ App.prototype.dialog = function(action){
 		data : {
 			_dialog: true
 		},
-		success : function(content){
-			$("#dialogbox").append(content).modal("show");								
-		}
-	});			
+	})
+	.done(function(content){
+		$("#dialogbox").append(content).modal("show");
+	})
+	.fail(function(xhr, status, error){
+		var code = xhr.status;
+		var message = xhr.responseText;
+		this.advert("danger", message);
+	}.bind(this));			
 };
 
 App.prototype.getUri = function(method, args){		

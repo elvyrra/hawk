@@ -14,7 +14,7 @@
 class FloatInput extends NumberInput{
 	public function __construct($param){
 		$this->decimals = 2;
-		$this->pattern = "^[0-9]+(.[0-9])?";
+		$this->pattern = "/^[0-9]+(.[0-9])?/";
 		
 		parent::__construct($param);	
 	}

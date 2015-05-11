@@ -20,7 +20,7 @@ class PasswordInput extends FormInput{
 			
 	public function __construct($param){
 		parent::__construct($param);
-		$this->pattern = "^.{6,}$";
+		$this->pattern = "/^(?=.*\d)(?=.*[a-zA-Z]).{6,16}$/";
 	}
 	
 	public function __toString(){

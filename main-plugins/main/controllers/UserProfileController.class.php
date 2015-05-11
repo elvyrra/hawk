@@ -141,7 +141,81 @@ class UserProfileController extends Controller{
             
         }
         
-    }   
+    } 
 
-    public function remove(){}  
+    /**
+     * Change the current user password
+     */
+    public function changePassword(){
+        $params = array(
+            'id' => 'update-password-form',
+            'fieldsets' => array(
+                'form' => array(
+                    new PasswordInput(array(
+                        'name' => 'current-password',
+                        'label' => Lang::get('main.update-password-current-password-label'),
+                        'required' => true,
+                    )),
+
+                    new PasswordInput(array(
+                        'name' => 'new-password',
+                        'required' => true,
+                        'label' => Lang::get('main.update-password-new-password-label'),                        
+                    )),
+
+                    new PasswordInput(array(
+                        'name' => 'password-confirm',
+                        'required' => true,
+                        'label' => Lang::get('main.update-password-new-password-confirm-label'),
+                        'compare' => 'new-password'
+                    ))
+                ),
+
+                '_submits' => array(
+                    new SubmitInput(array(
+                        'name' => 'valid',
+                        'value' => Lang::get('main.valid-button'),                        
+                    )),
+
+                    new ButtonInput(array(
+                        'name' => 'cancel',
+                        'value' => Lang::get('main.cancel-button'),
+                        'onclick' => 'mint.dialog("close")'
+                    ))
+                ),
+
+            ),
+            'onsuccess' => 'mint.dialog("close")'
+        );
+
+        $form = new Form($params);
+
+        if(!$form->submitted()){
+            return View::make($this->theme->getView("dialogbox.tpl"), array(
+                'title' => Lang::get('main.update-password-title'),
+                'page' => $form
+            ));
+        }
+        else{
+            if($form->check()){
+                $me = Session::getUser();
+                if($me->password != Crypto::saltHash($form->getData('current-password'))){
+                    $form->response(Form::STATUS_ERROR, Lang::get('main.update-password-bad-current-password'));
+                }
+                try{
+                    $me->set('password', Crypto::saltHash($form->getData('new-password')));
+                    $me->save();
+
+                    $form->response(Form::STATUS_SUCCESS, Lang::get('main.update-password-success'));
+                }
+                catch(Exception $e){
+                    $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get('main.update-password-error'));
+                }
+
+            }
+        }
+
+    }  
+
+
 }

@@ -133,7 +133,7 @@ class FormInput{
 		}
 		if(!empty($this->value) && $this->pattern){
 			// test the format of the field
-			if(!preg_match("~". $this->pattern . "~", $this->value)){
+			if(!preg_match($this->pattern, $this->value)){
 				// the format of the field value is not correct				
 				$form && $form->errors[$this->errorAt] = isset($this->errorMessage) ? $this->errorMessage : (Lang::exists('form.'.static::TYPE."-format") ? Lang::get('form.'.static::TYPE."-format") : Lang::get('form.field-format'));
 				return false;

@@ -45,7 +45,8 @@ var Form = function(id, fields){
  * @return {bool} - true if the form data is correct, false else
  */
 Form.prototype.check = function(){
-	var valid = true;
+	this.removeErrors();
+	var valid = true;	
 	for(var name in this.inputs){
 		if (!this.inputs[name].check()) {
 			valid = false;
@@ -73,6 +74,12 @@ Form.prototype.displayErrors = function(errors){
 	}	
 };
 
+
+/**
+ * Set the activity of the form. The activity can be "register" or "delete", 
+ * and represents the action that will be performed server side
+ * @param {string} activity - The activity value to set
+ */
 Form.prototype.setActivity = function(activity){
 	this.activity = activity;
 
@@ -81,6 +88,10 @@ Form.prototype.setActivity = function(activity){
 	}
 };
 
+
+/**
+ * Submit the form
+ */
 Form.prototype.submit = function(){		
 	/*** Remove all Errors on this form ***/
 	this.removeErrors();
@@ -115,7 +126,7 @@ Form.prototype.submit = function(){
 		})
 		
 		.fail(function(xhr, code, err){			
-			if(code === "parsererror"){
+			if(! xhr.responseJSON){
 				self.displayErrorMessage(xhr.responseText);
 			}
 			else{
@@ -151,11 +162,16 @@ Form.prototype.submit = function(){
 	return false;	
 };
 
+
+/**
+ * Reset the form values 
+ */
 Form.prototype.reset = function(){
 	this.node.get(0).reset();
 }
 
 
+/*----------------------- CLASS FormInput ------------------------*/
 
 /**
  * Class FormInput, represents any input in a form
@@ -180,14 +196,27 @@ var FormInput= function(field, form){
 	}
 };
 
+
+/**
+ * Get the value of the field
+ */
 FormInput.prototype.val = function(){
 	return this.node.val();
 };
 
+
+/**
+ * Get a property data of the field 
+ * @param {string} prop - the property to get the data value
+ */
 FormInput.prototype.data = function(prop){
 	return this.node.data(prop);
 };
 
+
+/**
+ * Check the value of the field is valid
+ */
 FormInput.prototype.check = function(){
 	/*** 1. If the field is required, the field can't be empty ***/
 	if (this.required) {
@@ -200,7 +229,8 @@ FormInput.prototype.check = function(){
 	
 	/*** 2. If the field has a specific pattern, test the value with this pattern ***/
 	if(this.pattern){		
-		if(this.val() && ! new RegExp(this.pattern).test(this.val())){
+		var regex = eval(this.pattern);
+		if(this.val() && ! regex.test(this.val())){
 			this.addError(Lang.exists('form.' + this.type + "-format") ? Lang.get('form.'+ this.type + "-format") : Lang.get("form.field-format"));			
 			return false;
 		}
@@ -209,12 +239,14 @@ FormInput.prototype.check = function(){
 	if (this.min) {
 		if (this.val() && this.val() < this.min){
 			this.addError(Lang.get('form.number-minimum', {value: this.min}));
+			return false;
 		}
 	}
 	
 	if (this.max) {
 		if (this.val() && this.val() > this.max){
 			this.addError(Lang.get('form.number-maximum', {value: this.max}));
+			return false;
 		}
 	}
 		
@@ -229,12 +261,18 @@ FormInput.prototype.check = function(){
 	return true;
 };
 
+
+/**
+ * Display an error on the field
+ */
 FormInput.prototype.addError = function(text){	
 	if(this.errorAt){
 		this.form.inputs[this.errorAt].addError(text);
 	}
 	else{
-		this.node.addClass('alert-danger').attr('title', text).tooltip({
+		this.node.tooltip('destroy');
+		this.node.addClass('alert-danger').tooltip({
+			title : text,
 			placement: 'right',
 			template: 	'<div class="tooltip input-error" role="tooltip">'+
 							'<div class="tooltip-arrow"></div>'+
@@ -244,8 +282,9 @@ FormInput.prototype.addError = function(text){
 	}			
 };
 
+/** 
+ * Remove the errors on the field 
+ */
 FormInput.prototype.removeError = function(){
-	this.node.removeClass("alert-danger").tooltip("destroy");		
+	this.node.removeClass("alert-danger").tooltip("destroy");
 };
-
-/******************* (C) COPYRIGHT 2014 ELVYRRA SAS *********************/

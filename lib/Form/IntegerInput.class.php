@@ -15,7 +15,7 @@ class IntegerInput extends NumberInput{
 	public function __construct($param){
 		parent::__construct($param);
 		
-		$this->pattern = "^\d*$";
+		$this->pattern = "/^\d*$/";
 	}
 	
 	public function dbvalue(){

@@ -40,7 +40,7 @@ class MainMenuWidget extends Widget{
 				),	
 				'change-password' => array(
 					'icon' => 'lock',
-					'url' => Router::getUri('UserPorfileController.changePassword'),
+					'url' => Router::getUri('change-password'),
 					'label' => Lang::get('main.menu-change-password'),
 					'target' => 'dialog',
 				),

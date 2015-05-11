@@ -20,7 +20,7 @@ class LoginController extends Controller{
 	_______________________________________________________*/	
 	private function form(){
 		/*** Get the registrered login and passwords ***/
-		$login = Crypto::aes256_decode($_COOKIE[sha1('login')]);
+		$login = Crypto::aes256Decode($_COOKIE[sha1('login')]);
 		$password = $_COOKIE[sha1('password')];
 		$param = array(
 			"id" => "login-form",
@@ -42,7 +42,7 @@ class LoginController extends Controller{
 						"field" => "password",
 						"required" => true,						
 						"default" => $password,
-						"decrypt" => array('Crypto', 'aes256_decode'),
+						"decrypt" => array('Crypto', 'aes256Decode'),
 						"get" => true,						
 						"label" => Lang::get('main.login-password-label'),
 					)),
@@ -94,7 +94,7 @@ class LoginController extends Controller{
 		}
 		else{
 			if($form->check()){
-				$hash = Crypto::salt_hash($form->getData('password'));
+				$hash = Crypto::saltHash($form->getData('password'));
 				
 				$example = new DBExample(array(
 					'$and' => array(
@@ -122,8 +122,8 @@ class LoginController extends Controller{
 						'ip' => Request::clientIp()
 					);					
 					if(isset($_POST['remember'])){
-						setcookie(sha1("login"), Crypto::aes256_encode($form->getData('login')), time() + 3600 * 24 *7, '/');
-						setcookie(sha1("password"), Crypto::aes256_encode($form->getData('password')), time() + 3600 * 24 *7, '/');
+						setcookie(sha1("login"), Crypto::aes256Encode($form->getData('login')), time() + 3600 * 24 *7, '/');
+						setcookie(sha1("password"), Crypto::aes256Encode($form->getData('password')), time() + 3600 * 24 *7, '/');
 					}
 					
 					$form->response(Form::STATUS_SUCCESS, Lang::get('main.login-success'));

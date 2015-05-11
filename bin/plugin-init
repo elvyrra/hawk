@@ -2,6 +2,7 @@
 
 <?php
 define('PLUGINS_DIR', __DIR__ . '/../plugins/');
+define('MAIN_PLUGINS_DIR', __DIR__ . '/../main-plugins/');
 $parameters = array(
     'name' => array(
         'question' => 'What is the name of the plugin (authorized caracters : alphanumeric, "-", "_") :',
@@ -34,7 +35,7 @@ foreach($parameters as $param => $options){
     do{
         echo $options['question'];
         $$param = trim(fgets(STDIN));
-        if($param == 'name' && is_dir(PLUGINS_DIR . $$param)){
+        if($param == 'name' && is_dir(PLUGINS_DIR . $$param) || is_dir(MAIN_PLUGINS_DIR . $$param)){
             echo "\033[0;31mThis plugin name already exists, please choose another name\n\033[0m";
             $$param = '';
         }
