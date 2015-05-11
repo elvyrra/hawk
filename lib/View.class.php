@@ -135,8 +135,8 @@ class View{
 		return ob_get_clean();
 	}	
 	
-	public static function make($file, $data = array(), $cache = null ){
-		$view = new self($file, $cache);
+	public static function make($file, $data = array()){
+		$view = new self($file);
 		$view->set($data);
 		return $view->display();
 	}	
@@ -146,7 +146,7 @@ class ViewException extends Exception{
 	const TYPE_FILE_NOT_FOUND = 1;
 	const TYPE_EVAL = 2;
 	
-	public function __construct($type, $file, $previous){
+	public function __construct($type, $file, $previous = null){
 		$code = $type;
 		switch($type){
 			case self::TYPE_FILE_NOT_FOUND:

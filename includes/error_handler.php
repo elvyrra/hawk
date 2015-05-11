@@ -37,7 +37,7 @@ if(ini_get('display_errors')){
 			exit(json_encode($param));
 		}
 		else{
-			echo View::make(Plugin::get('main')->getView('error.tpl'), $param);
+			echo View::make(ThemeManager::getSelected()->getView('error.tpl'), $param);
 		}
 
 	}, E_USER_ERROR | E_USER_WARNING);
@@ -55,7 +55,7 @@ if(ini_get('display_errors')){
 			echo json_encode($param);
 		}
 		else{
-			echo View::make(Plugin::get('main')->getView('error.tpl'), $param);
+			echo View::make(ThemeManager::getSelected()->getView('error.tpl'), $param);
 		}
 		exit;
 	}

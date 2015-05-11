@@ -188,7 +188,7 @@ class ItemList{
 				'from' => $this->table,
 				'where' => $where,
 				'binds' => $this->binds,
-				'orderby' => $this->sort,
+				'orderby' => $this->sorts,
 				'group' => $this->group,
 				'limit' => "$this->start, $this->lines",
 				'index' => $this->refAlias,
@@ -297,7 +297,7 @@ class ItemList{
 					}
 				}
 			}
-			return View::make(Plugin::get('main')->getView("item-list.tpl"), array(			
+			return View::make(ThemeManager::getSelected()->getView("item-list.tpl"), array(			
 				'list' => $this,
 				'display' => $display,
 				'linesParameters' => $param,

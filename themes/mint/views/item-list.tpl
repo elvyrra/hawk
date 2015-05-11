@@ -57,10 +57,10 @@
 							<span class='list-title-label list-title-label-{{ $this->id }}-{{ $name }}'>{{ $field['label'] }}</span>							
 							{if($field['sort'] !== false)}
 								<div class='list-sort-block' style='display:inline-block'>
-									<span class='list-sort-column list-sort-asc {{ $list->sorts[$name] == "1" ? "list-sort-active" : "" }}' data-field="{{ $name }}" value="{{ $list->sorts[$name] == '1' ? 0 : 1 }}">
+									<span class='list-sort-column list-sort-asc {{ $list->sorts[$name] == "ASC" ? "list-sort-active" : "" }}' data-field="{{ $name }}" value="{{ $list->sorts[$name] == 'ASC' ? '' : 'ASC' }}">
 										<span class='fa fa-sort-alpha-asc' title='{text key="main.list-sort-asc"}'></span>
 									</span>
-									<span class='list-sort-column list-sort-desc {{ $list->sorts[$name] == "-1" ? "list-sort-active" : "" }}' data-field="{{ $name }}" value="{{ $list->sorts[$name] == '-1' ? 0 : -1 }}">
+									<span class='list-sort-column list-sort-desc {{ $list->sorts[$name] == "DESC" ? "list-sort-active" : "" }}' data-field="{{ $name }}" value="{{ $list->sorts[$name] == 'DESC' ? '' : 'DESC' }}">
 										<span class='fa fa-sort-alpha-desc' title='{text key="main.list-sort-desc"}'></span>
 									</span>			
 								</div>

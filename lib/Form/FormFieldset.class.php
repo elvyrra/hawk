@@ -17,7 +17,7 @@ class FormFieldset{
 	}
 
 	public function __toString(){
-		return View::make(Plugin::get('main')->getView(Form::VIEWS_DIR . 'form-fieldset.tpl'), array(
+		return View::make(ThemeManager::getSelected()->getView(Form::VIEWS_DIR . 'form-fieldset.tpl'), array(
 			'fieldset' => $this,
 		));
 	}

@@ -13,16 +13,24 @@
  **********************************************************************/
 
 /*** Constant paths ***/
-define('LIB_DIR', ROOT_DIR . 'lib/');
-define('CUSTOM_LIB_DIR', ROOT_DIR . 'custom-lib/');
-define('VIEWS_DIR', 'views/');
-define('MAIN_PLUGINS_DIR', ROOT_DIR . 'main-plugins/');
-define('PLUGINS_DIR', ROOT_DIR . 'plugins/');
-define('THEMES_DIR', ROOT_DIR . 'themes/');
+define('LIB_DIR', ROOT_DIR . 'lib/'); // The folder containing all the core classes
+
+define('CUSTOM_LIB_DIR', ROOT_DIR . 'custom-lib/'); // The folder containing the developper custom libraries
+
+define('MAIN_PLUGINS_DIR', ROOT_DIR . 'main-plugins/'); // The folder containing the core plugins
+
+define('PLUGINS_DIR', ROOT_DIR . 'plugins/'); // The folder containing the installed plugins
+
+define('THEMES_DIR', ROOT_DIR . 'themes/'); // The folder containing the themes files
+
 define('CACHE_DIR', ROOT_DIR . 'cache/');
+
 define('CACHE_LANG_DIR', CACHE_DIR . 'lang/');
+
 define('USERFILES_DIR', ROOT_DIR . 'userfiles/');
+
 define('USERFILES_THEMES_DIR', USERFILES_DIR . 'themes/');
+
 define('USERFILES_PLUGINS_DIR', USERFILES_DIR . 'plugins/');
 
 // The main db name

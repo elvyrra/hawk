@@ -25,12 +25,12 @@ List.prototype.display = function(force){
 		lines : this.lines,
 		page : this.page,		
 	};
-	if (Object.keys(this.searches).length) {
+	// if (Object.keys(this.searches).length) {
 		data.searches = JSON.stringify(this.searches);
-	}
-	if (Object.keys(this.sorts).length) {
+	// }
+	// if (Object.keys(this.sorts).length) {
 		data.sorts = JSON.stringify(this.sorts);
-	}
+	// }
 	
 	if(force){
 		if((typeof(force) == "array" && !force.length) || (typeof(force) == "object" && !Object.keys(force).length))
@@ -82,7 +82,7 @@ List.prototype.goToPage = function(page){
 };
 
 List.prototype.sort = function(field, order){
-	if (order == '0') {
+	if (order == '') {
 		delete(this.sorts[field]);
 	}
 	else{

@@ -437,6 +437,13 @@ table th span.line{
 }
 
 
+/*------------------------ Panels -------------------------*/
+.panel-title a{
+    display: block;
+    height: 100%;
+    width: 100%;
+}
+
 
 /*------------------------ Main layout ----------------------*/
 

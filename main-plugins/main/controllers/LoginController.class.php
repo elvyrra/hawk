@@ -84,11 +84,8 @@ class LoginController extends Controller{
 	public function login(){
 		$form = $this->form();
 		if(!$form->submitted()){	
-			/*** Display the login page ***/
-			$template = isset($_GET['_dialog']) ? $this->theme->getView('dialogbox.tpl') : $this->theme->getView('tabs-layout/tabs-no-sidebar.tpl');
-
 			// Display the login page in a dialog box
-			return View::make($template, array(
+			return View::make($this->theme->getView('dialogbox.tpl'), array(
 				'page' => $form->__toString(),
 				'icon' => 'sign-in',
 				'title' => Lang::get('main.login-form-title'),

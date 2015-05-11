@@ -89,10 +89,8 @@ class FormInput{
               
 		$theme = ThemeManager::getSelected();
 		
-        $this->tpl = is_file(Plugin::get('main')->getView(Form::VIEWS_DIR . 'form-input-' . static::TYPE . '.tpl')) ?
-						Plugin::get('main')->getView(Form::VIEWS_DIR . 'form-input-' .  static::TYPE . '.tpl') :
-						Plugin::get('main')->getView(Form::VIEWS_DIR . 'form-input.tpl');
-						
+        $file = ThemeManager::getSelected()->getView(Form::VIEWS_DIR . 'form-input-' . static::TYPE . '.tpl');
+        $this->tpl = is_file($file) ? $file : ThemeManager::getSelected()->getView(Form::VIEWS_DIR . 'form-input.tpl');
     }
 	
 	/*
@@ -105,7 +103,7 @@ class FormInput{
 			unset($this->errorAt);
 		}
 
-		$inputLabel = $this->label ? View::make(Plugin::get('main')->getView(Form::VIEWS_DIR . 'form-input-label.tpl'), array(
+		$inputLabel = $this->label ? View::make(ThemeManager::getSelected()->getView(Form::VIEWS_DIR . 'form-input-label.tpl'), array(
 			'input' => $this
 		)) : '';
 		
@@ -113,7 +111,7 @@ class FormInput{
 			'input' => $this
 		));
             
-        return View::make(Plugin::get('main')->getView(Form::VIEWS_DIR . 'form-input-block.tpl'), array(
+        return View::make(ThemeManager::getSelected()->getView(Form::VIEWS_DIR . 'form-input-block.tpl'), array(
             'input' => $this, 
 			'inputLabel' => $inputLabel,
 			'inputDisplay' => $inputDisplay

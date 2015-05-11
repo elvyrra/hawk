@@ -230,6 +230,14 @@ class Plugin{
 	 * Return the full path of a view in the plugin
 	 */
 	public function getView($view){
+		// Check if the view is overriden in the current theme
+		$file= ThemeManager::getSelected()->getView('plugins/' . $this->name . '/' . $view);
+		if(is_file($file)){
+			// The view is overriden in the theme
+			return $file;
+		}
+
+		// The view is not overriden in the view
 		return $this->getViewsDir() . $view;
 	}
 	

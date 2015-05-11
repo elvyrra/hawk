@@ -296,7 +296,7 @@ class Form{
 	 * @return : string
 	 */
 	public function wrap($content){
-		return View::make(Plugin::get('main')->getView('form/form.tpl'), array(
+		return View::make(ThemeManager::getSelected()->getView(Form::VIEWS_DIR . 'form.tpl'), array(
 			'form' => $this,
 			'content' => $content
 		));
@@ -309,7 +309,7 @@ class Form{
 	 * @return : string
 	 */
 	public function display(){
-		$content = View::make(Plugin::get('main')->getView('form/form-content.tpl') , array(
+		$content = View::make(ThemeManager::getSelected()->getView(Form::VIEWS_DIR . 'form-content.tpl') , array(
 			'form' => $this,
 			'fields' => $fields,
 			'fieldsets' => $this->fieldsets,
