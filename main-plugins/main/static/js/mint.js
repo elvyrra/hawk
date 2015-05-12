@@ -117,7 +117,8 @@ App.prototype.init = function(){
 				
 				case '_blank' :
 					// Load the whole page in a new browser tab
-					return true;
+					window.open(url);
+					break;					
 				
 				case undefined :
 				case '' :
@@ -369,7 +370,7 @@ App.prototype.getUri = function(method, args){
 		return url;
 	}
 	else{
-		return '';
+		return '/INVALID_URL';
 	}
 };
 

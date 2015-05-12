@@ -96,12 +96,6 @@ class ItemList{
 		
 		// register the filters in cookie for future list call
 		setcookie("list-{$this->id}", json_encode($cookie), time() + 365 * 24 * 3600, '/');		
-        
-		/*______________________________________________________________________
-	
-					Get the data to display on the database
-		______________________________________________________________________*/		
-		$this->get();
 	}
 	
 	/*_____________________________________________________________________
@@ -252,6 +246,9 @@ class ItemList{
 	_____________________________________________________________________*/
 	public function __toString(){
 		try{
+        	// get the data to display
+        	$this->get();
+
 			// get the total number of pages
 	        $pages = (ceil($this->recordNumber / $this->lines) > 0) ? ceil($this->recordNumber / $this->lines) : 1;
 			

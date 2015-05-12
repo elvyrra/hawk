@@ -25,12 +25,9 @@ List.prototype.display = function(force){
 		lines : this.lines,
 		page : this.page,		
 	};
-	// if (Object.keys(this.searches).length) {
-		data.searches = JSON.stringify(this.searches);
-	// }
-	// if (Object.keys(this.sorts).length) {
-		data.sorts = JSON.stringify(this.sorts);
-	// }
+
+	data.searches = JSON.stringify(this.searches);
+	data.sorts = JSON.stringify(this.sorts);
 	
 	if(force){
 		if((typeof(force) == "array" && !force.length) || (typeof(force) == "object" && !Object.keys(force).length))
@@ -38,24 +35,28 @@ List.prototype.display = function(force){
 		data["set-"+this.id] = force;	
 	}
 	
-	this.action += this.selected ? ((this.action.match(/\?/) ? "&" : "?") + "selected=" + this.selected) : "";
-	var self = this;
-	
+	var get = this.getFilterData();
+	get.refresh = 1;
+	if(this.selected){
+		get.selected = this.selected;
+	};
+
     $.ajax({
         async : false,
-        url: this.action + "?refresh=1" ,
+        url: this.action + Object.toQueryString(get) ,
         type: 'post',
         data: data,
         cache : false,
-        success:function(response){            
-        	var node = this.target ? $(this.target) : this.wrapper;
-            node.html(response);
-        }.bind(this),
-        
-        error:function(xhr, status, err){
-            mint.advert("error", Lang.get("main.refresh-list-error"));
-        }
+    })
+    .done(function(response){            
+    	var node = this.target ? $(this.target) : this.wrapper;
+        node.html(response);
+    }.bind(this))
+
+    .fail(function(xhr, status, error){
+    	mint.advert("error", Lang.get("main.refresh-list-error"));
     });
+
     return false;
 };
 
@@ -96,6 +97,10 @@ List.prototype.search = function(field, search){
 	this.searches[field] = search;
 			
 	this.set({searches: this.searches});
+};
+
+List.prototype.getFilterData = function(){
+	return $("item-list-filter[data-list='"+this.id+"']").serializeObject();
 };
 
 List.prototype.initControls = function(){

@@ -33,6 +33,15 @@ Object.getKeyByValue= function(obj, value ) {
 	return null;
 };
 
+Object.toQueryString = function(object){
+	var params = [];
+	for(var i in object){
+		params.push(i + "=" + encodeURIComponent(object[i]));
+	}
+
+	return "?" + params.join("&");
+};
+
 Array.prototype.max = function(){
 	return Math.max.apply(null, this);
 };
