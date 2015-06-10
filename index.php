@@ -29,6 +29,7 @@ Router::route();
 Autoload::saveCache();
 
 /*** save the language cache ***/
+Lang::saveOriginCache();
 
 /*** Return the response to the client ***/
 Response::end();

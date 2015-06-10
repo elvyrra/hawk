@@ -1,5 +1,3 @@
-; plugin = "javascript"
-; language = "fr"
 alarm-critical-title = "Alerte critique : Danger imminent !"
 all-tabs-open = "Tous les onglets sont déjà ouverts"
 contact-already-in-group = "Ce contact appartient déjà à ce groupe"

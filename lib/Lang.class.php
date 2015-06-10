@@ -14,73 +14,45 @@
 class Lang{
 	const DEFAULT_LANGUAGE = 'en';
 	const ORIGIN_CACHE_FILE = CACHE_DIR . 'lang-file-paths.php';
+	const CACHE_DIR = CACHE_DIR . 'lang/';
+	const TRANSLATIONS_DIR = USERFILES_PLUGINS_DIR . 'admin/translations/';
 
 	public static $langs = array(); // This array contains all textdomains
 	
 	private static $originCache = array();
 
+	private $plugin, $lang, $originFile, $translatedFile, $cacheFile;
 	/**
-	 * Load a language file 
-	 * @param {string} $plugin1 - The first plugin to load
-	 * @param {string} $plugin2 - ...
+	 * @constructs
+	 * @param {string} $plugin - The plugin of the file
+	 * @param {string} $lang - The language of the file
 	 */
-	public static function load(){
-		
+	private function __construct($plugin, $lang){
+		$this->plugin = $plugin;
+		$this->lang = $lang;
 
-		$plugins = func_get_args();
-		
-		foreach($plugins as $plugin){
-			if(!isset(self::$langs[$plugin])){
-				self::$langs[$plugin] = array();
-				/*
-				 * First Load the default language
-				 */
-				$cache = CACHE_LANG_DIR . $plugin . '.' . self::DEFAULT_LANGUAGE . '.php';
-				$origin = self::getOriginFile($plugin, self::DEFAULT_LANGUAGE);
-
-				if($origin){
-					if(!is_file($cache) || filemtime($origin) > filemtime($cache)){
-						self::parse($origin, $cache);
-					}
-
-					self::$langs[$plugin] = include $cache;
-				}
-				
-				if(LANGUAGE !== self::DEFAULT_LANGUAGE){
-
-					$cache = CACHE_LANG_DIR . $plugin . '.' . LANGUAGE . '.php';
-					$origin = self::getOriginFile($plugin, LANGUAGE);
-
-					if($origin){
-						if(!is_file($cache) || filemtime($origin) > filemtime($cache)){
-							self::parse($origin, $cache);
-						}
-
-						self::$langs[$plugin] = include $cache;
-					}
-				}
-			}
-		}
+		$this->originFile  = $this->getOriginFile();
+		$this->translatedFile = $this->getTranslatedFile();
+		$this->cacheFile = $this->getCacheFile();
 	}
+
 
 	/**
 	 * Find the origin language file
-	 * @param {string} $plugin - The plugin to search
-	 * @param {string} $lang - The language in the file
 	 * @return {string} - The path of the origin language file
 	 */
-	private static function getOriginFile($plugin, $lang){
+	private function getOriginFile(){
 		if(is_file(self::ORIGIN_CACHE_FILE) && empty(self::$originCache)){
 			self::$originCache = include self::ORIGIN_CACHE_FILE;
 		}
 
-		if(isset(self::$originCache["$plugin.$lang"])){
+		if(isset(self::$originCache["$this->plugin.$this->lang"])){
 			// the file is registered in the cache
-			return self::$originCache["$plugin.$lang"];
+			return self::$originCache["$this->plugin.$this->lang"];
 		}
 
 		// The file is not present in the cache, search it
-		$cmd = 'find ' . ROOT_DIR . ' -name "' . $plugin . '.' . $lang . '.lang"';
+		$cmd = 'find ' . MAIN_PLUGINS_DIR . ' ' . PLUGINS_DIR . ' -name "' . $this->plugin . '.' . $this->lang . '.lang"';
 		exec($cmd, $output);		
 
 		if(!empty($output)){
@@ -88,7 +60,7 @@ class Lang{
 			$file = $output[0];
 
 			// register it in the cache
-			self::$originCache["$plugin.$lang"] = $file;
+			self::$originCache["$this->plugin.$this->lang"] = $file;
 			
 			return $file;
 		}
@@ -97,19 +69,80 @@ class Lang{
 
 
 	/**
-	 * Parse origin file 
+	 * Find the translated file in userfiles directory
+	 * @return {string} path - The path of the file
 	 */
-	public static function parse($origin, $target){
-		if(!is_dir(CACHE_LANG_DIR)){
-			mkdir(CACHE_LANG_DIR);
-		}
-		file_put_contents($target, '<?php return ' . var_export(parse_ini_string(file_get_contents($origin, true)), true) . ';');
+	private function getTranslatedFile(){		
+		return self::TRANSLATIONS_DIR . $this->plugin . '.' . $this->lang . '.lang';
+	}
+
+	/**
+	 * Find the cache file, containing the PHP version of the language files
+	 * @return {string} path - The path of the cache file
+	 */
+	private function getCacheFile(){
+		return self::CACHE_DIR . $this->plugin . '.' . $this->lang . '.php';
 	}
 
 
-	public static function saveCache(){
+	/**
+	 * Parse a language file 
+	 * @param {string} the file to parse
+	 * @return {array} the language keys of the language file
+	 */
+	private function parse($file){		
+		return is_file($file) ? parse_ini_string(file_get_contents($file)) : array();
+	}
+
+
+	/**
+	 * Make the cache file
+	 */
+	private function build(){				
+		if(!is_file($this->cacheFile) || (is_file($this->originFile) && filemtime($this->cacheFile) < filemtime($this->originFile)) || (is_file($this->translatedFile) && filemtime($this->cacheFile) < filemtime($this->translatedFile))){
+			$data = array_merge($this->parse($this->originFile), $this->parse($this->translatedFile));
+			if(!is_dir(self::CACHE_DIR)){
+				mkdir(self::CACHE_DIR, 0755);
+			}
+			file_put_contents($this->cacheFile, '<?php return ' . var_export($data, true) . ';' );
+		}
+
+		self::$langs[$this->plugin] = include $this->cacheFile;
+	}
+
+
+	/**
+	 * Load a language file 
+	 * @param {string} $plugin1 - The first plugin to load
+	 * @param {string} $plugin2 - ...
+	 */
+	public static function load(){
+		$plugins = func_get_args();
+		
+		foreach($plugins as $plugin){
+			if(!isset(self::$langs[$plugin])){
+				self::$langs[$plugin] = array();
+
+				$instance = new self($plugin, self::DEFAULT_LANGUAGE);
+				$instance->build();
+
+				if(LANGUAGE !== self::DEFAULT_LANGUAGE){
+					$instance = new self($plugin, LANGUAGE);
+					$instance->build();
+				}
+			}
+		}
+	}
+
+
+
+	/**
+	 * Save the cache fil containing the origin paths
+	 */
+	public static function saveOriginCache(){
 		file_put_contents(self::ORIGIN_CACHE_FILE, '<?php return ' . var_export(self::$originCache, true) . ';');
 	}
+
 
 	/**
 	 * Check if a language key exists 
@@ -132,8 +165,8 @@ class Lang{
     public static function get($langKey, $param = array(), $number = 0){
 		list($plugin, $key) = explode('.', $langKey);
 
-		if(!isset(self::$langs[$plugin])){
-			self::load($plugin);
+		if(!isset(self::$langs[$plugin])){			
+			self::load($plugin);			
 		}
         
 		// get the label(s)

@@ -65,24 +65,13 @@ App.prototype.require = function(scripts, callback){
  * @static @prop {array} required - Required scripts needed for mint to work
  */
 App.required = [
-	"jquery-2.1.3.min.js",
-	"jquery.addons.js",
-	"jquery.cookie.js",
-	"jquery.mask.min.js",
-	"bootstrap.min.js",
-	"bootstrap-colorpicker.min.js",
-	"bootstrap-datepicker.min.js",
-	"knockout-3.3.0.js",
-	"extends.js",
-	"date.js",
-	"tabs.js",
-	"form.js",
-	"list.js",
-	"lang.js",
-	"//cdn.ckeditor.com/4.4.7/full/ckeditor.js"
+	"extends",
+	"date",
+	"tabs",
+	"form",
+	"list",
+	"lang",
 ];
-
-
 
 /**
  * Initialize the application 
@@ -387,7 +376,3 @@ App.prototype.setRootUrl = function(url){
 };
 
 var mint = new App();    
-
-
-
-/******************* (C) COPYRIGHT 2014 ELVYRRA SAS ********************/

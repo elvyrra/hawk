@@ -1,5 +1,3 @@
-; plugin = "language"
-; language = "fr"
 add-lang-form-title = "Ajout d'une nouvelle langue"
 confirm-delete-key = "Voulez-vous vraiment supprimer cette clé de langue ?"
 confirm-delete-lang = "Si vous supprimez cette langue, toutes les traductions dans cette langue seront perdues. Voulez-vous continuer ?"

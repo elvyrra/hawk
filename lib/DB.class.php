@@ -245,6 +245,8 @@ class DB{
 		
 		$group = !empty($query->group) ? "GROUP BY ".implode(",", array_map(array(self, 'formatField'), $query->group)) : "";
 
+		$having = !empty($query->having) ? "HAVING $query->having" : '';
+
 		if(!empty($query->orderby)){
 			$orders = array();			
 			foreach($query->orderby as $field => $value){
@@ -264,7 +266,7 @@ class DB{
 			$limit = " LIMIT ".($query->start ? "$query->start, " : ""). "$query->limit";       
 		}
 		
-        $sql = "SELECT $query->fields FROM $query->from $where $group $orderby $limit";
+        $sql = "SELECT $query->fields FROM $query->from $where $group $having $orderby $limit";
 		
 		if(empty($query->binds)){
 		   $query->binds = array();

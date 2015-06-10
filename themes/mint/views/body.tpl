@@ -41,7 +41,7 @@
 </div>
 
 <script type="text/javascript">
-	mint.ready(function(){		
+	mint.ready(function(){	
 		$.pages = {{ $pages }};
 		$.openLastTab = function(i){
 			if (i >= $.pages.length) {

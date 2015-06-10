@@ -31,10 +31,6 @@ class MainController extends Controller{
 			}			
 		}
 				
-		//$menu = new MainMenuWidget($this);		
-		Lang::load('javascript', Plugin::current()->getLangDir() . 'javascript');
-		Lang::load('form', Plugin::current()->getLangDir() . 'form');
-		
 		$labels = array(
 			'main' => Lang::$langs['javascript'],
 			'form' =>  Lang::$langs['form']
@@ -64,8 +60,12 @@ class MainController extends Controller{
 	
 	public function newTab(){
 		if(Option::get('main.home-page-type') == 'custom'){
-			return '<input type="hidden" class="page-name" value="' . Lang::get('main.new-tab-page-name') . '" />'.
-					Option::get('main.home-page-html');			
+			$tmpfile = tempnam('', '');
+			file_put_contents($tmpfile, Option::get('main.home-page-html'));
+			$page = View::make($tmpfile);
+
+			return '<input type="hidden" class="page-name" value="' . htmlentities(Lang::get('main.new-tab-page-name'), ENT_QUOTES) . '" />'.
+					$page;
 		}
 		else{
 			Request::redirect(Option::get('main.home-page-item'));

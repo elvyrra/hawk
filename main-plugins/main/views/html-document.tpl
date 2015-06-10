@@ -21,7 +21,18 @@
 		<link rel="stylesheet" id="theme-base-stylesheet" href="{{ $themeBaseCss }}" />
 		<!-- Customized file of the theme -->
 		<link rel="stylesheet" id="theme-custom-stylesheet" href="{{ $themeCustomCss }}" />
-				
+
+						
+		<script type="text/javascript" src="{{ $mainJsDir }}jquery-2.1.3.min.js"></script>
+		<script type="text/javascript" src="{{ $mainJsDir }}jquery.addons.js"></script>
+		<script type="text/javascript" src="{{ $mainJsDir }}jquery.cookie.js"></script>
+		<script type="text/javascript" src="{{ $mainJsDir }}jquery.mask.min.js"></script>
+		<script type="text/javascript" src="{{ $mainJsDir }}bootstrap.min.js"></script>
+		<script type="text/javascript" src="{{ $mainJsDir }}bootstrap-colorpicker.min.js"></script>
+		<script type="text/javascript" src="{{ $mainJsDir }}bootstrap-datepicker.min.js"></script>
+		<script type="text/javascript" src="{{ $mainJsDir }}angular.min.js"></script>
+		<script type="text/javascript" src="//cdn.ckeditor.com/4.4.7/full/ckeditor.js"></script>
+		
 		<script type="text/javascript" id="main-js-script" src="{{ $mainJsDir }}mint.js"></script>
 		
 		<script type="text/javascript">

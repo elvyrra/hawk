@@ -35,8 +35,9 @@ List.prototype.display = function(force){
 		data["set-"+this.id] = force;	
 	}
 	
-	var get = this.getFilterData();
-	get.refresh = 1;
+	var get = {
+		refresh : 1
+	}
 	if(this.selected){
 		get.selected = this.selected;
 	};
@@ -97,10 +98,6 @@ List.prototype.search = function(field, search){
 	this.searches[field] = search;
 			
 	this.set({searches: this.searches});
-};
-
-List.prototype.getFilterData = function(){
-	return $("item-list-filter[data-list='"+this.id+"']").serializeObject();
 };
 
 List.prototype.initControls = function(){

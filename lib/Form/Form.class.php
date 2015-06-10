@@ -61,7 +61,7 @@ class Form{
 		 */
 		$this->action = $_SERVER['REQUEST_URI'];		
 				
-        Lang::load('form', Plugin::get('main')->getLangDir().'form');	
+        // Lang::load('form', Plugin::get('main')->getLangDir().'form');	
 		
 		// Get the parameters of the instance
         foreach($param as $key => $value){

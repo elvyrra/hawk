@@ -97,13 +97,13 @@ class MainMenuWidget extends Widget{
 					);
 				}
 				
-				// if($user->isAllowed('admin.languages') || $user->isAllowed('admin.all')){
-				// 	$adminMenu['language'] = array(
-				// 		'icon' => 'flag',
-				// 		'url' => Router::getUri('manage-languages'),
-				// 		'label' => Lang::get('main.menu-admin-language-title')
-				// 	);
-				// }
+				if($user->isAllowed('admin.languages') || $user->isAllowed('admin.all')){
+					$adminMenu['language'] = array(
+						'icon' => 'flag',
+						'url' => Router::getUri('manage-languages'),
+						'label' => Lang::get('main.menu-admin-language-title')
+					);
+				}
 			}
 		}
 		return View::make(ThemeManager::getSelected()->getView('main-menu.tpl'), array(

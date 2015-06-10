@@ -36,7 +36,7 @@ $("#manage-themes-page")
 /***
  * Ace editor for Css editing tab
  */
-mint.require(["ace/ace.js"], function(){
+zrequire(["ace/ace.js"], function(){
 	ace.config.set("modePath", mint.jsBaseUrl + "ace/");
 	ace.config.set("workerPath", mint.jsBaseUrl + "ace/") ;
 	ace.config.set("themePath", mint.jsBaseUrl + "ace/"); 

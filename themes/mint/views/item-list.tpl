@@ -1,20 +1,20 @@
 
 <div class="list-wrapper" id='{{ $list->id }}' >
 <!-- NAVIGATION BAR -->
-{if($list->navigation !== false)}
 	<div class="list-navigation {{ $list->NavigationClass }}" style="{{ $list->style }}">
 		<div class="pull-left">
 			{foreach($list->controls as $control)}
 				{{ (new ViewPluginButton($control))->display() }}
 			{/foreach}
 		</div>
+		{if($list->navigation !== false)}
 		<div class="pull-right">
 			<table>
 				<tr>
 					<td class='list-result-number'>{text key="main.list-results-number" number="$list->recordNumber"}</td>
 					<td>
 						<select class='list-max-lines'>
-							{foreach(array(10,20,30,50,100) as $v)}
+							{foreach(ItemList::$lineChoice as $v)}
 								<option value='{{ $v }}' {{ $v == $list->lines ? "selected" : "" }} > {{ $v }}</option>
 							{/foreach}					
 						</select>
@@ -34,8 +34,8 @@
 				</tr>
 			</table>
 		</div>
+		{/if}
 	</div>
-{/if}
 
 
 	<input type='hidden' name='file' class="list-filename" value='{{ $list->file }}' />	

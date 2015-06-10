@@ -15,7 +15,7 @@ class LanguageController extends Controller{
 		}
 		
 		if(empty($filters['tag'])){
-			$filters['tag'] = Lang::DEFAULT_LANGUAGE;
+			$filters['tag'] = LANGUAGE;
 		}	
 		return $filters;	 	
 	}
@@ -29,13 +29,13 @@ class LanguageController extends Controller{
 		
 		Lang::addKeysToJavaScript("language.confirm-delete-lang", "language.confirm-delete-key");
 		
+		$this->addJavaScript( Plugin::current()->getJsUrl() . 'languages.js');
+
 		return LeftSidebarTab::make(array(
 			'icon' => 'flag',
 			'title' => Lang::get('language.lang-page-name'),			
-			'page' => $this->compute('editKeys'),
-			'script' => array(
-				'src' => Plugin::current()->getJsUrl() . 'languages.js',
-			),
+			// 'page' => $this->compute('editKeys'),
+			'page' => $this->editKeys(),
 			'sidebar' => array(
 				'size' => 2,
 				'widgets' => array(new LanguageFilterWidget($filters), new NewLanguageKeyWidget())
@@ -60,7 +60,7 @@ class LanguageController extends Controller{
 					'nofieldset' => true,
 					
 					new HtmlInput(array(
-						'value' => $this->compute('listKeys')
+						'value' => $this->listKeys()
 					))
 				)
 			),

@@ -1,5 +1,3 @@
-; plugin = "main"
-; language = "fr"
 403-message = "Vous n'avez pas les droits nécessaires pour accéder à cette fonctionnalité"
 404-message = "La page que vous demandez : {uri} n'existe pas"
 back-button = "Retour"

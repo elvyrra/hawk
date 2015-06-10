@@ -94,7 +94,7 @@ class View{
 		$this->content = preg_replace(array_keys($replaces), $replaces, $this->content);
 		
 		// Parse plugins nodes		
-		$pattern = "#\{(\w+)((\s+\w+\=(['\"])(.*?)\\4)*)\s*\}#";
+		$pattern = "#\{(\w+)((\s+\w+\=(['\"])((?:\\\"|.)*?)\\4)*)\s*\}#";
 		$this->content = preg_replace_callback($pattern, function($matches){			
 			$component = $matches[1];
 			

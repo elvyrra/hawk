@@ -38,7 +38,6 @@ class Controller{
 		EventManager::trigger(new Event(get_called_class() . '.' . $method . '.' . self::BEFORE_ACTION, array('controller' => $this)));
 		
 		/*** Call the controller method ***/
-		//$dom = new DOMQuery($this->$method());
 		$dom = phpQuery::newDocument($this->$method());
 				
 		/*** Load the widgets after calling the controller method ***/		

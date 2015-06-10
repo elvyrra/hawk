@@ -13,10 +13,11 @@
  **********************************************************************/
 class ItemList{
 	/*** Class constants ***/	
-	private $TEMPLATE_DIR;
-	
 	const DEFAULT_MODEL = 'GenericModel';
 	const ALL_LINES = 'all';
+	public static $lineChoice = array(10, 20, 50, 100);
+	const DEFAULT_LINE_CHOICE = 20;
+
 	
 	/*** Instance default values ***/
 	public 	$controls = array(),
@@ -24,7 +25,7 @@ class ItemList{
 			$searches = array(),
 			$sorts = array(),
 			$binds = array(),
-			$lines = 20,
+			$lines = self::DEFAULT_LINE_CHOICE,
 			$page = 1,
 			$checkbox = false,
 			$action,

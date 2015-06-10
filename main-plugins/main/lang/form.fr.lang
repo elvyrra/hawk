@@ -1,5 +1,3 @@
-; plugin = "form"
-; language = "fr"
 confirm-delete = "Voulez-vous vraiment supprimer cet élément ?"
 date-format = "Format de date incorrect : jj/mm/aaaa"
 email-comparison = "Les deux emails sont différents, et doivent être identiques"

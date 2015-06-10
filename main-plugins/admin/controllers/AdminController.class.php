@@ -234,6 +234,7 @@ class AdminController extends Controller{
 				'form' => $form,	
 			)));
 			
+			$this->addJavaScript(Plugin::current()->getJsUrl() . 'settings.js');
 			return RightSidebarTab::make(array(
 				'icon' => 'cogs',
 				'title' => Lang::get('admin.settings-page-name'),
