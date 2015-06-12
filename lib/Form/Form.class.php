@@ -518,7 +518,7 @@ class Form{
 			case self::STATUS_CHECK_ERROR :
 				// An error occured while checking field syntaxes
 				http_response_code(self::HTTP_CODE_CHECK_ERROR);
-				$response['message'] = $message ? $message : Lang::get('form.'.$status.'-'.$this->dbaction);
+				$response['message'] = $message ? $message : Lang::get('form.error-fill');
 				$response['errors'] = $this->errors;			
 				break;
 			

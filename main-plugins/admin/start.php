@@ -105,16 +105,16 @@ Router::auth(Request::isAjax() && Session::logged(), function(){
 		// Edit a language
 		Router::any('edit-language', '/admin/languages/{tag}', array('where' => array('tag' => '[a-z]{2}|new'), 'action' => 'LanguageController.editLanguage'));
 		// Delete a language
-		Router::get('delete-language', '/admin/langauges/{tag}/delete', array('where' => array('tag' => '[a-z]{2}'), 'action' => 'LanguageController.deleteLanguage'));
-		// Edit or add a translation
-		Router::any('edit-language-key', '/admin/languages/keys/{keyId}', array('where' => array('keyId' => '\d+'), 'action' => 'LanguageController.editKey'));
-		// Delete a translation
-		Router::any('delete-language-key', '/admin/languages/keys/{keyId}/delete', array('where' => array('keyId' => '\d+'), 'action' => 'LanguageController.deleteKey'));
+		Router::get('delete-language', '/admin/languages/{tag}/delete', array('where' => array('tag' => '[a-z]{2}'), 'action' => 'LanguageController.deleteLanguage'));
 		
-		// IMport language file
+		// Add a language key
+		Router::post('add-language-key', '/admin/languages/keys/add', array('action' => 'LanguageController.addKey'));
+
+		// Delete a translation
+		Router::any('delete-translation', '/admin/languages/keys/{plugin}/{key}/{tag}/clean', array('where' => array('plugin' => '\w+', 'key' => '[\w\-]+', 'tag' => '[a-z]{2}'), 'action' => 'LanguageController.deleteTranslation'));
+		
+		// Import language file
 		Router::any('import-language-keys', '/admin/languages/import', array('action' => 'LanguageController.import'));
 		
-		// Export language file
-		Router::any('export-language-keys', '/admin/languages/export', array('action' => 'LanguageController.export'));
 	});
 });

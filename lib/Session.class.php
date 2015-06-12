@@ -1,18 +1,10 @@
 <?php
-/**********************************************************************
- *    						Session.class.php
- *
- *
- * Author:   Julien Thaon & Sebastien Lecocq 
- * Date: 	 Jan. 01, 2014
- * Copyright: ELVYRRA SAS
- *
- * This file is part of Beaver's project.
- *
- *
- **********************************************************************/
- 
-class Session{
+/**
+ * This trait is used to manage the user's sessions. It's declared as trait 
+ * to be used in custom classes developer could want to develop to extend
+ * the session management (manage licences, number of simultaneous connections, ...)
+ */
+trait Session{
 	static $logged, $admin, $root, $user;
 	
 	public static function getUser(){

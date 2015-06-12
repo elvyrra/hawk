@@ -67,7 +67,7 @@ Form.prototype.displayErrorMessage = function(text){
 };
 
 Form.prototype.displayErrors = function(errors){
-	if (typeof errors === "object" && !errors instanceof Array) {
+	if (typeof errors === "object" && !(errors instanceof Array)) {
 		for(var id in errors){		
 			this.inputs[id].addError(errors[id]);
 		}	

@@ -14,7 +14,7 @@ class ThemeManager{
         return self::$themes[$name];
     }
     
-    public function getSelected(){
+    public static function getSelected(){
         return self::get(Option::get('main.selected-theme'));
     }
     

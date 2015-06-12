@@ -156,7 +156,7 @@ class QuestionController extends Controller{
 						)),
 
 						new HiddenInput(array(
-							'name' => 'removable',
+							'name' => 'editable',
 							'default' => 1,
 						)),
 
@@ -282,15 +282,21 @@ class QuestionController extends Controller{
 					if($form->check()){					
 						$form->register(Form::NO_EXIT);
 
-						LanguageKey::create("admin.profile-question-" . $form->getData("name") . "-label", array(LANGUAGE => $_POST['label']));
+						Language::current()->saveTranslations(array(
+							'admin' => array(
+								'profile-question-' . $form->getData("name") . '-label' => $_POST['label']
+							)
+						));
 
 						// Create the lang options
 						if($form->fields['options']->required){
-							foreach(explode("\n", $form->getData("options")) as $i => $option){
+							$keys = array('admin'=> array());
+							foreach(explode(PHP_EOL, $form->getData("options")) as $i => $option){
 								if(!empty($option)){
-									LanguageKey::create("admin.profile-question-" . $form->getData("name") . "-option-$i", array(LANGUAGE => $option));
+									$keys['admin']['profile-question-' . $form->getData("name") . '-option-' . $i] = trim($option);
 								}
 							}	
+							Language::current()->saveTranslations($keys);
 						}					
 
 						$form->response(Form::STATUS_SUCCESS);		
@@ -306,18 +312,26 @@ class QuestionController extends Controller{
 	public function delete(){
 		$question = ProfileQuestion::getByName($this->name);
 
-		if($question->removable){
+		if($question->editable){
+			$params = json_decode($question->parameters, true);
+
 			$question->delete();
 			
-			// Remove the key for the label
-			LanguageKey::getByKey("admin.profile-question-" . $this->name . "-label")->delete();
+			// Remove the language keys for the label and the options
+			$keysToRemove = array(
+				'admin' => array(
+					'profile-question-' . $this->name . '-label',					
+				)
+			);
 
-			// Remove the keys for the option
-			$example = array('plugin' => 'admin', 'key' => array('$like' => 'profile-question-' . $this->name . '-option-%'));
-			$keys = LanguageKey::getListByExample(new DBExample($example));
-			foreach($keys as $key){
-				$key->delete();
-			}				
+			if(!empty($params['options'])){
+				foreach($params['options'] as $i => $value){
+					$keysToRemove['admin'][] = 'profile-question-' . $this->name . '-option-' . $i;
+				}
+			}
+			foreach(Language::getAll() as $language){
+				$language->removeTranslations($keysToRemove);
+			}
 		}
 	}
 	

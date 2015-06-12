@@ -1,36 +1,56 @@
 <?php
 
 class UserFilterWidget extends Widget{
-	public function getFilter(){
-		if(isset($_GET['user_filter_display'])){
-			$display = $_GET['user_filter_display'];
-			setcookie('user_filter_display', $display);
-		}
-		elseif(isset($_COOKIE['user_filter_display'])){
-			$display = $_COOKIE['user_filter_display'];
-		}
-		else{
-			$display = 'all';
-		}
+	public static $filters = array('status', 'roleId');
 
-		return $display;
+	public function getFilters(){
+		$result = json_decode($_COOKIE['user-filter'], true);
+
+		foreach(self::$filters as $name){
+			if(isset($_GET[$name])){
+				$result[$name] = $_GET[$name];
+			}
+
+			if(empty($result[$name])){
+				$result[$name] = '0';
+			}
+		}
+		setcookie('user-filter', json_encode($result));
+		
+		return $result;
 	}
 
 	public function display(){
+		$filters = $this->getFilters();
+		$roles = array(
+			0 => ' - '
+		);
+		foreach(Role::getAll() as $role){
+			$roles[$role->id] = $role->getLabel();
+		}
+
 		$form = new Form(array(
 			'id' => 'user-filter-form',
 			'fieldsets' => array(
 				'form' => array(
 					new RadioInput(array(
-						'name' => 'display',
-						'labelWidth' => 'auto',
+						'name' => 'status',
+						'labelWidth' => '100%',
+						'label' => Lang::get('admin.user-filter-status-label'),
 						'layout' => 'vertical',
-						'value' => $this->getFilter(),
+						'value' => $filters['status'],
 						'options' => array(
-							'all' => Lang::get('admin.user-filter-display-all'),
-							'active' => Lang::get('admin.user-filter-display-active'),
-							'inactive' => Lang::get('admin.user-filter-display-inactive')
+							'0' => Lang::get('admin.user-filter-status-all'),
+							'active' => Lang::get('admin.user-filter-status-active'),
+							'inactive' => Lang::get('admin.user-filter-status-inactive')
 						),
+					)),
+
+					new SelectInput(array(
+						'name' => 'roleId',
+						'label' => Lang::get('admin.user-filter-roleId-label'),
+						'value' => $filters['roleId'],
+						'options' => $roles
 					))
 				)
 			)
@@ -39,7 +59,7 @@ class UserFilterWidget extends Widget{
 
 		return View::make(ThemeManager::getSelected()->getView("box.tpl"), array(
 			'content' => $form,
-			'title' => Lang::get('admin.user-filter-display-label'),
+			'title' => Lang::get('admin.user-filter-legend'),
 			'icon' => 'filter',
 		));
 	}

@@ -1,6 +1,7 @@
 <?php
 class LanguageController extends Controller{
-	
+	const DEFAULT_KEY_PLUGIN = 'custom';
+
 	/**
 	 * Get the filters of the keys list
 	 */
@@ -34,8 +35,8 @@ class LanguageController extends Controller{
 		return LeftSidebarTab::make(array(
 			'icon' => 'flag',
 			'title' => Lang::get('language.lang-page-name'),			
-			// 'page' => $this->compute('editKeys'),
-			'page' => $this->editKeys(),
+			'page' => $this->compute('editKeys'),
+			// 'page' => $this->editKeys(),
 			'sidebar' => array(
 				'size' => 2,
 				'widgets' => array(new LanguageFilterWidget($filters), new NewLanguageKeyWidget())
@@ -60,7 +61,7 @@ class LanguageController extends Controller{
 					'nofieldset' => true,
 					
 					new HtmlInput(array(
-						'value' => $this->listKeys()
+						'value' => $this->compute('listKeys')
 					))
 				)
 			),
@@ -71,17 +72,18 @@ class LanguageController extends Controller{
 		}
 		else{
 			try{
-				foreach($_POST['translation'][$filters['tag']] as $keyId => $translation){
-					if(!empty($translation)){
-						$model = new LanguageTranslation();
-						$model->set('keyId', $keyId);
-						$model->set('languageTag', $filters['tag']);
-						$model->set('translation', $translation);
-						$model->save();
+				$keys = array();
+				foreach($_POST['translation'][$filters['tag']] as $langKey => $translation){
+					if(!empty($translation)){						
+						list($plugin, $key) = explode('.', $langKey);
+						if(empty($keys[$plugin])){
+							$keys[$plugin] = array();
+						}
+						$keys[$plugin][$key] = $translation;						
 					}				
 				}
-				
-				Language::getByTag($filters['tag'])->generateCacheFiles();
+
+				Language::getByTag($filters['tag'])->saveTranslations($keys);
 				
 				$form->response(Form::STATUS_SUCCESS, Lang::get('language.update-keys-success'));
 			}
@@ -93,112 +95,88 @@ class LanguageController extends Controller{
 	
 
 
-	public function keyForm($keyId){
+	public function keyForm(){
 		$param = array(
-			'id' => 'edit-lang-key-form-' . $keyId,
-			'model' => 'LanguageKey',
-			'action' => Router::getUri('LanguageController.editKey', array('keyId' => $keyId)),
-			'reference' => array('id' => $keyId),
-			'fieldsets' => array(
-				'form' => array(
-					'nofieldset' => true,
-					
-					new TextInput(array(
-						'name' => 'plugin',
-						'label' => Lang::get('language.key-form-plugin-label'),
-					)),
-					
-					new TextInput(array(
-						'name' => 'key',
-						'label' => Lang::get('language.key-form-key-label'),
-					)),			
-				),
-				
-				'_submits' => array(
-					new SubmitInput(array(
-						'name' => 'valid',
-						'value' => Lang::get('main.valid-button')
-					)),
-					
-					new DeleteInput(array(
-						'name' => 'delete',
-						'value' => Lang::get('main.delete-button'),
-						'notDisplayed' => !$keyId
-					)),
-					
-					new ButtonInput(array(
-						'name' => 'cancel',
-						'value' => Lang::get('main.cancel-button'),
-						'notDisplayed' => !$keyId,
-						'onclick' => 'mint.dialog("close")'
-					)),
-				),
-			),
-			'onsuccess' => ($keyId ? 'mint.dialog("close");' : 'mint.forms["edit-lang-key-form-0"].reset();') . 'mint.lists["language-key-list"].refresh();' 
-		);
+            'id' => 'add-lang-key-form',
+            'action' => Router::getUri('add-language-key'),
+            'fieldsets' => array(
+                'form' => array(
+                    'nofieldset' => true,
+                    
+                    new TextInput(array(
+                        'name' => 'plugin',
+                        'label' => Lang::get('language.key-form-plugin-label'),
+                        'readonly' => true,
+                        'required' => true,
+                        'default' => self::DEFAULT_KEY_PLUGIN
+                    )),
+                    
+                    new TextInput(array(
+                        'name' => 'key',
+                        'required' => true,
+                        'pattern' => '/^[\w\-\_]+$/',
+                        'label' => Lang::get('language.key-form-key-label'),
+                    )),         
+                ),
+                
+                '_submits' => array(
+                    new SubmitInput(array(
+                        'name' => 'valid',
+                        'value' => Lang::get('main.valid-button')
+                    )),
+                ),
+            ),
+            'onsuccess' => 'mint.lists["language-key-list"].refresh();mint.forms["add-lang-key-form"].node.get(0).reset();' 
+        );
 
-		$translations = LanguageKey::getById($keyId) ? LanguageKey::getById($keyId)->getTranslations() : array();
-		foreach(Language::getAll() as $language){
-			$param['fieldsets']['form'][] = new TextareaInput(array(				
-				'name' => "translation[{$language->tag}]",
-				'independant' => true,
-				'default' => $translations[$language->tag] ? $translations[$language->tag]->translation : '',
-				'label' => $language->label,
-			));
-		}
-		
-		$form = new Form($param);
+        foreach(Language::getAll() as $language){
+            $param['fieldsets']['form'][] = new TextareaInput(array(                
+                'name' => "translation[{$language->tag}]",
+                'label' => $language->label,
+                'placeholder' => Lang::get('language.key-form-translation-placeholder', array('tag' => $language->tag))
+            ));
+        }
 
-		return $form;
-
+        return new Form($param);
 	}
 
 	/**
-	 * Edit one translation key
+	 * Add a new language key
 	 */
-	public function editKey(){	
-		$form = $this->keyForm($this->keyId);
-		if(!$form->submitted()){
-			return View::make($this->theme->getView('dialogbox.tpl'), array(
-				'page' => $form,
-				'title' => Lang::get('language.' . ($form->new ? 'key-form-add-title' : 'key-form-edit-title')),
-			));
-		}
-		else{
-			if($form->submitted() == "delete"){
-				$form->delete();
+	public function addKey(){
+		$form = $this->keyForm();
+
+		if($form->check()){
+			$key = self::DEFAULT_KEY_PLUGIN . '.' . $form->getData('key');
+			if(Lang::exists($key)){
+				$form->error('key', Lang::get('language.key-already-exists'));
+				$form->response(Form::STATUS_CHECK_ERROR);
 			}
-			else{
-				if($form->check()){
-					try{
-						$keyId = $form->register(Form::NO_EXIT);
-						foreach($_POST['translation'] as $tag => $translation){
-							if(!empty($translation)){
-								$tr = new LanguageTranslation();
-								$tr->set('keyId', $keyId);
-								$tr->set('languageTag', $tag);
-								$tr->set('translation', $translation);
-								$tr->save();
-								
-								Language::getByTag($tag)->generateCacheFiles();
-							}
-						}						
-						
-						$form->response(Form::STATUS_SUCCESS);
-					}
-					catch(Exception $e){
-						$form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get('language.key-already-exists'));
-					}
+
+			foreach(Language::getAll() as $language){
+				$translation = $form->getData("translation[{$language->tag}]");
+				
+				if($translation){
+					$language->saveTranslations(array(
+						self::DEFAULT_KEY_PLUGIN => array(
+							$form->getData('key') => $translation
+						)
+					));					
 				}
 			}
+
+			$form->response(Form::STATUS_SUCCESS);
 		}
 	}
-	
+
+
 	/**
 	 * Delete a translation key
 	 * */
-	public function deleteKey(){
-		LanguageKey::getById($this->keyId)->delete();	
+	public function deleteTranslation(){
+		Language::getByTag($this->tag)->removeTranslations(array(
+			$this->plugin => array($this->key)
+		));
 	}
 	
 	/**
@@ -210,26 +188,55 @@ class LanguageController extends Controller{
 		}
 			
 		
-		$filter = null;
-		if($filters['keys'] == 'missing'){
-			$filter = new DBExample(array(
-				'$or' => array(
-					array('T.translation' => ''),
-					array('T.translation' => '$null')
-				)
-			));
-		}		
-				
+		// Find all files in main-plugin, plugins dans userfiles
+		$files = array();
+		$dirs = array(MAIN_PLUGINS_DIR, PLUGINS_DIR, Lang::TRANSLATIONS_DIR);
+		foreach($dirs as $dir){
+			$result = array();
+			exec('find ' . $dir . ' -name "*.*.lang"', $result);
+
+			foreach($result as $file){
+				list($plugin, $language, $ext) = explode('.', basename($file));
+
+				if(empty($files[$plugin])){
+					$files[$plugin] = array();
+				}
+				if(empty($files[$plugin][$language])){
+					$files[$plugin][$language] = array();
+				}
+				$files[$plugin][$language][$dir == Lang::TRANSLATIONS_DIR ? 'translation' : 'origin'] = $file;
+			}
+		}
+
+		$keys = array();
+		foreach($files as $plugin => $languages){					
+			foreach($languages as $tag => $paths){
+				if($tag == Lang::DEFAULT_LANGUAGE || $tag == $filters['tag']){
+					foreach($paths as $name => $file){
+						$translations = parse_ini_file($file);
+						foreach ($translations as $key => $value) {							
+							$langKey = "$plugin.$key";
+							if(empty($keys[$langKey])){
+								$keys[$langKey] = array();
+							}
+							$keys[$langKey][$tag] = $value;
+						}
+					}
+				}
+			}
+		}
+
+		$data = array();
+		foreach($keys as $langKey => $values){
+			if( $filters['keys'] != 'missing' ||  empty($values[$filters['tag']]) ) {
+				$data[] = array('langKey' => $langKey, 'origin' => $values[Lang::DEFAULT_LANGUAGE], 'translation' => $values[$filters['tag']]);
+			}
+		}
+
 		$param = array(
 			'id' => 'language-key-list',
 			'action' => Router::getUri('LanguageController.listKeys'),
-			'table' => LanguageKey::getTable() . ' K 
-						LEFT JOIN ' . LanguageTranslation::getTable() . ' DT ON DT.keyId = K.id AND DT.languageTag = "' . Lang::DEFAULT_LANGUAGE. '"
-						LEFT JOIN ' . LanguageTranslation::getTable() . ' T ON T.keyId = K.id AND T.languageTag = ' . DB::escape($filters['tag']),
-			'reference' => array('K.id' => 'id'),
-			'filter' => $filter,
-			'sorts' => array('langKey' => DB::SORT_ASC),
-			'group' => array('langKey'),
+			'data' => $data,
 			'controls' => array(
 				array(
 					'type' => 'submit',
@@ -252,45 +259,32 @@ class LanguageController extends Controller{
 					'icon' => 'download',
 					'label' => Lang::get('language.import-btn'),
 					'class' => 'btn-info'
-				),
-				
-				array(
-					'href' => Router::getUri('LanguageController.export'),
-					'target' => 'dialog',
-					'icon' => 'upload',
-					'label' => Lang::get('language.export-btn'),
-					'class' => 'btn-info'
-				),
+				),			
 			),
 			
 			'fields' => array(
-				'actions' => array(
-					'independant' => true,
-					'search' => false,
-					'sort' => false,
-					'display' => function($value, $field, $line){
-						return "<span class='fa fa-pencil text-primary edit-key' title='" . Lang::get('language.key-list-edit-btn') . "' href='" . Router::getUri('edit-language-key', array('keyId' => $line->id)) . "' target='dialog' ></span>
-								<span class='fa fa-close text-danger delete-key' title='" . Lang::get('language.key-list-delete-btn') . "' data-key='$line->id'></span>";						
-					}
-				),
-				
 				'langKey' => array(
-					'field' => 'CONCAT(K.plugin, ".", K.key)',
 					'label' => Lang::get('language.key-list-key-label'),
 				),
 				
-				'defaultTranslation' => array(
-					'field' => 'DT.translation',
+				'origin' => array(
 					'label' => Lang::get('language.key-list-default-translation-label', array('tag' => Lang::DEFAULT_LANGUAGE)),															
 				),
 				
 				'translation' => array(
-					'field' => 'T.translation',
 					'label' => Lang::get('language.key-list-default-translation-label', array('tag' => $filters['tag'])),								
 					'display' => function($value, $field, $line) use($filters){
-						return "<textarea name='translation[{$filters['tag']}][{$line->id}]' cols='40' rows='5'>$value</textarea>";
+						return "<textarea name='translation[{$filters['tag']}][{$line->langKey}]' cols='40' rows='5'>$value</textarea>";
 					}
-				),				
+				),	
+
+				'clean' => array(
+					'search' => false,
+					'sort' => false,
+					'display' => function($value, $field, $line) {
+						return "<span class='fa fa-undo text-danger delete-translation' title='" . Lang::get('language.delete-translation-btn') . "' data-key='$line->langKey'></span>";						
+					}
+				),			
 			)
 		);
 		
@@ -380,6 +374,10 @@ class LanguageController extends Controller{
 			'fieldsets' => array(
 				'form' => array(
 					'nofieldset' => true,
+
+					new HtmlInput(array(
+						'value' => Lang::get('language.import-file-description'),
+					)),
 					
 					new FileInput(array(
 						'name' => 'files[]',
@@ -413,37 +411,34 @@ class LanguageController extends Controller{
 		else{
 			if($form->check()){
 				try{
-					foreach($_FILES['files']['tmp_name'] as $tmpname){
-						try{
-							Language::importFile($tmpname);
-							unlink($tmpname);
+					foreach($_FILES['files']['name'] as $i => $filename){
+						// Check the filename is correct
+						if(!preg_match('/^([\w\-]+)\.([a-z]{2})\.lang$/', $filename, $matches)) {
+							throw new Exception(Lang::get('language.import-file-name-error'));
 						}
-						catch(Exception $e){
-							$form->error('files[]', Lang::get('language.import-file-format-error'));
-							throw $e;
+
+						list($m, $plugin, $lang) = $matches;
+
+						// Check the content of the file is valid
+						$tmpfile = $_FILES['files']['tmp_name'][$i];
+						if(($translations = parse_ini_file($filename)) === false){
+							throw new Exception(Lang::get('language.import-file-format-error'));
 						}
-					}
-					
-					foreach(Language::getAll() as $language){
-						$language->generateCacheFiles();
+
+						Language::getByTag($lang)->saveTranslations(array(
+							$plugin => $translations
+						));
+
+						unlink($tmpfile);						
 					}
 					
 					$form->response(Form::STATUS_SUCCESS);
 				}
 				catch(Exception $e){
-					$form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : '');
+					$form->error('files[]', $e->getMessage());
+					$form->response(Form::STATUS_CHECK_ERROR);
 				}
 			}		
 		}		
 	}
-	
-	
-	/**
-	 * Export translations from the database to files
-	 */
-	public function export(){
-		
-	}
 }
-
-Lang::load('language');

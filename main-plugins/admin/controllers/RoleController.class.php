@@ -140,10 +140,6 @@ class RoleController extends Controller{
 			'onsuccess' => 'mint.dialog("close"); mint.load(mint.getUri("list-roles"), {selector : "#admin-roles-tab"});'
 		);
 		
-		$key = LanguageKey::getByKey("roles.role-" . $this->roleId . "-label");
-		if($key){
-			$translations = $key->getTranslations();
-		}
 
 		foreach(Language::getAll() as $language){
 			$param['fieldsets']['form'][] = new TextInput(array(
@@ -151,7 +147,7 @@ class RoleController extends Controller{
 				"independant" => true,
 				'required' => $language->tag == LANGUAGE,
 				"label" => Lang::get("roles.role-label-label", array('lang' => $language->tag)),
-				"default" => $translations ? $translations[$language->tag]->translation : ''
+				"default" => Lang::get("roles.role-" . $this->roleId . "-label", array(), 0, $language->tag)
 			));
 		}
 		
@@ -178,27 +174,14 @@ class RoleController extends Controller{
 						$roleId = $form->register(Form::NO_EXIT);
 
 						// Create the language key for the translations of the role name	
-						LanguageKey::create("roles.role-$roleId-label", $_POST['translation']);
-						// if(!$key){
-						// 	$key = new LanguageKey();					
-						// 	$key->set(array(
-						// 		'plugin' => 'roles',
-						// 		'key' => "role-" . $roleId . "-label"
-						// 	));
-						// 	$key->save();
-						// }						
-						
-						// foreach($_POST['translation'] as $tag => $translation){
-						// 	if(!empty($translation)){
-						// 		$tr = new LanguageTranslation();
-						// 		$tr->set('keyId', $key->id);
-						// 		$tr->set('languageTag', $tag);
-						// 		$tr->set('translation', $translation);
-						// 		$tr->save();
+						foreach($_POST['translation'] as $tag => $translation){
 
-						// 		Language::getByTag($tag)->generateCacheFiles();
-						// 	}
-						// }
+							Language::getByTag($tag)->saveTranslations(array(
+								'roles' => array(
+									"role-$roleId-label" => $translation
+								)
+							));
+						}
 						
 						$form->response(Form::STATUS_SUCCESS);
 					}

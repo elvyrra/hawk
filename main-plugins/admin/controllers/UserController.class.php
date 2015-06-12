@@ -36,9 +36,9 @@ class UserController extends Controller{
 	 * Display the list of the users 
 	 */
 	public function listUsers(){
-		$example = array('U.id' => array('$ne' => User::GUEST_USER_ID));
-		$filter = (new UserFilterWidget())->getFilter();
-		switch($filter){
+		$example = array('id' => array('$ne' => User::GUEST_USER_ID));
+		$filters = (new UserFilterWidget())->getFilters();
+		switch($filters['status']){
 			case 'inactive' :
 				$example['active'] = 0;
 				break;
@@ -47,13 +47,15 @@ class UserController extends Controller{
 				$example['active'] = 1;
 				break;
 		}
+		if(!empty($filters['roleId'])){
+			$example['roleId'] = $filters['roleId'];
+		}
 
 		$param = array(
 			'id' => 'admin-users-list',
 			'model' => 'User',
-			'table' => 'User U INNER JOIN LanguageKey K ON K.plugin = "roles" AND CONCAT("role-", U.roleId, "-label") = K.key INNER JOIN LanguageTranslation T ON T.keyId = K.id AND T.languageTag="' . LANGUAGE. '"',
 			'action' => Router::getUri('list-users'),
-			'reference' => array('U.id' => 'id'),
+			'reference' => 'id',
 			'filter' => new DBExample($example),
 			'lineClass' => function($line){	return $line->active ? 'bg-success' : 'bg-danger'; },
 			'controls' => array(
@@ -84,22 +86,23 @@ class UserController extends Controller{
 					'sort' => false,
 				),
 				'username' => array(
-					'field' => 'U.username',
 					'label' => Lang::get('admin.users-list-username-label'),					
 				),
 
 				'email' => array(
-					'field' => 'U.email',
 					'label' => Lang::get('admin.users-list-email-label'),
 				),
 
 				'roleId' => array(
-					'field' => 'T.translation',
-					'label' => Lang::get('admin.users-list-roleId-label'),					
+					'label' => Lang::get('admin.users-list-roleId-label'),
+					'sort' => false,
+					'search' => false,
+					'display' => function($value){
+						return Lang::get('roles.role-' . $value . '-label');
+					}
 				),
 
 				'active' => array(
-					'field' => 'U.active',
 					'label' => Lang::get('admin.users-list-active-label'),
 					'search' => false,
 					'sort' => false,
@@ -109,7 +112,6 @@ class UserController extends Controller{
 				),
 
 				'createTime' => array(	
-					'field' => 'U.createTime',				
 					'label' => Lang::get('admin.users-list-createTime-label'),
 					'search' => false,
 					'display' => function($value){

@@ -14,7 +14,7 @@
 class DB{
 	// Static properties
 	private static $servers = array();
-	private static $instances = array();
+	public static $instances = array();
 	
 	// instance properties
 	private $connection; // PDO Object representing the connection to the server    

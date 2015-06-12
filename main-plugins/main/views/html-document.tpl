@@ -15,6 +15,7 @@
 		<link rel="stylesheet" href="{{ $mainCssDir }}bootstrap.min.css" />
 		<!-- Bootstrap Colorpicker -->
 		<link rel="stylesheet" href="{{ $mainCssDir }}bootstrap-colorpicker.min.css" />
+		<!-- Bootstrap Datepicker -->
 		<link rel="stylesheet" href="{{ $mainCssDir }}bootstrap-datepicker.min.css" />
 		
 		<!-- Base CSS file of the theme -->
@@ -30,7 +31,7 @@
 		<script type="text/javascript" src="{{ $mainJsDir }}bootstrap.min.js"></script>
 		<script type="text/javascript" src="{{ $mainJsDir }}bootstrap-colorpicker.min.js"></script>
 		<script type="text/javascript" src="{{ $mainJsDir }}bootstrap-datepicker.min.js"></script>
-		<script type="text/javascript" src="{{ $mainJsDir }}angular.min.js"></script>
+		<script type="text/javascript" src="{{ $mainJsDir }}knockout-3.3.0.js"></script>
 		<script type="text/javascript" src="//cdn.ckeditor.com/4.4.7/full/ckeditor.js"></script>
 		
 		<script type="text/javascript" id="main-js-script" src="{{ $mainJsDir }}mint.js"></script>

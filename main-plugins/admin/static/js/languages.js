@@ -26,13 +26,15 @@ $("#language-manage-page")
 /**
  * Delete a translation key
  */
-.on("click", ".delete-key", function(){
-	if (confirm(Lang.get('language.confirm-delete-key'))) {		
-		$.get(mint.getUri('LanguageController.deleteKey', {keyId : $(this).data('key')}), function(response){
-			mint.lists["language-key-list"].refresh();
-		});
-	}
+.on("click", ".delete-translation", function(){
+	var tag = $("#language-filter-form [name='tag']").val();
+	var data = $(this).data('key').split('.');
+	var plugin = data[0];
+	var key = data[1];
 
+	$.get(mint.getUri('delete-translation', {plugin : plugin, key : key, tag : tag}), function(response){
+		mint.lists["language-key-list"].refresh();
+	});
 });
 
 var form = mint.forms["language-filter-form"];

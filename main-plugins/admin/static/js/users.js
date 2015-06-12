@@ -28,7 +28,7 @@ $("#admin-users-tabs")
 })
 
 .on("change","#user-filter-form", function(){
-	$("#admin-users-tab").load(mint.getUri("list-users") + "?user_filter_display=" + $("#user-filter-form [name='display']:checked").val());
+	mint.load(mint.getUri("list-users") + "?" + $(this).serialize(), {selector : "#admin-users-tab"});
 });
 
 $("#dialogbox")
