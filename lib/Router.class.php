@@ -131,7 +131,9 @@ class Router{
 	// Generate a route from a given controller method and its arguments	
 	public static function getUri($method = '', $args= array()){
 		if(!$method){
-			return $_SERVER['REQUEST_URI'];
+			$fullUrl = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+			
+			return str_replace(Conf::get('rooturl'), '', $fullUrl);
 		}
 
 		$route = null;

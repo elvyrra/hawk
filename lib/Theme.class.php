@@ -52,8 +52,9 @@ class Theme{
     }
     
     public function buildCssFile($force = false){
-        if(!file_exists($this->getBuildDirname()))
-            mkdir($this->getBuildDirname());
+        if(!file_exists($this->getBuildDirname())){
+            mkdir($this->getBuildDirname(), 0755, true);
+        }
         
         if($force || !is_file($this->getBuildCssFile()) || filemtime($this->getBaseCssFile()) > filemtime($this->getBuildCssFile())){
             // Build the css

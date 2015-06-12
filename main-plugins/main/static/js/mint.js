@@ -65,12 +65,12 @@ App.prototype.require = function(scripts, callback){
  * @static @prop {array} required - Required scripts needed for mint to work
  */
 App.required = [
-	"extends",
-	"date",
-	"tabs",
-	"form",
-	"list",
-	"lang",
+	"extends.js",
+	"date.js",
+	"tabs.js",
+	"form.js",
+	"list.js",
+	"lang.js",
 ];
 
 /**

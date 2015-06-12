@@ -254,7 +254,7 @@ class Plugin{
 	 * Return the url where to find out the plugin static files
 	 */
 	public function getStaticUrl(){
-		return '/' . str_replace(ROOT_DIR, '', $this->rootDir) . 'static/';
+		return ROOT_URL .'/' . str_replace(ROOT_DIR, '', $this->rootDir) . 'static/';
 	}
 	
 
