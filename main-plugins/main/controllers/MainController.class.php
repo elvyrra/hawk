@@ -32,9 +32,9 @@ class MainController extends Controller{
 		}
 				
 		$labels = array(
-			'main' => Lang::$langs['javascript'],
-			'form' =>  Lang::$langs['form']
-		);		
+			'main' => Lang::keys('javascript'),
+			'form' =>  Lang::keys('form')
+		);	
 		if(!$body){
 			$body = View::make($this->theme->getView('body.tpl'), array(
 				'pages' => json_encode($pages),

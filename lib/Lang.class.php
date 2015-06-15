@@ -17,7 +17,7 @@ class Lang{
 	const CACHE_DIR = CACHE_DIR . 'lang/';
 	const TRANSLATIONS_DIR = USERFILES_PLUGINS_DIR . 'admin/translations/';
 
-	public static $langs = array(), $usedLanguage = ''; // This array contains all textdomains
+	private static $langs = array(), $usedLanguage = ''; // This array contains all textdomains
 	
 	private static $originCache = array();
 
@@ -106,14 +106,15 @@ class Lang{
 			}
 			file_put_contents($this->cacheFile, '<?php return ' . var_export($data, true) . ';' );
 		}
-
-		
 	}
 
+
+	
 	/**
 	 * Load a language file 
-	 * @param {string} $plugin1 - The first plugin to load
-	 * @param {string} $plugin2 - ...
+	 * @param {string} $plugin - The plugin to load
+	 * @param {string} $language - The language to get the translations in
+	 * @param {string} $force - If set to true, force to reload the translations
 	 */
 	private static function load($plugin, $language = LANGUAGE, $force = false){
 		if(!isset(self::$langs[$plugin]) || $force){
@@ -132,6 +133,20 @@ class Lang{
 		}
 	}
 
+
+	/**
+	 * Get the translations of a language file
+	 * @param {string} $plugin - The plugin to load
+	 * @param {string} $language - The language to get the translations in
+	 * @param {string} $force - If set to true, force to reload the translations
+	 */
+	public static function keys($plugin, $language = LANGUAGE, $reload = false){
+		if(!isset(self::$langs[$plugin]) || $reload || $language != self::$usedLanguage){
+			self::load($plugin, $language, $reload);
+		}
+
+		return self::$langs[$plugin];
+	}
 
 
 	/**
