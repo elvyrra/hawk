@@ -8,7 +8,7 @@ class ViewPluginPanel extends ViewPlugin{
 
 		return View::make(ThemeManager::getSelected()->getView('panel.tpl'), array(
 			'id' => $this->id,
-			'legend' => $this->legend,
+			'title' => $this->title,
 			'icon' => $this->icon,
 			'content' => $this->content,
 			'type' => $this->type ? $this->type : 'default'	
