@@ -1,6 +1,6 @@
 <?php
 
-class ViewPluginAccordion extends ViewPlugin{
+class ViewPluginPanel extends ViewPlugin{
 	public function display(){
 		if(!$this->id){
 			$this->id = uniqid();
