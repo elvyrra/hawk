@@ -31,7 +31,8 @@ class FormInput{
 		'style' => 'text',
 		'title' => 'html',
 		'type' => 'text',
-		'value' => 'html'
+		'value' => 'html',
+		'autocomplete' => 'text',
 	);
     public  $attributes = array(),
     		$class = '',
