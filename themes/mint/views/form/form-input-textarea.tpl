@@ -8,4 +8,9 @@
 						{{ $attr }}="{{ $input->$attr }}" 
 					{/if}
 				{/if}
-			{/foreach}>{{$input->value}}</textarea>
+			{/foreach}
+
+			{foreach($input->attributes as $key => $value)}
+				{if($value !== null)} {{ $key }}="{{ $value }}" {/if}
+			{/foreach}
+			>{{$input->value}}</textarea>

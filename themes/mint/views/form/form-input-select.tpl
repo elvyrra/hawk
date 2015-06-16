@@ -8,7 +8,10 @@
 					{{ $attr }}="{{ $input->$attr }}" 
 				{/if}
 			{/if}
-		{/foreach}>
+		{/foreach}
+		{foreach($input->attributes as $key => $value)}
+			{if($value !== null)} {{ $key }}="{{ $value }}" {/if}
+		{/foreach} >
 	
 		{if($input->invitation)}
 			<option>{{ $input->invitation }}</option>

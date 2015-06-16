@@ -8,6 +8,10 @@
 					{{ $attr }}="{{ $input->$attr }}" 
 				{/if}
 			{/if}
+		{/foreach}
+
+		{foreach($input->attributes as $key => $value)}
+			{if($value !== null)} {{ $key }}="{{ $value }}" {/if}
 		{/foreach} />
 {if($input->mask)}
 	<script>$('#{{$input->id}}').mask('{{$input->mask}}');</script>

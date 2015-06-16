@@ -10,7 +10,10 @@
 					name="{{ $input->name }}" 
 					value="{{ htmlentities($v, ENT_COMPAT) }}" 
 					{{ $v == $input->value ? "checked" : "" }} 
-					{{ $input->disabled ? "disabled" : "" }} />
+					{{ $input->disabled ? "disabled" : "" }} 
+					{foreach($input->attributes as $key => $value)}
+						{if($value !== null)} {{ $key }}="{{ $value }}" {/if}
+					{/foreach} />
 			<label for="{{$input->id}}-option-{{$v}}" style="{{$input->labelStyle}}"> {{ $label }} </label>
 		</li>
 	{/foreach}

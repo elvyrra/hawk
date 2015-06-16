@@ -19,7 +19,6 @@ class FormInput{
 		'checked' => 'bool',
 		'class' => 'text',
 		'cols' => 'int',
-		'data-bind' => 'text',
 		'disabled' => 'bool',
 		'id' => 'text',
 		'maxlength' => 'int',
@@ -34,7 +33,8 @@ class FormInput{
 		'type' => 'text',
 		'value' => 'html'
 	);
-    public  $class = '',
+    public  $attributes = array(),
+    		$class = '',
     		$title = '',
     		$style = '',
     		$name,

@@ -79,8 +79,9 @@ class DB{
      * @param string name, the name of the instance
 	 */
 	public static function get( $name){
-		if(isset(self::$instances[$name]))
+		if(isset(self::$instances[$name])){
 			return self::$instances[$name];
+		}
 		
 		$servers = self::$servers[$name];
 		foreach($servers as $i => $server){
