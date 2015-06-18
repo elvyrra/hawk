@@ -20,7 +20,9 @@ var App = function(){
 	this.lists = {};
 	this.scripts = {};
 	this.tabs = {};
-	this.readyCallbacks = [];	
+	this.readyCallbacks = [];
+	
+	this.isReady = false;
 
 	this.init();
 };
@@ -203,7 +205,16 @@ App.prototype.init = function(){
  * Add a callback when the application is ready to run
  */
 App.prototype.ready = function(callback){
-	addEventListener("mint-ready", callback);
+	if (this.isReady) {
+		callback();
+	}
+	else{
+		addEventListener("mint-ready", function(){
+			this.isReady = true;
+			callback();
+		}.bind(this));
+	}
+	
 };
 
 App.prototype.load = function(url, data){

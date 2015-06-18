@@ -106,17 +106,18 @@
 		{/if}
 	</table>
 </div>
-<script type="text/javascript">				
-	mint.lists["{{ $list->id }}"] = new List({
-		id : "{{ $list->id }}",
-		action : "{{ $list->action }}",
-		target : "{{ $list->target }}",
-		lines : {{ $list->lines }},
-		page : {{ $list->page }},
-		sorts : {{ json_encode($list->sorts,JSON_HEX_QUOT | JSON_HEX_APOS | JSON_FORCE_OBJECT) }},
-		searches : {{ json_encode($list->searches,JSON_HEX_QUOT | JSON_HEX_APOS| JSON_FORCE_OBJECT) }},
-		selected : {{ $list->selected !== false ? "'$list->selected'" : "null" }},
-		maxPages : {{ $pages }}
+<script type="text/javascript">
+	mint.ready(function(){
+		mint.lists["{{ $list->id }}"] = new List({
+			id : "{{ $list->id }}",
+			action : "{{ $list->action }}",
+			target : "{{ $list->target }}",
+			lines : {{ $list->lines }},
+			page : {{ $list->page }},
+			sorts : {{ json_encode($list->sorts,JSON_HEX_QUOT | JSON_HEX_APOS | JSON_FORCE_OBJECT) }},
+			searches : {{ json_encode($list->searches,JSON_HEX_QUOT | JSON_HEX_APOS| JSON_FORCE_OBJECT) }},
+			selected : {{ $list->selected !== false ? "'$list->selected'" : "null" }},
+			maxPages : {{ $pages }}
+		});
 	});
-/* 	mint.lists["{{ $list->id }}"].initControls(); */
 </script>
