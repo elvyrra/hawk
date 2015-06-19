@@ -143,11 +143,17 @@ Form.prototype.submit = function(){
 						
 					case 424 :
 						// An error occured in the form treatment						
-						self.displayErrorMessage(response.message);						
+						self.displayErrorMessage(response.message);
+						
+						/*** Trigger a form_error event to the form ***/		
+						self.node.trigger("error", response.data);
 						break;
 						
 					default :
 						self.displayErrorMessage(Lang.get('main.technical-error'));
+						
+						/*** Trigger a form_error event to the form ***/		
+						self.node.trigger("error", response.data);
 						break;
 				}
 			}
