@@ -164,5 +164,9 @@ class Router{
 		
 		return $url;		
 	}
+    
+    public static function getUrl($method = '', $args = array()){
+        return preg_replace('#/$#', '',Conf::get('rooturl')) . self::getUri($method, $args);
+    }
 	
 }
