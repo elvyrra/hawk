@@ -124,8 +124,9 @@ class FormInput{
 	 * Description: Check the data send by the form and set the errors if not
 	 */
 	public function check(&$form = null){				
-		if(empty($this->errorAt))
+		if(empty($this->errorAt)){
 			$this->errorAt = $this->name;
+        }
 		
 		if(!empty($this->required) && ((string)$this->value == '' || $this->emptyValue && $this->value === $this->emptyValue)){
 			// The field is required but not filled

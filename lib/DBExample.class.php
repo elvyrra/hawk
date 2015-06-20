@@ -108,7 +108,7 @@ class DBExample{
 							$elements[] = $this->parseElements($binds, $value, $operator, $key);
 						}
 						else{							
-							throw new DBExampleException("The value must be a scalar value");
+							throw new DBExampleException("The value must be a scalar value, given : $key => " . var_export($value, true));
 						}
 						break;
 				}
