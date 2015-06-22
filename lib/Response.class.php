@@ -25,7 +25,10 @@ class Response{
     public static function getType(){
         return self::$type;
     }
-      
+	
+	public static function setHttpCode($code){
+		http_response_code($code);      
+	}
     
 	public static function end(){
         switch(self::$type){
