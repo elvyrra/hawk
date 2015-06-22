@@ -45,7 +45,12 @@ class Model{
 	}
     
 
-
+	/**
+	 * Get a model instance by an example
+	 * @param {DBExample} $example - The example to find the data line
+	 * @param {array} $fields - The fields to get out
+	 * @return {Model} - the model found
+	 */
 	public static function getByExample(DBExample $example, $fields = array()){
         return DB::get(static::$dbname)->select(array(
             'fields' => $fields,
@@ -57,7 +62,14 @@ class Model{
 	}
 	
 	
-
+	/**
+	 * Get a list of model instances by an example
+	 * @param {DBExample} $example - The example to find the data lines
+	 * @param {string} $index - The field that will be used as array key in the result. If not set, the result will be a non associative array
+	 * @param {array} $fields - The fields to get out
+	 * @param {array} $order - The order of the results
+	 * @return {array[Model]} - the array containing found models
+	 */
     public static function getListByExample(DBExample $example, $index = null, $fields = array(), $order = array()){
 		return DB::get(static::$dbname)->select(array(
             'fields' => $fields,
@@ -70,12 +82,86 @@ class Model{
 	}
 	
 	
+	/**
+	 * Get a model instance by sql condition
+	 * @param {string} $where - The SQL condition
+	 * @param {array} $binds - The binded values
+	 * @param {array} $fields - The fields to get out
+	 * @return {Model} - the model found
+	 */
+	public static function getBySQL($where, $binds = array(), $fields = array()){
+		return DB::get(static::$dbname)->select(array(
+            'fields' => $fields,
+            'from' => static::$tablename,
+            'where' => $where,
+			'binds' => $binds,
+            'return' => get_called_class(),
+            'one' => true,
+        ));
+	}
 	
+	
+	/**
+	 * Get a list of model instances by a SQL condition
+	 * @param {string} $where - The example to find the data lines
+	 * @param {array} $binds - The binded values
+	 * @param {string} $index - The field that will be used as array key in the result. If not set, the result will be a non associative array
+	 * @param {array} $fields - The fields to get out
+	 * @param {array} $order - The order of the results
+	 * @return {array[Model]} - the array containing found models
+	 */
+    public static function getListBySQL($where, $binds = array(), $index = null, $fields = array(), $order = array()){
+		return DB::get(static::$dbname)->select(array(
+            'fields' => $fields,
+			'from' => static::$tablename,
+			'where' => $where,
+			'binds' => $binds,
+            'index' => $index,
+			'return' => get_called_class(),
+            'orderby' => $order
+		));        
+	}
+	
+	
+	
+	/**
+	 * Delete data in the database from an example
+	 * @param {DBExample} $example - The example to find the lines to delete
+	 */
+	public static function deleteByExample(DBExample $example){
+		return DB::get(static::$dbname)->delete(static::$tablename, $example);
+	}
+	
+	/**
+	 * Delete data in the database from a SQL condition
+	 * @param {string} $where - The SQL condition to find the lines to delete
+	 * @param {array} $binds - The binded values
+	 */
+	public static function deleteBySQL($where, $binds = array()){
+		return DB::get(static::$dbname)->delete(static::$tablename, $where, $binds);
+	}
+	
+	
+	/**
+	 * Count the number of elements filtered by an example
+	 * @param {DBExample} $example - The example to find the lines to delete
+	 * @param {array} $group - The fields used to group the results
+	 */
     public static function countElementsByExample(DBExample $example, $group = array()){
 		return DB::get(static::$dbname)->count(static::$tablename, $example, array(), self::$primaryColumn, $group);
 	}
     
-    
+	
+	
+    /**
+	 * Count the number of elements filtered by a SQL condition
+	 * @param {string} $where - The SQL condition
+	 * @param {array} $binds - the binded values
+	 * @param {array} $group - The fields used to group the results
+	 */
+    public static function countElementsBySQL($where, $binds,  $group = array()){
+		return DB::get(static::$dbname)->count(static::$tablename, $where, $binds, self::$primaryColumn, $group);
+	}
 
 
 
