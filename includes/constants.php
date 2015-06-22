@@ -1,17 +1,4 @@
 <?php
-/**********************************************************************
- *    						constants.php
- *
- *
- * Author:   Julien Thaon & Sebastien Lecocq 
- * Date: 	 Jan. 01, 2014
- * Copyright: ELVYRRA SAS
- *
- * This file is part of Beaver's project.
- *
- *
- **********************************************************************/
-
 /*** Constant paths ***/
 define('LIB_DIR', ROOT_DIR . 'lib/'); // The folder containing all the core classes
 
@@ -41,7 +28,3 @@ define('ENCODING', 'utf-8');
 
 // Allowed image types
 define('ALLOWED_IMAGE_UPLOAD_TYPES', 'image/png image/jpeg image/jpg image/bpm image/gif image/tif');
-
-/******************* (C) COPYRIGHT 2014 ELVYRRA SAS *********************/
-?>
-

@@ -1,9 +1,5 @@
 <?php
 
-if(NO_CACHE){
-	Plugin::get('main')->importLanguageFiles();
-}
-
 Router::get('index', '/', array('action' => 'MainController.index'));
 Router::get('new-tab', '/newtab', array('auth' => Request::isAjax() && (Session::logged() || Option::get('main.allow-guest')), 'action' => 'MainController.newTab'));
 	

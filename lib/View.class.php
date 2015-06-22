@@ -1,17 +1,8 @@
 <?php
-/**********************************************************************
- *    						View.class.js
- *
- *
- * Author:   Julien Thaon & Sebastien Lecocq 
- * Date: 	 Jan. 01, 2014
- * Copyright: ELVYRRA SAS
- *
- * This file is part of Beaver's project.
- * Description : This class is used to create a DOM template and
- *                  manipulate the DOM (add nodes, replace attribues, ... etc)
- *
- **********************************************************************/
+
+/**
+ * This class describes the behavior of views
+ */
 class View{	
 	private $file, $content, $data, $type;
 	private $cached = false;
@@ -165,5 +156,3 @@ class ViewException extends Exception{
 		parent::__construct($message, $code);
 	}
 }
-
-/******************* (C) COPYRIGHT 2014 ELVYRRA SAS *********************/
