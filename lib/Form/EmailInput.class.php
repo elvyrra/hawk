@@ -1,17 +1,16 @@
 <?php
-/**********************************************************************
- *    						EmailInput.class.php
- *
- *
- * Author:   Julien Thaon & Sebastien Lecocq 
- * Date: 	 Jan. 01, 2014
- * Copyright: ELVYRRA SAS
- *
- * This file is part of Beaver's project.
- *
- *
- **********************************************************************/
+/**
+ * EmailInput.class.php
+ * @author Elyrra SAS
+ */
+
+
 class EmailInput extends TextInput{
+
+	/**
+	 * Constructor
+	 * @param 
+	 */
 	public function __construct($param){
 		parent::__construct($param);
 		$this->pattern = "/^[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]{2,}\.[a-z]{2,4}$/";

@@ -48,7 +48,7 @@ class PluginController extends Controller{
                             // the plugin is not installed
                             $buttons = array(
                                 // Install button
-                                button(array(
+                                ButtonInput::create(array(
                                     'label' => Lang::get('admin.install-plugin-button'),
                                     'icon' => 'upload',
                                     'href' => Router::getUri('install-plugin', array('plugin' => $plugin->getName())),
@@ -56,7 +56,7 @@ class PluginController extends Controller{
                                 )),
 
                                 // Delete button
-                                button(array(
+                                ButtonInput::create(array(
                                     'label' => Lang::get('admin.delete-plugin-button'),
                                     'icon' => 'close',
                                     'class' => 'btn-danger',
@@ -70,7 +70,7 @@ class PluginController extends Controller{
                                 // The plugin is installed but not activated
                                 $buttons = array(
                                     // Activate button
-                                    button(array(
+                                    ButtonInput::create(array(
                                         'label' => Lang::get('admin.activate-plugin-button'),
                                         'class' => 'btn-success',
                                         'icon' => 'check',
@@ -80,7 +80,7 @@ class PluginController extends Controller{
                                     
                                     // Settings button
                                     method_exists($installer, 'settings') ? 
-                                        button(array(
+                                        ButtonInput::create(array(
                                             'icon' => 'cogs',
                                             'label' => Lang::get('admin.plugin-settings-button'),
                                             'href' => Router::getUri('plugin-settings', array('plugin' => $plugin->getName())),
@@ -88,7 +88,7 @@ class PluginController extends Controller{
                                         )) : '',
 
                                     // Uninstall button
-                                    button(array(
+                                    ButtonInput::create(array(
                                         'label' => Lang::get('admin.uninstall-plugin-button'),
                                         'class' => 'btn-danger',
                                         'icon' => 'close',
@@ -102,14 +102,14 @@ class PluginController extends Controller{
                                 $buttons = array(
                                     // Settings button
                                     method_exists($installer, 'settings') ? 
-                                        button(array(
+                                        ButtonInput::create(array(
                                             'icon' => 'cogs',
                                             'label' => Lang::get('admin.plugin-settings-button'),
                                             'href' => Router::getUri('plugin-settings', array('plugin' => $plugin->getName())),
                                             'target' => $actionsTarget
                                         )) : '',
 
-                                    button(array(
+                                    ButtonInput::create(array(
                                         'label' => Lang::get('admin.deactivate-plugin-button'),
                                         'class' => 'btn-danger',
                                         'icon' => 'ban',

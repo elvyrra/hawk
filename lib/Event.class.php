@@ -3,7 +3,7 @@
 class Event{
     private $name, $data;
     
-    public function __construct($name, $data){
+    public function __construct($name, $data = array()){
         $this->name = $name;
         $this->data = $data;
     }

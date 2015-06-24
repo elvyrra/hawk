@@ -1,20 +1,22 @@
 <?php
-/**********************************************************************
- *    						FormInput.class.php
- *
- *
- * Author:   Julien Thaon & Sebastien Lecocq 
- * Date: 	 Jan. 01, 2014
- * Copyright: ELVYRRA SAS
- *
- * This file is part of Beaver's project.
- *
- *
- **********************************************************************/
+/**
+ * FormInput.class.php
+ * @author Elvyrra SAS
+ */
 
-class FormInput{	
+/**
+ * This class describes the general behavior of inputs in forms. This class is associated to Form class
+ */
+class FormInput{
+    /**
+     * uniqid used to generate uniq id for input HTML nodes, when is is not specified
+     */
     protected static $uniqid;
 	
+    /**
+     * Attributes properties that can be called at input initialization, and there type
+     * @static array $attr 
+     */
 	public static $attr = array(
 		'checked' => 'bool',
 		'class' => 'text',
@@ -34,55 +36,156 @@ class FormInput{
 		'value' => 'html',
 		'autocomplete' => 'text',
 	);
-    public  $attributes = array(),
-    		$class = '',
-    		$title = '',
-    		$style = '',
-    		$name,
-    		$id,
-    		$value = '',
-    		$placeholder = '',
-    		$maxlength = 0,
-    		$disabled = false,
-    		$readonly = false,
-    		$required = false,
-    		$custom = array(),
-    		$errorAt = '',
-    		$nl = true,
-    		$notDisplayed = false,
-    		$hidden = false,
-    		$blockClass = '',
-    		$before = '',
-    		$after = '',
-    		$label = '',
-    		$beforeLabel = false,
-    		$labelStyle = '',
-    		$last = false,
-    		$first = false,
-    		$pattern = '',
-    		$mask = '';
+
+    /**
+     * HTML input attributes, used to apply non listed attributes, as aria or data attributes
+     */
+    public $attributes = array();
+
+    /**
+     * HTML class attribute
+     */
+    public $class = '';
+    		
+    /**
+     * HTML title attribute
+     */
+    public $title = '';
+
+    /**
+     * HTML style attribute
+     */
+    public $style = '';
+
+    /**
+     * HTMl name attribute (required)
+     */
+    public $name;
+    	
+    /**
+     * HTML id attribute. If not given, it will be generated form a uniqid and the name of the input
+     */
+    public $id;
+
+    /**
+     * Field value
+     */
+    public $value = '';
+
+    /**
+     * HTML placeholder attribute
+     */
+    public $placeholder = '';
+
+    /**
+     * HTML maxlength attribute
+     */
+    public $maxlength = 0;
+
+    /**
+     * HTML disabled attribute
+     */
+    public $disabled = false;
+
+    /**
+     * HTML readonly attribute
+     */
+    public $readonly = false;
+    		
+    /**
+     * Defines if the field is required or not
+     */
+    public $required = false;
+    		
+    /**
+     * Defines on what field to display errors. Can be used for example for hidden fields that value os dynamically filled client-side
+     */
+	public $errorAt = '';
+    		
+    /**
+     * Defines if the field has to be displayed on a new line
+     */
+    public $nl = true;
+
+    /**
+     * If set to true, the input won't be displayed. Can be usefull to hide a field in a specific usecase
+     */
+    public $notDisplayed = false;
+
+    /**
+     * If set to true, the input will be displayed but with a display none
+     */
+	public $hidden = false;
+
+    /**
+     * String to display before the input
+     */
+    public $before = '';
+
+    /**
+     * String to display after the input
+     */
+    public $after = '';
+    		
+    /**
+     * The label to display with the input
+     */
+    public $label = '';
+
+    /**
+     * If set to true, the input will be displayed before the label (defaultly, it is displayed after)
+     */
+    public $beforeLabel = false;
+
+    /**
+     * The style attribute to apply to the label
+     */
+    public $labelStyle = '';
+    		
+    /**
+     * The regular expression the input value must valid
+     */
+    public $pattern = '';
+
+    /**
+     * The input validators. Other parameters defaultly fills this property, but can ben completed at the instanciation
+     */
+    public $validators = array();
+    		
+    /**
+     * Mask to apply on the HTML input
+     */
+    public $mask = '';
+
+    /**
+     * Defines if the value of this field has to be unique in the database 
+     */
+    public $unique = false;
+
+    /**
+     * the type of data in the database
+     */
+    public $dataType = '';
 
 	
-    /*
-     * Constructeur par défaut de la classe FormInput
-     * @param : 
-     *  - String $name : L'alias, et attribut name du champ
-     *  - Array $param : Les paramètres du champ
-     *  - Form $form : Le formulaire auquel appartient ce champ
+    /**
+     * Constructor
+     * @param array $param The input parameters. This arguments is an associative array where each key is the name of a property of this class     
      */
     public function __construct($param) {
-        $this->custom = array();        
-        
+
         foreach($param as $key => $value){
             $this->$key = $value;
         }
+
 		if(!isset($this->name)){
 			$this->name = $this->field; 
 		}
 			
         if(!isset($this->id)){		
-			if(!isset(self::$uniqid))
+			if(!isset(self::$uniqid)){
 				self::$uniqid = uniqid();
+			}
             $this->id = self::$uniqid.'-'.$this->name;
 		}
 		
@@ -94,8 +197,22 @@ class FormInput{
         $this->tpl = is_file($file) ? $file : ThemeManager::getSelected()->getView(Form::VIEWS_DIR . 'form-input.tpl');
     }
 	
-	/*
-     * Affichage de l'input sous forme string
+
+    /**
+     * Create a input instance with it parameters
+     * @param array $param The input parameters. This arguments is an associative array where each key is the name of a property of this class
+     * @return FormInput The created instance
+     */
+	public static function create($param){
+		$class = get_called_class();
+		
+		return new $class($param);
+	}
+	
+
+	/**
+     * Display the input
+     * @return string the HTML result of the input displaying
      */
     public function __toString(){
 		$theme = ThemeManager::getSelected();
@@ -119,21 +236,27 @@ class FormInput{
         ));
     }
 	
-	/*
-	 * Prototype: public function check(array &$errors)
-	 * Description: Check the data send by the form and set the errors if not
-	 */
+
+    /**
+     * Check the submitted value of the input
+     * @param Form &$form The form to apply the errors in case of check failure
+     * @return bool True if the submitted value is valid, else false
+     */
 	public function check(&$form = null){				
 		if(empty($this->errorAt)){
 			$this->errorAt = $this->name;
         }
 		
+
+        // Check, if the field is required, that a value was submitted
 		if(!empty($this->required) && ((string)$this->value == '' || $this->emptyValue && $this->value === $this->emptyValue)){
 			// The field is required but not filled
 			$form && $form->errors[$this->errorAt] = Lang::get('form.required-field');
 			return false;
 		}
-		if(!empty($this->value) && $this->pattern){
+
+        // Check the format of the field is correct
+		if(!empty($this->value) && !empty($this->pattern)){
 			// test the format of the field
 			if(!preg_match($this->pattern, $this->value)){
 				// the format of the field value is not correct				
@@ -142,7 +265,8 @@ class FormInput{
 			}
 		}
 		
-		if(!empty($this->value) && $this->unique && $form ){
+        // If the value of this field must be unique in the database, check this unicity is not compromised
+		if(!empty($this->value) && !empty($this->unique) && $form ){
 			$example = new DBExample(array(
 				'$not' => $form->reference,
 				array($this->name => $this->dbvalue())
@@ -156,8 +280,10 @@ class FormInput{
 			}
 		}
 		
+        // Check custom validators
 		if(!empty($this->validators)){
 			foreach($this->validators as $validator){
+                $error = '';
 				if(is_callable($validator) && !$validator($this, $error)){
 					$form->errors[$this->errorAt] = $error;
 					return false;
@@ -169,10 +295,10 @@ class FormInput{
 		return true;
 	}
 	
-	/*
-	 * Prototype: public function dbValue()
-	 * Description : return the value, formatted for the database
-	 */
+    /**
+     * Return the value, formatted for the SQL database
+     * @return mixed The value, formatted for the database
+     */
 	public function dbvalue(){
 		switch(strtolower($this->dataType)){
 			case "boolean" :
@@ -195,19 +321,33 @@ class FormInput{
 		}		
 	}
 	
+
+    /**
+     * Set the value to the input
+     * @param mixed $value The value to set
+     */
 	public function set($value){
 		$this->value = $value;
 	}
 	
+
+    /**
+     * Create an input from an array, automaticall finding it type
+     * @param array $parameters The input parameters, formatted as the constructor parameters, and including a 'type' data
+     * @return FormInput The input instance
+     */
 	public static function getInstance($parameters){
-		if(!isset($parameters['type']))
+		// Detect the class name to instance
+        if(!isset($parameters['type'])){
 			$parameters['type'] = 'text';
+		}
 			
 		$classname = ucwords($parameters['type']).'Input';
-		unset($parameters['type']);
 		
+        // Remove the 'type' data, only used to find out the classname
+        unset($parameters['type']);
+		
+        // Create the instance
 		return new $classname($parameters);		
 	}
 }
-
-/******************* (C) COPYRIGHT 2014 ELVYRRA SAS *********************/

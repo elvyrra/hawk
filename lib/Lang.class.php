@@ -273,7 +273,9 @@ class Lang{
 		$content = implode(PHP_EOL, $lines);
 		file_put_contents($file, $content);		
 	}
-
-
-
 }
+
+/*** Save the language cache ***/
+EventManager::on('process-end', function(Event $event){
+	Lang::saveOriginCache();
+});

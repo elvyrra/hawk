@@ -13,6 +13,8 @@ if(!empty($sessionInterface)){
 	session_start();
 }
 
+EventManager::trigger(new Event('process-start'));
+
 /*** Initialize the plugins ***/
 $plugins = array_merge(Plugin::getMainPlugins(), Plugin::getActivePlugins());
 foreach($plugins as $plugin){	
@@ -21,15 +23,12 @@ foreach($plugins as $plugin){
 	}
 }
 
+EventManager::trigger(new Event('before-routing'));
+
 /*** Compute the routage ***/
 Router::route();
-//debug(Router::getRoutes());
 
-/*** Save the autoload cache ***/
-Autoload::saveCache();
-
-/*** save the language cache ***/
-Lang::saveOriginCache();
+EventManager::trigger(new Event('process-end'));
 
 /*** Return the response to the client ***/
 Response::end();

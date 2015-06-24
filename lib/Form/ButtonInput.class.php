@@ -1,21 +1,25 @@
 <?php
-/**********************************************************************
- *    						ButtonInput.class.php
- *
- *
- * Author:   Julien Thaon & Sebastien Lecocq 
- * Date: 	 Jan. 01, 2014
- * Copyright: ELVYRRA SAS
- *
- * This file is part of Beaver's project.
- *
- *
- **********************************************************************/
+/**
+ * ButtonInput.class.php
+ * @author Elvyrra SAS
+ */
+
+/**
+ * This class describes the button inputs in form (button, delete, dans submit)
+ */
 class ButtonInput extends FormInput{
+	// the type of the input
 	const TYPE = "button";
+	// this type of input is independant, so not inserted in database
 	const INDEPENDANT = true;
+
+	// this type of input has no label
 	const NO_LABEL = true;
 	
+	/**
+	 * Defines the icons for most common buttons
+	 * @static array $defaultIcons
+	 */
 	private static $defaultIcons = array(
 		'valid' => 'save',
 		'save' => 'save',
@@ -28,6 +32,10 @@ class ButtonInput extends FormInput{
 		'send' => 'mail-closed'	
 	);
 	
+	/**
+	 * Display the input 
+	 * @return string The HTML result of the input displaying
+	 */
 	public function __toString(){
 		if(!empty($this->notDisplayed)){
 			return '';
@@ -40,7 +48,9 @@ class ButtonInput extends FormInput{
 		
 		$param = array_filter($param, function($v){ return !empty($v);});
 
-		$param['label'] = $this->value;
+		if(!isset($param['label'])){
+			$param['label'] = $this->value;
+		}
 		$param['type'] = static::TYPE;
 		
 		$param = array_intersect_key($param, array_flip(array('id', 'class', 'icon', 'label', 'type', 'name', 'onclick', 'style', 'href', 'target')));
@@ -61,8 +71,13 @@ class ButtonInput extends FormInput{
 		));		
 	}
 	
+
+	/**
+	 * Check the submitted value
+	 * @param Form $form The form to apply the errors if the value is not valid
+	 * @return bool This function always return true, because no value is expected from a button
+	 */
 	public function check(&$form = null){
 		return true;
 	}	
 }
-/******************* (C) COPYRIGHT 2014 ELVYRRA SAS *********************/

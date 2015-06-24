@@ -1,19 +1,9 @@
 <?php
-/**********************************************************************
- *    						TextareaInput.class.php
- *
- *
- * Author:   Julien Thaon & Sebastien Lecocq 
- * Date: 	 Jan. 01, 2014
- * Copyright: ELVYRRA SAS
- *
- * This file is part of Beaver's project.
- *
- *
- **********************************************************************/
+/**
+ * This class describes the wysiwyg fields in forms. Wysiwyg behavior is computed by CKEditor library
+ * http://ckeditor.com/
+ */
 class WysiwygInput extends TextareaInput{
 	const TYPE = "wysiwyg";
 	
 }
-
-/******************* (C) COPYRIGHT 2014 ELVYRRA SAS *********************/

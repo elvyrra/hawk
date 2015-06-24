@@ -259,7 +259,7 @@ class Form{
 	}
 	
 	/*
-	 * Prototype: public function addInput($fieldset, $input, $after = 'last')
+	 * Prototype: public function addInput($fieldset, $input)
 	 * Description: Add a new input in the form
 	 */
 	public function addInput($fieldset, $input){
