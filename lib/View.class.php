@@ -72,15 +72,13 @@ class View{
 		$this->content = $this->content;	
 
 		// Import sub templates
-		while(preg_match(self::IMPORT_REGEX, $this->content)){			
-			$this->content = preg_replace_callback($reg, function($m){
-				$file = $m[2]{0} == '/' ? ROOT_DIR : dirname(realpath($this->file)) . '/' . $m[2];
-				
-				$view = new View($file);
-				return "<?php include '" . $view->fileCache->get() . "'; ?>";
+		$this->content = preg_replace_callback(self::IMPORT_REGEX, function($m){
+			$file = $m[2]{0} == '/' ? ROOT_DIR : dirname(realpath($this->file)) . '/' . $m[2];
 			
-			} , $this->content);
-		}
+			$view = new View($file);
+			return "<?php include '" . $view->fileCache->get() . "'; ?>";
+		
+		} , $this->content);
 		
 		// Parse PHP Structures
 		$replaces = array(
