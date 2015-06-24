@@ -6,6 +6,8 @@
 class View{	
 	private $file, $content, $data, $type;
 	private $cached = false;
+
+	private $dependencies = array();
 	
 	const PLUGINS_VIEW = 'view-plugins/';
 
@@ -15,13 +17,13 @@ class View{
 	const ECHO_REGEX = '#\{{2}\s*(.+?)\}{2}#is';
 
 	const PLUGIN_REGEX = '#\{(\w+)((\s+\w+\=([\'"])((?:\\\"|.)*?)\\4)*)\s*\}#';
-	const PLUGIN_ARGUMENTS_REGEX = '#(\w+)\=([\'"])(\{?)(.*?)(\}?)\\2#';
+	const PLUGIN_ARGUMENTS_REGEX = '#(\w+)\=([\'"])(\{?)((?:\\\"|.)*?)(\}?)\\2#';
 	
 	
 	/**
 	 * Constructor
 	 * @constructs
-	 * @param strin $file The template file to parse
+	 * @param string $file The template file to parse
 	 */
 	public function __construct($file){
 		/*** The selector can be a filename or a plain/html text ***/
@@ -31,9 +33,11 @@ class View{
 		
 		$this->file = $file;
 		
-		$this->fileCache = new FileCache($this->file, 'views', 'php');			
+		$this->fileCache = new FileCache($this->file, 'views', 'php');
+
+		$this->content = file_get_contents($file);				
+		$this->getDependencies();
 		if(! $this->fileCache->isCached()){
-			$this->content = file_get_contents($file);				
 			$this->parse();
 			$this->fileCache->set($this->content);
 		}
@@ -41,6 +45,17 @@ class View{
 		$this->include = $this->fileCache->get();
 	}
 	
+
+	/**
+	 * Get template dependencies
+	 */
+	private function getDependencies(){
+		preg_match_all(self::IMPORT_REGEX, $this->content, $matches, PREG_SET_ORDER);
+		foreach($matches as $match){
+			$file = $match[2];
+			$this->dependencies[$file] = new View($file{0} == '/' ? ROOT_DIR : dirname(realpath($this->file)) . '/' . $file);
+		}
+	}
 
 	/**
 	 * Set data to display in the view
@@ -69,13 +84,10 @@ class View{
 	 * @return View The view itself, to permit chained expressions
 	 */
 	private function parse(){
-		$this->content = $this->content;	
-
-		// Import sub templates
+		// Import sub templates		
 		$this->content = preg_replace_callback(self::IMPORT_REGEX, function($m){
-			$file = $m[2]{0} == '/' ? ROOT_DIR : dirname(realpath($this->file)) . '/' . $m[2];
+			$view = $this->dependencies[$m[2]];
 			
-			$view = new View($file);
 			return "<?php include '" . $view->fileCache->get() . "'; ?>";
 		
 		} , $this->content);
