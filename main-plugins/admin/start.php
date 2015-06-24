@@ -78,7 +78,7 @@ Router::auth(Request::isAjax() && Session::logged(), function(){
 		// Configure a plugin
 		Router::any('plugin-settings', '/admin/plugins/{plugin}/settings', array('where' => array('plugin' => '[a-zA-Z0-9\-_.]+'), 'action' => 'PluginController.settings'));
 
-		// Search for a plugin on the Mint database
+		// Search for a plugin on the remote platform
 		Router::get('search-plugins', '/admin/plugins/search', array('action' => 'PluginController.search'));
 		// Download and install a remote plugin
 		Router::get('download-plugin', '/admin/plugins/{plugin}/download', array('where' => array('plugin' => '[a-zA-Z0-9\-_.]+'), 'action' => 'PluginController.download'));

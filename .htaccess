@@ -8,7 +8,7 @@
   	Allow   from All	
 </FilesMatch>
 
-AuthName "Mint"
+AuthName "Hawk"
 AuthType Basic
 AuthUserFile /var/www/beaver/.htpasswd
 Require valid-user

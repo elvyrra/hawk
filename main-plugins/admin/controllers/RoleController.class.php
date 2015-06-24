@@ -133,11 +133,11 @@ class RoleController extends Controller{
 					new ButtonInput(array(
 						'name' => 'cancel',
 						'value' => Lang::get('main.cancel-button'),
-						'onclick' => 'mint.dialog("close")'
+						'onclick' => 'app.dialog("close")'
 					)),
 				),			
 			),			
-			'onsuccess' => 'mint.dialog("close"); mint.load(mint.getUri("list-roles"), {selector : "#admin-roles-tab"});'
+			'onsuccess' => 'app.dialog("close"); app.load(app.getUri("list-roles"), {selector : "#admin-roles-tab"});'
 		);
 		
 

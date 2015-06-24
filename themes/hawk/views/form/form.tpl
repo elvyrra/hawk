@@ -9,8 +9,8 @@
 	{{ $content }}	
 </form>
 <script type="text/javascript">
-	mint.ready(function(){
-		mint.forms["{{ $form->id }}"] = new Form("{{ $form->id }}", {{ json_encode($form->fields, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_NUMERIC_CHECK) }});
+	app.ready(function(){
+		app.forms["{{ $form->id }}"] = new Form("{{ $form->id }}", {{ json_encode($form->fields, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_NUMERIC_CHECK) }});
 		{if(!empty($form->onsuccess))}
 			$("#{{$form->id}}").on('success', function(event, data){		
 				{{ $form->onsuccess }}

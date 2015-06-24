@@ -1,5 +1,5 @@
 /*********************************************************************
- *    						mint.js
+ *    						app.js
  *
  *
  * Author:   Julien Thaon & Sebastien Lecocq 
@@ -64,7 +64,7 @@ App.prototype.require = function(scripts, callback){
 
 
 /**
- * @static @prop {array} required - Required scripts needed for mint to work
+ * @static @prop {array} required - Required scripts needed for app to work
  */
 App.required = [
 	"extends.js",
@@ -81,7 +81,7 @@ App.required = [
 App.prototype.init = function(){
 	this.require(App.required, function(){			
 
-		dispatchEvent(new Event("mint-ready"));
+		dispatchEvent(new Event("app-ready"));
 		
 		this.tabset = new Tabset();
 		var self = this;
@@ -183,7 +183,7 @@ App.prototype.init = function(){
             if (evt.lengthComputable) {
                 var percentComplete = parseInt(evt.loaded / evt.total * 100);
                 //Do something with upload progress here
-                window.mint.loading.progress(percentComplete);
+                window.app.loading.progress(percentComplete);
             }
         });	 
 
@@ -191,7 +191,7 @@ App.prototype.init = function(){
 	        if (evt.lengthComputable) {
 	            var percentComplete = parseInt(evt.loaded / evt.total * 100);
                 //Do something with upload progress here
-                window.mint.loading.progress(percentComplete);
+                window.app.loading.progress(percentComplete);
         	}
        	}, false);       
 
@@ -209,7 +209,7 @@ App.prototype.ready = function(callback){
 		callback();
 	}
 	else{
-		addEventListener("mint-ready", function(){
+		addEventListener("app-ready", function(){
 			this.isReady = true;
 			callback();
 		}.bind(this));
@@ -386,4 +386,4 @@ App.prototype.setRootUrl = function(url){
 	this.rootUrl = url;
 };
 
-var mint = new App();    
+var app = new App();    

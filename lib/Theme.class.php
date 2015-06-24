@@ -7,7 +7,7 @@ class Theme{
     const CSS_BASENAME = 'theme.css';
     const CSS_CUSTOM_BASENAME = 'theme-custom.css';
 
-    private static $nativeThemes = array("mint", "mint-dark");
+    private static $nativeThemes = array("hawk", "hawk-dark");
     
     
     public function __construct($name){

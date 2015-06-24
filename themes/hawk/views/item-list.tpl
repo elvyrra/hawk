@@ -107,8 +107,8 @@
 	</table>
 </div>
 <script type="text/javascript">
-	mint.ready(function(){
-		mint.lists["{{ $list->id }}"] = new List({
+	app.ready(function(){
+		app.lists["{{ $list->id }}"] = new List({
 			id : "{{ $list->id }}",
 			action : "{{ $list->action }}",
 			target : "{{ $list->target }}",

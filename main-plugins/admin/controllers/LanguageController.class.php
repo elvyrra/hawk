@@ -65,7 +65,7 @@ class LanguageController extends Controller{
 					))
 				)
 			),
-			'onsuccess' => 'mint.lists["language-key-list"].refresh();'
+			'onsuccess' => 'app.lists["language-key-list"].refresh();'
 		));
 		if(!$form->submitted()){
 			return $form;
@@ -126,7 +126,7 @@ class LanguageController extends Controller{
                     )),
                 ),
             ),
-            'onsuccess' => 'mint.lists["language-key-list"].refresh();mint.forms["add-lang-key-form"].node.get(0).reset();' 
+            'onsuccess' => 'app.lists["language-key-list"].refresh();app.forms["add-lang-key-form"].node.get(0).reset();' 
         );
 
         foreach(Language::getAll() as $language){
@@ -336,11 +336,11 @@ class LanguageController extends Controller{
 					new ButtonInput(array(
 						'name' => 'cancel',
 						'value' => Lang::get('main.cancel-button'),
-						'onclick' => 'mint.dialog("close")'
+						'onclick' => 'app.dialog("close")'
 					)),
 				)
 			),
-			'onsuccess' => 'mint.dialog("close"); mint.load(mint.getUri("LanguageController.index"));'
+			'onsuccess' => 'app.dialog("close"); app.load(app.getUri("LanguageController.index"));'
 		);
 		
 		$form = new Form($param);
@@ -396,7 +396,7 @@ class LanguageController extends Controller{
 					)),				
 				)
 			),
-			'onsuccess' => 'mint.dialog("close"); mint.lists["language-key-list"].refresh()'
+			'onsuccess' => 'app.dialog("close"); app.lists["language-key-list"].refresh()'
 		);
 		
 		$form = new Form($param);

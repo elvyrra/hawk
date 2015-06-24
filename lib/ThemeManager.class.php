@@ -2,11 +2,12 @@
 
 class ThemeManager{
     private static $themes;
-    const DEFAULT_THEME = 'mint';
+    const DEFAULT_THEME = 'hawk';
     
     public static function get($name = ''){
-        if(empty($name))
+        if(empty($name)){
             $name = self::DEFAULT_THEME;
+        }
             
         if(!isset($themes[$name])){
             self::$themes[$name] = new Theme($name);

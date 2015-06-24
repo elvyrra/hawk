@@ -2,7 +2,7 @@ $("#manage-themes-page")
 
 .on("click", ".select-theme", function(){
     if(confirm(Lang.get("admin.theme-update-reload-page-confirm"))){
-    	$.get(mint.getUri("select-theme", {name : $(this).data("theme")}), function(){
+    	$.get(app.getUri("select-theme", {name : $(this).data("theme")}), function(){
             location.reload();
     	});
     }        
@@ -10,8 +10,8 @@ $("#manage-themes-page")
 
 .on("click", ".delete-theme", function(){
 	if(confirm(Lang.get("admin.theme-delete-confirm"))){
-		$.get(mint.getUri("delete-theme", {name : $(this).data("theme")}), function(){
-			mint.load(mint.getUri("available-themes"), {selector: "#admin-themes-select-tab"});
+		$.get(app.getUri("delete-theme", {name : $(this).data("theme")}), function(){
+			app.load(app.getUri("available-themes"), {selector: "#admin-themes-select-tab"});
 		})
 	}
 })
@@ -22,8 +22,8 @@ $("#manage-themes-page")
 
 .on("click", ".delete-theme-media", function(){
 	if(confirm(Lang.get("admin.theme-delete-media-confirm"))){
-		$.get(mint.getUri("delete-theme-media", {filename : $(this).data('filename')}), function(){
-			mint.load(mint.getUri("theme-medias"), {selector : "#admin-themes-medias-tab"});
+		$.get(app.getUri("delete-theme-media", {filename : $(this).data('filename')}), function(){
+			app.load(app.getUri("theme-medias"), {selector : "#admin-themes-medias-tab"});
 		});
 	}
 })
@@ -37,9 +37,9 @@ $("#manage-themes-page")
  * Ace editor for Css editing tab
  */
 zrequire(["ace/ace.js"], function(){
-	ace.config.set("modePath", mint.jsBaseUrl + "ace/");
-	ace.config.set("workerPath", mint.jsBaseUrl + "ace/") ;
-	ace.config.set("themePath", mint.jsBaseUrl + "ace/"); 
+	ace.config.set("modePath", app.jsBaseUrl + "ace/");
+	ace.config.set("workerPath", app.jsBaseUrl + "ace/") ;
+	ace.config.set("themePath", app.jsBaseUrl + "ace/"); 
 
 	var editor = ace.edit("theme-css-edit");
 	editor.setTheme("ace/theme/chrome");

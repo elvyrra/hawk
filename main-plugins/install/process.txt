@@ -4,7 +4,7 @@
 4. Insérer les options :
 	main.timezone
 	main.language
-	main.selectedTheme = mint
+	main.selectedTheme = hawk
 5. Insérer les permissions : 
 	admin.manage
 6. Insérer les roles Guest et Admin

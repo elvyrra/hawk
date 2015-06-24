@@ -84,10 +84,10 @@ class ThemeController extends Controller{
 						'name' => 'reset',
 						'value' => Lang::get('admin.theme-custom-reset'),
 						'class' => 'btn-default',
-						'onclick' => 'mint.load(mint.getUri("customize-theme") + "?reset=1", {
+						'onclick' => 'app.load(app.getUri("customize-theme") + "?reset=1", {
 										selector : "#admin-themes-customize-tab",
 										onload : function(){
-											mint.forms["custom-theme-form"].node.trigger("success" , {href : "' . $theme->getBaseCssUrl() . '?' . time() .'"})
+											app.forms["custom-theme-form"].node.trigger("success" , {href : "' . $theme->getBaseCssUrl() . '?' . time() .'"})
 										}
 									})'
 					))
@@ -292,7 +292,7 @@ class ThemeController extends Controller{
 					)),
 				)
 			),
-			'onsuccess' => 'mint.load(mint.getUri("theme-medias"), {selector : "#admin-themes-medias-tab"});'
+			'onsuccess' => 'app.load(app.getUri("theme-medias"), {selector : "#admin-themes-medias-tab"});'
 
 		);
 
@@ -347,7 +347,7 @@ class ThemeController extends Controller{
 					)),
 				)
 			),
-			'onsuccess' => 'mint.load(mint.getUri("available-themes"), { selector : $("#admin-themes-select-tab")} );'
+			'onsuccess' => 'app.load(app.getUri("available-themes"), { selector : $("#admin-themes-select-tab")} );'
 
 		);
 

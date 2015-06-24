@@ -98,7 +98,7 @@ Form.prototype.submit = function(){
 	var self = this;
 	
 	if(this.activity == "delete" || this.check()){		
-		mint.loading.start();
+		app.loading.start();
 		
 		/**** Send a POST Ajax request to submit the form ***/
 		var data = this.node.serializeObject();
@@ -108,7 +108,7 @@ Form.prototype.submit = function(){
 
 		
 		$.ajax({
-			xhr : mint.xhr,
+			xhr : app.xhr,
 			url : this.action,
 			type : this.method,
 			dataType : 'json',
@@ -118,7 +118,7 @@ Form.prototype.submit = function(){
 		.done(function(results, code, xhr){
 			/*** treat the response ***/
 			if(results.message){
-				mint.advert("success", results.message);
+				app.advert("success", results.message);
 			}
 				
 			/*** Trigger a form_success event to the form ***/
@@ -159,7 +159,7 @@ Form.prototype.submit = function(){
 			}
 		})
 		.always(function(){
-			mint.loading.stop();			
+			app.loading.stop();			
 		});	
 	}
 	else{

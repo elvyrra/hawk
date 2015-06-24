@@ -34,15 +34,15 @@
 		<script type="text/javascript" src="{{ $mainJsDir }}knockout-3.3.0.js"></script>
 		<script type="text/javascript" src="//cdn.ckeditor.com/4.4.7/full/ckeditor.js"></script>
 		
-		<script type="text/javascript" id="main-js-script" src="{{ $mainJsDir }}mint.js"></script>
+		<script type="text/javascript" id="main-js-script" src="{{ $mainJsDir }}app.js"></script>
 		
 		<script type="text/javascript">
-			mint.setLanguage("{{ LANGUAGE }}");
-			mint.setRootUrl("{{ ROOT_URL }}");
-			mint.isConnected = {{ $logged }};
-			mint.setRoutes({{ json_encode(Router::getRoutes()) }});
+			app.setLanguage("{{ LANGUAGE }}");
+			app.setRootUrl("{{ ROOT_URL }}");
+			app.isConnected = {{ $logged }};
+			app.setRoutes({{ json_encode(Router::getRoutes()) }});
 				
-			mint.ready(function(){		
+			app.ready(function(){		
 				Lang.langs = {{ $langLabels }};
 			});
 		</script>

@@ -217,11 +217,11 @@ class UserController extends Controller{
 					new ButtonInput(array(
 						'name' => 'cancel',
 						'value' => Lang::get('main.cancel-button'),
-						'onclick' => 'mint.dialog("close")'
+						'onclick' => 'app.dialog("close")'
 					))
 				),
 			),
-			'onsuccess' => 'mint.dialog("close"); mint.lists["admin-users-list"].refresh();'
+			'onsuccess' => 'app.dialog("close"); app.lists["admin-users-list"].refresh();'
 		);
 
 		$form = new Form($param);

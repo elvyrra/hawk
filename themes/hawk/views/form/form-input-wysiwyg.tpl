@@ -3,7 +3,7 @@
 <script type="text/javascript">
 	(function(){
 		var editor = CKEDITOR.replace("{{ $input->id }}", {
-			language : mint.language,
+			language : app.language,
 			removeButtons : 'Save,Scayt,Rtl,Ltr,Language,Flash',
 			entities : false,		
 		});	

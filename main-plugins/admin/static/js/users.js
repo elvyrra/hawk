@@ -3,32 +3,32 @@ $("#admin-users-tabs")
 
 .on("click", ".delete-user", function(){
 	if(confirm(Lang.get('admin.user-delete-confirmation'))){
-		$.get(mint.getUri('remove-user', {username : $(this).data("user")}), function(){
-			mint.lists["admin-users-list"].refresh();
+		$.get(app.getUri('remove-user', {username : $(this).data("user")}), function(){
+			app.lists["admin-users-list"].refresh();
 		});
 	}
 })
 
 .on("click", ".lock-user, .unlock-user", function(){
-	$.get(mint.getUri('activate-user', {username : $(this).data("user"), value : $(this).hasClass("lock-user") ? 0 : 1}), function(){
-		mint.lists["admin-users-list"].refresh();
+	$.get(app.getUri('activate-user', {username : $(this).data("user"), value : $(this).hasClass("lock-user") ? 0 : 1}), function(){
+		app.lists["admin-users-list"].refresh();
 	});
 })
 
 .on("click", ".delete-role", function(){
 	if(confirm(Lang.get("roles.delete-role-confirmation"))){
-		$.get(mint.getUri("delete-role", {roleId : $(this).data("role")}), function(){
-			mint.load(mint.getUri("list-roles"), {selector : "#admin-roles-tab"});
+		$.get(app.getUri("delete-role", {roleId : $(this).data("role")}), function(){
+			app.load(app.getUri("list-roles"), {selector : "#admin-roles-tab"});
 		});
 	}
 })
 
 .on("change", ".set-default-role", function(){	
-	mint.load(mint.getUri("list-roles") + "?setdefault=" + $(this).attr("value") , {selector : "#admin-roles-tab"});
+	app.load(app.getUri("list-roles") + "?setdefault=" + $(this).attr("value") , {selector : "#admin-roles-tab"});
 })
 
 .on("change","#user-filter-form", function(){
-	mint.load(mint.getUri("list-users") + "?" + $(this).serialize(), {selector : "#admin-users-tab"});
+	app.load(app.getUri("list-users") + "?" + $(this).serialize(), {selector : "#admin-users-tab"});
 });
 
 $("#dialogbox")
@@ -39,7 +39,7 @@ $("#dialogbox")
 	var items = event.target.files;			
 	var blob = items[0];		
 	
-	mint.forms["user-form"].inputs[$(this).attr('name')].removeError();
+	app.forms["user-form"].inputs[$(this).attr('name')].removeError();
 	if(blob && /^image\//.test(blob.type)) {
 		/*** The loaded logo is well an image and it size is lower than 2MB ***/
 		var reader = new FileReader();
@@ -55,6 +55,6 @@ $("#dialogbox")
 	}
 	else{
 		$(this).val(null);
-		mint.forms["user-form"].inputs[$(this).attr('name')].addError(Lang.get("admin.user-form-image-format-error"));
+		app.forms["user-form"].inputs[$(this).attr('name')].addError(Lang.get("admin.user-form-image-format-error"));
 	}
 });

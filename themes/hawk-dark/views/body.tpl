@@ -17,17 +17,10 @@
 </div>
 
 <div id="footer">
-	{text key='main.mint-powered'}
+	{text key='main.hawk-powered'}
 </div>
 
 <div class="modal fade" id="dialogbox"></div>
-
-<div id='loading'>
-	<span class='fa fa-spinner fa-spin fa-5x'></span>
-	<div id="loading-bar">
-		<span id='loading-purcentage'></span>
-	</div>
-</div>
 
 <div class="template" id="tab-title-template">
 	<li role="presentation" class="main-tab-title corner-top" id="main-tab-title-@@id" data-tab="@@id">
@@ -41,7 +34,7 @@
 </div>
 
 <script type="text/javascript">
-	mint.ready(function(){	
+	app.ready(function(){		
 		$.pages = {{ $pages }};
 		$.openLastTab = function(i){
 			if (i >= $.pages.length) {
@@ -49,9 +42,9 @@
 			}
 			
 			if ($.pages[i]) {						
-				mint.load($.pages[i], {
+				app.load($.pages[i], {
 					newtab : true,
-					onload : function(){
+					callback : function(){
 						$.openLastTab(++i);
 					}
 				});
@@ -63,13 +56,12 @@
 		$(window).load(function(){							
 			{if(!$canAccessApplication)}
 				$("#main-menu-login-btn a").click();
-				mint.loading.stop();
 			{else}
 				if($.pages){
 					$.openLastTab(0);
 				}
-				else{					
-					mint.tabset.push();
+				else{
+					app.tabset.push();
 				}
 			{/if}
 		});		

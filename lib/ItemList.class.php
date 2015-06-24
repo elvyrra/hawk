@@ -72,7 +72,7 @@ class ItemList{
 				case "refresh" :
 					$button = array(
 						"icon" => "refresh", 						
-						"onclick" => "mint.lists['$this->id'].refresh();"
+						"onclick" => "app.lists['$this->id'].refresh();"
 					);
 				break;
 			}

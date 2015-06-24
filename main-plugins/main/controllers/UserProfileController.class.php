@@ -102,7 +102,7 @@ class UserProfileController extends Controller{
                     new ButtonInput(array(
                         'name' => 'cancel',
                         'value' => Lang::get('main.cancel-button'),
-                        'onclick' => 'mint.dialog("close")'
+                        'onclick' => 'app.dialog("close")'
                     ))
                 ),
             )
@@ -180,12 +180,12 @@ class UserProfileController extends Controller{
                     new ButtonInput(array(
                         'name' => 'cancel',
                         'value' => Lang::get('main.cancel-button'),
-                        'onclick' => 'mint.dialog("close")'
+                        'onclick' => 'app.dialog("close")'
                     ))
                 ),
 
             ),
-            'onsuccess' => 'mint.dialog("close")'
+            'onsuccess' => 'app.dialog("close")'
         );
 
         $form = new Form($params);

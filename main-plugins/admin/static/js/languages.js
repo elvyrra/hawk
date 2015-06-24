@@ -3,7 +3,7 @@
  * */
 $(".edit-lang").click(function(){
 	var tag = $("#language-filter-form [name='tag']").val();
-	mint.dialog(mint.getUri('LanguageController.editLanguage', {tag : tag}));
+	app.dialog(app.getUri('LanguageController.editLanguage', {tag : tag}));
 });
 
 /**
@@ -12,8 +12,8 @@ $(".edit-lang").click(function(){
 $(".delete-lang").click(function(){
 	if (confirm(Lang.get('language.confirm-delete-lang'))) {
 		var tag = $("#language-filter-form [name='tag']").val();
-		$.get(mint.getUri('LanguageController.deleteLanguage', {tag : tag}), function(response){
-			mint.load(mint.getUri('LanguageController.index'));
+		$.get(app.getUri('LanguageController.deleteLanguage', {tag : tag}), function(response){
+			app.load(app.getUri('LanguageController.index'));
 		});
 	}
 });
@@ -32,16 +32,16 @@ $("#language-manage-page")
 	var plugin = data[0];
 	var key = data[1];
 
-	$.get(mint.getUri('delete-translation', {plugin : plugin, key : key, tag : tag}), function(response){
-		mint.lists["language-key-list"].refresh();
+	$.get(app.getUri('delete-translation', {plugin : plugin, key : key, tag : tag}), function(response){
+		app.lists["language-key-list"].refresh();
 	});
 });
 
-var form = mint.forms["language-filter-form"];
+var form = app.forms["language-filter-form"];
 	
 form.submit = function(){
 	var data = JSON.stringify($(this.node).serializeObject());
-	mint.load(mint.getUri('LanguageController.listKeys') + '?filters=' + data, {selector : $("#language-key-list").parent()});
+	app.load(app.getUri('LanguageController.listKeys') + '?filters=' + data, {selector : $("#language-key-list").parent()});
 	return false;
 };
 

@@ -208,7 +208,7 @@ class PluginController extends Controller{
 
 
     /**
-     * Search a plugin in the mint database
+     * Search a plugin on the download platform
      */
     public function search(){}
 

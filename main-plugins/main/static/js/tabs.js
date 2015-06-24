@@ -105,7 +105,7 @@ Tabset.prototype.push = function(){
 		this.registerTabs();
 	}		
 	else{
-		mint.advert('info', Lang.get('main.all-tabs-open'));
+		app.advert('info', Lang.get('main.all-tabs-open'));
 	}	
 };
 
@@ -160,7 +160,7 @@ Tabset.prototype.getNextTab = function(id){
 };
 
 Tabset.prototype.registerTabs = function(){	
-	if (mint.isConnected) {
+	if (app.isConnected) {
 		var data = [];
 		for(var i in this.tabs){
 			data.push(this.tabs[i].url);

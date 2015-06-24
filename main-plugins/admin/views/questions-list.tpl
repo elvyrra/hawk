@@ -8,8 +8,8 @@
 <script type="text/javascript">
 	$(".delete-question").click(function(){
 		if(confirm(Lang.get("admin.confirm-delete-question"))){
-			$.get(mint.getUri("delete-profile-question", {name : $(this).data("question")}), function(){
-				mint.load(mint.getUri("profile-questions"), {selector : "#admin-questions-tab"});
+			$.get(app.getUri("delete-profile-question", {name : $(this).data("question")}), function(){
+				app.load(app.getUri("profile-questions"), {selector : "#admin-questions-tab"});
 			});
 		}
 	});
