@@ -25,6 +25,7 @@ class MainMenuWidget extends Widget{
 			$menus = $event->getData('menus');
 		}
 		
+		$userMenu = $adminMenu = array();
 		// Get the user menu
 		if(Session::logged()){
 			$userMenu = array(
@@ -58,7 +59,7 @@ class MainMenuWidget extends Widget{
 			
 			$user = Session::getUser();
 			if($user->isAllowed('admin')){
-				$adminMenu = array();
+				
 				if($user->isAllowed('admin.all')){
 					$adminMenu['settings'] = array(
 						'icon' => 'cog',

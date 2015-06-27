@@ -8,7 +8,7 @@
 {{ $message }}
 
 {foreach($trace as $i => $line)}
-#{{ $i }} {{ $line['file'] }}:{{ $line['line'] }} => {{$line['function']}}( {{ implode(", ", $line['args']) }} )
+	#{{ $i }} {{ $line['file'] }}:{{ $line['line'] }}
 
 {/foreach}
 </pre>

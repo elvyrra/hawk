@@ -12,29 +12,29 @@
  *
  **********************************************************************/
 class Form{
-    const DEFAULT_TYPE = "text";
-	const NO_CHECK = false;
-	const CHECK = true;
-	const GET_FROM_DATABASE = true;
-	
 	const NO_EXIT = false;
 	const EXIT_JSON = true;
 	    
     const VIEWS_DIR = 'form/';
 	
+	// Submission status
 	const STATUS_SUCCESS = 'success';
 	const STATUS_ERROR = 'error';
 	const STATUS_CHECK_ERROR = 'check-error';
 	
-	const HTTP_CODE_SUCCESS = 200;
-	const HTTP_CODE_CHECK_ERROR = 412;
-	const HTTP_CODE_ERROR = 424;
+	// Submission return codes
+	const HTTP_CODE_SUCCESS = 200; // OK
+	const HTTP_CODE_CHECK_ERROR = 412; // Data format error
+	const HTTP_CODE_ERROR = 424; // Treatment error
 	
+	// Actions
 	const ACTION_REGISTER = 'register';
 	const ACTION_DELETE = 'delete';
 
+	// Default model for form
 	const DEFAULT_MODEL = "GenericModel";
 	
+
 	// Default properties values
 	public	$type = 'json',
 			$method = 'post',
@@ -52,7 +52,11 @@ class Form{
 			$title = '',
 			$enctype = '',
 			$fields = array(),
-			$dbaction = self::ACTION_REGISTER;
+			$upload = false,
+			$nomessage = false,
+			$dbaction = self::ACTION_REGISTER,
+			$action = '',
+			$reference = array();
 	private $example = null;
 	
 	public function __construct($param){
@@ -72,7 +76,7 @@ class Form{
         	$this->columns = 1;
         }
 		
-		if(isset($this->model) && isset($this->reference)){
+		if(isset($this->model) && !empty($this->reference)){
 			$model = $this->model;				
 			$this->example = new DBExample($this->reference);
 			$this->object = $model::getByExample($this->example);				
@@ -303,30 +307,20 @@ class Form{
 	}
 	
 	/*
-	 * Prototype public function display($template)
-	 * Description : Display the form
-	 * @param : $template(optionnal), the template to display the form
-	 * @return : string
-	 */
-	public function display(){
-		$content = View::make(ThemeManager::getSelected()->getView(Form::VIEWS_DIR . 'form-content.tpl') , array(
-			'form' => $this,
-			'fields' => $fields,
-			'fieldsets' => $this->fieldsets,
-			'column' => 0		
-		));
-		return $this->wrap($content);
-	}
-	/*
-	 * Prototype : public function __toString()
-	 * Description : Overload lagic method __toString
+	 * Display the form 
+	 * @return string The HTML result of form displaying
 	 */
 	public function __toString(){
 		try{
-			return $this->display();
+			$content = View::make(ThemeManager::getSelected()->getView(Form::VIEWS_DIR . 'form-content.tpl') , array(
+				'form' => $this,
+				'fieldsets' => $this->fieldsets,
+				'column' => 0		
+			));
+			return $this->wrap($content);
 		}
 		catch(Exception $e){
-			exception_handler($e);
+			ErrorHandler::exception($e);
 		}
 	}
 	
@@ -447,18 +441,15 @@ class Form{
 				throw new Exception("The method delete of the class Form can be called only if model and reference properties are set");
 			}
 			
-			$model = $this->model;
-			$object = $model::getByExample($this->example);
-			
-			if(!$object){
+			if(!$this->object){
 				throw new Exception("This object instance cannot be removed : No such object");
 			}
 			
-			$object->delete();
-			$id = $object->getPrimaryColumn();
+			$id = $this->object->getPrimaryColumn();
+			$this->object->delete();
 			
 			$this->addReturn(array(
-				'primary' => $object->$id,
+				'primary' => $this->object->$id,
 				'action' => self::ACTION_DELETE
 			));
 			$this->status = self::STATUS_SUCCESS;
@@ -466,7 +457,7 @@ class Form{
 			if($exit){
 				$this->response(self::STATUS_SUCCESS, $success ? $success : Lang::get('form.success-delete'));
 			}
-			return $object->$id;
+			return $this->object->$id;
 		}
 		catch(DatabaseException $e){		
 			$this->status = self::STATUS_ERROR;
@@ -549,4 +540,3 @@ class Form{
 		}
 	}	
 }
-/******************* (C) COPYRIGHT 2014 ELVYRRA SAS *********************/

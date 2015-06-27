@@ -114,7 +114,6 @@ class LoginController extends Controller{
 					}
 					
 					// The user can be connected 
-					session_start();										
 					$_SESSION['user'] = array(
 						'id' => $user->id,						
 						'email' => $user->email,

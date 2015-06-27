@@ -14,10 +14,12 @@
 class PasswordInput extends FormInput{
 	const TYPE = "password";
 	
+
 	public 	$get = false,
 			$decrypt = false,
-			$encrypt = false;
-			
+			$encrypt = false,
+			$check = false;
+
 	public function __construct($param){
 		parent::__construct($param);
 		$this->pattern = "/^(?=.*\d)(?=.*[a-zA-Z]).{6,16}$/";

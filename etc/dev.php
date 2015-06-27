@@ -11,4 +11,4 @@ define('NO_CACHE', false);
 define('APP_VERSION', '1.0');
 
 ini_set('display_errors', true);
-error_reporting(E_ALL & ~E_STRICT & ~E_DEPRECATED & ~E_NOTICE);
+error_reporting(E_ALL && ~E_STRICT);

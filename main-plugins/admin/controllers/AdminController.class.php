@@ -262,11 +262,11 @@ class AdminController extends Controller{
 									$file = $upload->getFile();
 
 									$image = Image::getInstance($file->tmpFile);										
-									while($image->getFileSize() > $field->maxSize){										
-										// Compress the image
-										$file->tmpFile = dirname($file->tmpFile) . '/' . uniqid();
-										$image = $image->compress(50, $file->tmpFile);
-									}
+									// while($image->getFileSize() > $field->maxSize){										
+									// 	// Compress the image
+									// 	$file->tmpFile = dirname($file->tmpFile) . '/' . uniqid();
+									// 	$image = $image->compress(50, $file->tmpFile);
+									// }
 
 									$basename = uniqid() . '.' . $file->extension;
 									$dir = Plugin::get('main')->getUserfilesDir();

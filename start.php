@@ -5,6 +5,7 @@ require INCLUDES_DIR . 'custom-constants.php';
 require INCLUDES_DIR . 'autoload.php';
 require INCLUDES_DIR . 'config.php';
 require INCLUDES_DIR . 'functions.php';
+require INCLUDES_DIR . 'error-handler.php';
 
 
 define("ROOT_URL", Conf::get('rooturl') . '/');

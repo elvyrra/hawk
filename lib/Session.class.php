@@ -35,7 +35,7 @@ trait Session{
 		if(empty($_SESSION['user'])){	
 			self::$logged = false;
 		}
-		elseif($_SESSION['user']['ip'] != Request::clientIp()){
+		elseif(isset($_SESSION['user']['ip']) && $_SESSION['user']['ip'] != Request::clientIp()){
 			return false;
 		}
 		else{		

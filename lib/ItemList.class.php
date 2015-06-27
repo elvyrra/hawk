@@ -119,7 +119,7 @@ class ItemList{
 		$where = array();
 		if(!empty($this->filter)){
 			if($this->filter instanceof DBExample){
-				$where[] = $this->filter->parse($this->binds);				
+				$where[] = $this->filter->parse($this->binds);	
 			}
 			elseif(is_array($this->filter)){
 				$where[] = $this->filter[0];
@@ -165,6 +165,7 @@ class ItemList{
 
 		try{
 			$where = implode(" AND ", $where);
+
 			$model = $this->model;			
 			$this->recordNumber = $this->dbo->count($this->table, $where, $this->binds, $this->refField, $this->group);
 			
@@ -246,9 +247,9 @@ class ItemList{
 		DISPLAY THE LIST (WITH OR WITHOUT NAVIGATION BAR)
 	_____________________________________________________________________*/
 	public function __toString(){
-		try{
-        	// get the data to display
-        	$this->get();
+    	try{
+	    	// get the data to display
+	    	$this->get();
 
 			// get the total number of pages
 	        $pages = (ceil($this->recordNumber / $this->lines) > 0) ? ceil($this->recordNumber / $this->lines) : 1;
@@ -295,6 +296,7 @@ class ItemList{
 					}
 				}
 			}
+			
 			return View::make(ThemeManager::getSelected()->getView("item-list.tpl"), array(			
 				'list' => $this,
 				'display' => $display,
@@ -303,7 +305,7 @@ class ItemList{
 			));
 		}
 		catch(Exception $e){
-			exception_handler($e);
+			ErrorHandler::exception($e);
 		}
 	}	
 	

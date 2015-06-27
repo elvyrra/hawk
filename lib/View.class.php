@@ -149,7 +149,10 @@ class View{
 			include $this->fileCache->getFile();
 		}
 		catch(Exception $e){
-			throw new ViewException(ViewException::TYPE_EVAL, $this->file, $e);
+			$exception = new ViewException(ViewException::TYPE_EVAL, $this->file, $e);
+
+			Response::set($exception->display());
+			Response::end();
 		}		
 		return ob_get_clean();
 	}	
@@ -194,6 +197,27 @@ class ViewException extends Exception{
 			break;
 		}
 		
-		parent::__construct($message, $code);
+		parent::__construct($message, $code, $previous);
+	}
+
+	public function display(){
+		$display = '<div class="alert alert-danger">
+						<div class="error-title">
+							<i class="fa fa-exclamation-cirle"></i>
+							View Exception
+						</div>
+
+						<div class="error-content">
+							<pre>' . $this->getMessage() . PHP_EOL;
+
+		foreach($this->getTrace() as $i => $line){
+			$display .= 		'#' . $i . ' ' . $line['file'] . ':' . $line['line'] . ' => ' . $line['function'] . '(' . implode(', ', $line['args']) . ')' . PHP_EOL;
+		}
+
+		$display =			'</pre>
+						</div>
+					</div>';
+
+		return $display;
 	}
 }

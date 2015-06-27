@@ -167,6 +167,17 @@ class FormInput{
      */
     public $dataType = '';
 
+    /**
+     * The database field attached to the input
+     */
+    public $field;
+
+
+    /**
+     * Define the value defined as "empty", default ""
+     */
+    public $emptyValue = '';
+    
 	
     /**
      * Constructor
@@ -215,25 +226,30 @@ class FormInput{
      * @return string the HTML result of the input displaying
      */
     public function __toString(){
-		$theme = ThemeManager::getSelected();
-		
-		if($this->name == $this->errorAt){
-			unset($this->errorAt);
-		}
+        try{
+    		$theme = ThemeManager::getSelected();
+    		
+    		if($this->name == $this->errorAt){
+    			unset($this->errorAt);
+    		}
 
-		$inputLabel = $this->label ? View::make(ThemeManager::getSelected()->getView(Form::VIEWS_DIR . 'form-input-label.tpl'), array(
-			'input' => $this
-		)) : '';
-		
-		$inputDisplay = View::make($this->tpl, array(
-			'input' => $this
-		));
-            
-        return View::make(ThemeManager::getSelected()->getView(Form::VIEWS_DIR . 'form-input-block.tpl'), array(
-            'input' => $this, 
-			'inputLabel' => $inputLabel,
-			'inputDisplay' => $inputDisplay
-        ));
+    		$inputLabel = $this->label ? View::make(ThemeManager::getSelected()->getView(Form::VIEWS_DIR . 'form-input-label.tpl'), array(
+    			'input' => $this
+    		)) : '';
+    		
+    		$inputDisplay = View::make($this->tpl, array(
+    			'input' => $this
+    		));
+                
+            return View::make(ThemeManager::getSelected()->getView(Form::VIEWS_DIR . 'form-input-block.tpl'), array(
+                'input' => $this, 
+    			'inputLabel' => $inputLabel,
+    			'inputDisplay' => $inputDisplay
+            ));
+        }
+        catch(Exception $e){
+            ErrorHandler::exception($e);
+        }
     }
 	
 

@@ -1,15 +1,3 @@
-/**********************************************************************
- *    						form.js
- *
- *
- * Author:   Julien Thaon & Sebastien Lecocq 
- * Date: 	 Jan. 01, 2014
- * Copyright: ELVYRRA SAS
- *
- * This file is part of Beaver's project.
- *
- *
- **********************************************************************/
 
 /**
  * @class Form
@@ -44,11 +32,11 @@ var Form = function(id, fields){
  * Check the dat of the form
  * @return {bool} - true if the form data is correct, false else
  */
-Form.prototype.check = function(){
+Form.prototype.isValid = function(){
 	this.removeErrors();
 	var valid = true;	
 	for(var name in this.inputs){
-		if (!this.inputs[name].check()) {
+		if (!this.inputs[name].isValid()) {
 			valid = false;
 		}
 	}
@@ -97,7 +85,7 @@ Form.prototype.submit = function(){
 	this.removeErrors();
 	var self = this;
 	
-	if(this.activity == "delete" || this.check()){		
+	if(this.activity == "delete" || this.isValid()){		
 		app.loading.start();
 		
 		/**** Send a POST Ajax request to submit the form ***/
@@ -223,7 +211,7 @@ FormInput.prototype.data = function(prop){
 /**
  * Check the value of the field is valid
  */
-FormInput.prototype.check = function(){
+FormInput.prototype.isValid = function(){
 	/*** 1. If the field is required, the field can't be empty ***/
 	if (this.required) {
 		var emptyValue = this.emptyValue || '';
