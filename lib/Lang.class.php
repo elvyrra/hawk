@@ -128,7 +128,12 @@ class Lang{
 				$instance = new self($plugin, $language);
 				$instance->build();
 
-				self::$langs[$plugin] = array_merge(self::$langs[$plugin], include $instance->cacheFile);
+				$translations = include $instance->cacheFile;
+				if(!is_array($translations)){
+					$translations = array();
+				}
+
+				self::$langs[$plugin] = array_merge(self::$langs[$plugin], $translations);
 			}
 		}
 	}
@@ -198,16 +203,19 @@ class Lang{
         if($labels !== null){
             if(is_array($labels)){
 				// Multiple values are affected to this key (singular / plural)
-				if((int) $number > 1)
+				if((int) $number > 1){
 					// Get the plural of the language key
-                    $label = isset($labels[$number]) ? $labels[$number] : $labels['p'];
-                else
+                    $label = isset($labels[$number]) ? $labels[$number] : (isset($labels['p']) ? $labels['p'] : $langKey);
+                }
+                else{
 					// Get the singular of the language key
-                    $label = isset($labels[$number]) ? $labels[$number] : $labels['s'];
+                    $label = isset($labels[$number]) ? $labels[$number] : (isset($labels['s']) ? $labels['s'] : $langKey);
+                }
             }
-            else
+            else{
 				// The language key is a single string
                 $label = $labels;			
+            }
 			
 			if(!empty($param)){
 				// Replace parameters into the language key
@@ -267,7 +275,14 @@ class Lang{
 
 		$lines = array();
 		foreach($data as $key => $value){
-			$lines[] = $key . ' = "' . addcslashes($value, '"') . '"';
+			if(! is_array($value)){
+				$lines[] = $key . ' = "' . addcslashes($value, '"') . '"';
+			}
+			else{
+				foreach($value as $multiplier => $val){
+					$lines[] = $key . '[' . $multiplier . '] = "' . addcslashes($val, '"') . '"';
+				}
+			}
 		}
 
 		$content = implode(PHP_EOL, $lines);

@@ -2,7 +2,7 @@
 <html lang="fr">
 	<head>
 		<meta charset="{{ ENCODING }}" />
-		<meta content="text/html; charset=utf-8" />
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<title>{{ Option::get('main.title') }}</title>
 		{if($favicon)}
 			<link rel="shortcut icon" href="{{ $favicon }}" />
@@ -39,7 +39,7 @@
 		<script type="text/javascript">
 			app.setLanguage("{{ LANGUAGE }}");
 			app.setRootUrl("{{ ROOT_URL }}");
-			app.isConnected = {{ $logged }};
+			app.isConnected = {{ (int) Session::logged() }};
 			app.setRoutes({{ json_encode(Router::getRoutes()) }});
 				
 			app.ready(function(){		

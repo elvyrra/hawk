@@ -1,21 +1,13 @@
 <?php
-/**********************************************************************
- *    						HtmlInput.class.php
- *
- *
- * Author:   Julien Thaon & Sebastien Lecocq 
- * Date: 	 Jan. 01, 2014
- * Copyright: ELVYRRA SAS
- *
- * This file is part of Beaver's project.
- *
- *
- **********************************************************************/
+/**
+ * HtmlInput.class.php
+ */
 class HtmlInput extends FormInput{
 	const TYPE = 'html';
 	const INDEPENDANT = true;
-	const NO_LABEL = true;
-	
+
+    public $plainText = false;
+
 	public function check(&$form = null){
 		return true;
 	}

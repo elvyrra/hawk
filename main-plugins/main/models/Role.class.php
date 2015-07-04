@@ -13,7 +13,7 @@ class Role extends Model{
 		}
 		else{
 			$example = array('id' => array('$ne' => self::GUEST_ROLE_ID));
-			return self::getListByExample(new DBExample($example), $index, $fields, $orders);
+			return self::getListByExample(new DBExample($example), $index, $fields, $order);
 		}
 	}
 

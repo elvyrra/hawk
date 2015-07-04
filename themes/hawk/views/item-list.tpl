@@ -1,7 +1,7 @@
 
 <div class="list-wrapper" id='{{ $list->id }}' >
 <!-- NAVIGATION BAR -->
-	<div class="list-navigation {{ $list->NavigationClass }}" style="{{ $list->style }}">
+	<div class="list-navigation">
 		<div class="pull-left">
 			{foreach($list->controls as $control)}
 				{{ (new ViewPluginButton($control))->display() }}
@@ -39,38 +39,36 @@
 
 
 	<input type='hidden' name='file' class="list-filename" value='{{ $list->file }}' />	
-	{if($list->force)}
-		<textarea class='list-forced-result'>{{ json_encode($list->force, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_NUMERIC_CHECK) }}</textarea>
-	{/if}
+	
 	<table class="list table table-hover table-stripped">
-		{if(!$list->noTitle)}
+		{if(!$list->noHeader)}
 			<!-- FIRST LINE, CONTAINING THE LABELS OF THE FIELDS AND THE SEARCH AND SORT OPTIONS -->
-			<tr class='ui-state-default list-title-line'>
-				{if($list->checkbox && !$pdf)}
-					<th>
-						<input type='checkbox' class='list-checkbox-all' value="all" {{ $list->checkbox['default']=="all" ? "checked" : "" }} />
-					</th>		
-				{/if}
+			<tr class='ui-state-default list-title-line'>				
 				{foreach($list->fields as $name => $field)}
-					{if(!$field['hidden'] && !($pdf & $field['pdf']=== false))}
+					{if(! $field->hidden)}
 						<th class="list-column-title">
-							<span class='list-title-label list-title-label-{{ $this->id }}-{{ $name }}'>{{ $field['label'] }}</span>							
-							{if($field['sort'] !== false)}
+							<span class='list-title-label list-title-label-{{ $this->id }}-{{ $name }}'>{{ $field->label }}</span>							
+							{if($field->sort)}
 								<div class='list-sort-block' style='display:inline-block'>
-									<span class='list-sort-column list-sort-asc {{ $list->sorts[$name] == "ASC" ? "list-sort-active" : "" }}' data-field="{{ $name }}" value="{{ $list->sorts[$name] == 'ASC' ? '' : 'ASC' }}">
+									<!-- Sort ascending -->
+									<span class='list-sort-column list-sort-asc {{ !empty($list->sorts[$name]) && $list->sorts[$name] == "ASC" ? "list-sort-active" : "" }}' data-field="{{ $name }}" value="{{ !empty($list->sorts[$name]) && $list->sorts[$name] == 'ASC' ? '' : 'ASC' }}">
 										<span class='fa fa-sort-alpha-asc' title='{text key="main.list-sort-asc"}'></span>
 									</span>
-									<span class='list-sort-column list-sort-desc {{ $list->sorts[$name] == "DESC" ? "list-sort-active" : "" }}' data-field="{{ $name }}" value="{{ $list->sorts[$name] == 'DESC' ? '' : 'DESC' }}">
+
+									<!-- sort descending -->
+									<span class='list-sort-column list-sort-desc {{ !empty($list->sorts[$name]) && $list->sorts[$name] == "DESC" ? "list-sort-active" : "" }}' data-field="{{ $name }}" value="{{ !empty($list->sorts[$name]) && $list->sorts[$name] == 'DESC' ? '' : 'DESC' }}">
 										<span class='fa fa-sort-alpha-desc' title='{text key="main.list-sort-desc"}'></span>
 									</span>			
 								</div>
 							{/if}
 
-							{if($field['search'] !== false)}
+							{if($field->search)}
 								<div class='list-search-block'>		
-									<input type='text' class='list-search-input {{ empty($list->searches[$name]) ? "empty" : "not-empty alert-info" }}' data-field="{{ $name }}" value="{{ htmlspecialchars($list->searches[$name], ENT_QUOTES) }}" />
 									{if(!empty($list->searches[$name]))}
+										<input type='text' class="list-search-input not-empty alert-info" data-field="{{ $name }}" value="{{ htmlspecialchars($list->searches[$name], ENT_QUOTES) }}" />
 										<i class="fa fa-times-circle clean-search" data-field="{{ $name }}"></i>
+									{else}
+										<input type='text' class="list-search-input empty" data-field="{{ $name }}" />
 									{/if}
 								</div>
 							{/if}							
@@ -82,21 +80,16 @@
 		
 		<!-- THE CONTENT OF THE LIST RESULTS -->
 		{if($list->recordNumber)}
-			{foreach($display as $id => $line)}
+			{foreach($data as $id => $line)}
 				<tr class="list-line list-line-{{ $list->id }} {{ $linesParameters[$id]['class'] }}" value="{{ $id }}" >					
-					{if($list->checkbox)}
-						<td style='width:30px'>
-							<input type='checkbox' class="list-checkbox list-checkbox-{{ $list->id }}" value="{{ $id }}" {{ $this->checked && ($list->checked == "all" || in_array($id, $list->checked)) ? "checked" : "" }} />
-						</td>
-					{/if}
-					{foreach($line as $name => $data)}
-						<td {if($data['class'])} class="{{ $data['class'] }}" {/if}
-							{if($data['title'])} title="{{ $data['title'] }}" {/if}
-							{if($data['style'])} style="{{ $data['style'] }}" {/if}
-							{if($data['onclick'])} onclick="{{ $data['onclick'] }}" {/if}
-							{if($data['href'])} href="{{$data['href']}}" {/if}
-							{if($data['target'])} target="{{$data['target']}}" {/if} >
-							{{ $data['display'] }}
+					{foreach($line as $name => $cell)}
+						<td {if(!empty($cell['class']))} class="{{ $cell['class'] }}" {/if}
+							{if(!empty($cell['title']))} title="{{ $cell['title'] }}" {/if}
+							{if(!empty($cell['style']))} style="{{ $cell['style'] }}" {/if}
+							{if(!empty($cell['onclick']))} onclick="{{ $cell['onclick'] }}" {/if}
+							{if(!empty($cell['href']))} href="{{$cell['href']}}" {/if}
+							{if(!empty($cell['target']))} target="{{$cell['target']}}" {/if} >
+							{{ $cell['display'] }}
 						</td>
 					{/foreach}
 				</tr>

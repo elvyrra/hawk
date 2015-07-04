@@ -20,8 +20,9 @@ class LoginController extends Controller{
 	_______________________________________________________*/	
 	private function form(){
 		/*** Get the registrered login and passwords ***/
-		$login = Crypto::aes256Decode($_COOKIE[sha1('login')]);
-		$password = $_COOKIE[sha1('password')];
+		$login = !empty($_COOKIE[sha1('login')]) ? Crypto::aes256Decode($_COOKIE[sha1('login')]) : '';
+		$password = !empty($_COOKIE[sha1('password')]) ? $_COOKIE[sha1('password')] : '';
+
 		$param = array(
 			"id" => "login-form",
 			"method" => "post",
@@ -64,6 +65,7 @@ class LoginController extends Controller{
 					
 					Option::get('main.open-register') ? 
 						new ButtonInput(array(
+							'name' => 'register',
 							'value' => Lang::get('main.register-button'),
 							'href' => Router::getUri('LoginController.register'),
 							'target' => 'dialog',
@@ -73,7 +75,8 @@ class LoginController extends Controller{
 				),
 			),
 			'onsuccess' => 'location.reload()',
-		);		
+		);	
+
 		return new Form($param);
 	}
 	

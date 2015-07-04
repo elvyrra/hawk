@@ -6,7 +6,11 @@ class LanguageController extends Controller{
 	 * Get the filters of the keys list
 	 */
 	private function getFilters(){
-		$filters = array();
+		$filters = array(
+			'tag' => LANGUAGE,
+			'keys' => 'all'
+		);
+
 		if(isset($_GET['filters'])){
 			setcookie('languages-filters', $_GET['filters'], 0, '/');
 			$filters = json_decode($_GET['filters'], true);
@@ -15,9 +19,6 @@ class LanguageController extends Controller{
 			$filters = json_decode($_COOKIE['languages-filters'], true);
 		}
 		
-		if(empty($filters['tag'])){
-			$filters['tag'] = LANGUAGE;
-		}	
 		return $filters;	 	
 	}
 	
@@ -61,21 +62,26 @@ class LanguageController extends Controller{
 					'nofieldset' => true,
 					
 					new HtmlInput(array(
+						'name' => 'keyList',
 						'value' => $this->compute('listKeys')
 					))
 				)
 			),
 			'onsuccess' => 'app.lists["language-key-list"].refresh();'
 		));
+
 		if(!$form->submitted()){
+			// Display the form
 			return $form;
 		}
 		else{
+			// Register the translations
 			try{
 				$keys = array();
 				foreach($_POST['translation'][$filters['tag']] as $langKey => $translation){
 					if(!empty($translation)){						
 						list($plugin, $key) = explode('.', $langKey);
+						$key = str_replace(array('{', '}'), array('[', ']'), $key);
 						if(empty($keys[$plugin])){
 							$keys[$plugin] = array();
 						}
@@ -215,11 +221,24 @@ class LanguageController extends Controller{
 					foreach($paths as $name => $file){
 						$translations = parse_ini_file($file);
 						foreach ($translations as $key => $value) {							
-							$langKey = "$plugin.$key";
-							if(empty($keys[$langKey])){
-								$keys[$langKey] = array();
+							if(!is_array($value)){
+								// This is a single key
+								$langKey = "$plugin.$key";
+								if(empty($keys[$langKey])){
+									$keys[$langKey] = array();
+								}
+								$keys[$langKey][$tag] = $value;
 							}
-							$keys[$langKey][$tag] = $value;
+							else{
+								// This is a multiple key
+								foreach($value as $multiplier => $val){
+									$langKey = $plugin . '.' . $key . '[' . $multiplier . ']';
+									if(empty($keys[$langKey])){
+										$keys[$langKey] = array();
+									}
+									$keys[$langKey][$tag] = $val;
+								}
+							}
 						}
 					}
 				}
@@ -229,7 +248,11 @@ class LanguageController extends Controller{
 		$data = array();
 		foreach($keys as $langKey => $values){
 			if( $filters['keys'] != 'missing' ||  empty($values[$filters['tag']]) ) {
-				$data[] = array('langKey' => $langKey, 'origin' => $values[Lang::DEFAULT_LANGUAGE], 'translation' => $values[$filters['tag']]);
+				$data[] = array(
+					'langKey' => $langKey, 
+					'origin' => isset($values[Lang::DEFAULT_LANGUAGE]) ? $values[Lang::DEFAULT_LANGUAGE] : '', 
+					'translation' => isset($values[$filters['tag']]) ? $values[$filters['tag']] : ''
+				);
 			}
 		}
 
@@ -274,7 +297,9 @@ class LanguageController extends Controller{
 				'translation' => array(
 					'label' => Lang::get('language.key-list-default-translation-label', array('tag' => $filters['tag'])),								
 					'display' => function($value, $field, $line) use($filters){
-						return "<textarea name='translation[{$filters['tag']}][{$line->langKey}]' cols='40' rows='5'>$value</textarea>";
+						$key = str_replace(array('[', ']'), array('{', '}'), $line->langKey);
+
+						return "<textarea name='translation[{$filters['tag']}][{$key}]' cols='40' rows='5'>$value</textarea>";
 					}
 				),	
 
@@ -290,7 +315,7 @@ class LanguageController extends Controller{
 		
 		$list = new ItemList($param);
 		
-		return $list;
+		return $list->__toString();
 	}
 	
 	

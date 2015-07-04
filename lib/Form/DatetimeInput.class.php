@@ -7,6 +7,10 @@
  * This class describes date and datetime inputs
  */
 class DatetimeInput extends TextInput{	
+
+	public $max = null, 
+			$min = null;
+			
 	/**
 	 * Display the input
 	 * @return string The HTML result of displaying

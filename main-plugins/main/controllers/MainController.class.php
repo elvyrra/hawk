@@ -21,7 +21,7 @@ class MainController extends Controller{
 		// Get the first plugin to display
 		if($pages === null){
 			$pages = array();
-			if(Session::logged() && Option::get('main.open-last-tabs')){
+			if(Session::logged() && Option::get('main.open-last-tabs') && !empty($_COOKIE['open-tabs'])){
 				// Open the last tabs the users opened before logout
 				$pages = json_decode($_COOKIE['open-tabs'], true);
 			}
@@ -51,7 +51,6 @@ class MainController extends Controller{
 			'mainJsDir' => Plugin::get('main')->getJsUrl(),
 			'mainCssDir' => Plugin::get('main')->getCssUrl(),
 			'body' => $body,
-			'logged' => (int) Session::logged(),
 			'langLabels' => $labelsJSON,
 			'favicon' => $faviconFile ? USERFILES_PLUGINS_URL . 'main/' . $faviconFile : ''
 		));

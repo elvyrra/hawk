@@ -1,6 +1,11 @@
 <?php
 
 class ViewPluginButton extends ViewPlugin{
+	public $class = '',
+			$icon = '',
+			$label = '',
+			$param = array();
+
 	public function __construct($params = array()){
 		if(isset($params['data'])){
 			$params = $params['data'];

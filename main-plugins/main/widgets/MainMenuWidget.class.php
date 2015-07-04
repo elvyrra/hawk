@@ -31,14 +31,15 @@ class MainMenuWidget extends Widget{
 			$userMenu = array(
 				'myProfile' => array(
 					'icon' => 'user',
-					'url' => Router::getUri('UserProfileController.display', array('userId' => $user->id)),
+					'url' => Router::getUri('edit-profile', array('userId' => $user->id)),
 					'label' => Lang::get('main.menu-my-profile'),
+					'target' => 'dialog'
 				),
-				'editProfile' => array(
-					'icon' => 'pencil',
-					'url' => Router::getUri('UserProfileController.edit', array('userId' => $user->id)),
-					'label' => Lang::get('main.menu-edit-profile'),
-				),	
+				// 'editProfile' => array(
+				// 	'icon' => 'pencil',
+				// 	'url' => Router::getUri('UserProfileController.edit', array('userId' => $user->id)),
+				// 	'label' => Lang::get('main.menu-edit-profile'),
+				// ),	
 				'change-password' => array(
 					'icon' => 'lock',
 					'url' => Router::getUri('change-password'),
@@ -47,7 +48,7 @@ class MainMenuWidget extends Widget{
 				),
 				'logout' => array(
 					'icon' => 'sign-out',
-					'url' => Router::getUri('LoginController.logout'),
+					'url' => Router::getUri('logout'),
 					'label' => Lang::get('main.menu-logout'),
 					'class' => 'real-link'
 				),			

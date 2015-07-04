@@ -5,7 +5,7 @@ class RoleController extends Controller{
 	 *  List all the roles
 	 */
 	public function listRoles(){
-		if($_GET['setdefault']){
+		if(!empty($_GET['setdefault'])){
 			Option::set('roles.default-role', $_GET['setdefault']);
 			$defaultRole = $_GET['setdefault'];
 		}

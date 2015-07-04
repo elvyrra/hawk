@@ -4,13 +4,13 @@ class PermissionController extends Controller{
 	public function index(){
 		$permissionGroups = Permission::getAllGroupByPlugin();
 
-		$example = $this->roleId ? array('roleId' => $this->roleId) : array();
+		$example = isset($this->roleId) ? array('roleId' => $this->roleId) : array();
 		$data = RolePermission::getListByExample(new DBExample($example));
 		$values = array();
 		foreach($data as $value){
 			$values[$value->permissionId][$value->roleId] = $value->value;
 		}
-		$roles = $this->roleId ? array(Role::getById($this->roleId)) : Role::getAll(null, array(), array(), Option::get('main.allow-guest') ? true : false);
+		$roles = isset($this->roleId) ? array(Role::getById($this->roleId)) : Role::getAll(null, array(), array(), Option::get('main.allow-guest') ? true : false);
 
 		$param = array(
 			'id' => 'permissions-form',

@@ -16,6 +16,8 @@ class FileInput extends FormInput{
 	const INDEPENDANT = true;
 
 	public 	$multiple = false;
+
+	public $extensions = array();
 	
 	public function check(&$form = null){
 		if(empty($this->errorAt))
@@ -28,7 +30,6 @@ class FileInput extends FormInput{
 			return false;
 		}
 
-		$filenames = $_FILES[$basename]['name'];
 		if($upload && $this->extensions){			
 			foreach($upload->getFiles() as $file){				
 				if(!in_array($file->extension, $this->extensions)){

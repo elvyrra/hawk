@@ -1,23 +1,20 @@
 <?php
-/**********************************************************************
- *    						record.event.listener.js
- *
- *
- * Author:   Julien Thaon & Sebastien Lecocq 
- * Date: 	 Jan. 01, 2014
- * Copyright: ELVYRRA SAS
- *
- * This file is part of Beaver's project.
- *
- *
- **********************************************************************/
+/**
+ * ItemList.class.php
+ * @author Elvyrra SAS
+ */
+
+/**
+ * This class is used to generate and display smart lists, getting data from the database or a given array
+ */
+
 class ItemList{
 	/*** Class constants ***/	
 	const DEFAULT_MODEL = 'GenericModel';
 	const ALL_LINES = 'all';
-	public static $lineChoice = array(10, 20, 50, 100);
 	const DEFAULT_LINE_CHOICE = 20;
 
+	public static $lineChoice = array(10, 20, 50, 100);
 	
 	/*** Instance default values ***/
 	public 	$controls = array(),
@@ -27,16 +24,39 @@ class ItemList{
 			$binds = array(),
 			$lines = self::DEFAULT_LINE_CHOICE,
 			$page = 1,
-			$checkbox = false,
 			$action,
 			$model = self::DEFAULT_MODEL,
+			$group = array(),
+			$selected = null,
+			$lineClass = null,
+			$style = '',
+			$navigation = true,
+			$navigationClass = '',
+			$noHeader = false,
+			$target = '',
 			$emptyMessage;
 	private $dbo;
+
+	private static $fieldsProperties = array(
+		'field' => null,
+		'class' => null,
+		'title' => null, 
+		'href' => null,
+		'onclick' => null, 
+		'style' => null, 
+		'unit' => null,
+		'display' => null, 
+		'target' => null,
+		'sort' => true,
+		'search' => true,
+		'independant' => false,
+		'hidden' => false,
+	);
 			
-	/*______________________________________________________________________
-	
-		CONTRUCTOR : INIT THE ATTRIBUTES AND THE DATA IN THE DATABASE
-	______________________________________________________________________*/
+	/**
+	 * Constructor
+	 * @param arary $params The parameter of the list
+	 */
 	public function __construct($params){
 		/*** Default values ***/		
 		$this->emptyMessage = Lang::get('main.list-no-result');
@@ -66,15 +86,22 @@ class ItemList{
 		$this->dbo= DB::get($model::getDbName());
 		$this->table = $model::getTable();
 		
+		/*** initialize fields default values ***/
+		foreach($this->fields as $name => &$field){
+			$field = new ItemListField($field);			
+		}
+
 		/*** initialize controls ***/
 		foreach($this->controls as &$button){
-			switch($button['template']){				
-				case "refresh" :
-					$button = array(
-						"icon" => "refresh", 						
-						"onclick" => "app.lists['$this->id'].refresh();"
-					);
-				break;
+			if(!empty($button['template'])){
+				switch($button['template']){				
+					case "refresh" :
+						$button = array(
+							"icon" => "refresh", 						
+							"onclick" => "app.lists['$this->id'].refresh();"
+						);
+					break;
+				}
 			}
 		}
 		
@@ -90,7 +117,7 @@ class ItemList{
 			if(isset($_POST[$name])){
 				$this->$name = json_decode($_POST[$name],true);
 			}
-			
+
 			// to register in cookie the current filters
 			$cookie[$name] = $this->$name;
 		}
@@ -99,13 +126,12 @@ class ItemList{
 		setcookie("list-{$this->id}", json_encode($cookie), time() + 365 * 24 * 3600, '/');		
 	}
 	
-	/*_____________________________________________________________________
-	
-		GET THE DATA TO DISPLAY FROM THE DATABASE, GET OR POST
-	_____________________________________________________________________*/
+	/**
+	 * Get the data to display
+	 * @return array The data to display
+	 */
 	public function get(){		
-	    $this->displayedColumns = 0;
-		if(!empty($this->data) && is_array($this->data)){
+		if(isset($this->data) && is_array($this->data)){
 	    	return $this->getFromArray($this->data);
 	    }
 	    elseif($this->model && $this->table){
@@ -113,6 +139,11 @@ class ItemList{
 		}
 	}
 	
+
+	/**
+	 * Get the data from the database
+	 * @return array The data taken from the databases
+	 */
 	private function getFromDatabase(){
 		$fields = array();
 				
@@ -130,43 +161,37 @@ class ItemList{
 			}
 		} 		
 			
-		
 		/* insert the reference if not present in the fields **/
 		if(!isset($this->fields[$this->refAlias])){
-			$this->fields[$this->refAlias] = array(
+			$this->fields[$this->refAlias] = new ItemListField(array(
 				'field' => $this->refField,
 				'hidden' => true
-			);
+			));
 		}
 		
 		/*** Prepare the fields to research ***/
 		$searches = array();
 		foreach($this->fields as $name => &$field){
-			if(!$field['independant']){
-				if(!isset($field['field'])){
-					$field['field'] = $name;
+			if(!$field->independant){
+
+				if(!$field->field){
+					$field->field = $name;
 				}
-				$fields[$this->dbo->formatField($field['field'])] = $this->dbo->formatField($name);
+				
+				$fields[$this->dbo->formatField($field->field)] = $this->dbo->formatField($name);
 				
 				/*** Get the pattern condition ***/			
-				if($pattern = $this->searches[$name]){
-					$where[] = DBExample::make(array($field['field'] => array('$like' => "%$pattern%")), $this->binds);
+				$pattern = !empty($this->searches[$name]) ? $this->searches[$name] : '';
+				if($pattern){
+					$where[] = DBExample::make(array($field->field => array('$like' => "%$pattern%")), $this->binds);
 				}	
 			}
-
-			/*** Get the number of displayed columns ***/
-			if(!$field['hidden']){
-				$this->displayedColumns ++;
-			}
-		}
-		if($this->checkbox){
-			$this->displayedColumns++;
 		}
 
 		try{
 			$where = implode(" AND ", $where);
 
-			$model = $this->model;			
+			$model = $this->model;		
 			$this->recordNumber = $this->dbo->count($this->table, $where, $this->binds, $this->refField, $this->group);
 			
 			/*** Get the number of the page ***/
@@ -202,20 +227,19 @@ class ItemList{
 	
 	/**
 	 * Get the data of the list from a given array
+	 * @param array $data The array where to take the data to display
 	 */
 	private function getFromArray($data){
 		foreach($this->fields as $name => &$field){
-			if(!$field['hidden']){
-				$this->displayedColumns ++;
-			}
-			
-			if($pattern = $this->searches[$name]){
+			$pattern = isset($this->searches[$name]) ? $this->searches[$name] : null;
+			if($pattern){
 				$data = array_filter($data, function($line) use($pattern, $name){
 					return stripos($line[$name], $pattern) !== false;
 				});
 			}
 			
-			if($sort = $this->sorts[$name]){				 
+			$sort = isset($this->sorts[$name]) ? $this->sorts[$name] : null;
+			if($sort){
 				usort($data, function($a, $b) use($sort, $name){
 					if($sort > 0){
 						return $a[$name] < $b[$name];
@@ -238,14 +262,21 @@ class ItemList{
 		return true;
 	}
 	
+
+	/**
+	 * Set the list data
+	 * @param array $data The data to set
+	 */
 	public function set($data){
 		$this->getFromArray($data);
 	}
 	
-	/*_____________________________________________________________________
 	
-		DISPLAY THE LIST (WITH OR WITHOUT NAVIGATION BAR)
-	_____________________________________________________________________*/
+
+	/**
+	 * Display the list
+	 * @return string The HTML result of displaying
+	 */
 	public function __toString(){
     	try{
 	    	// get the data to display
@@ -255,15 +286,17 @@ class ItemList{
 	        $pages = (ceil($this->recordNumber / $this->lines) > 0) ? ceil($this->recordNumber / $this->lines) : 1;
 			
 			/*** At least one result to display ***/
-			$display = array();
+			$data = array();
 			$param = array();
 			if(is_array($this->results)){
 				foreach($this->results as $id => $line){
-					$display[$id] = array();
-					$param[$id] = array();
+					$data[$id] = array();
+					$param[$id] = array(
+						'class' => ''
+					);
 
 					if($this->selected == $id){
-						$param[$id]['class'] = 'selected ';
+						$param[$id]['class'] .= 'selected ';
 					}
 					if($this->lineClass){
 						$function = $this->lineClass;
@@ -271,35 +304,41 @@ class ItemList{
 					}
 
 					foreach($this->fields as $name => $field){
-						$display[$id][$name] = array();
+						$cell = array(
+							'class' => '',
+							'style' => '',
+							'display' => !empty($line->$name) ? $line->$name : ''
+						);
 
-						foreach(array('title', 'href', 'onclick', 'style', 'unit', 'class', 'display', 'target') as $prop){
-							if(isset($field[$prop])){
-								if(is_callable($field[$prop])){
-									$field[$prop] = $field[$prop]($line->$name, $field, $line);
+						foreach(self::$fieldsProperties as $prop => $default){
+							if(!is_null($field->$prop)){
+								if(is_callable($field->$prop)){
+									$func = $field->$prop;
+									$cell[$prop] = $func(!empty($line->$name) ? $line->$name : null, $field, $line);									
 								}
-								$display[$id][$name][$prop] = $field[$prop];
+								else{
+									$cell[$prop] = $field->$prop;									
+								}
 							}						
 						}
-						$display[$id][$name]['class'] .= " list-cell-$this->id-$name ";
-						if(isset($field['onclick']) || isset($field['href'])){
-							$display[$id][$name]['class'] .= " list-cell-clickable";
+
+						$cell['class'] .= " list-cell-$this->id-$name ";
+						if($field->onclick || $field->href){
+							$cell['class'] .= " list-cell-clickable";
 						}							 
 								
-						if($field['hidden']){
-							$display[$id][$name]['style'] = 'display:none';
+						if($field->hidden) {
+							$cell['class'] = ' list-cell-hidden';
 						}
-							
-						if(!isset($display[$id][$name]['display'])){
-							$display[$id][$name]['display'] = $line->$name;
-						}
+
+						$data[$id][$name] = $cell;
 					}
 				}
 			}
 			
 			return View::make(ThemeManager::getSelected()->getView("item-list.tpl"), array(			
 				'list' => $this,
-				'display' => $display,
+				'data' => $data,
 				'linesParameters' => $param,
 				'pages' => $pages
 			));
@@ -308,18 +347,4 @@ class ItemList{
 			ErrorHandler::exception($e);
 		}
 	}	
-	
-	/*_____________________________________________________________________
-	
-		GET THE FIELD ARRAY, BY THE NAME OF THE FIELD 
-	_____________________________________________________________________*/
-	private function getFieldByName($name){
-		foreach($this->fields as $id => $field){
-			if($field['name'] == $name || $field['field'] == $name)
-				return $this->fields[$id];			
-		}
-		return null;
-	}	
 }
-
-/******************* (C) COPYRIGHT 2014 ELVYRRA SAS *********************/

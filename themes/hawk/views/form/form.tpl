@@ -1,4 +1,5 @@
-<form 	class="{{ $form->class }} form {{ $form->ajax ? 'ajax-form' : '' }} {{ $form->upload ? 'upload-form' : ''}}" 
+<form 	name="{{ $form->name }}" 
+		class="{{ $form->class }} form {{ $form->upload ? 'upload-form' : ''}}" 
 		id="{{ $form->id }}" 
 		method="{{ $form->method }}" 
 		action="{{ $form->action }}" 
@@ -8,9 +9,6 @@
 	>
 	
 	<input type='hidden' name='_FORM_ACTION_' value='valid'/>
-	{if($form->title)}
-		<h2 class='form-title' >{{ $form->title }}</h2>
-	{/if}
 	
 	<div class='form-result-message'>
 		{if($form->status == Form::STATUS_ERROR)}

@@ -1,5 +1,7 @@
 <?php
 /*** Initialize the application ***/
+define('SCRIPT_START_TIME', microtime(true));
+
 define('ROOT_DIR', __DIR__ . '/');
 define('INCLUDES_DIR', ROOT_DIR . 'includes/');
 

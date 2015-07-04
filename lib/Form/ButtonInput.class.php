@@ -31,6 +31,8 @@ class ButtonInput extends FormInput{
 		'previous' => 'step-backward',
 		'send' => 'mail-closed'	
 	);
+
+	public $nl = false;
 	
 	/**
 	 * Display the input 
@@ -56,8 +58,9 @@ class ButtonInput extends FormInput{
 		$param = array_intersect_key($param, array_flip(array('id', 'class', 'icon', 'label', 'type', 'name', 'onclick', 'style', 'href', 'target')));
 		
 		/*** Set the attributes of the button ***/	
-		if(!preg_match("!\bbtn-\w+\b!", $param['class']))
-			$class .= " btn-inverse";
+		if(!preg_match("!\bbtn-\w+\b!", $param['class'])){
+			$param['class'] .= " btn-default";
+		}
 		
 		/*** Set the attribute and text to the span inside the button ***/
 		$param = array_map(function($v){return htmlentities($v, ENT_QUOTES); }, $param);

@@ -4,12 +4,7 @@ class AdminController extends Controller{
 	const MAX_LOGO_SIZE = 200000; // 200 Ko
 	const MAX_FAVICON_SIZE = 20000; // 20 Ko
 	
-	public function index(){
-		
-	}
-	
 	public function settings(){		
-		
 		
 		$languages = array();
 		foreach(Language::getAll() as $lang){
@@ -24,7 +19,7 @@ class AdminController extends Controller{
 			$roles[$role->id] = Lang::get("roles.role-$role->id-label");
 		}
 
-		$menus = Menu::getAvailableMenus($user);
+		$menus = Menu::getAvailableMenus();
 
 		$menuItems = array();
 		foreach($menus as $menu){
@@ -235,7 +230,7 @@ class AdminController extends Controller{
 			)));
 			
 			$this->addJavaScript(Plugin::current()->getJsUrl() . 'settings.js');
-			return RightSidebarTab::make(array(
+			return NoSidebarTab::make(array(
 				'icon' => 'cogs',
 				'title' => Lang::get('admin.settings-page-name'),
 				'description' => Lang::get('admin.settings-page-description'),

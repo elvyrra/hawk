@@ -35,41 +35,129 @@ class Form{
 	const DEFAULT_MODEL = "GenericModel";
 	
 
-	// Default properties values
-	public	$type = 'json',
-			$method = 'post',
-			$model = self::DEFAULT_MODEL,
-			$labelWidth = '150px',
-			$status = null,
-			$columns = 1,
-			$ajax = true,
-			$binds = array(),
-			$returns = array(),
-			$errors = array(),
-			$class = '',			
-			$target = '',
-			$autocomplete = true,
-			$title = '',
-			$enctype = '',
-			$fields = array(),
-			$upload = false,
-			$nomessage = false,
-			$dbaction = self::ACTION_REGISTER,
-			$action = '',
-			$reference = array();
-	private $example = null;
+	/**
+	 * The submit method (Default : POST)
+	 */
+	public	$method = 'post',
+
+	/**
+	 * The form name
+	 */
+	$name = '',
+
+	/**
+	 * The form id
+	 */
+	$id = '',
+
+	/**
+	 * The model used for display and database treatment
+	 */
+	$model = self::DEFAULT_MODEL,
+
+	/**
+	 * The width of the input labels (Default : 150px)
+	 */
+	$labelWidth = '150px',
+
+	/**
+	 * The submission status. This variable can be used if you want to know the treatment status before executing other instructions
+	 */
+	$status = null,
+
+	/**
+	 * The number of columns to display the form. Each fieldset will be displayed on a column. For example, if you define 6 fieldsets in your form, and select 3 for this property,
+	 * the form will be displayed on 2 lines, with 3 fieldsets by line.
+	 * Default 1
+	 */
+	$columns = 1,
+
 	
-	public function __construct($param){
+	/**
+	 * This property can be set if you want to apply a css class to the form
+	 */
+	$class = '',			
+
+	/**
+	 * Defines the target where to submit the form
+	 */
+	$target = '',
+
+	/**
+	 * Defines if the form can autocompleted (Default true)
+	 */
+	$autocomplete = true,
+
+	/**
+	 * Defines the attribute 'enctype' of the form
+	 */
+	$enctype = '',
+
+	/**
+	 * The form input fields
+	 */
+	$fields = array(),
+
+	/**
+	 * Defines if the form do an AJAX uplaod
+	 */
+	$upload = false,
+
+	/**
+	 * If set to true, no return message will be displayed when the form is submitted
+	 */
+	$nomessage = false,
+
+
+	/**
+	 * Defines the form action. Default the current URL
+	 */
+	$action = '',
+
+	/**
+	 * The reference to get the object in the database and update it. This property must be displayed as array('field' => 'value', 'field2' => 'value2')
+	 */
+	$reference = array();
+	
+	/**
+	 * The database example, generated from the reference, to find the object to display and treat in the database
+	 */
+	private $example = null,
+	
+	/**
+	 * The data returned by the form
+	 */
+	$returns = array(),
+
+	/**
+	 * The form errors 
+	 */
+	$errors = array(),
+
+	/**
+	 * The action that is performed on form submission
+	 */
+	$dbaction = self::ACTION_REGISTER;
+	
+
+	/**
+	 * Constructor
+	 * @param array $param The form parameters
+	 */
+	public function __construct($param = array()){
 		/*
 		 * Default values
 		 */
 		$this->action = $_SERVER['REQUEST_URI'];		
 				
-        // Lang::load('form', Plugin::get('main')->getLangDir().'form');	
-		
 		// Get the parameters of the instance
-        foreach($param as $key => $value){
-            $this->$key = $value;
+		$data = $param;
+		unset($data['fieldsets']);
+		$this->setParam($data);
+        
+
+        if(!$this->name){
+        	$this->name = $this->id;
         }
 
         if(!in_array($this->columns, array(1,2,3,4,6,12))){
@@ -89,52 +177,48 @@ class Form{
 		
 
 		// Get the fields in the "fields" instance property, and add the default values for the fieldsets and fields
-		$this->groups = $this->fieldsets;
 		$this->fieldsets = array();
-        if(!empty($this->groups)){
-	        foreach($this->groups as $name => &$fieldset){
+        if(!empty($param['fieldsets'])){
+	        foreach($param['fieldsets'] as $name => &$fieldset){
 	            $inputs = array();
 	            $params = array();
+
+	            $this->addFieldset(new FormFieldset($this, $name));
+
 	            foreach($fieldset as $key => &$field){
 					if($field instanceof FormInput){									
-						if(defined(get_class($field).'::INDEPENDANT')){
-							// This field is independant from the database
-							$field->independant = true;
-						}
-						
-						if(defined(get_class($field).'::NO_LABEL')){                    
-							// This field cannot have any label
-							unset($field->label);
-						}
-						
-						$labelWidth = $this->labelWidth;
-						if(isset($fieldset['labelWidth'])){
-							$labelWidth = $fieldset['labelWidth'];
-						}
-						if(isset($field->labelWidth)){
-							$labelWidth = $field->labelWidth;
-						}
-						$field->labelWidth = $labelWidth;
-						
-						if($name == '_submits' && !isset($field->nl)){                   
-							// A field in this fieldset cannot return to the new line
-							$field->nl = false;
-						}
-							
-						$this->fields[$field->name] = &$field;					
-						$inputs[$field->name] = &$field;
+						$this->addInput($field, $name);
 					}
 					else{
-						$params[$key] = $field;
+						$this->fieldsets[$name]->setParam($key, $field);
 					}
 	            }
-	            $this->fieldsets[$name] = new FormFieldset($this, $name, $inputs, $params);
 	        }
         }
+
 		// get the data of the form to display or register
         $this->reload();		
 	}
 	
+
+	/**
+	 * Set form parameters
+	 */
+	public function setParam($param, $value = null){
+		if(is_array($param)){
+			foreach($param as $key => $val){
+				$this->setParam($key, $val);
+			}
+		}
+		else{
+			$this->$param = $value;
+		}
+	}
+
+
+	/**
+	 * Get the POST and FILES data from php://input. This is used for AJAX uploads
+	 */
 	public function getFromInput(){		
 		$input = file_get_contents("php://input");
 		if(!empty($input)){
@@ -199,11 +283,10 @@ class Form{
 		}
 	}
 	
-	/*
-	 * Prototype: public function reload()
-	 * Description: Reload the data of the form
+	/**
+	 * Reload the form data
 	 */
-	public function reload($database = false, $data = array()){
+	public function reload(){
         if($this->upload){
 			$this->getFromInput();
 		}
@@ -221,7 +304,7 @@ class Form{
 		}
 
 		if($this->submitted()){
-			$entry = $this->method == 'get' ? $_GET : $_POST;
+			$entry = strtolower($this->method) == 'get' ? $_GET : $_POST;
 			foreach($entry as $name => $value){
 				$data[$name] = $value;				
 			}
@@ -231,9 +314,10 @@ class Form{
 		$this->set($data);		
 	}
 	
-	/*
-	 * Prototype: public function set($field, $value)
-	 * Description: Force the value of a field in the form
+	
+	/**
+	 * Set the values for field
+	 * @param array $data The data to set, where the keys are the names of the field, and the array values, the values to affect
 	 */
 	public function set($data, $prefix = ''){
 		foreach($data as $key => $value){
@@ -248,6 +332,12 @@ class Form{
 		}
 	}
 	
+
+	/**
+	 * Get data of the form
+	 * @param string $name If set, the function will return the value of the field, else it will return an array containing all field values
+	 * @param mixed If $name is set, the function will return the value of the field, else it will return an array containing all field values
+	 */
 	public function getData($name = null){
 		if($name){
 			return $this->fields[$name]->value;
@@ -262,11 +352,25 @@ class Form{
 		}
 	}
 	
-	/*
-	 * Prototype: public function addInput($fieldset, $input)
-	 * Description: Add a new input in the form
+
+	/**
+	 * Add a fieldset to the form
 	 */
-	public function addInput($fieldset, $input){
+	public function addFieldset(FormFieldset $fieldset){
+		$this->fieldsets[$fieldset->name] = $fieldset;
+	}
+	
+	/**
+	 * Add an input to the form
+	 * @param FormInput $input The input to insert in the form
+	 * @param string $fieldset (optionnal) The fieldset where to insert the input. If not set, the input will be just included in $form->fields, out of any fieldset
+	 */
+	public function addInput(FormInput $input, $fieldset = ''){
+		if($input::INDEPENDANT){
+			// This field is independant from the database
+			$input->independant = true;
+		}
+		
 		$labelWidth = $this->labelWidth;
 		if(isset($this->fieldsets[$fieldset]->labelWidth)){
 			$labelWidth = $this->fieldsets[$fieldset]->labelWidth;
@@ -276,28 +380,30 @@ class Form{
 		}
 		$input->labelWidth = $labelWidth;
 
-		$this->fieldsets[$fieldset]->inputs[$input->name] = $input;		
 		$this->fields[$input->name] = &$input;
+		
+		if($fieldset){
+			$this->fieldsets[$fieldset]->inputs[$input->name] = $input;
+		}
 	}
 	
 	
-	/*
-     * Prototype : public function submitted()
-     * Description : Détermine si le formulaire a été soumis ou non
-     */
+	/**
+	 * Defines if the form has been submitted, and if so, return the action to perform
+	 * @return mixed If the form is not submitted, this function will return FALSE. Else, the function will return 'register' or 'delete', depending on the user action
+	 */
     public function submitted(){
     	if(Request::method() == "delete"){
     		return self::ACTION_DELETE;
     	}
         $entry = $this->method == 'get' ? $_GET : $_POST;
-		return isset($entry['_FORM_ACTION_']) ? $entry['_FORM_ACTION_'] : null;        
+		return isset($entry['_FORM_ACTION_']) ? $entry['_FORM_ACTION_'] : false;        
     }  
 	
-	/*
-	 * Prototype: public function wrap($content)
-	 * Description : wrap the content of the form with the form tag and return the string result
-	 * @param : string $content, the content of the form
-	 * @return : string
+	
+	/**
+	 * This method is used when you defin your own template for displaying the form content. It will wrap the form content with the <form> tag, and all the parameters defined for this form
+	 * @return string The HTML result
 	 */
 	public function wrap($content){
 		return View::make(ThemeManager::getSelected()->getView(Form::VIEWS_DIR . 'form.tpl'), array(
@@ -311,12 +417,22 @@ class Form{
 	 * @return string The HTML result of form displaying
 	 */
 	public function __toString(){
-		try{
+		try{			
+			if(empty($this->fieldsets)){				
+				// Generate a fake fieldset, to keep the same engine for forms that have fieldsets or not
+				$this->addFieldset(new FormFieldset($this, ''));
+				foreach ($this->fields as $name => $input) {
+					$this->fieldsets['']->inputs[$name] = &$input;
+				}
+			}
+
+			// Generate the form content 
 			$content = View::make(ThemeManager::getSelected()->getView(Form::VIEWS_DIR . 'form-content.tpl') , array(
 				'form' => $this,
-				'fieldsets' => $this->fieldsets,
 				'column' => 0		
 			));
+
+			// Wrap the content with the form tag
 			return $this->wrap($content);
 		}
 		catch(Exception $e){
@@ -324,19 +440,12 @@ class Form{
 		}
 	}
 	
-	/*
-     * Prototype : public function displayInput($fieldset, $field)
-     * Description : Display a field and it label
-     * @param : 
-     */
-    public function displayInput($field){
-		return $this->fields[$field];		
-    }
 	
-	/*
-	 * Prototype: public function check($exit = self::JSON)
-	 * Description : Check the data submitted by the form
-	 * @param : $exit, if true and errors are catched, the script willl end
+
+	/**
+	 * Check if the submitted values are correct
+	 * @param bool $exit If set to true and if the data is not valid, this function will output the validation result on HTTP response
+	 * @return bool true if the data is valid, false else.
 	 */
 	public function check($exit = self::EXIT_JSON){				
 		if(empty($this->errors))			
@@ -362,10 +471,12 @@ class Form{
 		return true;
 	}
 	
-	/*
-	 * Prototype : public function resgister($exit = self::JSON)
-	 * Register the data into the database for new elements or elemnt upation
-	 * @param : $exit, if true, exit the script when finished
+	/**
+	 * Register the submitted data in the database
+	 * @param bool $exit If set to true, the script will output after function execution, not depending on the result
+	 * @param string $success Defines the message to output if the action has been well executed
+	 * @param string $error Defines the message to output if an error occured
+	 * @return mixed The id of the created or updated element in the database
 	 */
 	public function register($exit = self::EXIT_JSON, $success = "", $error = ""){			
 		try{
@@ -428,10 +539,12 @@ class Form{
 	}        
        
 	
-	/*
-	 * Prototype: public function delete($exit = self::JSON)
-	 * Description : delete an element from the database
-	 * @param : $exit, if true, exit the script after delete
+	/**
+	 * Delete the element from the database
+	 * @param bool $exit If set to true, the script will output after function execution, not depending on the result
+	 * @param string $success Defines the message to output if the action has been well executed
+	 * @param string $error Defines the message to output if an error occured
+	 * @return mixed The id of the deleted object
 	 */
 	public function delete($exit = self::EXIT_JSON, $success = "", $error = ""){
 		try{
@@ -469,17 +582,20 @@ class Form{
 		}
 	}
 	
-	/*
-	 * Prototype: public function error($name, $error)
-	 * Description: Add an error to the set of errors in the form
+	/**
+	 * Add an error on a field
+	 * @param string $name The name of the input to apply the error
+	 * @param string $error The error message to apply
 	 */
 	public function error($name, $error){
 		$this->errors[$name] = $error;
 	}
 	
-	/*
-	 * Prototype: public function addReturn($name, $message)
-	 * Description : Add an information to return to the client
+	
+	/**
+	 * Add data to return to the client. To add several returns in on function call, define the first parameter as an associative array
+	 * @param string $name The name of the data to return
+	 * @param string $message The value to apply
 	 */
 	public function addReturn($name, $message= ""){
 		if(is_array($name)){
@@ -490,10 +606,12 @@ class Form{
 			$this->returns[$name] = $message;
 	}
 	
-	/*
-	 * Prototype: public function response($status, $message)
-	 * Description: return the response to the client
-	 */ 
+
+	/**
+	 * Output the response of the form (generally when submitted)
+	 * @param string $status The status to output. You can use the class constants STATUS_SUCCESS, STATUS_CHECK_ERROR or STATUS_ERROR
+	 * @param string $message The message to output. If not set, the default message corresponding to the status will be output
+	 */
 	public function response($status, $message = ''){
 		$response = array();
 		switch($status){
@@ -525,10 +643,13 @@ class Form{
 		Response::end();
 	}
 	
-    /*
-	 * Prototype: public function treat($exit = self::JSON)
-	 * Description: Generic treatment of the form
-	 */ 
+    
+
+    /**
+     * Make a generic treatment that detect the action to execute, check the form if necessary, and execute the action
+     * @param bool $exit If true, exit the script after function execution
+     * @return mixed The id of the treated element
+     */
 	public function treat($exit = self::EXIT_JSON){
 		if($this->submitted() == self::ACTION_DELETE){
 			return $this->delete($exit);

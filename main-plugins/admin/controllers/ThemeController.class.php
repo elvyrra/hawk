@@ -59,7 +59,7 @@ class ThemeController extends Controller{
 		$theme = ThemeManager::getSelected();
 		$variables = $theme->getCssVariables(file_get_contents($theme->getBaseCssFile()));
 		
-		if($_GET['reset']){
+		if(!empty($_GET['reset'])){
 			foreach($variables as $var){
 				Option::delete('theme-' . $theme->getName() . '.' . $var['name']);
 			}
@@ -189,7 +189,8 @@ class ThemeController extends Controller{
 						'value' => $css,
 					)),
 
-					new HtmlInput(array(						
+					new HtmlInput(array(	
+						'name' => 'ace',					
 						'value' => '<style id="editing-css-computed">' . $css . '</style><div id="theme-css-edit" contenteditable>' . $css . '</div>'
 					)),
 				)
@@ -307,6 +308,11 @@ class ThemeController extends Controller{
 
 		if($form->check()){
 			$uploader = Upload::getInstance('medias');
+
+			$dir = ThemeManager::getSelected()->getMediasDir();
+			if(!is_dir($dir)){
+				mkdir($dir, 0755, true);
+			}
 			foreach($uploader->getFiles() as $file){
 				$uploader->move($file, ThemeManager::getSelected()->getMediasDir());
 			}

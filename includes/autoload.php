@@ -1,16 +1,24 @@
 <?php
 /**
- * This class describes the autoload behavior of the application
+ * Autoload.class.php
  * @author Elvyrra SAS
  */
+
+/**
+ * This class describes the autoload behavior of the application
+ */
 class Autoload{
-	// Array containing the autoload cache
+    /**
+     * Array containing the autoload cache
+     */
     private static $cache = array();
 	
 	// Autoload cache file
     const CACHE_FILE = CACHE_DIR . 'autoload-cache.php';
 
-	// folders where to search classes declarations
+	/**
+     * folders where to search classes declarations
+     */
     private static $searchDirectories = array(
         LIB_DIR,
         PLUGINS_DIR, 
@@ -62,9 +70,11 @@ class Autoload{
     }
 }
 
+
+// register autoload function 
 spl_autoload_register('Autoload::load', true, false);
 
-/*** Save the autoload cache ***/
+// Save the autoload cache 
 EventManager::on('process-end', function(Event $event){
 	Autoload::saveCache();
 });

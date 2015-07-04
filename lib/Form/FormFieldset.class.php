@@ -1,8 +1,18 @@
 <?php
+/**
+ * FormFieldset.class.php
+ * @author Elvyrra SAS
+ */
 
+/**
+ * This class describes the behavior of a form fieldset
+ */
 class FormFieldset{
-	public $name, $legend, $inputs, $form;
+	public $name, $legend, $inputs, $form, $legendId = '';
 
+	/**
+	 * Constructor
+	 */
 	public function __construct($form, $name, $inputs= array(), $params = array()){
 		$this->name = $name;		
 		$this->form = $form;
@@ -15,6 +25,12 @@ class FormFieldset{
 			$this->legendId = $form->id . '-' . $this->name . '-legend';
 		}
 	}
+
+
+	public function setParam($param, $value){
+		$this->$param = $value;
+	}
+
 
 	public function __toString(){
 		return View::make(ThemeManager::getSelected()->getView(Form::VIEWS_DIR . 'form-fieldset.tpl'), array(

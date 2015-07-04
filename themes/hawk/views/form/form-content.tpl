@@ -1,4 +1,4 @@
-{foreach($fieldsets as $blockname => $fieldset)}
+{foreach($form->fieldsets as $blockname => $fieldset)}
 	{if($column++ % $form->columns == 0)}
 	<div class='row'>
 	{/if}
@@ -7,7 +7,7 @@
 		{{ $fieldset }}								
 	</div>
 
-	{if($column % $form->columns == 0 || $column == count($form->fields))}
+	{if($column % $form->columns == 0 || $column == count($form->fieldsets))}
 	</div>
 	{/if}
 {/foreach}

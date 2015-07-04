@@ -9,15 +9,30 @@
 
 class ErrorHandler {
 
-	public static function error($no, $str, $file, $line, $context){			
+	public static function error($no, $str, $file, $line, $context){	
+		if (!(error_reporting() & $no)) {
+	        // This error code is not in error_reporting
+	        return;
+	    }
 		switch($no){
 			case E_NOTICE :
+			case E_USER_NOTICE: 
+				$level = "info";
+				$icon = 'info-circle';
+				$title = "PHP Notice";
+			break;
+
 			case E_STRICT :
+				$level = "info";
+				$icon = 'info-circle';
+				$title = "PHP Strict";
+			break;
+
 			case E_DEPRECATED :
 			case E_USER_DEPRECATED :
 				$level = "info";
 				$icon = 'info-circle';
-				$title = "PHP Notice";
+				$title = "PHP Deprecated";
 			break;
 
 			case E_USER_WARNING :
@@ -55,24 +70,19 @@ class ErrorHandler {
 	}
 
 	public static function exception($e){
-		if(ini_get('display_errors')){			
-			$param = array(
-				'level' => 'danger',
-				'icon' => 'excalamation-circle',
-				'title' => get_class($e),
-				'message' => $e->getMessage(),
-				'trace' => $e->getTrace()
-			);
+		$param = array(
+			'level' => 'danger',
+			'icon' => 'excalamation-circle',
+			'title' => get_class($e),
+			'message' => $e->getMessage(),
+			'trace' => $e->getTrace()
+		);
 
-			if(Response::getType() === "json"){
-				Response::set(json_encode($param));
-			}
-			else{				
-				Response::set(View::make(ThemeManager::getSelected()->getView('error.tpl'), $param));
-			}
+		if(Response::getType() === "json"){
+			Response::set(json_encode($param));
 		}
-		else{
-			Response::setHttpCode(500);
+		else{				
+			Response::set(View::make(ThemeManager::getSelected()->getView('error.tpl'), $param));
 		}
 		Response::end();
 	}

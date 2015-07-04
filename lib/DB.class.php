@@ -1,46 +1,80 @@
 <?php
-/**********************************************************************
- *    						DB.class.php
- *
- *
- * Author:   Julien Thaon & Sebastien Lecocq 
- * Date: 	 Jan. 01, 2014
- * Copyright: ELVYRRA SAS
- *
- * This file is part of Beaver's project.
- *
- *
- **********************************************************************/
+/**
+ * DB.class.php
+ * @author Elvyrra SAS
+ */
+
+/**
+ * This class is a manager for MySQL connection and queries
+ */
 class DB{
-	// Static properties
+	/**
+	 * List of servers to connect
+	 */
 	private static $servers = array();
+
+	/**
+	 * List of connections instances
+	 */
 	public static $instances = array();
 	
-	// instance properties
-	private $connection; // PDO Object representing the connection to the server    
-	private $host, $username, $password, $dbname;
-	public $sql, $binds;
+	/**
+	 * PDO Object representing the connection to the server    
+	 */
+	private $connection;
+
+	/**
+	 * The hosname of the connection
+	 */
+	private $host, 
+
+	/**
+	 * the user connected to the database
+	 */
+	$username, 
+
+	/**
+	 * The password of the user
+	 */
+	$password, 
+
+	/**
+	 * The selected database
+	 */
+	$dbname,
+
+
+	/**
+	 * The charset
+	 */
+	$charset = 'utf8',
+
+	/**
+	 * The logged queries
+	 */
+	$log = array();
+
+
+	// Status constants
+	const RETURN_STATUS = 0; // Returns the status of the query execution
+	const RETURN_ARRAY = 1;	// Return each line of the query result in an array
+	const RETURN_OBJECT = 3; // Return each line of the query result in an object
+	const RETURN_LAST_INSERT_ID = 5; // Return The last inserted id
+	const RETURN_AFFECTED_ROWS = 6; // Return the rows affected by the query
+	const RETURN_QUERY = 7; // Return the query it self
+	const RETURN_CURSOR = 8; // Return a cursor
 	
-	const RETURN_STATUS = 0;
-	const RETURN_ARRAY = 1;	
-	const RETURN_OBJECT = 3;
-	const RETURN_LAST_INSERT_ID = 5;
-	const RETURN_AFFECTED_ROWS = 6;
-	const RETURN_QUERY = 7;
-	const RETURN_CURSOR = 8;
-	
-	const SORT_ASC = 'ASC';
-	const SORT_DESC = 'DESC';
+	// Sort constants
+	const SORT_ASC = 'ASC'; // Sort ascending 
+	const SORT_DESC = 'DESC'; // Sort descending
+
+
 	
 	/**
 	 * @constructs
 	 * @param {array} $data - the connection properties
 	 */
 	public function __construct($data) {        
-        $this->charset = 'utf8';
-		$this->sql = "";
-		$this->binds = array();
-		
 		foreach($data as $key => $value){
 			$this->$key = $value;
 		}
@@ -68,6 +102,8 @@ class DB{
 	
 	/*
 	 * Description : Add a configuration for a database connection
+	 * @param array $params The connection parameters. Each element of this array is an array itself, containing the connections data : 'host', 'dbname', 'username', 'password'. 
+	 	When openning the connection, if the first connection fails, a connection will be tried on the second element, and then. This is usefull for master / slave connections
 	 */
 	public static function add($name, $params){
 		self::$servers[$name] = $params;
@@ -115,91 +151,113 @@ class DB{
 			'args' => array()
 		);
 		
-		extract($default);
-		extract($options);
+		foreach($default as $name => $value){
+			if(!isset($options[$name])){
+				$options[$name] = $value;
+			}
+		}
 		
         try {
+			// Prepare the query
 			$stmt = $this->connection->prepare($sql);			
+			
+			// Prepare query logging
+			$log = $sql;
+
+			// Bind values to the query
 			foreach($binds as $key => $bind){
 				$stmt->bindValue(":$key", $bind);
+				$log = str_replace(":$key", $this->connection->quote($bind), $log);
 			}
-			$stmt->execute();
 			
-			if(is_int($return)){
-				switch($return){
+			// Execute the query
+			$start = microtime(true);
+			$stmt->execute();
+			$end = microtime(true);
+
+			// Get the result
+			$result;
+			if(is_int($options['return'])){
+				switch($options['return']){
 					case self::RETURN_STATUS:
-						return true;
+						$result =  true;
 					break;
 				
 					case self::RETURN_ARRAY:
-						if($onerow){
-							return $stmt->fetch(PDO::FETCH_ASSOC);
+						if($options['onerow']){
+							$result = $stmt->fetch(PDO::FETCH_ASSOC);
 						}
 						else{
 							$data = array();
 							while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
-								if($index){
-									$data[$row[$index]] = $row;
+								if($options['index']){
+									$data[$row[$options['index']]] = $row;
 								}
 								else{
 									$data[]= $row;
 								}
 							}
-							return $data;
+							$result = $data;
 						}
 					break;
 				
 					case self::RETURN_OBJECT :
-						if($onerow){
-							return $stmt->fetch(PDO::FETCH_OBJ);
+						if($options['onerow']){
+							$result = $stmt->fetch(PDO::FETCH_OBJ);
 						}
 						else{
 							$data = array();
 							while($row = $stmt->fetch(PDO::FETCH_OBJ)){
-								if($index){
+								if($options['index']){
+									$index = $options['index'];
 									$data[$row->$index]= $row;
 								}
 								else{
 									$data[] = $row;
 								}
 							}
-							return $data;
+							$result = $data;
 						}
 					break;
 				
 					case self::RETURN_LAST_INSERT_ID :
-						return $this->connection->lastInsertId();
+						$result = $this->connection->lastInsertId();
 					break;
 				
 					case self::RETURN_AFFECTED_ROWS :
-						return $stmt->rowCount();
+						$result = $stmt->rowCount();
 					break;
 				
 					case self::RETURN_CURSOR :
-						return $stmt;
+						$result = $stmt;
 					break;				
 				}
 			}
 			else{
-				if($onerow){
-					$object = $stmt->fetchObject($return, $args);
-					return $object !== false ? $object : null;
+				if($options['onerow']){
+					$object = $stmt->fetchObject($options['return'], $options['args']);
+					$result = $object !== false ? $object : null;
 				}
 				else{
 					$data = array();
-					while($row = $stmt->fetchObject($return, $args)){
-						if($index){
+					while($row = $stmt->fetchObject($options['return'], $options['args'])){
+						if($options['index']){
+							$index = $options['index'];
 							$data[$row->$index] = $row;
 						}
 						else{
 							$data[] = $row;
 						}
 					}
-					return $data;
+					$result = $data;
 				}
 			}
+
+			$this->addLog($log, $result, $start, $end);
+			return $result;
         }
         catch(PDOException $e) {
+        	$this->addLog($log, 'query failed', $start, microtime(true));
             throw new DBException($e->getMessage(), DBException::QUERY_ERROR, $sql);
         }  	
 	}
@@ -264,7 +322,7 @@ class DB{
 			$limit = "LIMIT 1";
 		}
 		elseif(!empty($query->limit)){
-			$limit = " LIMIT ".($query->start ? "$query->start, " : ""). "$query->limit";       
+			$limit = " LIMIT ".(!empty($query->start) ? "$query->start, " : ""). "$query->limit";       
 		}
 		
         $sql = "SELECT $query->fields FROM $query->from $where $group $having $orderby $limit";
@@ -408,6 +466,25 @@ class DB{
 	public static function escape($str){		
 		return reset(self::$instances)->connection->quote($str);
 	}
+
+
+	/**
+	 * Add a query in log
+	 */
+	public function addLog($log, $result, $start, $end){
+		$this->logs[] = array(
+			'query' => $log, 
+			'result' => $result,
+			'start' => $start - SCRIPT_START_TIME,
+			'end' => $end - SCRIPT_START_TIME,
+			'time' => $end - $start
+		);
+	}
+
+
+	/**
+	 * Get the DB logs
+	 */
 	
 }
 

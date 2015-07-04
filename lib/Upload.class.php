@@ -1,9 +1,16 @@
 <?php
+/**
+ * Uplaod.class.php
+ * @author Elvyrra SAS
+ */
 
+/**
+ * This class permits to treat AJAX uploads 
+ */
 class Upload{
 	private $files = array();
 
-	public function getInstance($name){
+	public static function getInstance($name){
 		try{
 			return new self($name);
 		}
@@ -28,7 +35,7 @@ class Upload{
 				);				
 			}
 		}
-		else{
+		else{			
 			$this->files[] = (object) array(
 				'basename' => $_FILES[$name]['name'],
 				'tmpFile' => $_FILES[$name]['tmp_name'],

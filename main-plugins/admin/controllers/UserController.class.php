@@ -14,6 +14,7 @@ class UserController extends Controller{
 		);
 
 		$this->addCss(Plugin::current()->getCssUrl(). "users.css");
+		$this->addJavaScript(Plugin::current()->getJsUrl() . 'users.js');
 		
 		$page = View::make(Plugin::current()->getViewsDir() . 'users.tpl', array(
 			'tabs' => $tabs,
@@ -22,10 +23,7 @@ class UserController extends Controller{
 		return NoSidebarTab::make(array(
 			'page' => $page,
 			'icon' => 'users',
-			'title' => 'Utilisateurs',
-			'script' => array(
-				'src' => Plugin::current()->getJsUrl() . 'users.js',
-			),
+			'title' => 'Utilisateurs'			
 		));
 	}
 	
@@ -123,8 +121,8 @@ class UserController extends Controller{
 		
 		$list = new ItemList($param);
 
-		if($_GET['refresh']){
-			return $list;	
+		if(!empty($_GET['refresh'])){
+			return $list->__toString();	
 		}
 		else{
 			Lang::addKeysToJavaScript("admin.user-delete-confirmation");

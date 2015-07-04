@@ -707,6 +707,10 @@ a, a:active, a:hover, a:visited, a:focus{
 .list-cell-clickable{
     cursor: pointer;
 }
+
+.list-cell-hidden{
+	display: none;
+}
 	
 
 /*** Tha navigation table ***/

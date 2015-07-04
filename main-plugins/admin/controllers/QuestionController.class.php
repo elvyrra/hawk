@@ -135,7 +135,8 @@ class QuestionController extends Controller{
 	
 	
 	public function edit(){
-		if(!$q = ProfileQuestion::getByName($this->name) || $q->editable){
+		$q = ProfileQuestion::getByName($this->name);
+		if(!$q || $q->editable){
 			
 			$allowedTypes = array('text', 'textarea', 'checkbox', 'radio', 'select', 'datetime', 'file');
 			$param = array(
@@ -167,7 +168,9 @@ class QuestionController extends Controller{
 								return Lang::get('admin.profile-question-form-type-' . $type);
 							}, $allowedTypes)),							
 							'label' => Lang::get('admin.profile-question-form-type-label'),
-							'data-bind' => 'value: type',
+							'attributes' => array(
+								'data-bind' => 'value: type',
+							)
 						)),
 
 						new CheckboxInput(array(
@@ -188,28 +191,36 @@ class QuestionController extends Controller{
 							'name' => 'parameters',
 							'id' => 'question-form-parameters',
 							'hidden' => true,	
-							'data-bind' => 'value: parameters'
+							'attribtues' => array(
+								'data-bind' => 'value: parameters'
+							)
 						)),
 
 						new CheckboxInput(array(
 							'name' => 'required',
 							'independant' => true,
 							'label' => Lang::get('admin.profile-question-form-required-label'),
-							'data-bind' => "checked: required",
+							'attributes' => array(
+								'data-bind' => "checked: required",
+							)
 						)),
 
 						new DatetimeInput(array(
 							'name' => 'minDate',
 							'independant' => true,
 							'label' => Lang::get('admin.profile-question-form-minDate-label'),
-							'data-bind' => "value : maxDate"
+							'attributes' => array(
+								'data-bind' => "value : maxDate"
+							),
 						)),				
 
 						new DatetimeInput(array(
 							'name' => 'maxDate',
 							'independant' => true,
 							'label' => Lang::get('admin.profile-question-form-maxDate-label'),
-							'data-bind' => "value : maxDate"
+							'attributes' => array(
+								'data-bind' => "value : maxDate"
+							),
 						)),
 
 						new HtmlInput(array(
@@ -227,10 +238,12 @@ class QuestionController extends Controller{
 						new TextareaInput(array(
 							'name' => 'options',
 							'independant' => true,
-							'required' => $_POST['type'] == "select" || $_POST['type'] == "radio",
+							'required' => isset($_POST['type']) && ($_POST['type'] == "select" || $_POST['type'] == "radio"),
 							'label' => Lang::get('admin.profile-question-form-options-label') . '<br />' . Lang::get('admin.profile-question-form-options-description'),
 							'labelClass' => 'required',
-							'data-bind' => "value : options",
+							'attributes' => array(
+								'data-bind' => "value : options",
+							),
 							'cols' => 20,
 							'rows' => 10
 						))

@@ -1,10 +1,17 @@
 <?php
+/**
+ * UserFilterWidget.class.php
+ * @author Elvyrra SAS
+ */
 
+/**
+ * This Widget is used to filter the users list by status or role
+ */
 class UserFilterWidget extends Widget{
 	public static $filters = array('status', 'roleId');
 
 	public function getFilters(){
-		$result = json_decode($_COOKIE['user-filter'], true);
+		$result = !empty($_COOKIE['user-filter']) ? json_decode($_COOKIE['user-filter'], true) : array();
 
 		foreach(self::$filters as $name){
 			if(isset($_GET[$name])){

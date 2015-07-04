@@ -17,7 +17,10 @@ class Plugin{
 			$definition = array(),
 			$config = array(),
 			$options = array();
-	private $rootDir;	
+	private $rootDir,
+			$removable,
+			$active;
+	
 	
 	private static $mainPlugins = array('main', 'install', 'admin');
 	private static $instances = array();
@@ -43,7 +46,7 @@ class Plugin{
 			}
 		}
 		else{
-			$this->active = true;
+			$this->active = 1;
 			$this->removable = false;
 		}
 	}
@@ -106,7 +109,8 @@ class Plugin{
 		foreach($dirs as $dir){
 			foreach(glob($dir . '*') as $dir){
 				$name = basename($dir);
-				$plugins[$name] = self::get($name, $config[$name]);
+				$config = isset($configs[$name]) ? $configs[$name] : array();
+				$plugins[$name] = self::get($name, $config);
 			}
 		}
 		

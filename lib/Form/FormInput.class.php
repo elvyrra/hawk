@@ -177,17 +177,26 @@ class FormInput{
      * Define the value defined as "empty", default ""
      */
     public $emptyValue = '';
+
+    /**
+     * Define the class on the label
+     */
+    public $labelClass = '';
+
+    /**
+     * If set to true, then this field won't be searched and updating in the database
+     */
+    public $independant = true;
     
-	
+    const NO_LABEL = false;
+    const INDEPENDANT = false;
     /**
      * Constructor
      * @param array $param The input parameters. This arguments is an associative array where each key is the name of a property of this class     
      */
     public function __construct($param) {
 
-        foreach($param as $key => $value){
-            $this->$key = $value;
-        }
+        $this->setParam($param);
 
 		if(!isset($this->name)){
 			$this->name = $this->field; 
@@ -206,6 +215,21 @@ class FormInput{
 		
         $file = ThemeManager::getSelected()->getView(Form::VIEWS_DIR . 'form-input-' . static::TYPE . '.tpl');
         $this->tpl = is_file($file) ? $file : ThemeManager::getSelected()->getView(Form::VIEWS_DIR . 'form-input.tpl');
+    }
+
+
+    /**
+     * Set the input parameters
+     */
+    public function setParam($param, $value = null){
+        if(is_array($param)){
+            foreach($param as $key => $val){
+                $this->setParam($key, $val);
+            }
+        }
+        else{
+            $this->$param = $value;
+        }
     }
 	
 
@@ -233,7 +257,7 @@ class FormInput{
     			unset($this->errorAt);
     		}
 
-    		$inputLabel = $this->label ? View::make(ThemeManager::getSelected()->getView(Form::VIEWS_DIR . 'form-input-label.tpl'), array(
+    		$inputLabel = ! static::NO_LABEL && $this->label ? View::make(ThemeManager::getSelected()->getView(Form::VIEWS_DIR . 'form-input-label.tpl'), array(
     			'input' => $this
     		)) : '';
     		
@@ -267,7 +291,7 @@ class FormInput{
         // Check, if the field is required, that a value was submitted
 		if(!empty($this->required) && ((string)$this->value == '' || $this->emptyValue && $this->value === $this->emptyValue)){
 			// The field is required but not filled
-			$form && $form->errors[$this->errorAt] = Lang::get('form.required-field');
+			$form && $form->error($this->errorAt, Lang::get('form.required-field'));
 			return false;
 		}
 
@@ -276,7 +300,7 @@ class FormInput{
 			// test the format of the field
 			if(!preg_match($this->pattern, $this->value)){
 				// the format of the field value is not correct				
-				$form && $form->errors[$this->errorAt] = isset($this->errorMessage) ? $this->errorMessage : (Lang::exists('form.'.static::TYPE."-format") ? Lang::get('form.'.static::TYPE."-format") : Lang::get('form.field-format'));
+				$form && $form->error($this->errorAt, isset($this->errorMessage) ? $this->errorMessage : (Lang::exists('form.'.static::TYPE."-format") ? Lang::get('form.'.static::TYPE."-format") : Lang::get('form.field-format')) );
 				return false;
 			}
 		}
@@ -291,7 +315,7 @@ class FormInput{
 			$model = $form->model;
 			if($model::getByExample($example)){
 				// The field must be unique but is not
-				$form->errors[$this->errorAt] = Lang::get('form.unique-field');
+				$form->error($this->errorAt, Lang::get('form.unique-field'));
 				return false;
 			}
 		}
@@ -301,7 +325,7 @@ class FormInput{
 			foreach($this->validators as $validator){
                 $error = '';
 				if(is_callable($validator) && !$validator($this, $error)){
-					$form->errors[$this->errorAt] = $error;
+					$form->error($this->errorAt, $error);
 					return false;
 				}
 			}

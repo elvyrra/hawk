@@ -52,7 +52,7 @@ class MenuItem extends Model{
 		else{
 			// First update the items which order is greater than the one you want to include
 			$sql = 'UPDATE ' . self::$tablename . ' SET  `order` = `order` + 1  WHERE menuId = :menuId AND `order` >= :order';
-			DB::get(self::$dbname)->query($sql, array('order' => $order, 'menuId' => $data['menuId']));
+			DB::get(self::$dbname)->query($sql, array('order' => $data['order'], 'menuId' => $data['menuId']));
 		}
 
 		// Insert the menu item

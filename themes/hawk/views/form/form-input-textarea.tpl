@@ -1,5 +1,5 @@
 <textarea 	{foreach($input::$attr as $attr => $type)}
-				{if($input->$attr)}
+				{if(!empty($input->$attr))}
 					{if($type == "bool")}
 						{{ $attr }} 
 					{elseif($type == "html")}

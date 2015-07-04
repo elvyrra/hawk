@@ -28,7 +28,7 @@ class Option{
 		return isset(self::$options[$plugin]) ? self::$options[$plugin] : false;
 	}
 	
-	public function set($name, $value){
+	public static function set($name, $value){
 		list($plugin, $key) = explode('.', $name);
 		self::$options[$plugin][$key] = $value;
 		
@@ -39,8 +39,8 @@ class Option{
 		));
 	}
 
-	public function delete($name){
+	public static function delete($name){
 		list($plugin, $key) = explode('.', $name);
-		DB::get(MAINDB)	->delete('Option', new DBExample(array('plugin' => $plugin, 'key' => $key)));
+		DB::get(MAINDB)->delete('Option', new DBExample(array('plugin' => $plugin, 'key' => $key)));
 	}
 }

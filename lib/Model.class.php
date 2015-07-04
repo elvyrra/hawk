@@ -234,6 +234,7 @@ class Model{
 
 
 	public function delete(){
+		$class = get_called_class();
 		$id = static::$primaryColumn;
 		$deleted = $this->dbo->delete(static::$tablename, new DBExample(array($id => $this->$id)));
 
