@@ -10,12 +10,12 @@
 			</div>
 		{/if}
 		<div class="row">
-			<div class="col-md-{{ $pageSize }} page-content">			
-				{if(!empty($page))}
-					{{ $page }}
+			<div class="page-content {{ $page['class'] }}">			
+				{if(!empty($page['content']))}
+					{{ $page['content'] }}
 				{/if}
 			</div>
-			<div class="col-md-{{ $sidebar['size'] }} page-sidebar">
+			<div class="page-sidebar {{ $sidebar['class'] }}">
 				{if(!empty($sidebar['widgets']))}
 					{foreach($sidebar['widgets'] as $widget)}
 						{{ $widget->display() }}

@@ -30,7 +30,13 @@ EventManager::trigger(new Event('before-routing'));
 /*** Compute the routage ***/
 Router::route();
 
-EventManager::trigger(new Event('process-end'));
+$event = new Event('process-end'), array(
+	'output' => phpQuery::newDocument(Response::get()), 
+	'execTime' => microtime(true) - SCRIPT_START_TIME
+):
+EventManager::trigger($event);
+
+Response::set($event->getData('output')->htmlOuter());
 
 /*** Return the response to the client ***/
 Response::end();

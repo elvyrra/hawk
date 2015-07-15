@@ -1,22 +1,16 @@
 <?php
 
 class RightSidebarTab extends View{
-	const DEFAULT_CONTENT_SIZE = 10;
-	const DEFAULT_SIDEBAR_SIZE = 2;
-	const MAX_SIZE = 12;
 
-	public static function make($data){
-		if(isset($data['sidebar']['size'])){
-			if($data['sidebar']['size'] > self::MAX_SIZE){
-				$data['sidebar']['size'] = self::DEFAULT_SIDEBAR_SIZE;
-			}
-			$data['pageSize'] = self::MAX_SIZE - $data['sidebar']['size'];
-		}
-		else{
-			$data['pageSize'] = self::DEFAULT_CONTENT_SIZE;
-			$data['sidebar']['size'] = self::DEFAULT_SIDEBAR_SIZE;
+	public static function make($data){		
+		if(!isset($data['sidebar']['class'])){
+			$data['sidebar']['class'] = 'col-md-3 col-lg-2';
 		}
 
+		if(!isset($data['page']['class'])){
+			$data['page']['class'] = 'col-md-9 col-lg-10';
+		}
+		
 		return parent::make(ThemeManager::getSelected()->getView('tabs-layout/tabs-sidebar-right.tpl'), $data);
 	}
 }

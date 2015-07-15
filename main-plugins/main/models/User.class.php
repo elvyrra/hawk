@@ -49,7 +49,7 @@ class User extends Model{
 			$data = DB::get(self::$dbname)->query($sql, array('id' => $this->id), array('return' => DB::RETURN_ARRAY, 'index' => 'name'));			
 			$this->profile = array_map(function($v){ return $v['value']; }, $data);
 		}		
-		return $prop ? $this->profile[$prop] : $this->profile;
+		return $prop ? (isset($this->profile[$prop]) ? $this->profile[$prop] : null) : $this->profile;
 	}
 
 	public function setProfileData($prop, $value){

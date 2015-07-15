@@ -36,10 +36,10 @@ class LanguageController extends Controller{
 		return LeftSidebarTab::make(array(
 			'icon' => 'flag',
 			'title' => Lang::get('language.lang-page-name'),			
-			'page' => $this->compute('editKeys'),
-			// 'page' => $this->editKeys(),
+			'page' => array(
+				'content' => $this->compute('editKeys')
+			),
 			'sidebar' => array(
-				'size' => 2,
 				'widgets' => array(new LanguageFilterWidget($filters), new NewLanguageKeyWidget())
 			),
 			'tabId' => 'language-manage-page'

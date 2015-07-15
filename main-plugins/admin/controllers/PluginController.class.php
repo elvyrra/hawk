@@ -20,7 +20,9 @@ class PluginController extends Controller{
             'sidebar' => array(
                 'widgets' => $widgets,
             ),
-            'page' => $list,            
+            'page' => array(
+                'content' => $list
+            )
         ));
     }    
 
@@ -58,7 +60,7 @@ class PluginController extends Controller{
                                     'label' => Lang::get('admin.delete-plugin-button'),
                                     'icon' => 'close',
                                     'class' => 'btn-danger',
-                                    'href' => Router::getUri('delte-plugin', array('plugin' => $plugin->getName())),
+                                    'href' => Router::getUri('delete-plugin', array('plugin' => $plugin->getName())),
                                     'target' => $actionsTarget,
                                 ))
                             );

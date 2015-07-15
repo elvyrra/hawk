@@ -26,20 +26,15 @@ class MainMenuWidget extends Widget{
 		}
 		
 		$userMenu = $adminMenu = array();
-		// Get the user menu
 		if(Session::logged()){
+			// Get the user menu items
 			$userMenu = array(
-				'myProfile' => array(
+				'my-profile' => array(
 					'icon' => 'user',
 					'url' => Router::getUri('edit-profile', array('userId' => $user->id)),
 					'label' => Lang::get('main.menu-my-profile'),
 					'target' => 'dialog'
-				),
-				// 'editProfile' => array(
-				// 	'icon' => 'pencil',
-				// 	'url' => Router::getUri('UserProfileController.edit', array('userId' => $user->id)),
-				// 	'label' => Lang::get('main.menu-edit-profile'),
-				// ),	
+				),				
 				'change-password' => array(
 					'icon' => 'lock',
 					'url' => Router::getUri('change-password'),
@@ -58,6 +53,7 @@ class MainMenuWidget extends Widget{
 			));
 			$userMenu = $event->getData('menus');
 			
+			// Get the admin menu items
 			$user = Session::getUser();
 			if($user->isAllowed('admin')){
 				

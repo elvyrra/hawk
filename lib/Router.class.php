@@ -89,9 +89,13 @@ class Router{
             	if($route->isAuthValid()){
 					self::$currentRoute = $route;
 					list($classname, $method) = explode(".", $route->action);
-	                
-	                // call a controller method
+
+					// call a controller method
 					$controller = new $classname($route->getData());                              
+
+					// Emit an event, saying the routing action is finished
+					$event = new Event('after-routing', array('controller' => $controller, 'method' => $method, 'args' => $route->getData()));
+					EventManager::trigger($event);
 	                
 					Response::set($controller->compute($method));
 				}
