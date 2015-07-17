@@ -16,7 +16,7 @@ class MainController extends Controller{
 	/**
 	 * Display the main page
 	 * */
-	public function index($body = "", $pages = null){	
+	public function index($body = "", $pages = null){			
 		$canAccessApplication = Session::getUser()->canAccessApplication();		
 		// Get the first plugin to display
 		if($pages === null){
@@ -35,6 +35,7 @@ class MainController extends Controller{
 			'main' => Lang::keys('javascript'),
 			'form' =>  Lang::keys('form')
 		);	
+		
 		if(!$body){
 			$body = View::make($this->theme->getView('body.tpl'), array(
 				'pages' => json_encode($pages),
@@ -43,20 +44,20 @@ class MainController extends Controller{
 		}
 		
 		$labelsJSON = json_encode($labels, JSON_HEX_APOS | JSON_HEX_QUOT);
-		$faviconFile = Option::get('main.favicon') ? Option::get('main.favicon') : Option::get('main.logo');
-		return View::make(Plugin::current()->getView('html-document.tpl'), array(
-			'themeBaseCss' => $this->theme->getBaseCssUrl(),
-			'themeCustomCss' => $this->theme->getCustomCssUrl(),
+
+		return View::make(ThemeManager::getSelected()->getView('html-document.tpl'), array(
+			'themeBaseCss' => ThemeManager::getSelected()->getBaseCssUrl(),
+			'themeCustomCss' => ThemeManager::getSelected()->getCustomCssUrl(),
 			'pages' => json_encode($pages),
-			'mainJsDir' => Plugin::get('main')->getJsUrl(),
-			'mainCssDir' => Plugin::get('main')->getCssUrl(),
+			'mainJsDir' => Plugin::current()->getJsUrl(),
+			'mainCssDir' => Plugin::current()->getCssUrl(),
 			'body' => $body,
 			'langLabels' => $labelsJSON,
-			'favicon' => $faviconFile ? USERFILES_PLUGINS_URL . 'main/' . $faviconFile : ''
+			'favicon' => $this->getFaviconUrl()
 		));
 	}
-	
-	
+
+
 	public function newTab(){
 		if(Option::get('main.home-page-type') == 'custom'){
 			$tmpfile = tempnam('', '');
@@ -84,4 +85,16 @@ class MainController extends Controller{
 		));		
 	}
 
+	/**
+	 * Get the application favicon URL
+	 */
+	public function getFaviconUrl(){
+		$favicon = Option::get('main.favicon') ? Option::get('main.favicon') : Option::get('main.logo');
+		if(empty($favicon)){
+			return Plugin::current()->getStaticUrl() . 'img/hawk-favicon.ico';
+		}
+		else{
+			return USERFILES_PLUGINS_URL . 'main/' . $favicon;
+		}
+	}
 }

@@ -186,7 +186,9 @@ class FormInput{
     /**
      * If set to true, then this field won't be searched and updating in the database
      */
-    public $independant = true;
+    public $independant = false;
+
+    public $insert = true;
     
     const NO_LABEL = false;
     const INDEPENDANT = false;

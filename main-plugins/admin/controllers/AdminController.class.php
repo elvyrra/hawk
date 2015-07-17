@@ -6,10 +6,7 @@ class AdminController extends Controller{
 	
 	public function settings(){		
 		
-		$languages = array();
-		foreach(Language::getAll() as $lang){
-			$languages[$lang->tag] = $lang->label;
-		}
+		$languages = array_map(function($language){ return $language->label; }, Language::getAll('tag'));
 
 		$roleObjects = Role::getListByExample(new DBExample(array(
 			'id' => array('$ne' => 0)

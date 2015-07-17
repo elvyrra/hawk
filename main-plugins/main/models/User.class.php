@@ -11,7 +11,7 @@ class User extends Model{
 	
 	public function __construct($data = array()){
 		parent::__construct($data);
-		if($this->roleId){
+		if(!empty($this->roleId)){
 			$this->role = Role::getById($this->roleId);		
 		}
 	}

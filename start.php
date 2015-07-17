@@ -7,8 +7,15 @@ require INCLUDES_DIR . 'config.php';
 require INCLUDES_DIR . 'functions.php';
 require INCLUDES_DIR . 'error-handler.php';
 
+define("ROOT_URL", Conf::get('rooturl') ? Conf::get('rooturl') . '/' : '');
 
-define("ROOT_URL", Conf::get('rooturl') . '/');
+/*** Define the main paths ***/
+define('THEMES_ROOT_URL', ROOT_URL . 'themes/');
+define('PLUGINS_ROOT_URL', ROOT_URL . 'plugins/');
+
+define('USERFILES_ROOT_URL', ROOT_URL . 'userfiles/');
+define('USERFILES_PLUGINS_URL', USERFILES_ROOT_URL . 'plugins/');
+define('USERFILES_THEMES_URL', USERFILES_ROOT_URL . 'themes/');
 
 if(Conf::has('db')){
     /*** Access to the OS database (MySQL) ***/   
@@ -21,24 +28,16 @@ if(Conf::has('db')){
         exit(DEBUG_MODE ? $e->getMessage() : Lang::get('main.connection-error'));
     }
 }
-
 /*** Get the session system ***/
-define('SESSION_SYSTEM', Conf::get('session.system'));
+define('SESSION_SYSTEM', Conf::has('session.system') ? Conf::get('session.system') : DEFAULT_SESSION_ENGINE);
 
 /*** Constants depending to the options ***/
-Option::getPluginOptions('main');
-define("LANGUAGE", Option::get('main.language'));
+define("LANGUAGE", Conf::has('db') && Option::get('main.language') ? Option::get('main.language') : Lang::DEFAULT_LANGUAGE);
     
 /*** Timezone ***/
-define("TIMEZONE", Option::get('main.timezone'));
+define("TIMEZONE", Conf::has('db') && Option::get('main.timezone') ? Option::get('main.timezone')  : DEFAULT_TIMEZONE);
 date_default_timezone_set(TIMEZONE);
 
-/*** Define the main paths ***/
-define('THEMES_ROOT_URL', ROOT_URL . 'themes/');
-define('PLUGINS_ROOT_URL', ROOT_URL . 'plugins/');
 
-define('USERFILES_ROOT_URL', ROOT_URL . 'userfiles/');
-define('USERFILES_PLUGINS_URL', USERFILES_ROOT_URL . 'plugins/');
-define('USERFILES_THEMES_URL', USERFILES_ROOT_URL . 'themes/');
 
 ?>

@@ -1,8 +1,4 @@
 <?php
-if(NO_CACHE){
-	Plugin::get('admin')->importLanguageFiles();
-}
-
 Router::auth(Request::isAjax() && Session::logged(), function(){
 	/*** Application settings ***/
 	Router::any('main-settings', '/admin/settings', array('auth' => Session::isAllowed('admin.all'), 'action' => 'AdminController.settings'));
@@ -25,7 +21,7 @@ Router::auth(Request::isAjax() && Session::logged(), function(){
 		// Add / Edit a role
 		Router::any('edit-role', '/admin/roles/{roleId}', array('where' => array('roleId' => '\-?\d+'), 'action' => 'RoleController.edit'));
 		// Remove a role
-		Router::get('delete-role', '/admin/roles/{roleId}/remove', array('where' => array('roleId' => '\d+'), 'action' => 'RoleController.remove'));		
+		Router::get('delete-role', '/admin/roles/{roleId}/remove', array('where' => array('roleId' => '\-?\d+'), 'action' => 'RoleController.remove'));		
 		// Manage the permission of a role
 		Router::any('role-permissions', '/admin/roles/{roleId}/permissions', array('where' => array('roleId' => '\d+'), 'action' => 'PermissionController.index'));
 

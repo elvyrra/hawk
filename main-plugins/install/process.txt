@@ -1,3 +1,11 @@
+Dans le formulaire, demander :
+    La langue du site (proposer Français et Anglais)
+    L'URL du site (à voir pour la calculer)
+    Le dbhost, username, password, et nom de base
+    Le timezone (autodétection par défaut)
+
+
+
 1. Créer la base
 2. Créer toutes les tables
 3. Insérer l'anglais et le français (+ clés de langues)
@@ -9,5 +17,5 @@
 	admin.manage
 6. Insérer les roles Guest et Admin
 7. Insérer l'utilsateur guest en id=0, et le premier utilisateur de rôle admin
-8. Insérer le lient entre le role Admin et la permission admin.manage
+8. Insérer le lien entre le role Admin et la permission admin.manage
 9. Si fichier package.json fourni, installation des différents plugins et thèmes

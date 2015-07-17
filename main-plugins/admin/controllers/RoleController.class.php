@@ -147,7 +147,7 @@ class RoleController extends Controller{
 				"independant" => true,
 				'required' => $language->tag == LANGUAGE,
 				"label" => Lang::get("roles.role-label-label", array('lang' => $language->tag)),
-				"default" => Lang::get("roles.role-" . $this->roleId . "-label", array(), 0, $language->tag)
+				"default" => Lang::exists("roles.role-" . $this->roleId . "-label") ? Lang::get("roles.role-" . $this->roleId . "-label", array(), 0, $language->tag) : ''
 			));
 		}
 		

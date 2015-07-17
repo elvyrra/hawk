@@ -446,7 +446,7 @@ class LanguageController extends Controller{
 
 						// Check the content of the file is valid
 						$tmpfile = $_FILES['files']['tmp_name'][$i];
-						if(($translations = parse_ini_file($filename)) === false){
+						if(($translations = parse_ini_file($tmpfile)) === false){
 							throw new Exception(Lang::get('language.import-file-format-error'));
 						}
 

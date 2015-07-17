@@ -195,6 +195,14 @@ class Form{
 	            }
 	        }
         }
+        else{
+        	$this->addFieldset(new FormFieldset($this, 'form'));
+        	foreach($this->fields as &$field){
+        		if($field instanceof FormInput){
+        			$this->addInput($field, 'form');
+        		}
+        	}
+        }
 
 		// get the data of the form to display or register
         $this->reload();		
@@ -490,8 +498,10 @@ class Form{
 				$model = $this->model; 
 				$this->object = new $model();
 			}
-			$this->object->set($this->reference);
-						
+			else{
+				$this->object->set($this->reference);
+			}
+				
 			foreach($this->fields as $name => $field){								
 				/* Determine if we have to insert this field in the set of inserted values
 				 * A field can't be inserted if :
@@ -505,7 +515,6 @@ class Form{
 				}									
 			}
 
-						
 			if(!$this->new){							
 				$this->object->update();
 			}

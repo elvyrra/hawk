@@ -177,22 +177,22 @@ class Model{
     
 
 
-	public function save(){
-		
+	public function save(){		
 		$insert = $this->prepareDatabaseData();
-        $onduplicate = implode(', ', array_map(function($key){
+        $duplicateUpdates = array_map(function($key){
 			if($key == static::$primaryColumn){
 				return "`$key`=LAST_INSERT_ID(`$key`)";
 			}
 			else{
             	return "`$key` = VALUES(`$key`)";
 			}
-        }, array_keys($insert)));
+        }, array_keys($insert));
         
 		if(!isset($insert[static::$primaryColumn])){
 			$key = static::$primaryColumn;
-			$onduplicate .= ", `$key`=LAST_INSERT_ID(`$key`)";
+            $duplicateUpdates[] = "`$key`=LAST_INSERT_ID(`$key`)";			
 		}
+        $onduplicate = implode(', ', $duplicateUpdates);
         
         $lastid = $this->dbo->insert(static::$tablename, $insert, '', $onduplicate);
         if($lastid){

@@ -16,7 +16,7 @@ class ThemeManager{
     }
     
     public static function getSelected(){
-        return self::get(Option::get('main.selected-theme'));
+        return self::get(Conf::has('db') ? Option::get('main.selected-theme') : self::DEFAULT_THEME);
     }
     
     public static function setSelected($name){

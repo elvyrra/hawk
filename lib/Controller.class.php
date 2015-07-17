@@ -20,8 +20,7 @@ class Controller{
 	const BEFORE_ACTION = 'before';
     const AFTER_ACTION = 'after';
 	
-	public function __construct($param = array()){
-		$this->dbo = DB::get('main');
+	public function __construct($param = array()){		
 		foreach($param as $key => $value){
 			$this->$key = $value;
 		}	
