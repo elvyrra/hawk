@@ -16,41 +16,21 @@ class MainController extends Controller{
 	/**
 	 * Display the main page
 	 * */
-	public function index($body = "", $pages = null){			
-		$canAccessApplication = Session::getUser()->canAccessApplication();		
-		// Get the first plugin to display
-		if($pages === null){
-			$pages = array();
-			if(Session::logged() && Option::get('main.open-last-tabs') && !empty($_COOKIE['open-tabs'])){
-				// Open the last tabs the users opened before logout
-				$pages = json_decode($_COOKIE['open-tabs'], true);
-			}
-			
-			if(empty($pages) && $canAccessApplication){
-				$pages[] = Router::getUri('MainController.newTab');
-			}			
-		}
-				
+	public function index($body){			
 		$labels = array(
 			'main' => Lang::keys('javascript'),
 			'form' =>  Lang::keys('form')
-		);	
-		
-		if(!$body){
-			$body = View::make($this->theme->getView('body.tpl'), array(
-				'pages' => json_encode($pages),
-				'canAccessApplication' => $canAccessApplication
-			));		
-		}
-		
+		);			
 		$labelsJSON = json_encode($labels, JSON_HEX_APOS | JSON_HEX_QUOT);
 
+		$title = Conf::has('db') ? Option::get('main.title') : DEFAULT_HTML_TITLE;
+
 		return View::make(ThemeManager::getSelected()->getView('html-document.tpl'), array(
+			'title' => $title,
 			'themeBaseCss' => ThemeManager::getSelected()->getBaseCssUrl(),
 			'themeCustomCss' => ThemeManager::getSelected()->getCustomCssUrl(),
-			'pages' => json_encode($pages),
-			'mainJsDir' => Plugin::current()->getJsUrl(),
-			'mainCssDir' => Plugin::current()->getCssUrl(),
+			'mainJsUrl' => Plugin::current()->getJsUrl(),
+			'mainCssUrl' => Plugin::current()->getCssUrl(),
 			'body' => $body,
 			'langLabels' => $labelsJSON,
 			'favicon' => $this->getFaviconUrl()
@@ -58,18 +38,45 @@ class MainController extends Controller{
 	}
 
 
-	public function newTab(){
-		if(Option::get('main.home-page-type') == 'custom'){
-			$tmpfile = tempnam('', '');
-			file_put_contents($tmpfile, Option::get('main.home-page-html'));
-			$page = View::make($tmpfile);
+	public function main(){
+		$canAccessApplication = Session::getUser()->canAccessApplication();		
 
-			return '<input type="hidden" class="page-name" value="' . htmlentities(Lang::get('main.new-tab-page-name'), ENT_QUOTES) . '" />'.
-					$page;
+		$pages = array();
+		if(Session::logged() && Option::get('main.open-last-tabs') && !empty($_COOKIE['open-tabs'])){
+			// Open the last tabs the users opened before logout
+			$pages = json_decode($_COOKIE['open-tabs'], true);
 		}
-		else{
-			Request::redirect(Option::get('main.home-page-item'));
+		
+		if(empty($pages) && $canAccessApplication){
+			$pages[] = Router::getUri('new-tab');
 		}
+
+		$body = View::make($this->theme->getView('body.tpl'), array(
+			'pages' => json_encode($pages),
+			'canAccessApplication' => $canAccessApplication
+		));	
+
+		return $this->index($body);
+	}
+
+
+	public function newTab(){
+		switch(Option::get('main.home-page-type')){
+			case 'custom' :
+				$tmpfile = tempnam('', '');
+				file_put_contents($tmpfile, Option::get('main.home-page-html'));
+				$page = View::make($tmpfile);
+
+				return '<input type="hidden" class="page-name" value="' . htmlentities(Lang::get('main.new-tab-page-name'), ENT_QUOTES) . '" />'. $page;
+			break;
+
+			case 'page' :
+				Response::redirect(Option::get('main.home-page-item'));
+			break;
+
+			default :
+				return '<input type="hidden" class="page-name" value="' . htmlentities(Lang::get('main.new-tab-page-name'), ENT_QUOTES) . '" />';
+		}		
 	}
 	
 	public function page404(){
@@ -89,7 +96,10 @@ class MainController extends Controller{
 	 * Get the application favicon URL
 	 */
 	public function getFaviconUrl(){
-		$favicon = Option::get('main.favicon') ? Option::get('main.favicon') : Option::get('main.logo');
+		if(Conf::has('db')){
+			$favicon = Option::get('main.favicon') ? Option::get('main.favicon') : Option::get('main.logo');
+		}
+
 		if(empty($favicon)){
 			return Plugin::current()->getStaticUrl() . 'img/hawk-favicon.ico';
 		}

@@ -160,13 +160,11 @@ Tabset.prototype.getNextTab = function(id){
 };
 
 Tabset.prototype.registerTabs = function(){	
-	if (app.isConnected) {
-		var data = [];
-		for(var i in this.tabs){
-			data.push(this.tabs[i].url);
-		}
-		$.cookie('open-tabs', JSON.stringify(data), {expire : 365, path : '/'});
-	}			
+	var data = [];
+	for(var i in this.tabs){
+		data.push(this.tabs[i].url);
+	}
+	$.cookie('open-tabs', JSON.stringify(data), {expire : 365, path : '/'});
 };
 
 Tabset.prototype.getTabsNumber = function(){

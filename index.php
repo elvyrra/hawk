@@ -8,7 +8,7 @@ define('INCLUDES_DIR', ROOT_DIR . 'includes/');
 require ROOT_DIR . 'start.php';
 
 /*** Open the session ***/
-$sessionInterface = ucfirst(SESSION_SYSTEM) . 'Session';
+$sessionInterface = ucfirst(SESSION_ENGINE) . 'Session';
 if(!empty($sessionInterface)){
 	$handler = new $sessionInterface();
 	session_set_save_handler($handler);

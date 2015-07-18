@@ -346,7 +346,7 @@ App.prototype.dialog = function(action){
 	}.bind(this));			
 };
 
-App.prototype.getUri = function(method, args){		
+App.prototype.getUri = function(method, args){			
 	var route = null;
 	if(method in this.routes){
 		route = this.routes[method];

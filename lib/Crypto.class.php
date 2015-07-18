@@ -37,4 +37,19 @@ class Crypto{
 	public static function saltHash($password, $salt = CRYPTO_SALT){
 		return sha1($salt . $password . $salt);
 	}
+
+
+	/**
+	 * Generate random key 
+	 * @param int $length The length of the generated key
+	 * @return string the generated key
+	 */
+	public function generateKey($length){
+		$result = '';
+		for ($i=0; $i < $length; $i++) { 
+			$result .= chr(mt_rand(32,127));
+		}
+
+		return $result;
+	}
 }

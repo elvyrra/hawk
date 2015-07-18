@@ -3,11 +3,14 @@
 require INCLUDES_DIR . 'constants.php';
 require INCLUDES_DIR . 'custom-constants.php';
 require INCLUDES_DIR . 'autoload.php';
+if(!is_file(INCLUDES_DIR . 'config.php')){
+	touch(INCLUDES_DIR . 'config.php');
+}
 require INCLUDES_DIR . 'config.php';
 require INCLUDES_DIR . 'functions.php';
 require INCLUDES_DIR . 'error-handler.php';
 
-define("ROOT_URL", Conf::get('rooturl') ? Conf::get('rooturl') . '/' : '');
+define("ROOT_URL", (string) Conf::get('rooturl') . '/');
 
 /*** Define the main paths ***/
 define('THEMES_ROOT_URL', ROOT_URL . 'themes/');
@@ -29,7 +32,7 @@ if(Conf::has('db')){
     }
 }
 /*** Get the session system ***/
-define('SESSION_SYSTEM', Conf::has('session.system') ? Conf::get('session.system') : DEFAULT_SESSION_ENGINE);
+define('SESSION_ENGINE', Conf::has('session.engine') ? Conf::get('session.engine') : DEFAULT_SESSION_ENGINE);
 
 /*** Constants depending to the options ***/
 define("LANGUAGE", Conf::has('db') && Option::get('main.language') ? Option::get('main.language') : Lang::DEFAULT_LANGUAGE);

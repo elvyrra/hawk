@@ -61,7 +61,13 @@ class Theme{
 			$css = file_get_contents($this->getBaseCssFile());
             
 			// Get the theme options
-			$options = Option::getPluginOptions('theme-' . $this->name);
+            if(Conf::has('db')){
+                $options = Option::getPluginOptions('theme-' . $this->name);
+            }
+            else{
+                $options = array();
+            }
+
 
 			// Replace the variables
             $variables = $this->getCssVariables($css);

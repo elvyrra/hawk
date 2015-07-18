@@ -1,0 +1,31 @@
+set-language-title = "Hawk installation"
+set-language-label = "Choose your language"
+continue-button = "Continue" 
+
+settings-global-legend = "General data"
+settings-title-label = "Application title"
+settings-rooturl-label = "Application URL"
+settings-timezone-label = "Your timezone"
+settings-session-label = "Session engine"
+settings-session-file-value = "File"
+settings-session-file-value = "Database"
+settings-version-label = "Version"
+
+
+settings-database-legend = "Database connection"
+settings-db-host-label = "Host"
+settings-db-username-label = "Username"
+settings-db-password-label = "Password"
+settings-db-dbname-label = "The database name (if not exists yet, will be created)"
+
+settings-admin-legend = "Administrator"
+settings-admin-login-label = "Login"
+settings-admin-email-label = "Email"
+settings-admin-password-label = "Password"
+settings-admin-passagain-label = "Retype your password"
+
+
+install-button = "Install Hawk"
+
+install-error = "An error occured while installing your Hawk instance"
+install-success = "Hawk has been successfully installed"

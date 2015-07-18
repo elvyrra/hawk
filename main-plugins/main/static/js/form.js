@@ -20,7 +20,7 @@ var Form = function(id, fields){
 	var self = this;
 	this.node.submit(function(event){
 		/*** Prevent default browser behavior ***/
-		event.preventDefault();		
+		// event.preventDefault();		
 		
 		return self.submit();
 	});
