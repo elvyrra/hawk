@@ -1,15 +1,6 @@
-/*********************************************************************
- *    						app.js
- *
- *
- * Author:   Julien Thaon & Sebastien Lecocq 
- * Date: 	 Jan. 01, 2014
- * Copyright: ELVYRRA SAS
- *
- * This file is part of Mint's project.
- *
- *
- **********************************************************************/
+/**
+ * @class App - This class describes the behavior of the application 
+ */
 var App = function(){
 	this.language = '';
 	this.rootUrl = '';
@@ -23,6 +14,12 @@ var App = function(){
 	this.readyCallbacks = [];
 	
 	this.isReady = false;
+
+	this.notification = {
+		display : ko.observable(false),
+		level : ko.observable(),
+		message : ko.observable()
+	}
 
 	this.init();
 };
@@ -69,6 +66,7 @@ App.prototype.require = function(scripts, callback){
 App.required = [
 	"extends.js",
 	"date.js",
+	"view.js",
 	"tabs.js",
 	"form.js",
 	"list.js",
@@ -76,26 +74,31 @@ App.required = [
 ];
 
 /**
+ * @const {string} INVALID_URI - The URI to return for non existing route
+ */
+App.INVALID_URI = '/INVALID_URI';
+
+/**
  * Initialize the application 
  */
 App.prototype.init = function(){
 	this.require(App.required, function(){			
 
-		dispatchEvent(new Event("app-ready"));
-		
 		this.tabset = new Tabset();
 		var self = this;
-		$("body").on('click', '[href]:not(.real-link):not([href^="#"])', function(event){
+
+		/**
+		 * Call URIs by AJAX on click on links
+		 */
+		$("body").on('click', '[href]:not(.real-link):not([href^="#"]):not([href^="javascript:"])', function(event){
 			var node = $(event.currentTarget);
 			var url = $(node).attr('href');
-			if (url.match(/^javascript\:/)) {
-				return true;
-			}
-			
-			event.preventDefault();		
+						
+			event.preventDefault();
 			var data = {};
-			
-			switch($(node).attr('target')) {
+
+			var target = $(node).attr('target');
+			switch(target) {
 				case 'newtab' :
 					// Load the page in a new tab of the application
 					data = {newtab : true};
@@ -122,24 +125,11 @@ App.prototype.init = function(){
 					this.load(url, {selector : $(node).attr('target')});
 					break;
 			}	
-			
-			// return false;
 		}.bind(this))
 		
-		.on('click', ".main-tabs-close", function(event){
-			this.tabset.remove($(event.currentTarget).data('tab'));
-		}.bind(this))
-
-		.on("change", ":file", function(event){
-			var node = event.currentTarget;
-			if(node.files.length){
-				$(node).next(".input-file-invitation").removeClass("btn-default").addClass("file-chosen btn-success");				
-			}
-			else{
-				$(node).next(".input-file-invitation").removeClass("file-chosen btn-success").addClass("btn-default");
-			}
-		}.bind(this));
-		
+		/**
+		 * Treat back button 
+		 */
 		window.onpopstate = function(event){
 			event.preventDefault();
 			if(self.tabset.getActiveTab()){
@@ -156,45 +146,63 @@ App.prototype.init = function(){
 		};
 
 		this.loading = {
+			display : ko.observable(true),
+			progressing : ko.observable(false),
+			purcentage : ko.observable(0),
+
+			/**
+			 * Display loading
+			 */
 			start : function(){
-				$('#loading').show();
+				this.display(true);
 			},
 
+			/**
+			 * show loading progression
+			 */
 			progress : function(purcentage){
-				$("#loading-purcentage").css("width", purcentage+"%");
-				if(purcentage){
-					$("#loading-bar").addClass("progressing");
-				}
-				else{
-					$("#loading-bar").removeClass("progressing");	
-				}
+				this.purcentage(purcentage);
+				this.progressing(purcentage ? true : false);
 			},	
 			
+			/**
+			 * Hide loading 
+			 */
 			stop : function(){
-				$('#loading').hide();
-				this.progress(0);
+				this.display(false);
+				this.progress(0);				
 			}
 		};
+
+		dispatchEvent(new Event("app-ready"));
+		
 	}.bind(this));
 
+
+	/**
+	 * Customize app HttpRequestObject
+	 */
 	this.xhr = function(){
 		var xhr = new window.XMLHttpRequest();
-        xhr.upload.addEventListener("progress", function(evt) {
-            if (evt.lengthComputable) {
+        
+        this.computeProgession = function(evt){
+        	if (evt.lengthComputable) {
                 var percentComplete = parseInt(evt.loaded / evt.total * 100);
                 //Do something with upload progress here
                 window.app.loading.progress(percentComplete);
             }
-        });	 
+        }
 
-        xhr.addEventListener("progress", function(evt) {
-	        if (evt.lengthComputable) {
-	            var percentComplete = parseInt(evt.loaded / evt.total * 100);
-                //Do something with upload progress here
-                window.app.loading.progress(percentComplete);
-        	}
-       	}, false);       
+        /**
+         * Compute progression on upload AJAX requests
+         */
+        xhr.upload.addEventListener("progress", this.computeProgession);
 
+        /**
+         * Compute progression on AJAX requests
+         */
+        xhr.addEventListener("progress", this.computeProgession);
+	        
         return xhr;
 	}.bind(this);
 };
@@ -217,26 +225,37 @@ App.prototype.ready = function(callback){
 	
 };
 
+
+/**
+ * Load a page in the current step, or a new step, or a given html node
+ * @param {string} url The url to load
+ * @param {object} data, the options. This object can hasve the following data :
+  	- newtab (default false) : if set to true, the page will be loaded in a new tab of the application
+  	- onload (default null) : A callback function to execute when the page is loaded
+  	- post (default null) : an object of POST data to send in the URL
+ */
 App.prototype.load = function(url, data){
 	/*** Default options ***/
 	var options = {			
 		newtab : false,
-		callback : null,
+		onload : null,
 		post : null
 	};
 	
-	for(var i in data)
+	for(var i in data){
 		options[i] = data[i];
+	}
 		
 	if(url){					            
-		/*** WE FIRST CHECK THAT PAGE DOES NOT ALREADY EXIST IN A TAB ***/
+		/*** we first check that page does not already exist in a tab ***/
 		if(url != this.getUri('MainController.newTab')){				
-			for(var i in this.tabset.tabs){
-				if (this.tabset.tabs[i].url == url) {						
+			for(var i= 0; i < this.tabset.tabs().length; i++){
+				if (this.tabset.tabs()[i].url() == url) {
 					if (i !== this.tabset.getActiveTab().id) {
 						this.tabset.activateTab(i);
 					}
-					// return false;
+					options.newtab = false;
+					break;
 				}
 			}
 		}
@@ -247,8 +266,9 @@ App.prototype.load = function(url, data){
         if(options.newtab){
             this.tabset.push();
         }
-		if(!options.selector)
+		if(!options.selector){
 			options.selector = this.tabset.getActiveTab().getPaneNode();
+		}
         
 		/*** DETERMINE THE NODE THAT WILL BE LOADED THE PAGE ***/			
 		if($(options.selector).length){
@@ -261,15 +281,16 @@ App.prototype.load = function(url, data){
 			.done(function(response){					
 				this.loading.stop();
 				
-				$(options.selector).html(response);
 				if($(options.selector).get(0) == this.tabset.getActiveTab().getPaneNode().get(0)){
 					// The page has been loaded in a whole tab
 					// Register the tab url
 					var activeTab = this.tabset.getActiveTab();
-					activeTab.setUrl(url);
+					activeTab.url(url);
+
+					activeTab.content(response);
 					
 					// Set the tab title
-					activeTab.setTitle($(options.selector).find(".page-name").first().val());
+					activeTab.title($(options.selector).find(".page-name").first().val());
 					
 					// Regiter the tabs in the cookie
 					this.tabset.registerTabs();
@@ -278,6 +299,9 @@ App.prototype.load = function(url, data){
 					this.tabset.getActiveTab().history.push(url);
 					
 					history.pushState({}, '', "#!" + url);
+				}
+				else{
+					$(options.selector).html(response);
 				}
 
 				if(options.onload){
@@ -289,14 +313,14 @@ App.prototype.load = function(url, data){
 			.fail(function(xhr, status, error){
 				var code = xhr.status;
 				var message = xhr.responseText;
-				this.advert("danger", message);
+				this.notify("danger", message);
 				this.loading.stop();				
 			}.bind(this));
 		}
 		else{
 	        /*** The selector to home the loaded url doesn't exist ***/
 			this.loading.stop();
-			this.advert("danger", Lang.get('main.loading-page-error'));
+			this.notify("danger", Lang.get('main.loading-page-error'));
 		}			
 	}
 	else{
@@ -304,23 +328,72 @@ App.prototype.load = function(url, data){
 	}
 };
 
-App.prototype.advert = function(state, message){
-	var classname = "alert-"+state;
-			
-	$("#advert-message").remove();
-	$('body').prepend(	"<div id='advert-message' class='alert "+classname+"' onclick='$(this).hide(\"slow\", function(){ $(this).remove() });'>"+								
-							"<span>"+message+"</span>"+
-							"<span class='close' onclick='$(this).parent().hide(\"slow\", function(){ $(this).remove() });'>&times</span>"+
-						"</div>");		
-	$("#advert-message").show("slow");
-	if(state != "danger"){
-		setTimeout(function(){
-			$("#advert-message .close").trigger("click");
-		}, 3500);
+
+/**
+ * Open a set of pages 
+ */
+App.prototype.openLastTabs = function(uris){
+	if(!uris.length){
+		// No more tab has to be open
+		return;
 	}
 
+	var uri = uris.shift();
+	app.load(uri, {
+		newtab : true,
+		onload : this.openLastTabs.bind(this, uris)
+	});	
 };
 
+
+/**
+ * Display a notification on the application or on the user desktop
+ * @param {string} level - The notification level (info, success, warning, danger or desktop)
+ * @param {string} message - The message to display in the notification
+ * @parma {object} options - The options for desktop notifications
+ */
+App.prototype.notify = function(level, message, options){
+	if(level == "desktop"){
+		// this is a desktop notification
+		if(! ('Notification' in window)){
+			this.notify('success', message);
+		}
+		else if(Notification.permission === 'granted'){
+			var notification = new Notification(message, options);
+		}
+		else if(Notification.permission !== 'denied'){
+			// Ask for user permission to display notifications
+			Notification.requestPermission(function(permission){
+				Notification.permission = permission;
+
+				this.notify(level, message, options);
+			}.bind(this));
+		}
+	}
+	else{
+		// Display an advert message in the application
+		this.notification.display(true);
+		this.notification.message(message);
+		this.notification.level(level);
+		
+		if(level != "danger"){
+			this.notification.timeout = setTimeout(function(){
+				this.hideNotification();
+			}.bind(this), 3500);
+		}	
+	}
+};
+
+App.prototype.hideNotification = function(){
+	clearTimeout(this.notification.timeout);
+	this.notification.display(false);
+}
+
+
+/**
+ * Load a URL in a dialog box
+ * @param {string} action - The action to perform. If "close", it will wlose the current dialog box, else it will load the action in the dialog box and open it
+ */
 App.prototype.dialog = function(action){
 	$("#dialogbox").empty();
 	if(action == "close"){			
@@ -342,10 +415,17 @@ App.prototype.dialog = function(action){
 	.fail(function(xhr, status, error){
 		var code = xhr.status;
 		var message = xhr.responseText;
-		this.advert("danger", message);
+		this.notify("danger", message);
 	}.bind(this));			
 };
 
+
+/**
+ * Get uri for a given route name or the controller of the route
+ * @param {string} method - The route name or the controller method executed by this route
+ * @param {object} args - The route parameters
+ * @return {string} - the computed URI
+ */
 App.prototype.getUri = function(method, args){			
 	var route = null;
 	if(method in this.routes){
@@ -370,20 +450,56 @@ App.prototype.getUri = function(method, args){
 		return url;
 	}
 	else{
-		return '/INVALID_URL';
+		return App.INVALID_URI;
 	}
 };
 
+
+/**
+ * Set the existing routes of the application 
+ * @param {object} routes - The routes to set
+ */
 App.prototype.setRoutes = function(routes){
 	this.routes = routes;
 };
 
+
+/**
+ * Set the language of the application
+ * @param {string} language - The language tag
+ */
 App.prototype.setLanguage = function(language){
 	this.language = language;
 };
 
+
+/**
+ * Set the root url of the application 
+ * @param {string} url - The root url to set
+ */
 App.prototype.setRootUrl = function(url){
 	this.rootUrl = url;
 };
 
-var app = new App();    
+window.app = new App(); 
+
+app.ready(function(){
+	ko.bindingProvider.instance.preprocessNode = function(node) {
+	    // Only react if this is a comment node of the form <!-- template: ... -->
+	    if (node.nodeType == 8) {
+	        var match = node.nodeValue.match(/^\s*(template\s*:[\s\S]+)/);
+	        if (match) {
+	            // Create a pair of comments to replace the single comment
+	            var c1 = document.createComment("ko " + match[1]),
+	                c2 = document.createComment("/ko");
+	            node.parentNode.insertBefore(c1, node);
+	            node.parentNode.replaceChild(c2, node);
+	 
+	            // Tell Knockout about the new nodes so that it can apply bindings to them
+	            return [c1, c2];
+	        }
+	    }
+	}
+
+	ko.applyBindings(app, $("body").get(0));   
+});

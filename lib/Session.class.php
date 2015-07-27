@@ -9,7 +9,7 @@
  * the session management (manage licences, number of simultaneous connections, ...)
  */
 trait Session{
-	static $logged, $admin, $root, $user;
+	static $connected, $admin, $root, $user;
 	
 	public static function getUser(){
 		if(isset(self::$user)){
@@ -22,18 +22,18 @@ trait Session{
 		return self::$user;
 	}
 	
-	/*_____________________________________________________________
-		
-		Function that returns if the current user is correctly 
-		logged and has right to be logged
-	_____________________________________________________________*/
-	public static function logged(){
-		if(isset(self::$logged))
-			return self::$logged;
+	/**
+	 * Returns if the current user is connected or not
+	 * @return bool true if the user is connected, else returns false
+	 */
+	public static function isConnected(){
+		if(isset(self::$connected)){
+			return self::$connected;
+		}
 		
 		/*** Test the session ***/		
 		if(empty($_SESSION['user'])){	
-			self::$logged = false;
+			self::$connected = false;
 		}
 		elseif(isset($_SESSION['user']['ip']) && $_SESSION['user']['ip'] != Request::clientIp()){
 			return false;
@@ -41,9 +41,9 @@ trait Session{
 		else{		
 			/*** The session is not empty . Check the coherency between the user id and
 				company Id, and with the rights ***/				
-			self::$logged = self::getUser() && self::getUser()->isConnected();
+			self::$connected = self::getUser() && self::getUser()->isConnected();
 		}
-		return self::$logged;
+		return self::$connected;
 	}
 
 	public static function isAllowed($action){

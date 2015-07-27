@@ -10,7 +10,4 @@ permissions-update-error = "Une erreur est survenue pendant la mise à jour des 
 permissions-update-success = "Les autorisations ont été mise à jour."
 role-0-label = "Invité"
 role-1-label = "Administrateur"
-role-11-label = "Utilisateur"
 role-label-label = "Nom du rôle ({lang})"
-role--1-label = "Développeur"
-role-12-label = "Développeur"

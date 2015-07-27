@@ -138,7 +138,7 @@ class QuestionController extends Controller{
 		$q = ProfileQuestion::getByName($this->name);
 		if(!$q || $q->editable){
 			
-			$allowedTypes = array('text', 'textarea', 'checkbox', 'radio', 'select', 'datetime', 'file');
+			$allowedTypes = ProfileQuestion::$allowedTypes;
 			$param = array(
 				'id' => 'profile-question-form',
 				'model' => 'ProfileQuestion',

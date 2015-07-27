@@ -19,8 +19,6 @@ class Model{
 				$this->dbvars[] = $key;
 			}
 		}
-        
-        $this->dbo = DB::get(static::$dbname);
     }
     
 
@@ -52,7 +50,7 @@ class Model{
 	 * @return {Model} - the model found
 	 */
 	public static function getByExample(DBExample $example, $fields = array()){
-        return DB::get(static::$dbname)->select(array(
+        return self::getDbInstance()->select(array(
             'fields' => $fields,
             'from' => static::$tablename,
             'where' => $example,
@@ -71,7 +69,7 @@ class Model{
 	 * @return {array[Model]} - the array containing found models
 	 */
     public static function getListByExample(DBExample $example, $index = null, $fields = array(), $order = array()){
-		return DB::get(static::$dbname)->select(array(
+		return self::getDbInstance()->select(array(
             'fields' => $fields,
 			'from' => static::$tablename,
 			'where' => $example,
@@ -90,7 +88,7 @@ class Model{
 	 * @return {Model} - the model found
 	 */
 	public static function getBySQL($where, $binds = array(), $fields = array()){
-		return DB::get(static::$dbname)->select(array(
+		return self::getDbInstance()->select(array(
             'fields' => $fields,
             'from' => static::$tablename,
             'where' => $where,
@@ -111,7 +109,7 @@ class Model{
 	 * @return {array[Model]} - the array containing found models
 	 */
     public static function getListBySQL($where, $binds = array(), $index = null, $fields = array(), $order = array()){
-		return DB::get(static::$dbname)->select(array(
+		return self::getDbInstance()->select(array(
             'fields' => $fields,
 			'from' => static::$tablename,
 			'where' => $where,
@@ -129,7 +127,7 @@ class Model{
 	 * @param {DBExample} $example - The example to find the lines to delete
 	 */
 	public static function deleteByExample(DBExample $example){
-		return DB::get(static::$dbname)->delete(static::$tablename, $example);
+		return self::getDbInstance()->delete(static::$tablename, $example);
 	}
 	
 	/**
@@ -138,7 +136,7 @@ class Model{
 	 * @param {array} $binds - The binded values
 	 */
 	public static function deleteBySQL($where, $binds = array()){
-		return DB::get(static::$dbname)->delete(static::$tablename, $where, $binds);
+		return self::getDbInstance()->delete(static::$tablename, $where, $binds);
 	}
 	
 	
@@ -148,7 +146,7 @@ class Model{
 	 * @param {array} $group - The fields used to group the results
 	 */
     public static function countElementsByExample(DBExample $example, $group = array()){
-		return DB::get(static::$dbname)->count(static::$tablename, $example, array(), self::$primaryColumn, $group);
+		return self::getDbInstance()->count(static::$tablename, $example, array(), self::$primaryColumn, $group);
 	}
     
 	
@@ -160,7 +158,7 @@ class Model{
 	 * @param {array} $group - The fields used to group the results
 	 */
     public static function countElementsBySQL($where, $binds,  $group = array()){
-		return DB::get(static::$dbname)->count(static::$tablename, $where, $binds, self::$primaryColumn, $group);
+		return self::getDbInstance()->count(static::$tablename, $where, $binds, self::$primaryColumn, $group);
 	}
 
 
@@ -194,7 +192,7 @@ class Model{
 		}
         $onduplicate = implode(', ', $duplicateUpdates);
         
-        $lastid = $this->dbo->insert(static::$tablename, $insert, '', $onduplicate);
+        $lastid = self::getDbInstance()->insert(static::$tablename, $insert, '', $onduplicate);
         if($lastid){
             $id = static::$primaryColumn;
             $this->$id = $lastid;
@@ -217,7 +215,7 @@ class Model{
         $id = static::$primaryColumn;
 		$insert = $this->prepareDatabaseData();
         
-        $lastid = $this->dbo->insert(static::$tablename, $insert, 'IGNORE');
+        $lastid = self::getDbInstance()->insert(static::$tablename, $insert, 'IGNORE');
         if($lastid){
             $this->$id = $lastid;
         }
@@ -228,7 +226,7 @@ class Model{
     public function update(){
         $update = $this->prepareDatabaseData();
         $id = static::$primaryColumn;
-        $this->dbo->update(static::$tablename, new DBExample(array($id => $this->$id)), $update);
+        self::getDbInstance()->update(static::$tablename, new DBExample(array($id => $this->$id)), $update);
     }
 	
 
@@ -236,7 +234,7 @@ class Model{
 	public function delete(){
 		$class = get_called_class();
 		$id = static::$primaryColumn;
-		$deleted = $this->dbo->delete(static::$tablename, new DBExample(array($id => $this->$id)));
+		$deleted = self::getDbInstance()->delete(static::$tablename, new DBExample(array($id => $this->$id)));
 
         EventManager::trigger(new Event(strtolower($class).'.deleted', array('object' => $this)));
 
@@ -284,9 +282,11 @@ class Model{
     public static function getDbName(){
         return static::$dbname;
     }
-    
 
 
+    public static function getDbInstance(){
+        return DB::get(static::$dbname);
+    }
 
     public function getPrimaryValues(){
         $cols = array();

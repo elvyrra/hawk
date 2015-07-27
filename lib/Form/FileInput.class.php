@@ -15,6 +15,18 @@ class FileInput extends FormInput{
 	const TYPE = "file";
 	const INDEPENDANT = true;
 
+	public function __construct($param){
+		parent::__construct($param);
+
+		$bind = "value: value";
+		if(!empty($this->attributes['data-bind'])){
+			$this->attributes['data-bind'] .= ', ' . $bind;
+		}
+		else{
+			$this->attributes['data-bind'] = $bind;
+		}
+	}
+
 	public 	$multiple = false;
 
 	public $extensions = array();
@@ -26,14 +38,14 @@ class FileInput extends FormInput{
 		$basename = preg_replace("/^(\w+)(\[.*)?$/", "$1", $this->name);
 		$upload = Upload::getInstance($basename);
 		if($this->required && !$upload){
-			$form->errors[$this->errorAt] = Lang::get('form.required-field');
+			$form->error($this->errorAt, Lang::get('form.required-field'));
 			return false;
 		}
 
 		if($upload && $this->extensions){			
 			foreach($upload->getFiles() as $file){				
 				if(!in_array($file->extension, $this->extensions)){
-					$form && $form->errors[$this->errorAt] = Lang::get('form.invalid-file-extension');
+					$form && $form->error($this->errorAt, Lang::get('form.invalid-file-extension'));
 					return false;
 				}
 			}

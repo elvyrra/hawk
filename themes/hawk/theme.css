@@ -1,6 +1,5 @@
 /* define(headerBackground, color, "Header and footer backgrounds", #333) */
 /* define(headerColor, color, "Header and footer font color", #d6d6d6) */
-/* define(backgroundImage, file, "Background image", none) */
 /* define(textColor, color, "Text color", #777) */
 /* define(bodyBackground, color, "Body background", #fff) */
 /* define(fontSize, dimension, "Global font size", 12px) */
@@ -18,14 +17,13 @@
 /* define(bgDanger, color, "background color danger", #f2dede) */
 
 body{
-    background: @bodyBackground url(@backgroundImage);        
     margin: 0;
     padding: 0;
     height: 100%;
     position: absolute;
     width: 100%;	
-	font-size: @fontSize;
-	color : @textColor;
+	font-size: 12px;
+	color : #777777;
 	font-family: "Open Sans", Arial;
 }
 
@@ -34,23 +32,23 @@ h1,h2,h3,h4,h5,h6{
 	font-weight: normal;
 }
 
-.text-muted{ color: @colorMuted;}
-.text-primary{ color: @colorPrimary;}
-.text-success{ color: @colorSuccess;}
-.text-info{ color: @colorInfo;}
-.text-warning{ color: @colorWarning;}
-.text-danger{ color: @colorDanger;}
+.text-muted{ color: #777777;}
+.text-primary{ color: #337ab7;}
+.text-success{ color: #3c763d;}
+.text-info{ color: #31708f;}
+.text-warning{ color: #8a6d3b;}
+.text-danger{ color: #a94442;}
 
-.bg-primary{ background: @bgPrimary;}
-.bg-success{ background: @bgSuccess;}
-.bg-info{ background: @bgInfo;}
-.bg-warning{ background: @bgWarning;}
-.bg-danger{ background: @bgDanger;}
+.bg-primary{ background: #337ab7;}
+.bg-success{ background: #dff0d8;}
+.bg-info{ background: #d9edf7;}
+.bg-warning{ background: #fcf8e3;}
+.bg-danger{ background: #f2dede;}
 
-.alert-success{ background: @bgSuccess; color: @colorSuccess;}
-.alert-info{ background: @bgInfo; color: @colorInfo;}
-.alert-warning{ background: @bgWarning; color: @colorWarning;}
-.alert-danger{ background: @bgDanger; color: @colorDanger;}
+.alert-success{ background: #dff0d8; color: #3c763d;}
+.alert-info{ background: #d9edf7; color: #31708f;}
+.alert-warning{ background: #fcf8e3; color: #8a6d3b;}
+.alert-danger{ background: #f2dede; color: #a94442;}
 
 .btn{
 	font-size: inherit;
@@ -130,14 +128,8 @@ input[type="file"] {
 .input-file-invitation {
 	padding: 6px 12px;
 	border-radius: 0;
-}
-
-.input-file-invitation .file-chosen-icon{
-	visibility: hidden;
-}
-
-.input-file-invitation.file-chosen .file-chosen-icon{
-	visibility: visible;
+	overflow: hidden;
+	height: 30px;
 }
 
 input[type="radio"]{
@@ -177,16 +169,16 @@ label{
 
 label.required:after{
 	content: "*";
-	color: @colorDanger;
+	color: #a94442;
 }
 
 fieldset{
-	border : 1px solid @colorPrimary;
+	border : 1px solid #337ab7;
 	box-shadow: none;
 }
 
 legend{
-	color: @colorPrimary;
+	color: #337ab7;
 	border: none;
 	background: none;
 	margin-left: 15px;
@@ -274,7 +266,7 @@ form > table > tbody > tr > td{
 	font-weight: normal;
 }
 .navbar-inverse .nav > li > a {
-	padding: 13px 15px 8px;
+	padding: 0;
 	border-left: 1px solid #101417;
 	color: rgb(214, 214, 214);
 	outline: 0px;
@@ -449,35 +441,36 @@ table th span.line{
 
 
 #main-menu, #footer{        
-    background: @headerBackground;
-    color: @headerColor;
+    background: #333333;
+    color: #d6d6d6;
     width: 100%;
     border: none;
 }
 #main-menu{
-    position: relative;
-    left: 0;
-    top: 0;
-    height: 30px;
+    /*height: 30px;*/
+    min-height: 30px;
     margin-bottom: 5px;
+    border-radius: 0;
+}
+
+#main-menu .navbar-header{
+    color: white;
 }
 
 #main-menu .application-logo{
 	width: 30px;
 	height: 30px;
 }
-#main-menu .main-menu-title{
+#main-menu .main-menu{
     background: none;
     height: 30px;
 	line-height: 30px;
     padding: 0 5px;
     vertical-align: middle;
 	cursor: pointer;
-	border-right: 1px solid grey;
-	border-left: 1px solid grey;
 }
 
-#main-menu .main-menu-title:hover{
+#main-menu .main-menu:hover{
     background-color: rgba(25, 31, 36,0.6);
 }
 
@@ -516,25 +509,33 @@ table th span.line{
 	background: #eee;
 	height: 20px;
 	margin-right: 2px;
+	/*width: calc(10% - 2px);*/
+	max-width: 200px;
 }
 #main-nav-tabs .main-tab-title.active{	
-	background: @bodyBackground;
+	background: #ffffff;
 	color: black;	
 }
 #main-nav-tabs .main-tab-title > a{
 	padding: 0 10px;
-	display: inline;
+	display: inline-block;
 	border: none;
 	background: none;
+	width: calc(100% - 25px);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 100%;
+	white-space: nowrap;
 }
 #main-nav-tabs .main-tab-title > a > .fa{
 	margin-right: 5px;
 }
 
-#main-nav-tabs .main-tab-title > .main-tabs-close{
-	float: right;
-	margin: 2px 3px;;
+#main-nav-tabs .main-tab-title .main-tab-close{
 	padding: 0;
+	padding-left: 8px;	
+	height: 100%;
+	width: 20px;
 }
 
 
@@ -583,7 +584,7 @@ table th span.line{
 
 /*--------------------- Tabs content --------------------*/
 .main-tab-pane .page-title{
-	color: @titleColor;
+	color: #337ab7;
 	text-align: center;
 	margin: 5px 0;
 }
@@ -595,7 +596,7 @@ a, a:active, a:hover, a:visited, a:focus{
 }
 
 /*-------------------- Advert message ------------------*/
-#advert-message{
+.app-notification{
     position: fixed;
     width: 50%;
     top: 45px;
@@ -603,13 +604,9 @@ a, a:active, a:hover, a:visited, a:focus{
     z-index: 1050;
     font-size: 1.2em;    
     min-height: 40px;
-    display: none;
-}
-
-#advert-message .advert-message-close{
-    position: absolute;
-    top : 0;
-    right: 0;
+	visibility: hidden;
+	opacity: 0;
+    transition: visibility .35s, opacity .35s;
 }
 
 /*-------------------- Dialog box ---------------------*/
@@ -624,7 +621,7 @@ a, a:active, a:hover, a:visited, a:focus{
 
 .list{
     width: 100%;
-    color: @textColor;
+    color: #777777;
     border-collapse: collapse;
 }
 	
@@ -661,7 +658,7 @@ a, a:active, a:hover, a:visited, a:focus{
 }
     
 .list-sort-column.list-sort-active{
-    color: @colorSuccess;
+    color: #3c763d;
     opacity: 1;
 }
     
@@ -685,8 +682,8 @@ a, a:active, a:hover, a:visited, a:focus{
 
 /** The search field ***/
 .list-search-input.not-empty {
-    background-color: @bgInfo;
-    color: @colorInfo;
+    background-color: #d9edf7;
+    color: #31708f;
 }	
 
 .list-line{
@@ -790,7 +787,7 @@ input[type="text"].list-page-number{
 
 #loading-purcentage{
 	width: 0%;
-	background: @colorSuccess;
+	background: #3c763d;
 	height: 100%;
 	display: block;
 	border-radius: 5px;
@@ -837,7 +834,7 @@ p .fa{
 }
 
 .box .box-header{
-    background: @titleColor;        
+    background: #337ab7;        
     font-size: 1.2em;
     color: white;    
     padding-left: 5px;
@@ -862,12 +859,12 @@ p .fa{
 }
 
 .tooltip.input-error .tooltip-inner{
-	background: @bgDanger;
-	color: @colorDanger;
+	background: #f2dede;
+	color: #a94442;
 }
 
 .tooltip.input-error .tooltip-arrow{
-	border-right-color: @bgDanger;
+	border-right-color: #f2dede;
 }
 
 /*------------------- Manage themes page -----------------------*/

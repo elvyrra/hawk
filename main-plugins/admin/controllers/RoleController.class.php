@@ -175,7 +175,6 @@ class RoleController extends Controller{
 
 						// Create the language key for the translations of the role name	
 						foreach($_POST['translation'] as $tag => $translation){
-
 							Language::getByTag($tag)->saveTranslations(array(
 								'roles' => array(
 									"role-$roleId-label" => $translation
@@ -202,7 +201,7 @@ class RoleController extends Controller{
 	public function remove(){
 		$role = Role::getById($this->roleId);
 		if($role && $role->isRemovable()){			
-			$this->dbo->update(User::getTable(), new DBExample(array('roleId' => $role->id)), array('roleId' => Option::get('roles.default-role')));
+			User::getDbInstance()->update(User::getTable(), new DBExample(array('roleId' => $role->id)), array('roleId' => Option::get('roles.default-role')));
 
 			$role->delete();
 

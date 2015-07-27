@@ -78,18 +78,20 @@ class LanguageController extends Controller{
 			// Register the translations
 			try{
 				$keys = array();
-				foreach($_POST['translation'][$filters['tag']] as $langKey => $translation){
-					if(!empty($translation)){						
-						list($plugin, $key) = explode('.', $langKey);
-						$key = str_replace(array('{', '}'), array('[', ']'), $key);
-						if(empty($keys[$plugin])){
-							$keys[$plugin] = array();
-						}
-						$keys[$plugin][$key] = $translation;						
-					}				
-				}
+				if(!empty($_POST['translation'][$filters['tag']])){
+					foreach($_POST['translation'][$filters['tag']] as $langKey => $translation){
+						if(!empty($translation)){						
+							list($plugin, $key) = explode('.', $langKey);
+							$key = str_replace(array('{', '}'), array('[', ']'), $key);
+							if(empty($keys[$plugin])){
+								$keys[$plugin] = array();
+							}
+							$keys[$plugin][$key] = $translation;						
+						}				
+					}
 
-				Language::getByTag($filters['tag'])->saveTranslations($keys);
+					Language::getByTag($filters['tag'])->saveTranslations($keys);
+				}
 				
 				$form->response(Form::STATUS_SUCCESS, Lang::get('language.update-keys-success'));
 			}

@@ -155,7 +155,6 @@ class Form{
 		unset($data['fieldsets']);
 		$this->setParam($data);
         
-
         if(!$this->name){
         	$this->name = $this->id;
         }

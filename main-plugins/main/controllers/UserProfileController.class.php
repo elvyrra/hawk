@@ -58,28 +58,24 @@ class UserProfileController extends Controller{
                         'name' => 'username',
                         'required' => true,
                         'label' => Lang::get('admin.user-form-username-label'),
+                        'value' => $user->username,
+                        'disabled' => true,
                     )),
                     
                     new EmailInput(array(
                         'name' => 'email',
                         'required' => true,
                         'label' => Lang::get('admin.user-form-email-label'),
-                    )),
-                    
-                    new CheckboxInput(array(
-                        'name' => 'active',
-                        'hidden' => true,
-                    )),
-                    
-                    new CheckboxInput(array(
-                        'name' => 'suspended',
-                        'hidden' => true,
+                        'value' => $user->email,
+                        'disabled' => true,
                     )),
                     
                     new SelectInput(array(
                         'name' => 'roleId',
                         'options' => $roles,
-                        'label' => Lang::get('admin.user-form-roleId-label')
+                        'label' => Lang::get('admin.user-form-roleId-label'),
+                        'value' => $user->roleId,
+                        'disabled' => true,
                     ))
                 ),
                 
@@ -93,23 +89,19 @@ class UserProfileController extends Controller{
                         'value' => Lang::get('main.valid-button')
                     )),
                     
-                    new DeleteInput(array(
-                        'name' => 'delete',
-                        'value' => Lang::get('main.delete-button'),
-                        'notDisplayed' => !$user,
-                    )),
-
                     new ButtonInput(array(
                         'name' => 'cancel',
                         'value' => Lang::get('main.cancel-button'),
                         'onclick' => 'app.dialog("close")'
                     ))
                 ),
-            )
+            ),
+
+            'onsuccess' => 'app.dialog("close")',
         );
 
-        
-        foreach(ProfileQuestion::getAll('name', array(), array('order' => DB::SORT_ASC)) as $question){
+        $questions = ProfileQuestion::getAll('name', array(), array('order' => DB::SORT_ASC));
+        foreach($questions as $question){
             $classname = ucwords($question->type) . 'Input';
             $field = json_decode($question->parameters, true);
             $field['name'] = $question->name;
@@ -119,7 +111,7 @@ class UserProfileController extends Controller{
             
             if($user){
                 if($question->type == "file"){
-                    $field['after'] = "<img src='" . ( $user->getProfileData($question->name) ? "background: url(" . $user->getProfileData($question->name) . ")" : "") . "' class='profile-image' />";
+                    $field['after'] = "<img src='" . ( $user->getProfileData($question->name) ? $user->getProfileData($question->name) : "") . "' class='profile-image' />";
                 }
                 else{
                     $field['value'] = $user->getProfileData($question->name);
@@ -137,8 +129,34 @@ class UserProfileController extends Controller{
             ));
         }
         else{
+            try{
+                foreach($questions as $question){
+                    if($question->type === 'file'){
+                        $upload = Upload::getInstance($question->name);
 
-            
+                        if($upload){
+                            $file = $upload->getFile(0);
+                            $dir = Plugin::current()->getUserfilesDir()  . 'img/';
+                            $url = Plugin::current()->getUserfilesUrl() . 'img/';
+                            if(!is_dir($dir)){
+                                mkdir($dir, 0755, true);
+                            }
+                            
+                            $upload->move($file, $dir);
+                            $user->setProfileData($question->name, $url . $file->basename);
+                        }
+                    }
+                    else{
+                        $user->setProfileData($question->name, $form->getData($question->name));
+                    }
+                }            
+
+                $user->saveProfile();
+                $form->response(Form::STATUS_SUCCESS, Lang::get('main.user-profile-update-success'));
+            }
+            catch(Exception $e){
+                $form->response(Form::STATUS_ERROR, Lang::get('main.user-profile-update-error'));
+            }
         }
         
     } 

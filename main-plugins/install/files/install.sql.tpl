@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS `MenuItem` (
   `name` varchar(64) NOT NULL,
   `labelKey` varchar(128) NOT NULL,
   `action` varchar(128) NOT NULL,
+  `actionParameters` varchar(1024) NOT NULL DEFAULT '',
   `target` varchar(32) NOT NULL,
   `order` int(2) NOT NULL,
   `permissionId` int(11) NOT NULL DEFAULT '0',

@@ -4,6 +4,8 @@ class ProfileQuestion extends Model{
 	protected static $tablename = "ProfileQuestion";
 	protected static $primaryColumn = 'name';
 
+	public static $allowedTypes = array('text', 'textarea', 'checkbox', 'radio', 'select', 'datetime', 'file');
+
 	public static function getByName($name){
 		return self::getById($name);
 	}

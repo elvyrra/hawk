@@ -11,59 +11,47 @@
  *
  **********************************************************************/
 var Tab = function(id){
-	this.id = id;
-	this.titleNode = $('#main-tab-title-' + this.id);
-	this.paneNode = $('#main-tab-' + this.id);
-	this.closeNode = $(".main-tabs-close[data-tab='" + this.id + "']");
+	this.id = ko.observable(id);
+	this.title = ko.observable("");
+	this.url = ko.observable("");
+	this.content = ko.observable("");
+
+	this.titleSelector = '#main-tab-title-' + this.id();
+	this.paneSelector = '#main-tab-' + this.id();
 	this.history = [];
 	var self = this;
-
-	this.titleNode.find("a").on("shown.bs.tab", function(){
-		history.replaceState({}, "", "#!" + this.history[this.history.length - 1]);
-	}.bind(this));
 };
 
 Tab.create = function(id){
-	/*** Add the title ***/	
-	$(Tabset.titlesContainer).find('.add-tab-button').before($("#tab-title-template").html().replace(/@@id/g, id));		
-				
-	/*** Add the panel ***/
-	$(Tabset.panesContainer).append($("#tab-content-template").html().replace(/@@id/g, id));
-	
-	return new Tab(id);
+	return new Tab(id);	
 };
 
 Tab.prototype.getPaneNode = function(){
-	return this.paneNode;
+	return $(this.paneSelector);
 };
 
 Tab.prototype.getContent = function(){
-	return this.getPaneNode().html();
+	return this.content();
 };
 
 Tab.prototype.setContent = function(html){
-	this.getPaneNode.html(html);	
+	this.content(html);	
 };
 
 Tab.prototype.getTitleNode = function(){
-	return this.titleNode;	
+	return $(this.titleSelector);	
 };
 
 Tab.prototype.getTitle = function(){
-	return this.getTitleNode().find('a').html();
+	return this.title();
 };
 
 Tab.prototype.setTitle = function(title){
-	this.getTitleNode().find('a').html(title);
+	this.title(title);
 };
 
 Tab.prototype.activate = function(){
-	this.titleNode.find('a').tab('show');	
-};
-
-Tab.prototype.remove = function(){
-	this.titleNode.remove();
-	this.paneNode.remove();	
+	$('#main-tab-title-' + this.id() + ' a').tab('show');	
 };
 
 Tab.prototype.setUrl = function(url){
@@ -80,93 +68,86 @@ Tab.prototype.setUrl = function(url){
 
 
 var Tabset = function(){
-	this.tabs = {};
+	this.tabs = ko.observableArray([]);
+
+	$("body").on("shown.bs.tab", ".main-tab-title", function(evt){
+		var id = $(evt.currentTarget).attr('data-tab');
+		var tab = this.tabs()[id];
+		history.replaceState({}, "", "#!" + tab.history[tab.history.length - 1]);
+	}.bind(this));
 };
 
-Tabset.MAX_TABS_NUMBER = 10;
+Tabset.MAX_TABS_NUMBER = 20;
 Tabset.titlesContainer = "#main-nav-tabs";
 Tabset.panesContainer = "#main-tab-content";
+Tabset.index = 0;
 
 Tabset.prototype.push = function(){
-	var indexes = Object.keys(this.tabs);
-	if(this.getTabsNumber() < Tabset.MAX_TABS_NUMBER){
-		var index = indexes.length ? indexes.max() + 1 : 0;
-		
+	if(this.tabs().length < Tabset.MAX_TABS_NUMBER){
 		/* Create the tab */
-		this.tabs[index] = Tab.create(index);		
+		var index = this.tabs.push(new Tab(Tabset.index ++)) - 1;
 		
 		/*** Activate the new tab ***/
 		this.activateTab(index);
 		
-		// Display / hide close buttons
-		this.displayControlButtons();
-		
-		// Add the tab to the tabs object		
-		this.registerTabs();
 	}		
 	else{
-		app.advert('info', Lang.get('main.all-tabs-open'));
+		app.notify('info', Lang.get('main.all-tabs-open'));
 	}	
 };
 
 Tabset.prototype.activateTab = function(id){
-	this.tabs[id].activate();	
+	this.tabs()[id].activate();	
 };
 
 Tabset.prototype.remove = function(id){
-	if (this.getActiveTab() == this.tabs[id]){
+	if (this.getActiveTab() == this.tabs()[id]){
 		var next = this.getNextTab(id);
 		/* Activate the next tab */
 		next.activate();
 	}
 	
 	/* Delete the tab nodes */
-	this.tabs[id].remove();
-	/* remove the tab object from the "tabs" structure */
-	delete(this.tabs[id]);
+	this.tabs.splice(id, 1);	
+
 	/* Register the new list of tabs */
 	this.registerTabs();
 		
-	this.displayControlButtons();
-};
-
-Tabset.prototype.displayControlButtons = function() {	
-	if(this.getTabsNumber() == 1)
-		$(".main-tabs-close").hide();
-	else
-		$(".main-tabs-close").show();
-		
-	if(this.getTabsNumber() >= Tabset.MAX_TABS_NUMBER)
-		$(".add-tab-button").hide();
-	else
-		$(".add-tab-button").show();
 };
 
 Tabset.prototype.getActiveTab = function(){
 	var id = parseInt($('.main-tab-title.active').data('tab'));
-	return this.tabs[id];
+	return this.tabs()[id];
 };
 
 Tabset.prototype.getNextTab = function(id){
-	var indexes = Object.keys(this.tabs);
-	var index = indexes.indexOf(''+id);
-	if (index == indexes.length - 1){
+	if (id == this.tabs().length - 1){
 		// This tab is the last one, get the previous one
-		return this.tabs[indexes[index - 1]];
+		return this.tabs()[id - 1];
 	}
 	else{
-		return this.tabs[indexes[index + 1]];
+		return this.tabs()[id + 1];
 	}	
 };
 
 Tabset.prototype.registerTabs = function(){	
 	var data = [];
-	for(var i in this.tabs){
-		data.push(this.tabs[i].url);
+	for(var i = 0; i < this.tabs().length; i++){
+		data.push(this.tabs()[i].url());
 	}
 	$.cookie('open-tabs', JSON.stringify(data), {expire : 365, path : '/'});
 };
 
-Tabset.prototype.getTabsNumber = function(){
-	return Object.keys(this.tabs).length;
-};
+Tabset.prototype.clickTab = function(data, event){
+	if(event.which === 2){
+		var tabId = $(event.currentTarget).attr('data-tab');
+
+		this.remove(tabId);
+
+		return false;
+	}
+
+	else{
+		return true;
+	}
+}

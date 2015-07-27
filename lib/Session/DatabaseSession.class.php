@@ -1,31 +1,36 @@
 <?php
 
 class DatabaseSession implements SessionHandlerInterface{
-    private $db, $table;
+    private $db;
     private static $data;
     
-	
+	const TABLE = 'Session';
 	
     public function close(){
         return true;
     }
     
     public function destroy($session_id){
-        return $this->db->delete($this->table, 'id = :id', array('id' => $session_id)) ? true : false;
+        return $this->db->delete(self::TABLE, 'id = :id', array('id' => $session_id)) ? true : false;
+
+        // Clean expired sessions
+        $this->gc(0);
     }
     
     public function gc($maxlifetime){
-        return $this->db->delete($this->table, 'expire < :lifetime', array('lifetime' => time() - $maxlifetime)) ? true : false;
+        return $this->db->delete(self::TABLE, 'expire < UNIX_TIMESTAMP()') ? true : false;
     }
     
-    public function open($save_path, $name){
+    public function open($savePath, $name){
         $this->db = DB::get(MAINDB);        
+
+        // Clean expired sessions
+        $this->gc(0);
     }
     
     public function read($session_id){
-        $this->table = 'Session';
         $line = $this->db->select(array(
-            'from' => $this->table,
+            'from' => self::TABLE,
             'where' => 'id = :id',
             'binds' => array('id' => $session_id),
             'one' => true
@@ -34,11 +39,12 @@ class DatabaseSession implements SessionHandlerInterface{
         return $line['data'];
     }
     
-    public function write($session_id, $session_data){		
-        return $this->db->insert($this->table, array(
-            'id' => $session_id,
-            'data' => $session_data,
-            'expire' => (time() + ini_get("session.gc_maxlifetime"))
-        ), 'IGNORE' , 'data = "'.addcslashes($session_data, '"').'"');
+    public function write($sessionId, $data){	
+        $sql = 'REPLACE INTO ' . self::TABLE . ' (id, data, expire) VALUES (:id, :data, UNIX_TIMESTAMP() + :lifetime)';
+        return $this->db->query($sql, array(
+            'id' => $sessionId,
+            'data' => $data,
+            'lifetime' => ini_get("session.gc_maxlifetime")
+        ));
     }
 }

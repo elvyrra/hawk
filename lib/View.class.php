@@ -104,9 +104,12 @@ class View{
 		// Parse plugins nodes		
 		$this->content = preg_replace_callback(self::PLUGIN_REGEX, function($matches){			
 			list($l, $component, $arguments) = $matches;
+			$componentClass = 'ViewPlugin' . ucfirst($component);
 			
+			if(!class_exists($componentClass)){
+				return $matches[0];
+			}
 			try{			
-				$componentClass = 'ViewPlugin' . ucfirst($component);
 				
 				$parameters = array();
 

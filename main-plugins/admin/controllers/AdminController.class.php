@@ -70,7 +70,7 @@ class AdminController extends Controller{
 					new FileInput(array(
 						'name' => 'logo',
 						'label' => Lang::get('admin.settings-logo-label'),
-						'after' => Option::get('main.logo') ? '<img src="/userfiles/plugins/main/'.Option::get('main.logo').'" height="50" width="50" />' : '',
+						'after' => Option::get('main.logo') ? '<img src="/userfiles/plugins/main/'.Option::get('main.logo').'" class="settings-logo-preview" />' : '',
 						'maxSize' => 200000,
 						'extensions' => array('gif', 'png', 'jpg', 'jpeg')
 					)),
@@ -78,9 +78,9 @@ class AdminController extends Controller{
 					new FileInput(array(
 						'name' => 'favicon',
 						'label' => Lang::get('admin.settings-favicon-label'),
-						'after' => Option::get('main.favicon') ? '<img src="/userfiles/plugins/main/'.Option::get('main.favicon').'" height="50" width="50" />' : '',
+						'after' => Option::get('main.favicon') ? '<img src="/userfiles/plugins/main/'.Option::get('main.favicon').'" class="settings-favicon-preview" />' : '',
 						'maxSize' => 20000,
-						'extensions' => array('gif', 'png', 'jpg', 'jpeg')
+						'extensions' => array('gif', 'png', 'jpg', 'jpeg', 'ico')
 					))
 				),
 				
@@ -222,6 +222,8 @@ class AdminController extends Controller{
 		
 		$form = new Form($param);
 		if(!$form->submitted()){
+			$this->addCss(Plugin::current()->getCssUrl() . 'settings.css');
+
 			$page = $form->wrap(View::make(Plugin::current()->getViewsDir() . 'settings.tpl', array(
 				'form' => $form,	
 			)));
@@ -246,26 +248,33 @@ class AdminController extends Controller{
 							}
 							Option::set($name, $field->dbvalue());					
 						}
-						else{				
-
+						elseif($field instanceof FileInput){			
 							$upload = Upload::getInstance($name);						
 							if($upload){							
 								try{									
 									$file = $upload->getFile();
 
-									$image = Image::getInstance($file->tmpFile);										
-									// while($image->getFileSize() > $field->maxSize){										
-									// 	// Compress the image
-									// 	$file->tmpFile = dirname($file->tmpFile) . '/' . uniqid();
-									// 	$image = $image->compress(50, $file->tmpFile);
-									// }
-
-									$basename = uniqid() . '.' . $file->extension;
+									
 									$dir = Plugin::get('main')->getUserfilesDir();
+									
 									if(!is_dir($dir)){
 										mkdir($dir, 0755);
+									}									
+
+									if($name == 'favicon'){
+										$basename = uniqid() . '.ico';
+										$generator = new PHPICO($file->tmpFile, array(
+											array(16, 16),
+											array(32, 32),
+											array(48, 48),
+											array(64, 64),
+										));
+										$generator->save_ico($dir . $basename);
 									}
-									$upload->move($file, $dir, $basename);	
+									else{
+										$basename = uniqid() . '.' . $file->extension;
+										$upload->move($file, $dir, $basename);	
+									}
 
 									// remove the old image
 									@unlink($dir . Option::get("main.$name"));
@@ -273,7 +282,7 @@ class AdminController extends Controller{
 									Option::set("main.$name", $basename);
 								}
 								catch(ImageException $e){
-									$form->error($prop, Lang::get('form.image-format'));
+									$form->error($name, Lang::get('form.image-format'));
 									throw $e;
 								}
 							}						

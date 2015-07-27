@@ -55,7 +55,7 @@ List.prototype.display = function(force){
     }.bind(this))
 
     .fail(function(xhr, status, error){
-    	app.advert("error", Lang.get("main.refresh-list-error"));
+    	app.notify("error", Lang.get("main.refresh-list-error"));
     });
 
     return false;

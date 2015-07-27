@@ -106,7 +106,7 @@ Form.prototype.submit = function(){
 		.done(function(results, code, xhr){
 			/*** treat the response ***/
 			if(results.message){
-				app.advert("success", results.message);
+				app.notify("success", results.message);
 			}
 				
 			/*** Trigger a form_success event to the form ***/

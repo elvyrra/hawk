@@ -12,6 +12,8 @@ define('THEMES_DIR', ROOT_DIR . 'themes/'); // The folder containing the themes 
 
 define('CACHE_DIR', ROOT_DIR . 'cache/');
 
+define('LOG_DIR', ROOT_DIR . 'logs/');
+
 define('CACHE_LANG_DIR', CACHE_DIR . 'lang/');
 
 define('USERFILES_DIR', ROOT_DIR . 'userfiles/');

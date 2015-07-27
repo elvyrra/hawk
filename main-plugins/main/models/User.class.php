@@ -58,11 +58,11 @@ class User extends Model{
 
 	public function saveProfile(){
 		foreach($this->profile as $prop => $value){
-			$questionValue = new ProfileQuestionValue();
-			$questionValue->question = $prop;
-			$questionValue->userId = $this->id;
-			$questionValue->value = $value;
-
+			$questionValue = new ProfileQuestionValue(array(
+				'question' => $prop,
+				'userId' => $this->id,
+				'value' => $value
+			));
 			$questionValue->save();
 		}
 	}

@@ -1,5 +1,5 @@
 <?php
-Router::auth(Request::isAjax() && Session::logged(), function(){
+Router::auth(Request::isAjax() && Session::isConnected(), function(){
 	/*** Application settings ***/
 	Router::any('main-settings', '/admin/settings', array('auth' => Session::isAllowed('admin.all'), 'action' => 'AdminController.settings'));
 

@@ -42,7 +42,7 @@ class MainController extends Controller{
 		$canAccessApplication = Session::getUser()->canAccessApplication();		
 
 		$pages = array();
-		if(Session::logged() && Option::get('main.open-last-tabs') && !empty($_COOKIE['open-tabs'])){
+		if(Session::isConnected() && Option::get('main.open-last-tabs') && !empty($_COOKIE['open-tabs'])){
 			// Open the last tabs the users opened before logout
 			$pages = json_decode($_COOKIE['open-tabs'], true);
 		}

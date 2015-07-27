@@ -66,3 +66,6 @@ update-password-new-password-confirm-label = "Confirm your new password"
 update-password-bad-current-password = "The current password you filled is wrong."
 update-password-error = "An error occured while updating your password."
 update-password-success = "Your password has been successfully updated."
+
+user-profile-update-success = "Your profile was successfully updated"
+user-profile-update-error = "An error occured while updating your profile"

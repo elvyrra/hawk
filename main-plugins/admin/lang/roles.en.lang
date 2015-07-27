@@ -10,5 +10,4 @@ permissions-update-error = "An error occured while updating the roles permission
 permissions-update-success = "The permissions have been successfully updated"
 role-0-label = "Guest"
 role-1-label = "Admin"
-role-11-label = "User"
 role-label-label = "Role name ({lang})"

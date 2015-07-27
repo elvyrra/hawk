@@ -8,7 +8,9 @@ class Menu extends Model{
 	public function __construct($data = array()){
 		parent::__construct($data);
 
-		$this->label = Lang::get($this->labelKey);
+		if(!empty($this->labelKey)){
+			$this->label = Lang::get($this->labelKey);
+		}
 	}
 		
 	public static function getAvailableMenus($user = null){

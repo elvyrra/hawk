@@ -12,6 +12,8 @@
  *
  **********************************************************************/
 class Router{
+	const INVALID_URL = '/INVALID_URL';
+
 	private static $routes = array();	
 	private static $activeRoutes = array();	
 	private static $controllers = array();
@@ -151,7 +153,7 @@ class Router{
 		}
 		
 		if(empty($route)){
-			return "/INVALID_URL";
+			return self::INVALID_URL;
 		}
 		
 		$url = $route->originalUrl;

@@ -9,14 +9,55 @@ class MainMenuWidget extends Widget{
 	 * */
 	public function display(){
 		$user = Session::getUser();
-		if(!$user->canAccessApplication()){
-			$menus = array();
+		$menus = $userMenus = array();
+
+
+		if(Session::isConnected()){
+			// Get the user menu items
+			$userMenus[] = new Menu(array(
+				'name' => 'user',				
+				'label' => $user->getUsername(),
+				'visibleItems' => array(
+					new MenuItem(array(
+						'name' => 'profile',
+						'icon' => 'user',
+						'url' => Router::getUri('edit-profile', array('userId' => $user->id)),
+						'labelKey' => 'main.menu-my-profile',
+						'target' => 'dialog'
+					)),				
+					new MenuItem(array(
+						'name' => 'change-password',
+						'icon' => 'lock',
+						'url' => Router::getUri('change-password'),
+						'labelKey' => 'main.menu-change-password',
+						'target' => 'dialog',
+					)),
+
+					new MenuItem(array(
+						'name' => 'logout',
+						'icon' => 'sign-out',
+						'url' => 'javascript: location = app.getUri(\'logout\');',
+						'labelKey' => 'main.menu-logout',
+					))
+				)		
+			));
+			$event = new Event(self::EVENT_AFTER_GET_USER_MENU, array(
+				'menus' => $userMenus
+			));
+			$userMenus = $event->getData('menus');
 		}
-		else{
+
+
+		if($user->canAccessApplication()){			
 			// Get the menus 
 			$menus = Menu::getAvailableMenus($user);
 
-			
+			$adminMenuId = Menu::getByName('admin')->id;
+			if(!empty($menus[$adminMenuId])){
+				$userMenus[] = $menus[$adminMenuId];
+				unset($menus[$adminMenuId]);
+			}
+
 			// Trigger an event to add or remove menus from plugins 
 			$event = new Event(self::EVENT_AFTER_GET_MENUS, array(
 				'menus' => $menus
@@ -24,91 +65,13 @@ class MainMenuWidget extends Widget{
 			EventManager::trigger($event);
 			$menus = $event->getData('menus');
 		}
-		
-		$userMenu = $adminMenu = array();
-		if(Session::logged()){
-			// Get the user menu items
-			$userMenu = array(
-				'my-profile' => array(
-					'icon' => 'user',
-					'url' => Router::getUri('edit-profile', array('userId' => $user->id)),
-					'label' => Lang::get('main.menu-my-profile'),
-					'target' => 'dialog'
-				),				
-				'change-password' => array(
-					'icon' => 'lock',
-					'url' => Router::getUri('change-password'),
-					'label' => Lang::get('main.menu-change-password'),
-					'target' => 'dialog',
-				),
-				'logout' => array(
-					'icon' => 'sign-out',
-					'url' => Router::getUri('logout'),
-					'label' => Lang::get('main.menu-logout'),
-					'class' => 'real-link'
-				),			
-			);
-			$event = new Event(self::EVENT_AFTER_GET_USER_MENU, array(
-				'menus' => $userMenu
-			));
-			$userMenu = $event->getData('menus');
-			
-			// Get the admin menu items
-			$user = Session::getUser();
-			if($user->isAllowed('admin')){
-				
-				if($user->isAllowed('admin.all')){
-					$adminMenu['settings'] = array(
-						'icon' => 'cog',
-						'url' => Router::getUri('AdminController.settings'),
-						'label' => Lang::get('main.menu-admin-settings-title'),
-					);
-				}
-				
-				if($user->isAllowed('admin.users') || $user->isAllowed('admin.all')){
-					$adminMenu['users'] = array(
-						'icon' => 'users',
-						'url' => Router::getUri('manage-users'),
-						'label' => Lang::get('main.menu-admin-users-title'),
-					);
 
-					$adminMenu['permissions'] = array(
-						'icon' => 'ban',
-						'url' => Router::getUri('permissions'),
-						'label' => Lang::get('main.menu-admin-roles-title'),
-					);
-				}
-					
-				if($user->isAllowed('admin.themes') || $user->isAllowed('admin.all')){
-					$adminMenu['display'] = array(
-						'icon' => 'paint-brush',
-						'url' => Router::getUri('manage-themes'),
-						'label' => Lang::get('main.menu-admin-display-title'),
-					);
-				}
-					
-				if($user->isAllowed('admin.all')){
-					$adminMenu['plugins'] = array(
-						'icon' => 'plug',
-						'url' => Router::getUri('manage-plugins'),
-						'label' => Lang::get('main.menu-admin-plugins-title'),
-					);
-				}
-				
-				if($user->isAllowed('admin.languages') || $user->isAllowed('admin.all')){
-					$adminMenu['language'] = array(
-						'icon' => 'flag',
-						'url' => Router::getUri('manage-languages'),
-						'label' => Lang::get('main.menu-admin-language-title')
-					);
-				}
-			}
-		}
+		
+
 		return View::make(ThemeManager::getSelected()->getView('main-menu.tpl'), array(
 			'menus' => $menus,
 			'user' => $user,
-			'userMenu' => $userMenu,
-			'adminMenu' => $adminMenu,
+			'userMenus' => $userMenus,
 			'logo' => Option::get('main.logo') ? USERFILES_PLUGINS_URL . 'main/' . Option::get('main.logo') : ''
 		));
 	}

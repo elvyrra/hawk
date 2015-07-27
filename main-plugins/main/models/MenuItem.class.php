@@ -3,11 +3,22 @@
 class MenuItem extends Model{
 	public static $tablename = "MenuItem";
 	protected static $primaryColumn = "id";
-	
+
 	public function __construct($data = array()){
 		parent::__construct($data);
 
-		$this->label = Lang::get($this->labelKey);
+		if(!empty($this->labelKey)){
+			$this->label = Lang::get($this->labelKey);
+		}
+
+		if(!empty($this->action)){
+			$params = !empty($this->actionParameters) ? json_decode($this->actionParameters, true) : array();
+			$this->url = Router::getUri($this->action, $params);
+
+			if($this->url == Router::INVALID_URL){
+				$this->url = $this->action;
+			}
+		}
 	}
 	
 	public static function getByName($name, $menuName){

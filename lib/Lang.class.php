@@ -127,7 +127,6 @@ class Lang{
 			if($language !== self::DEFAULT_LANGUAGE){
 				$instance = new self($plugin, $language);
 				$instance->build();
-
 				$translations = include $instance->cacheFile;
 				if(!is_array($translations)){
 					$translations = array();
@@ -290,7 +289,9 @@ class Lang{
 		if(!is_dir($dir)){
 			mkdir($dir, 0755, true);
 		}
-		file_put_contents($file, $content);		
+		
+		file_put_contents($file, $content);
+		touch($file, time() + 3);
 	}
 }
 
