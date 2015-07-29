@@ -11,7 +11,11 @@ class Response{
     public static function set($content){
         self::$content = $content;        
     }
-    
+
+    public static function setContentType($type){
+        header('Content-type: ' . $type);
+    }
+
     public static function setJson(){
         header("Content-type: application/json");
         self::$type = 'json';

@@ -1,7 +1,7 @@
 <?php
 
 class DatabaseSession implements SessionHandlerInterface{
-    private $db;
+    private $db, $lifetime;
     private static $data;
     
 	const TABLE = 'Session';
@@ -18,11 +18,12 @@ class DatabaseSession implements SessionHandlerInterface{
     }
     
     public function gc($maxlifetime){
-        return $this->db->delete(self::TABLE, 'expire < UNIX_TIMESTAMP()') ? true : false;
+        return $this->db->delete(self::TABLE, ':lifetime AND mtime + :lifetime < UNIX_TIMESTAMP()', array('lifetime' => $this->lifetime)) ? true : false;
     }
     
     public function open($savePath, $name){
         $this->db = DB::get(MAINDB);        
+        $this->lifetime = Option::get('main.session-lifetime');
 
         // Clean expired sessions
         $this->gc(0);
@@ -40,11 +41,10 @@ class DatabaseSession implements SessionHandlerInterface{
     }
     
     public function write($sessionId, $data){	
-        $sql = 'REPLACE INTO ' . self::TABLE . ' (id, data, expire) VALUES (:id, :data, UNIX_TIMESTAMP() + :lifetime)';
+        $sql = 'REPLACE INTO ' . self::TABLE . ' (id, data, mtime) VALUES (:id, :data, UNIX_TIMESTAMP())';
         return $this->db->query($sql, array(
             'id' => $sessionId,
             'data' => $data,
-            'lifetime' => ini_get("session.gc_maxlifetime")
         ));
     }
 }

@@ -210,7 +210,7 @@ class QuestionController extends Controller{
 							'independant' => true,
 							'label' => Lang::get('admin.profile-question-form-minDate-label'),
 							'attributes' => array(
-								'data-bind' => "value : maxDate"
+								'data-bind' => "value : minDate"
 							),
 						)),				
 
@@ -309,7 +309,9 @@ class QuestionController extends Controller{
 									$keys['admin']['profile-question-' . $form->getData("name") . '-option-' . $i] = trim($option);
 								}
 							}	
-							Language::current()->saveTranslations($keys);
+							foreach(Language::getAll() as $language){
+								$language->saveTranslations($keys);
+							}
 						}					
 
 						$form->response(Form::STATUS_SUCCESS);		

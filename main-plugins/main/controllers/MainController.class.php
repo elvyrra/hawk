@@ -63,15 +63,13 @@ class MainController extends Controller{
 	public function newTab(){
 		switch(Option::get('main.home-page-type')){
 			case 'custom' :
-				$tmpfile = tempnam('', '');
-				file_put_contents($tmpfile, Option::get('main.home-page-html'));
-				$page = View::make($tmpfile);
+				$page = View::makeFromString(Option::get('main.home-page-html'));
 
 				return '<input type="hidden" class="page-name" value="' . htmlentities(Lang::get('main.new-tab-page-name'), ENT_QUOTES) . '" />'. $page;
 			break;
 
 			case 'page' :
-				Response::redirect(Option::get('main.home-page-item'));
+				Response::redirectToAction(Option::get('main.home-page-item'));
 			break;
 
 			default :
@@ -106,5 +104,16 @@ class MainController extends Controller{
 		else{
 			return USERFILES_PLUGINS_URL . 'main/' . $favicon;
 		}
+	}
+
+	/**
+	 * Display the application terms
+	 */
+	public function terms(){
+		$content = Option::get('main.terms');
+
+		$pdf = new PDF($content);
+
+		return $pdf->display('conditions.pdf');
 	}
 }

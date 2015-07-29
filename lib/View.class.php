@@ -172,6 +172,24 @@ class View{
 		$view->set($data);
 		return $view->display();
 	}	
+
+
+	/**
+	 * Generate a view from a string
+	 * @param string $content The string of the origin template
+	 * @param array $data The data to apply to the view
+	 * @return string The HTML result of the string
+	 */
+	public static function makeFromString($content, $data = array()){
+		$file = tempnam('', '');
+		file_put_contents($file, $content);
+
+		$result = self::make($file, $data);
+
+		unlink($file);
+
+		return $result;
+	}
 }
 
 

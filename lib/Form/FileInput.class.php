@@ -15,16 +15,9 @@ class FileInput extends FormInput{
 	const TYPE = "file";
 	const INDEPENDANT = true;
 
-	public function __construct($param){
-		parent::__construct($param);
-
-		$bind = "value: value";
-		if(!empty($this->attributes['data-bind'])){
-			$this->attributes['data-bind'] .= ', ' . $bind;
-		}
-		else{
-			$this->attributes['data-bind'] = $bind;
-		}
+	public function __toString(){
+		$this->value = '';
+		return parent::__toString();
 	}
 
 	public 	$multiple = false;

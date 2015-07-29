@@ -77,7 +77,7 @@ var Tabset = function(){
 	}.bind(this));
 };
 
-Tabset.MAX_TABS_NUMBER = 20;
+Tabset.MAX_TABS_NUMBER = 10;
 Tabset.titlesContainer = "#main-nav-tabs";
 Tabset.panesContainer = "#main-tab-content";
 Tabset.index = 0;
@@ -103,8 +103,10 @@ Tabset.prototype.activateTab = function(id){
 Tabset.prototype.remove = function(id){
 	if (this.getActiveTab() == this.tabs()[id]){
 		var next = this.getNextTab(id);
-		/* Activate the next tab */
-		next.activate();
+		if(next){
+			/* Activate the next tab */
+			next.activate();
+		}
 	}
 	
 	/* Delete the tab nodes */
@@ -116,11 +118,12 @@ Tabset.prototype.remove = function(id){
 };
 
 Tabset.prototype.getActiveTab = function(){
-	var id = parseInt($('.main-tab-title.active').data('tab'));
+	var id = parseInt($('.main-tab-title.active').attr('data-tab'));
 	return this.tabs()[id];
 };
 
 Tabset.prototype.getNextTab = function(id){
+	id = parseInt(id);
 	if (id == this.tabs().length - 1){
 		// This tab is the last one, get the previous one
 		return this.tabs()[id - 1];

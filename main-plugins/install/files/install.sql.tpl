@@ -175,7 +175,7 @@ INSERT INTO `RolePermission` (`roleId`, `permissionId`, `value`) VALUES
 CREATE TABLE IF NOT EXISTS `Session` (
   `id` varchar(64) NOT NULL,
   `data` mediumtext NOT NULL,
-  `expire` int(11) NOT NULL,
+  `mtime` int(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -185,7 +185,7 @@ CREATE TABLE IF NOT EXISTS `User` (
   `email` varchar(128) NOT NULL,
   `username` varchar(64) NOT NULL,
   `password` varchar(512) NOT NULL,
-  `active` tinyint(1) NOT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT 1,
   `createTime` int(11) NOT NULL,
   `createIp` varchar(15) NOT NULL,
   `roleId` int(11) NOT NULL,

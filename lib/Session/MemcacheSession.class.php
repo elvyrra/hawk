@@ -25,7 +25,7 @@ class MemcacheSession implements SessionHandlerInterface{
     }
     
     public function write($session_id, $session_data){
-        return $this->client->set($session_id, $session_data, MEMCACHE_COMPRESSED, time() + ini_get("session.gc_maxlifetime"));
+        return $this->client->set($session_id, $session_data, MEMCACHE_COMPRESSED, time() + Option::get('main.session-lifetime'));
     }
     
 }

@@ -27,7 +27,7 @@ class FloatInput extends NumberInput{
 	public function check(&$form = null){
 		if(parent::check($form)){
 			if(!empty($this->value) && !is_numeric($this->value)){
-				$form->errors[$this->errorAt] = Lang::get('form.number-format');
+				$form->error($this->errorAt, Lang::get('form.number-format'));
 				return false;
 			}			
 			return true;

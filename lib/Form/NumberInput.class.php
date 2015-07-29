@@ -11,19 +11,21 @@
  *
  *
  **********************************************************************/
-class NumberInput extends TextInput{
+class NumberInput extends FormInput{
+	const TYPE = "number";
+
 	public function check(&$form = null){
 		if(parent::check($form)){
 			if(!empty($this->value) && !is_numeric($this->value)){
-				$form->errors[$this->errorAt] = Lang::get('form.number-format');
+				$form->error($this->errorAt, Lang::get('form.number-format'));
 				return false;
 			}
 			elseif(isset($this->minimum) && $this->value < $this->minimum){
-				$form->errors[$this->errorAt] = Lang::get("form.number-minimum", array('value' => $this->minimum));
+				$form->error($this->errorAt, Lang::get("form.number-minimum", array('value' => $this->minimum)));
 				return false;		
 			}
 			elseif(isset($this->maximum) && $this->value > $this->maximum){
-				$form->errors[$this->errorAt] = Lang::get("form.number-maximum", array('value' => $this->maximum));
+				$form->error($this->errorAt, Lang::get("form.number-maximum", array('value' => $this->maximum)));
 				return false;			
 			}
 			return true;

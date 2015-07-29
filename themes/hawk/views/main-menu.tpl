@@ -14,10 +14,10 @@
 			<ul class="nav navbar-nav">
 				{foreach($menus as $menu)}					
 					<li class="dropdown main-menu" id="main-menu-{{ $menu->id }}" data-menu="{{ $menu->name }}">
-						<span class="dropdown-toggle main-menu-title" type="button" id="main-menu-title-{{ $menu->id }}" data-toggle="dropdown">
+						<div class="dropdown-toggle main-menu-title" type="button" id="main-menu-title-{{ $menu->id }}" data-toggle="dropdown">
 							{{ $menu->label }}
 							<i class="fa fa-caret-down"></i>
-						</span>
+						</div>
 						<ul class="dropdown-menu" role="menu" aria-labelledby="main-menu-title-{{ $menu->id }}" id="main-menu-items-{{ $menu->id }}">
 							{foreach($menu->visibleItems as $item)}
 								<li role="presentation" class="main-menu-item" id="main-menu-item-{{ $item->id }}" data-item="{{ $item->name }}">
@@ -35,10 +35,10 @@
 				{if(Session::isConnected())}
 					{foreach($userMenus as $menu)}						
 						<li class="dropdown main-menu" id="main-user-menu-{{ $menu->name }}" data-menu="{{ $menu->name }}">
-							<span class="dropdown-toggle main-menu-title" type="button" id="main-user-menu-title-{{ $menu->name }}" data-toggle="dropdown">
+							<div class="dropdown-toggle main-menu-title" id="main-user-menu-title-{{ $menu->name }}" data-toggle="dropdown">
 								{{ $menu->label }}
 								<i class="fa fa-caret-down"></i>
-							</span>
+							</div>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="main-user-menu-title-{{ $menu->name }}" id="main-menu-items-{{ $menu->name }}">
 								{foreach($menu->visibleItems as $item)}
 									<li role="presentation" class="main-menu-item" id="main-user-menu-item-{{ $item->name }}" data-item="{{ $item->name }}">
@@ -51,10 +51,10 @@
 						</li>
 					{/foreach}
 				{else}
-					<li id="main-menu-login-btn" class="main-menu-title">
-						<a href="{uri action="LoginController.login"}" target="dialog">
+					<li class="main-menu" >						
+						<div class="main-menu-title" href="{uri action="LoginController.login"}" target="dialog">
 							<i class="fa fa-sign-in"></i> {text key="main.login"}
-						</a>
+						</div>
 					</li>
 				{/if}
 			</ul>

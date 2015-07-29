@@ -28,7 +28,7 @@ class CheckboxInput extends FormInput{
 	 * @return integer - if the checkbox has been submitted as checked, returns 1, else return 0
 	 */
 	public function dbvalue(){	
-        return isset($_POST[$this->name]) ? 1 : 0;		
+        return isset($_POST[$this->name]) ? '1' : '0';		
 	}
 }
 /******************* (C) COPYRIGHT 2014 ELVYRRA SAS *********************/

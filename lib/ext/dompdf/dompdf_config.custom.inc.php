@@ -25,5 +25,5 @@ define("DOMPDF_ENABLE_PHP", true);
 //define("DOMPDF_ENABLE_FONTSUBSETTING", true);
 
 // DOMPDF authentication
-define("DOMPDF_ADMIN_USERNAME", "root");
-define("DOMPDF_ADMIN_PASSWORD", "eltouristo06");
+// define("DOMPDF_ADMIN_USERNAME", "");
+// define("DOMPDF_ADMIN_PASSWORD", "");

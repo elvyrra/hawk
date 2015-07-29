@@ -1,10 +1,16 @@
 {import "form-input.tpl"}
-<label for="{{$input->id}}" class="input-file-invitation" data-bind="css : value() ? 'btn-success' : 'btn-default'">
+<label for="{{$input->id}}" class="input-file-invitation" >
 	{text key="main.input-file-invitation"}
-	<span class="fa fa-check file-chosen-icon" data-bind="visible: value"></span>
+	<span class="fa fa-check file-chosen-icon" ></span>
 </label>
 <script type="text/javascript">
-	ko.applyBindings({
-		value : ko.observable()
-	}, $("[id='{{ $input->id }}']").parent().get(0));
+    (function(){
+        var Model = function(){
+            this.value = ko.observable('');            
+        };
+
+        var model = new Model();
+        
+        ko.applyBindingsToNode($("[id='{{ $input->id }}']").get(0), {value : model.value, css : { 'filled' : model.value} });
+    })();
 </script>

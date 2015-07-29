@@ -7,7 +7,6 @@
 		autocomplete="{{ $form->autocomplete ? "on" : "off" }}" 
 		{{ $form->enctype ? "enctype='{$form->enctype}" : "" }} 
 	>
-	
 	<input type='hidden' name='_FORM_ACTION_' value='valid'/>
 	
 	<div class='form-result-message'>
@@ -15,7 +14,6 @@
 			<p class="alert alert-error">{{ $form->returns['message'] }}</p>
 		{/if}
 	</div>	
-	
 	{{ $content }}	
 </form>
 

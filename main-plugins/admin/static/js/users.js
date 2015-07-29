@@ -34,7 +34,6 @@ $("#admin-users-tabs")
 $("#dialogbox")
 
 .on("change", "#user-form input[type='file']", function(event){
-	debugger;
 	event.preventDefault();
 	var items = event.target.files;			
 	var blob = items[0];		

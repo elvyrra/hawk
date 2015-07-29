@@ -32,6 +32,10 @@ class Option{
 	 * @return array All the options of the plugin with their values
 	 */
 	public static function getPluginOptions($plugin){
+		if(!conf::has('db')){
+			return array();			
+		}
+		
 		$options = DB::get(MAINDB)->select(array(
 			'from' => 'Option',
 			'where' => new DBExample(array('plugin' => $plugin))			

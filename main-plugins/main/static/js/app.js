@@ -66,7 +66,6 @@ App.prototype.require = function(scripts, callback){
 App.required = [
 	"extends.js",
 	"date.js",
-	"view.js",
 	"tabs.js",
 	"form.js",
 	"list.js",
@@ -89,8 +88,9 @@ App.prototype.init = function(){
 
 		/**
 		 * Call URIs by AJAX on click on links
-		 */
-		$("body").on('click', '[href]:not(.real-link):not([href^="#"]):not([href^="javascript:"])', function(event){
+		 */	
+		var linkSelector = '[href]:not(.real-link):not([href^="#"]):not([href^="javascript:"])';
+		$("body").on('click', linkSelector, function(event){
 			var node = $(event.currentTarget);
 			var url = $(node).attr('href');
 						
@@ -98,6 +98,9 @@ App.prototype.init = function(){
 			var data = {};
 
 			var target = $(node).attr('target');
+			if(event.which == 2 && ! target){
+				target = "newtab";
+			}
 			switch(target) {
 				case 'newtab' :
 					// Load the page in a new tab of the application
@@ -126,6 +129,24 @@ App.prototype.init = function(){
 					break;
 			}	
 		}.bind(this))
+
+		// Open a link in a new tab of the application
+		.on("mousedown", linkSelector, function(event){
+			if(event.which == 2){
+				if(! $(this).attr('target')){
+					event.type = "click";
+
+					var clickEvent = new Event("click", event);
+					clickEvent.which =2;
+					$(this).get(0).dispatchEvent(clickEvent);
+				}
+
+				event.preventDefault();
+				event.stopPropagation();
+				event.stopImmediatePropagation();				
+				return false;
+			}
+		});
 		
 		/**
 		 * Treat back button 
@@ -281,7 +302,7 @@ App.prototype.load = function(url, data){
 			.done(function(response){					
 				this.loading.stop();
 				
-				if($(options.selector).get(0) == this.tabset.getActiveTab().getPaneNode().get(0)){
+				if(this.tabset.getActiveTab() && $(options.selector).get(0) == this.tabset.getActiveTab().getPaneNode().get(0)){
 					// The page has been loaded in a whole tab
 					// Register the tab url
 					var activeTab = this.tabset.getActiveTab();
@@ -379,7 +400,7 @@ App.prototype.notify = function(level, message, options){
 		if(level != "danger"){
 			this.notification.timeout = setTimeout(function(){
 				this.hideNotification();
-			}.bind(this), 3500);
+			}.bind(this), 5000);
 		}	
 	}
 };
@@ -395,9 +416,9 @@ App.prototype.hideNotification = function(){
  * @param {string} action - The action to perform. If "close", it will wlose the current dialog box, else it will load the action in the dialog box and open it
  */
 App.prototype.dialog = function(action){
-	$("#dialogbox").empty();
+	$("#dialogbox").empty().modal('hide');
+	
 	if(action == "close"){			
-		$("#dialogbox").modal("hide");
 		return;
 	}
 	
@@ -484,22 +505,5 @@ App.prototype.setRootUrl = function(url){
 window.app = new App(); 
 
 app.ready(function(){
-	ko.bindingProvider.instance.preprocessNode = function(node) {
-	    // Only react if this is a comment node of the form <!-- template: ... -->
-	    if (node.nodeType == 8) {
-	        var match = node.nodeValue.match(/^\s*(template\s*:[\s\S]+)/);
-	        if (match) {
-	            // Create a pair of comments to replace the single comment
-	            var c1 = document.createComment("ko " + match[1]),
-	                c2 = document.createComment("/ko");
-	            node.parentNode.insertBefore(c1, node);
-	            node.parentNode.replaceChild(c2, node);
-	 
-	            // Tell Knockout about the new nodes so that it can apply bindings to them
-	            return [c1, c2];
-	        }
-	    }
-	}
-
 	ko.applyBindings(app, $("body").get(0));   
 });

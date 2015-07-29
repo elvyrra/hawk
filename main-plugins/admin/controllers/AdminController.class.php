@@ -21,7 +21,9 @@ class AdminController extends Controller{
 		$menuItems = array();
 		foreach($menus as $menu){
 			foreach($menu->visibleItems as $item){
-				$menuItems[$item->action] = $menu->label . " &gt; " . $item->label;
+				if(!$item->target || $item->target == 'newtab'){
+					$menuItems[$item->action] = $menu->label . " &gt; " . $item->label;
+				}
 			}
 		}
 
@@ -67,6 +69,14 @@ class AdminController extends Controller{
 						'label' => Lang::get('admin.settings-currency-label')
 					)),	
 
+					new IntegerInput(array(
+						'name' => 'main.tabsNumber',
+						'default' => Option::get('main.tabsNumber') ? Option::get('main.tabsNumber') : 10,
+						'minimum' => 1,
+						'maximum' => 20,
+						'label' => Lang::get('admin.settings-tabs-number-label'),
+					)),
+
 					new FileInput(array(
 						'name' => 'logo',
 						'label' => Lang::get('admin.settings-logo-label'),
@@ -97,6 +107,9 @@ class AdminController extends Controller{
 						'default' => Option::get('main.home-page-type') ? Option::get('main.home-page-type') : 'default',
 						'label' => Lang::get('admin.settings-home-page-type-label'),
 						'layout' => 'vertical',
+						'attributes' => array(
+							'data-bind' => 'checked : homePage.type'
+						)
 					)),
 					
 					new WysiwygInput(array(
@@ -143,42 +156,102 @@ class AdminController extends Controller{
 						'layout' => 'vertical',
 						'label' => Lang::get('admin.settings-open-registers-label'),
 						'default' => Option::get('main.open-register') ?  Option::get('main.open-register') : 0,
+						'attributes' => array(
+							'data-bind' => 'checked: register.open'
+						)
 					)),
 					
 					new CheckboxInput(array(
 						'name' => 'main.confirm-register-email',
 						'label' => Lang::get('admin.settings-confirm-email-label'),
 						'default' => Option::get('main.confirm-register-email'),
-						'dataType' => 'int'
+						'dataType' => 'int',
+						'attributes' => array(
+							'data-bind' => 'checked: register.checkEmail'
+						)
+					)),
+
+					new WysiwygInput(array(
+						'name' => 'main.confirm-email-content',
+						'default' => Option::get('main.confirm-email-content'),
+						'label' => Lang::get('admin.settings-confirm-email-content-label'),
+						'labelWidth' => 'auto',
 					)),
 					
 					new CheckboxInput(array(
 						'name' => 'main.confirm-register-terms',
 						'label' => Lang::get('admin.settings-confirm-terms-label'),
 						'default' => Option::get('main.confirm-register-terms'),
-						'dataType' => 'int'
+						'dataType' => 'int',
+						'labelWidth' => 'auto',
+						'attributes' => array(
+							'data-bind' => 'checked: register.checkTerms'
+						)
+					)),
+
+					new WysiwygInput(array(
+						'name' => 'main.terms',
+						'label' => Lang::get('admin.settings-terms-label'),
+						'labelWidth' => 'auto',
+						'default' => Option::get('main.terms'),
 					)),
 
 					new SelectInput(array(
 						'name' => 'roles.default-role',
-						'label' => Lang::get('main.settings-default-role-label'),
+						'label' => Lang::get('admin.settings-default-role-label'),
 						'options' => $roles,
 						'default' => Option::get('roles.default-role')
-					))
+					)),
+
+					// new IntegerInput(array(
+					// 	'name' => 'main.session-lifetime',
+					// 	'label' => Lang::get('admin.settings-session-lifetime-label'),
+					// 	'default' => Option::get('main.session-lifetime') ? Option::get('main.session-lifetime') : 0,
+					// 	'minimum' => 0,
+					// 	'after' => Lang::get('admin.settings-session-lifetime-description')
+					// ))
+
+
 				),
 				
 				'email' => array(
 					'nofieldset' => true,
+
+					new EmailInput(array(
+						'name' => 'main.mailer-from',
+						'default' => Option::get('main.mailer-from') ? Option::get('main.mailer-from') : Session::getUser()->email,
+						'label' => Lang::get('admin.settings-mailer-from-label')
+					)),					
+
+					new TextInput(array(
+						'name' => 'main.mailer-from-name',
+						'default' => Option::get('main.mailer-from-name') ? Option::get('main.mailer-from-name') : Session::getUser()->getDisplayName(),
+						'label' => Lang::get('admin.settings-mailer-from-name-label')
+					)),
+
+					new SelectInput(array(
+						'name' => 'main.mailer-type',
+						'default' => Option::get('main.mailer-type'),
+						'options' => array(
+							'mail' => Lang::get('admin.settings-mailer-type-mail-value'),
+							'smtp' => Lang::get('admin.settings-mailer-type-smtp-value'),
+							'pop3' => Lang::get('admin.settings-mailer-type-pop3-value')
+						),
+						'label' => Lang::get('admin.settings-mailer-type-label'),
+						'attributes' => array(
+							'data-bind' => 'value: mail.type'
+						)
+					)),
 					
 					new TextInput(array(
-						'name' => 'main.stmp-host',
-						'default' => Option::get('main.smtp-host'),
-						'label' => Lang::get('admin.settings-smtp-host-label'),						
+						'name' => 'main.mailer-host',
+						'default' => Option::get('main.mailer-host'),
+						'label' => Lang::get('admin.settings-mailer-host-label'),						
 					)),
 					
 					new IntegerInput(array(
-						'name' => 'main.smtp-port',
-						'default' => Option::get('main.smpt-port'),
+						'name' => 'main.mailer-port',
+						'default' => Option::get('main.mailer-port'),
 						'label' => ':',
 						'labelWidth' => 'auto',
 						'size' => 4,
@@ -186,25 +259,25 @@ class AdminController extends Controller{
 					)),
 					
 					new TextInput(array(
-						'name' => 'main.stmp-username',
-						'default' => Option::get('main.smtp-username'),
-						'label' => Lang::get('admin.settings-smtp-username-label'),						
+						'name' => 'main.mailer-username',
+						'default' => Option::get('main.mailer-username'),
+						'label' => Lang::get('admin.settings-mailer-username-label'),						
 					)),
 					
 					new PasswordInput(array(
-						'name' => 'main.stmp-password',
+						'name' => 'main.mailer-password',
 						'encrypt' => 'Crypto::aes256_encode',
 						'decrypt' => 'Crypto::aes256_decode',
-						'default' => Option::get('main.smtp-password'),
-						'label' => Lang::get('admin.settings-smtp-password-label'),						
+						'default' => Option::get('main.mailer-password'),
+						'label' => Lang::get('admin.settings-mailer-password-label'),						
 					)),
 					
 					new SelectInput(array(
 						'name' => 'main.smtp-secured',
 						'options' => array(
-							'none' => Lang::get('main.no-txt'),
-							'SSL' => 'SSL',
-							'TSL' => 'TSL'
+							'' => Lang::get('main.no-txt'),
+							'ssl' => 'SSL',
+							'tsl' => 'TSL'
 						),
 						'label' => Lang::get('admin.settings-smtp-secured-label')
 					))
@@ -242,11 +315,12 @@ class AdminController extends Controller{
 					// register scalar values
 					foreach($form->fields as $name => $field){
 						if(!$field instanceof FileInput && !$field instanceof ButtonInput){
-							$value = $form->getData($name);
+							$value = $field->dbvalue();
 							if($value === null){
 								$value = '0';
 							}
-							Option::set($name, $field->dbvalue());					
+							$field->set($value);
+							Option::set($name, $value);					
 						}
 						elseif($field instanceof FileInput){			
 							$upload = Upload::getInstance($name);						

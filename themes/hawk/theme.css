@@ -1,19 +1,29 @@
-/* define(headerBackground, color, "Header and footer backgrounds", #333) */
-/* define(headerColor, color, "Header and footer font color", #d6d6d6) */
-/* define(textColor, color, "Text color", #777) */
+/* define(textColor, color, "Body text color", #777) */
 /* define(bodyBackground, color, "Body background", #fff) */
 /* define(fontSize, dimension, "Global font size", 12px) */
 /* define(titleColor, color, "Color of title", #337ab7) */
+
+/* define(headerBackground, color, "Header and footer backgrounds", #333) */
+/* define(headerColor, color, "Header and footer font color", #d6d6d6) */
+
 /* define(colorMuted, color, "Text color muted", #777) */
+
+/* define(colorDefault, color, "Text color for default elements", #fff) */
+/* define(bgDefault, color, "Background color for default elements", #333) */
+
 /* define(colorPrimary, color, "Text color primary", #337ab7) */
-/* define(colorSuccess, color, "Text color success", #3c763d) */
-/* define(colorInfo, color, "Text color info", #31708f) */
-/* define(colorWarning, color, "Text color warning", #8a6d3b) */
-/* define(colorDanger, color, "Text color danger", #a94442) */
 /* define(bgPrimary, color, "background color primary", #337ab7) */
+
+/* define(colorSuccess, color, "Text color success", #3c763d) */
 /* define(bgSuccess, color, "background color success", #dff0d8) */
+
+/* define(colorInfo, color, "Text color info", #31708f) */
 /* define(bgInfo, color, "background color info", #d9edf7) */
+
+/* define(colorWarning, color, "Text color warning", #8a6d3b) */
 /* define(bgWarning, color, "background color warning", #fcf8e3) */
+
+/* define(colorDanger, color, "Text color danger", #a94442) */
 /* define(bgDanger, color, "background color danger", #f2dede) */
 
 body{
@@ -23,7 +33,8 @@ body{
     position: absolute;
     width: 100%;	
 	font-size: 12px;
-	color : #777777;
+	color : @textColor;
+    background: @bodyBackground;
 	font-family: "Open Sans", Arial;
 }
 
@@ -32,23 +43,61 @@ h1,h2,h3,h4,h5,h6{
 	font-weight: normal;
 }
 
-.text-muted{ color: #777777;}
-.text-primary{ color: #337ab7;}
-.text-success{ color: #3c763d;}
-.text-info{ color: #31708f;}
-.text-warning{ color: #8a6d3b;}
-.text-danger{ color: #a94442;}
+.text-muted{ 
+    color: @colorMuted;
+}
+.text-primary{ 
+    color: @colorPrimary;
+}
+.text-success{ 
+    color: @colorSuccess;
+}
+.text-info{ 
+    color: @colorInfo;
+}
+.text-warning{
+    color: @colorWarning;
+}
+.text-danger{ 
+    color: @colorDanger;
+}
 
-.bg-primary{ background: #337ab7;}
-.bg-success{ background: #dff0d8;}
-.bg-info{ background: #d9edf7;}
-.bg-warning{ background: #fcf8e3;}
-.bg-danger{ background: #f2dede;}
+.bg-primary{ 
+    background: @bgPrimary;
+}
+.bg-success{ 
+    background: @bgSuccess;
+}
+.bg-info{ 
+    background: @bgInfo;
+}
+.bg-warning{ 
+    background: @bgWarning;
+}
+.bg-danger{ 
+    background: @bgDanger;
+}
 
-.alert-success{ background: #dff0d8; color: #3c763d;}
-.alert-info{ background: #d9edf7; color: #31708f;}
-.alert-warning{ background: #fcf8e3; color: #8a6d3b;}
-.alert-danger{ background: #f2dede; color: #a94442;}
+.alert-primary{ 
+    background: @bgPrimary; 
+    color: @colorPrimary;
+}
+.alert-success{ 
+    background: @bgSuccess; 
+    color: @colorSuccess;
+}
+.alert-info{
+    background: @bgInfo; 
+    color: @colorInfo;
+}
+.alert-warning{ 
+    background: @bgWarning;
+    color: @colorWarning;
+}
+.alert-danger{ 
+    background: @bgDanger; 
+    color: @colorDanger;
+}
 
 .btn{
 	font-size: inherit;
@@ -56,18 +105,15 @@ h1,h2,h3,h4,h5,h6{
 }
 
 .btn-default{
-	background: #333;
+	background: @bgDefault;
 	border-color: #777;
-	color: white;
+	color: @colorDefault;
 }
 
 .btn-default:hover{
 	background: #555;
-	color: white;
+	color: @colorDefault;
 }
-
-/* COMPONENTS */
-
 
 /* labels */
 .label, .badge {font-weight: lighter;}
@@ -94,10 +140,12 @@ select,
 textarea {
   font-family: "Open Sans", Arial;
   outline-style: none;
-  color: #777;
+  color: @textColor;
 }
 input[type="text"],
 input[type="password"],
+input[type="date"],
+input[type="number"],
 select,
 textarea {	
 	font-size: 13px;	
@@ -105,7 +153,6 @@ textarea {
 	border-radius: 4px;
     border: 1px solid #ddd;
     height: 30px;
-    /*line-height: 30px;*/
 }
 
 textarea{
@@ -121,16 +168,33 @@ textarea:focus{
 			box-shadow: inset 0 0px 1px rgba(0, 0, 0, 0.075), 0 0 4px rgba(82, 168, 236, 0.6);
 }
 
+/*----------------------- File inputs -----------------------*/
 input[type="file"] {
 	display: none;
 }
 
-.input-file-invitation {
+input[type="file"] + label {
 	padding: 6px 12px;
 	border-radius: 0;
 	overflow: hidden;
-	height: 30px;
+	height: 30px;    
+    background: @bgDefault;
+    color: @colorDefault;
+    border-color: #777;
 }
+input[type="file"] + label > .file-chosen-icon {
+    visibility: hidden;
+}
+
+input[type="file"].filled + label{
+    background: #5cb85c;
+    color: #fff;
+    border-color: #4cae4c;
+}
+input[type="file"].filled + label > .file-chosen-icon{
+    visibility: visible;
+}
+
 
 input[type="radio"]{
 	margin-right: 4px;
@@ -493,23 +557,17 @@ table th span.line{
   	height: calc(100% - 60px);
 }
 
-.add-tab-button{
-	padding: 1px 5px 0 5px;
-	border: 1px solid #ddd;
-	margin-left: 3px;	
-}
-
 #main-nav-tabs{
     height: 20px;
     width: 100%;	
 }
+
 #main-nav-tabs .main-tab-title{	
 	border: 1px solid #DDD;	
 	border-bottom: none;
 	background: #eee;
 	height: 20px;
 	margin-right: 2px;
-	/*width: calc(10% - 2px);*/
 	max-width: 200px;
 }
 #main-nav-tabs .main-tab-title.active{	
@@ -536,6 +594,13 @@ table th span.line{
 	padding-left: 8px;	
 	height: 100%;
 	width: 20px;
+}
+
+#main-nav-tabs .add-tab-button{
+    padding: 1px 5px 0 5px;
+    border: 1px solid #ddd;
+    margin-left: 3px;   
+    width: 22px;
 }
 
 
@@ -881,4 +946,10 @@ p .fa{
 
 #manage-themes-page .theme-item:hover .icons{
 	display: block;
+}
+
+/*------------------------------- Profile ----------------------------------*/
+.profile-image{
+    width: 150px;
+    height: auto;
 }

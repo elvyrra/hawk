@@ -20,7 +20,7 @@ class FileSession implements SessionHandlerInterface{
 
     public function read($id)
     {
-        return (string)@file_get_contents("$this->savePath/sess_$id");
+        return (string) @file_get_contents("$this->savePath/sess_$id");
     }
 
     public function write($id, $data)

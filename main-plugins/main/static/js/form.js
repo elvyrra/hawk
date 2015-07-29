@@ -11,7 +11,7 @@ var Form = function(id, fields){
 	this.upload = this.node.hasClass('upload-form');
 	this.action = this.node.attr('action');
 	this.method = this.node.attr('method');
-	
+	this.youpi = ko.observable("coucou");
 	this.inputs = {};
 	for(var name in fields){
 		this.inputs[name] = new FormInput(fields[name], this);
@@ -19,9 +19,6 @@ var Form = function(id, fields){
 	
 	var self = this;
 	this.node.submit(function(event){
-		/*** Prevent default browser behavior ***/
-		// event.preventDefault();		
-		
 		return self.submit();
 	});
 };
@@ -176,17 +173,17 @@ var FormInput= function(field, form){
 		this[key] = field[key];
 	}
 	this.node = $("[id='"+this.id+"']");
-	var self = this;
+
 	if (this.type == "submit") {		
 		this.node.click(function(){			
 			/*** Ask for confirmation ***/
-			if(self.name == "delete" && !confirm(Lang.get("form.confirm-delete")))
+			if(this.name == "delete" && !confirm(Lang.get("form.confirm-delete")))
 				/*** The user finally doesn't want to delete the record ***/
 				return false;	
 			
 			/*** The user confirmed ***/			
-			self.form.setActivity(self.name);
-		});
+			this.form.setActivity(this.name);
+		}.bind(this));		
 	}
 };
 
@@ -230,16 +227,16 @@ FormInput.prototype.isValid = function(){
 		}
 	}
 	
-	if (this.min) {
-		if (this.val() && this.val() < this.min){
-			this.addError(Lang.get('form.number-minimum', {value: this.min}));
+	if (this.minimum) {
+		if (this.val() && this.val() < this.minimum){
+			this.addError(Lang.get('form.number-minimum', {value: this.minimum}));
 			return false;
 		}
 	}
 	
-	if (this.max) {
-		if (this.val() && this.val() > this.max){
-			this.addError(Lang.get('form.number-maximum', {value: this.max}));
+	if (this.maximum) {
+		if (this.val() && this.val() > this.maximum){
+			this.addError(Lang.get('form.number-maximum', {value: this.maximum}));
 			return false;
 		}
 	}

@@ -2,13 +2,16 @@
 
 <script type="text/javascript">
 	(function(){
-		var editor = CKEDITOR.replace("{{ $input->id }}", {
+		var id = "{{ $input->id }}";
+		var editor = CKEDITOR.replace(id, {
 			language : app.language,
 			removeButtons : 'Save,Scayt,Rtl,Ltr,Language,Flash',
 			entities : false,		
-		});	
-		editor.on('change', function(event){
-			$("#{{ $input->id }}").val(event.editor.getData());
-		})
+			on : {				
+				change : function(event){ 
+					document.getElementById(id).value = event.editor.getData(); 
+				}
+			}
+		});			
 	})();
 </script>

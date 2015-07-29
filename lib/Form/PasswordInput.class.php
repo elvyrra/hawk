@@ -36,7 +36,7 @@ class PasswordInput extends FormInput{
 			// Check the confirmation password
 			if(!empty($this->compare) && $form){			
 				if(	$this->value != $form->getData($this->compare)){
-					$form->errors[$this->errorAt] = Lang::get('form.password-comparison');
+					$form->error($this->errorAt, Lang::get('form.password-comparison'));
 					return false;
 				}
 			}
@@ -50,7 +50,7 @@ class PasswordInput extends FormInput{
 				));
 				$model = $form->model;
 				if($model::getByExample($example)){
-					$form->errors[$this->errorAt] = Lang::get('form.invalid-password');
+					$form->error($this->errorAt, Lang::get('form.invalid-password'));
 					return false;
 				}		
 			}

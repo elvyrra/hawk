@@ -16,7 +16,15 @@
 	{if($canAccessApplication)}
 	<ul class="nav nav-tabs" role="tablist" id="main-nav-tabs">
 		<!-- ko foreach: tabs -->
-		<li role="presentation" class="main-tab-title corner-top" data-bind="attr: { id : 'main-tab-title-' + id(), 'data-tab' : $index }, click : $parent.clickTab.bind($parent), style : { width: 'calc(' + (100 / $parent.tabs().length) + '% - 2px)' }">
+		<li role="presentation" class="main-tab-title corner-top" data-toggle="tooltip" data-placement="bottom" data-bind="attr: { 
+																				id : 'main-tab-title-' + id(), 
+																				'data-tab' : $index,
+																				title : title 
+																			}, 
+																			click : $parent.clickTab.bind($parent), 
+																			style : { 
+																				width: 'calc((100% - 25px )/ ' + $parent.tabs().length + ' - 2px )' 
+																			}">
 			<a role="tab" data-toggle="tab" data-bind="attr: { href: '#main-tab-' + id() }, html : title" ></a>
 
 			<span class="main-tab-close pull-right" data-bind="attr: { 'data-tab' : $index }, visible: $parent.tabs().length > 1, click : function(){ $parent.remove($index()) }">
@@ -55,7 +63,10 @@
 
 
 <script type="text/javascript">
-	app.ready(function(){	
+	app.ready(function(){
+		{if(Option::get('main.tabsNumber'))}
+			Tabset.MAX_TABS_NUMBER = {{ Option::get('main.tabsNumber') }};
+		{/if}
 		{if(!$canAccessApplication)}
 			app.dialog(app.getUri('login'));
 			app.loading.stop();

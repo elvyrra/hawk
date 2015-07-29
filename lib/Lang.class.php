@@ -259,7 +259,7 @@ class Lang{
 	public static function getUserTranslations($plugin, $language){
 		$lang = new self($plugin, $language);
 		$file = $lang->getTranslatedFile();
-		return is_file($file) ? parse_ini_file($file) : array();
+		return is_file($file) ? parse_ini_string(file_get_contents($file)) : array();
 	}
 
 	/**

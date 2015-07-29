@@ -31,7 +31,6 @@ $("#language-manage-page")
 	var data = $(this).data('key').split('.');
 	var plugin = data[0];
 	var key = data[1];
-	debugger;
 	$.get(app.getUri('delete-translation', {plugin : plugin, key : key, tag : tag}), function(response){
 		app.lists["language-key-list"].refresh();
 	});

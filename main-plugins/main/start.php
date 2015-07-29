@@ -15,5 +15,12 @@ Router::auth(Session::isConnected(), function(){
 
 Router::auth(!Session::isConnected(), function(){
     Router::any('login', '/login', array('action' => 'LoginController.login'));
-	Router::any('register', '/register', array('action' => 'LoginController.register'));
+	
+	Router::auth(Option::get('main.open-register'), function(){
+		Router::any('register', '/register', array('action' => 'LoginController.register'));
+
+		Router::get('validate-registration', '/register/{token}', array('where' => array('token' => '[^\s]+'), 'action' => 'LoginController.validateRegister'));
+	});
 });
+
+Router::get('terms', '/terms-of-application', array('action' => 'MainController.terms'));

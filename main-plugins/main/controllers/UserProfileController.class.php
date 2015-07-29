@@ -211,6 +211,7 @@ class UserProfileController extends Controller{
         if(!$form->submitted()){
             return View::make($this->theme->getView("dialogbox.tpl"), array(
                 'title' => Lang::get('main.update-password-title'),
+                'icon' => 'lock',
                 'page' => $form
             ));
         }

@@ -1,26 +1,17 @@
-$("#settings-form-tabs .nav a:first").tab('show');
-	
-$("#settings-form [name='main.home-page-type']").change(function(){
-	if($(this).is(':checked')){
-		if ($(this).val() == 'custom') {
-			$("#home-page-html").parent().slideDown();
-			$("#home-page-item").parent().slideUp();
-		}
-		else{
-			$("#home-page-html").parent().slideUp();
-			$("#home-page-item").parent().slideDown();
-		}
-	}
-}).trigger('change');
+ko.applyBindings({
+	homePage : {
+		type : ko.observable(app.forms['settings-form'].inputs['main.home-page-type'].value)
+	},
 
-$("#settings-form [name='main.open-register']").change(function(){
-	var nodes = $("#settings-form").find("[name='main.confirm-register-email'], [name='main.confirm-register-terms']");
-	if($(this).is(':checked')){
-		if ($(this).val() == '0') {
-			nodes.parent().slideUp();
-		}
-		else{
-			nodes.parent().slideDown();
-		}
+	register : {
+		open : ko.observable(app.forms['settings-form'].inputs['main.open-register'].value.toString()),
+        checkEmail : ko.observable(app.forms['settings-form'].inputs['main.confirm-register-email'].value),
+        checkTerms : ko.observable(app.forms['settings-form'].inputs['main.confirm-register-terms'].value),
+	},
+
+	mail : {
+		type : ko.observable(app.forms['settings-form'].inputs['main.mailer-type'].value)
 	}
-}).trigger('change');
+}, $("#settings-form-tabs").get(0));
+
+$("#settings-form-tabs .nav a:first").tab('show');

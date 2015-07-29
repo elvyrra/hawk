@@ -9,16 +9,24 @@
 class DatetimeInput extends TextInput{	
 
 	public $max = null, 
-			$min = null;
-			
+			$min = null,
+			$format = null,
+			$dbformat = 'Y-m-d';
+	
+	public function __construct($param){
+		parent::__construct($param);
+		
+		if(empty($this->format)){
+			$this->format = Lang::get('main.date-format');			
+		}
+
+	}		
+
 	/**
 	 * Display the input
 	 * @return string The HTML result of displaying
 	 */
 	public function __toString(){
-		if(!isset($this->format)){
-			$this->format = Lang::get('main.date-format');			
-		}
 		
 		if(is_numeric($this->value)){
 			$this->timestamp = $this->value;
@@ -57,12 +65,12 @@ class DatetimeInput extends TextInput{
 			// Check the format of the given date
 			$tmp = date_parse_from_format($this->format, $this->value);
 			if(empty($tmp)){
-				$form->errors[$this->errorAt] = Lang::get('form.date-format');
+				$form->error($this->errorAt, Lang::get('form.date-format'));
 				return false;
 			}		
 			// Check the date is valid
 			if(!checkdate($tmp['month'], $tmp['day'], $tmp['year'])){					
-				$form->errors[$this->errorAt] = Lang::get('form.invalid-date');
+				$form->error($this->errorAt, Lang::get('form.invalid-date'));
 				return false;
 			}						
 			

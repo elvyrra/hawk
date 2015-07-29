@@ -12,6 +12,8 @@ $sessionInterface = ucfirst(SESSION_ENGINE) . 'Session';
 if(!empty($sessionInterface)){
 	$handler = new $sessionInterface();
 	session_set_save_handler($handler);
+
+	session_set_cookie_params((int) Option::get('main.session-lifetime'));
 	session_start();
 }
 
