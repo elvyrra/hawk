@@ -1,3 +1,0 @@
-<?php
-
-`rm -r cache/*`;
