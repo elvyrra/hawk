@@ -13,16 +13,17 @@ class Response{
     }
 
     public static function setContentType($type){
+        Log::debug('change content type of response to ' . $type);
         header('Content-type: ' . $type);
     }
 
-    public static function setJson(){
-        header("Content-type: application/json");
+    public static function setJson(){        
+        self::setContentType('application/json');
         self::$type = 'json';
     }
     
     public static function setScript(){
-        header("Content-type: application/javascript");
+        self::setContentType('application/javascript');
         self::$type = 'script';
     }
 
@@ -34,7 +35,7 @@ class Response{
 		http_response_code($code);      
 	}
     
-	public static function end(){
+	public static function end(){        		
         switch(self::$type){
             case 'json' :
                 echo json_encode(self::$content, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_NUMERIC_CHECK);
@@ -42,12 +43,13 @@ class Response{
             default :
                 echo self::$content;
             break;
-        }		
+        }
         exit;
     }
 	
 	public static function redirect($url){
-		header("Location: $url");
+        Log::debug('redirect to ' . $url);
+        header("Location: $url");
 		exit;
 	}
 	

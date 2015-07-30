@@ -112,6 +112,15 @@ class Mail{
 	}
 
 	/**
+	 * Set subject
+	 */
+	public function subject($subject){
+		$this->mailer->Subject = $subject;
+
+		return $this;
+	}
+
+	/**
 	 * set HTML content
 	 */
 	public function html($html){
@@ -144,17 +153,10 @@ class Mail{
 	 */
 	public function send(){
 		if(!$this->mailer->send()){
+			Log::error('The mail could not be sent because : ' . $this->mailer->ErrorInfo);
 			throw new MailException($this->mailer->ErrorInfo);
 		}
-	}
-
-	/**
-	 * Set subject
-	 */
-	public function subject($subject){
-		$this->mailer->Subject = $subject;
-
-		return $this;
+		Log::info('An email was sent to ' . implode(', ', $this->mailer->all_recipients));
 	}
 }
 

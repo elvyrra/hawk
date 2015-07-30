@@ -413,6 +413,7 @@ class Form{
 	 * @return string The HTML result
 	 */
 	public function wrap($content){
+		Log::info('display form ' . $this->id);
 		return View::make(ThemeManager::getSelected()->getView(Form::VIEWS_DIR . 'form.tpl'), array(
 			'form' => $this,
 			'content' => $content
@@ -464,6 +465,7 @@ class Form{
 		
 		if(!empty($this->errors)){
 			$this->status = self::STATUS_ERROR;
+			Log::warning(Session::getUser()->username . ' has badly completed the form ' . $this->id);
 			if($exit){
 				/*** The form check failed ***/
 				$this->response(self::STATUS_CHECK_ERROR, Lang::get('form.error-fill'));
@@ -531,6 +533,7 @@ class Form{
 			));	
 			$this->status = self::STATUS_SUCCESS;
 			
+			Log::info(Session::getUser()->username . ' has updated the data on the form ' . $this->id);
 			if($exit){
 				// output the response
 				$this->response(self::STATUS_SUCCESS, $success ? $success : Lang::get('form.success-register'));
@@ -539,6 +542,7 @@ class Form{
 		}
 		catch(DatabaseException $e){				
 			$this->status = self::STATUS_ERROR;			
+			Log::error('An error occured while registering data on the form ' . $this->id . ' : ' . $e->getMessage());
 			if($exit){
 				$this->response(self::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : ($error ? $error : Lang::get('form.error-register')));
 			}
@@ -575,6 +579,7 @@ class Form{
 			));
 			$this->status = self::STATUS_SUCCESS;
 			
+			Log::info('The delete action on the form ' . $this->id . ' was successflully completed');
 			if($exit){
 				$this->response(self::STATUS_SUCCESS, $success ? $success : Lang::get('form.success-delete'));
 			}
@@ -582,6 +587,7 @@ class Form{
 		}
 		catch(DatabaseException $e){		
 			$this->status = self::STATUS_ERROR;
+			Log::error('An error occured while deleting the element of the form ' . $this->id . ' : ' . $e->getMessage());
 			
 			if($exit){
 				$this->response(self::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : ($error ? $error : Lang::get('form.error-delete')));
@@ -647,7 +653,8 @@ class Form{
 				break;
 		}
 		
-		Response::set(json_encode($response, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_NUMERIC_CHECK));
+		Response::setJson();
+		Response::set($response);
 		Response::end();
 	}
 	

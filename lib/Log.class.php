@@ -83,7 +83,7 @@ class Log{
         }
 
         // Add an event on the end of the script to close the resource
-        EventManager::on('process-end', function($event){
+        EventManager::on('process-end', function($event){            
             fclose($this->resource);
         });
     }
@@ -107,8 +107,16 @@ class Log{
     private function write($message){
         $trace = debug_backtrace();
         $trace = (object) $trace[1];
-                    
-        $input = date('Y-m-d H:i:s') . ' - ' . $trace->file . ':' . $trace->line . ' - ' . $message . PHP_EOL;
+
+        $data = array(
+            'date' => date('Y-m-d H:i:s'),
+            'uri' => Request::uri(),
+            'ip' => Request::clientIp(),
+            'trace' => $trace->file . ':' . $trace->line,
+            'message' => $message,
+        );
+
+        $input =  implode(' - ', $data) . PHP_EOL;        
         fwrite($this->resource, $input);
     }
 
@@ -124,35 +132,35 @@ class Log{
     }
 
     /**
-     * Log info data
+     * Log info data. Use this function to log user action like form submission
      */
     public static function info($message){
         self::getInstance(self::LEVEL_INFO)->write($message);
     }
 
     /**
-     * Log debug data
+     * Log debug data. this function is used to log script execution steps
      */
     public static function debug($message){
         self::getInstance(self::LEVEL_DEBUG)->write($message);
     }
 
     /**
-     * Log notice data
+     * Log notice data. This function is used to log anormal non blocking usage
      */
     public static function notice($message){
         self::getInstance(self::LEVEL_NOTICE)->write($message);
     }
 
     /**
-     * Log warning data
+     * Log warning data. this function is used to log actions that didn't work because of user bad action (eg form badly completed)
      */
     public static function warning($message){
         self::getInstance(self::LEVEL_WARNING)->write($message);
     }
 
     /**
-     * Log error data
+     * Log error data. This function is used to log actions that didn't work because of a script error 
      */
     public static function error($message){
         self::getInstance(self::LEVEL_ERROR)->write($message);

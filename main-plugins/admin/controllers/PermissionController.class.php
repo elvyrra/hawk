@@ -1,6 +1,10 @@
 <?php
 
 class PermissionController extends Controller{
+
+	/**
+	 * Display the main page of the permission settings
+	 */
 	public function index(){
 		$permissionGroups = Permission::getAllGroupByPlugin();
 
@@ -72,12 +76,14 @@ class PermissionController extends Controller{
 						}
 					}
 				}
-						
+				
+				Log::info('Permissions were succesfully updated');
 				$form->response(Form::STATUS_SUCCESS, Lang::get("roles.permissions-update-success"));
 				
 			}
 			catch(Exception $e){
-				$form->respnse(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get("roles.permissions-update-error"));
+				Log::error('An error occured while updating permissions');
+				$form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get("roles.permissions-update-error"));
 			}
 		}
 	}

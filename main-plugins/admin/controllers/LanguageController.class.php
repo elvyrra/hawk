@@ -1,4 +1,11 @@
 <?php
+/**
+ * LanguageController.class.php
+ */
+
+/**
+ * This class is the controller for language key actions
+ */
 class LanguageController extends Controller{
 	const DEFAULT_KEY_PLUGIN = 'custom';
 
@@ -93,9 +100,11 @@ class LanguageController extends Controller{
 					Language::getByTag($filters['tag'])->saveTranslations($keys);
 				}
 				
+				Log::info('The translations has been updated');
 				$form->response(Form::STATUS_SUCCESS, Lang::get('language.update-keys-success'));
 			}
 			catch(DBException $e){
+				Log::error('An error occured while updating translations : ' . $e->getMessage());
 				$form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get('language.update-keys-error'));
 			}
 		}
@@ -155,25 +164,32 @@ class LanguageController extends Controller{
 		$form = $this->keyForm();
 
 		if($form->check()){
-			$key = self::DEFAULT_KEY_PLUGIN . '.' . $form->getData('key');
-			if(Lang::exists($key)){
-				$form->error('key', Lang::get('language.key-already-exists'));
-				$form->response(Form::STATUS_CHECK_ERROR);
-			}
-
-			foreach(Language::getAll() as $language){
-				$translation = $form->getData("translation[{$language->tag}]");
-				
-				if($translation){
-					$language->saveTranslations(array(
-						self::DEFAULT_KEY_PLUGIN => array(
-							$form->getData('key') => $translation
-						)
-					));					
+			try{
+				$key = self::DEFAULT_KEY_PLUGIN . '.' . $form->getData('key');
+				if(Lang::exists($key)){
+					$form->error('key', Lang::get('language.key-already-exists'));
+					$form->response(Form::STATUS_CHECK_ERROR);
 				}
-			}
 
-			$form->response(Form::STATUS_SUCCESS);
+				foreach(Language::getAll() as $language){
+					$translation = $form->getData("translation[{$language->tag}]");
+					
+					if($translation){
+						$language->saveTranslations(array(
+							self::DEFAULT_KEY_PLUGIN => array(
+								$form->getData('key') => $translation
+							)
+						));					
+					}
+				}
+
+				Log::info('A new language key has been added');
+				$form->response(Form::STATUS_SUCCESS);
+			}
+			catch(Exception $e){
+				Log::error('An error occured while adding a language key : ' . $e->getMessage());
+				$form->response(Form::STATUS_ERROR);
+			}
 		}
 	}
 
@@ -182,9 +198,15 @@ class LanguageController extends Controller{
 	 * Delete a translation key
 	 * */
 	public function deleteTranslation(){
-		Language::getByTag($this->tag)->removeTranslations(array(
-			$this->plugin => array($this->key)
-		));
+		try{
+			Language::getByTag($this->tag)->removeTranslations(array(
+				$this->plugin => array($this->key)
+			));
+			Log::info('A translation has been reset : ' . $this->plugin . '.' . $this->key);
+		}
+		catch(Exception $e){
+			Log::error('An error occured while reseting the language key ' . $this->plugin . '.' . $this->key);
+		}	
 	}
 	
 	/**
@@ -388,7 +410,13 @@ class LanguageController extends Controller{
 	 * Delete a language
 	 */
 	public function deleteLanguage(){
-		Language::getByTag($this->tag)->delete();		
+		try{
+			Language::getByTag($this->tag)->delete();		
+			Log::info('The language ' . $this->tag . ' has been removed');
+		}
+		catch(Exception $e){
+			Log::error('An error occured while removing the language ' . $this->tag . ' : ' . $e->getMessage());
+		}
 	}
 	
 	/**
@@ -459,10 +487,12 @@ class LanguageController extends Controller{
 						unlink($tmpfile);						
 					}
 					
+					Log::info('Language files were successfully imported');
 					$form->response(Form::STATUS_SUCCESS);
 				}
 				catch(Exception $e){
-					$form->error('files[]', $e->getMessage());
+					Log::error('An error occured whiel importing language files : ' . $e->getMessage());
+					$form->error('files[]', $e->getMessage());					
 					$form->response(Form::STATUS_CHECK_ERROR);
 				}
 			}		

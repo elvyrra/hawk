@@ -118,6 +118,7 @@ class Lang{
 	 */
 	private static function load($plugin, $language = LANGUAGE, $force = false){
 		if(!isset(self::$langs[$plugin]) || $force){
+			Log::debug('Reload keys for plugin ' . $plugin . ' and for language ' . $language);
 			self::$langs[$plugin] = array();
 
 			$instance = new self($plugin, self::DEFAULT_LANGUAGE);

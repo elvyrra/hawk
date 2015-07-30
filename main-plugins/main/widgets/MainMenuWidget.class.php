@@ -3,6 +3,9 @@
 class MainMenuWidget extends Widget{
 	const EVENT_AFTER_GET_MENUS = 'menu.after_get_items';
 	const EVENT_AFTER_GET_USER_MENU = 'menu.after_get_user_items';
+
+	const USER_MENU_NAME = 'user';
+	const ADMIN_MENU_NAME = 'admin';
 	
 	/**
 	 * Display the main menu
@@ -11,62 +14,43 @@ class MainMenuWidget extends Widget{
 		$user = Session::getUser();
 		$menus = $userMenus = array();
 
-
-		if(Session::isConnected()){
-			// Get the user menu items
-			$userMenus[] = new Menu(array(
-				'name' => 'user',				
-				'label' => $user->getUsername(),
-				'visibleItems' => array(
-					new MenuItem(array(
-						'name' => 'profile',
-						'icon' => 'user',
-						'url' => Router::getUri('edit-profile', array('userId' => $user->id)),
-						'labelKey' => 'main.menu-my-profile',
-						'target' => 'dialog'
-					)),				
-					new MenuItem(array(
-						'name' => 'change-password',
-						'icon' => 'lock',
-						'url' => Router::getUri('change-password'),
-						'labelKey' => 'main.menu-change-password',
-						'target' => 'dialog',
-					)),
-
-					new MenuItem(array(
-						'name' => 'logout',
-						'icon' => 'sign-out',
-						'url' => 'javascript: location = app.getUri(\'logout\');',
-						'labelKey' => 'main.menu-logout',
-					))
-				)		
-			));
-			$event = new Event(self::EVENT_AFTER_GET_USER_MENU, array(
-				'menus' => $userMenus
-			));
-			$userMenus = $event->getData('menus');
+		if(Session::isConnected()) {
+			unset($userMenus['user']);
 		}
-
+	
+		$event = new Event(self::EVENT_AFTER_GET_USER_MENU, array(
+			'menus' => $userMenus
+		));
+		$userMenus = $event->getData('menus');
 
 		if($user->canAccessApplication()){			
 			// Get the menus 
-			$menus = Menu::getAvailableMenus($user);
+			$menus = Menu::getAvailableMenus($user, 'name');
 
-			$adminMenuId = Menu::getByName('admin')->id;
-			if(!empty($menus[$adminMenuId])){
-				$userMenus[] = $menus[$adminMenuId];
-				unset($menus[$adminMenuId]);
+			// Get the user menu
+			if(Session::isConnected()){
+				$menus[self::USER_MENU_NAME]->label = $user->getUsername();
+				$userMenus[self::USER_MENU_NAME] = $menus[self::USER_MENU_NAME];				
+			}
+			// remove the user menu from applications menus
+			unset($menus[self::USER_MENU_NAME]);
+
+			// put the admin menu in user menu
+			if(!empty($menus[self::ADMIN_MENU_NAME])){
+				$userMenus[self::ADMIN_MENU_NAME] = $menus[self::ADMIN_MENU_NAME];
+				unset($menus[self::ADMIN_MENU_NAME]);
 			}
 
 			// Trigger an event to add or remove menus from plugins 
 			$event = new Event(self::EVENT_AFTER_GET_MENUS, array(
-				'menus' => $menus
+				'menus' => $menus,
+				'userMenus' => $userMenus
 			));
 			EventManager::trigger($event);
 			$menus = $event->getData('menus');
+			$userMenus = $event->getData('userMenus');
 		}
 
-		
 
 		return View::make(ThemeManager::getSelected()->getView('main-menu.tpl'), array(
 			'menus' => $menus,

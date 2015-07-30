@@ -30,7 +30,6 @@ trait Session{
 		if(isset(self::$connected)){
 			return self::$connected;
 		}
-		
 		/*** Test the session ***/		
 		if(empty($_SESSION['user'])){	
 			self::$connected = false;
@@ -40,7 +39,7 @@ trait Session{
 		}
 		else{		
 			/*** The session is not empty . Check the coherency between the user id and
-				company Id, and with the rights ***/				
+				company Id, and with the rights ***/
 			self::$connected = self::getUser() && self::getUser()->isConnected();
 		}
 		return self::$connected;

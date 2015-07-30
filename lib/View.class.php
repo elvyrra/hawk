@@ -210,6 +210,7 @@ class ViewException extends Exception{
 			break;
 			
 			case self::TYPE_EVAL:
+				debug($previous);
 				$trace = array_map(function($t){
 					return $t['file'] . ':' . $t['line'];
 				}, $previous->getTrace());

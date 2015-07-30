@@ -42,8 +42,13 @@ class UserProfileController extends Controller{
     /**
      * Create or edit an user
      */
-    public function edit(){         
-        $user = User::getById($this->userId);
+    public function edit(){
+        if(!$this->userId){
+            $user = Session::getUser();
+        }         
+        else{
+            $user = User::getById($this->userId);
+        }
         $roles = array_map(function($role){ return $role->getLabel(); }, Role::getAll('id'));
 
         $param = array(

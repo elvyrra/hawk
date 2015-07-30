@@ -351,6 +351,7 @@ class Plugin{
 		), 'IGNORE');
 
 		$this->getInstallerInstance()->install();		
+		Log::notice('The plugin ' . $this->name . ' has been installed');
 	}
 	
 
@@ -361,6 +362,7 @@ class Plugin{
 		Db::get(MAINDB)->delete("Plugin", 'name = :name', array('name' => $this->name));
 
 		$this->getInstallerInstance()->uninstall();
+		Log::notice('The plugin ' . $this->name . ' has been uninstalled');
 	}
 
 	/**
@@ -380,6 +382,8 @@ class Plugin{
 		DB::get(MAINDB)->update("Plugin", 'name = :name', array('active' => 1), array('name' => $this->name));	
 
 		$this->getInstallerInstance()->activate();
+
+		Log::notice('The plugin ' . $this->name . ' has been activated');
 	}
 	
 
@@ -392,6 +396,8 @@ class Plugin{
 		DB::get(MAINDB)->update("Plugin", 'name = :name', array('active' => 0), array('name' => $this->name));	
 
 		$this->getInstallerInstance()->deactivate();
+
+		Log::notice('The plugin ' . $this->name . ' has been deactivated');
 	}
 	
 

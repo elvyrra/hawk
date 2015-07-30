@@ -37,15 +37,26 @@ class Controller{
 		EventManager::trigger(new Event(get_called_class() . '.' . $method . '.' . self::BEFORE_ACTION, array('controller' => $this)));
 		
 		/*** Call the controller method ***/
-		$dom = phpQuery::newDocument($this->$method());
+		$result = $this->$method();
+		if(Response::getType() == 'html'){
+			$dom = phpQuery::newDocument($result);
+		}
+		else{
+			$dom = $result;
+		}
 				
 		/*** Load the widgets after calling the controller method ***/		
 		$event = new Event(get_called_class() . '.' . $method . '.' . self::AFTER_ACTION, array('controller' => $this, 'result' => $dom));
 		EventManager::trigger($event);
 		
-		$dom = $event->getData('result');
+		$result = $event->getData('result');
 		
-		return $dom->htmlOuter();
+		if( $result instanceof phpQuery){
+			return $result->htmlOuter();
+		}
+		else{
+			return $result;
+		}
 	}
 
 	public function addCss($url){

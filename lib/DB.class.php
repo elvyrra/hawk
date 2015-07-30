@@ -123,14 +123,16 @@ class DB{
 		foreach($servers as $i => $server){
             try{
                 self::$instances[$name] = new self($server);
-                
+                Log::debug('Connection to db ' . $name . ' successfull');
                 // The connection succeed
                 break;
             }
             catch(DBException $e){
+            	Log::notice('Impossible to connect to db ' . $name . ' on instance ' . $i . ' : ' . $e->getMessage());
                 // The connection failed, try to connect to the next slave
                 if(!isset($servers[$i+1])){
                     // the last slave connection failed
+                    Log::error('Impossible to connect to db ' . $name . ' : ' . $e->getMessage());
                     throw $e;
                 }
             }            
@@ -257,7 +259,7 @@ class DB{
 			return $result;
         }
         catch(PDOException $e) {
-        	$this->addLog($log, 'query failed', $start, microtime(true));
+        	$this->addLog($log, 'query failed', $start, microtime(true));        	
             throw new DBException($e->getMessage(), DBException::QUERY_ERROR, $sql);
         }  	
 	}
@@ -500,6 +502,7 @@ class DBException extends Exception{
 			
 			case self::QUERY_ERROR:
 				$message = "An error was detected : $message in the Database Query : $value";
+				Log::error($message);
 			break;
 			
 		}

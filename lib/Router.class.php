@@ -94,6 +94,7 @@ class Router{
 
 					// call a controller method
 					$controller = new $classname($route->getData());                              
+					Log::debug('URI ' . self::getUri() . ' has been routed => ' . $classname . '::' . $method);
 
 					// Emit an event, saying the routing action is finished
 					$event = new Event('after-routing', array('controller' => $controller, 'method' => $method, 'args' => $route->getData()));
@@ -103,6 +104,7 @@ class Router{
 				}
 				else{					
 					http_response_code(403);
+					Log::warning('A user with the IP address ' . Request::clientIp() . ' tried to access ' . self::getUri() . ' without the necessary privileges');
 					Response::set(Lang::get('main.403-message'));
 				}
 				return;
@@ -110,6 +112,7 @@ class Router{
 		}
 		
 		// The route was not found 
+		Log::warning('The URI ' . self::getUri() . ' has not been routed');
 		http_response_code(404);
         Response::set(Lang::get('main.404-message', array('uri' => $uri)));
 	}

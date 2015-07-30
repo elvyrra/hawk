@@ -13,9 +13,12 @@ class Menu extends Model{
 		}
 	}
 		
-	public static function getAvailableMenus($user = null){
-		if($user == null){
+	public static function getAvailableMenus($user = null, $index = null){
+		if($user === null){
 			$user = Session::getUser();
+		}
+		if($index === null){
+			$index = self::$primaryColumn;
 		}
 		
 		$menuItems = MenuItem::getAvailableItems();
@@ -24,6 +27,15 @@ class Menu extends Model{
 
 		foreach($menuItems as $item){
 			$menus[$item->menuId]->visibleItems[] = $item;
+		}
+
+		if($index != self::$primaryColumn){
+			$id = self::$primaryColumn;
+			foreach($menus as $menu){
+
+				$menus[$menu->$index] = $menu;
+				unset($menus[$menu->$id]);
+			}
 		}
 		
 		$menus = array_filter($menus, function($menu){

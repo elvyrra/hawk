@@ -32,6 +32,9 @@ CREATE TABLE IF NOT EXISTS `Menu` (
 ) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8;
 
 /*!40000 ALTER TABLE `Menu` DISABLE KEYS */;
+INSERT INTO `Menu` (`id`, `name`, `labelKey`, `order`) VALUES
+(1, 'user', 'user.username', 1),
+(2, 'admin', 'main.menu-admin-title', 0);
 /*!40000 ALTER TABLE `Menu` ENABLE KEYS */;
 
 
@@ -51,8 +54,17 @@ CREATE TABLE IF NOT EXISTS `MenuItem` (
   CONSTRAINT `MenuItem_ibfk_1` FOREIGN KEY (`menuId`) REFERENCES `Menu` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8;
 
--- Export de données de la table hawk.MenuItem : ~0 rows (environ)
 /*!40000 ALTER TABLE `MenuItem` DISABLE KEYS */;
+INSERT INTO `MenuItem` (`id`, `menuId`, `name`, `labelKey`, `action`, `actionParameters`, `target`, `order`, `permissionId`) VALUES
+(1, 2, 'settings', 'main.menu-admin-settings-title', 'main-settings', '', '', 0, 1),
+(2, 2, 'users', 'main.menu-admin-users-title', 'manage-users', '', '', 1, 2),
+(3, 2, 'permissions', 'main.menu-admin-roles-title', 'permissions', '', '', 2, 2),
+(4, 2, 'themes', 'main.menu-admin-display-title', 'manage-themes', '', '', 3, 3),
+(5, 2, 'plugins', 'main.menu-admin-plugins-title', 'manage-plugins', '', '', 4, 1),
+(6, 2, 'translations', 'main.menu-admin-language-title', 'manage-languages', '', '', 5, 5),
+(7, 1, 'profile', 'main.menu-my-profile', 'edit-profile', '', 'dialog', 0, 0),
+(8, 1, 'change-password', 'main.menu-change-password', 'change-password', '', 'dialog', 1, 0),
+(9, 1, 'logout', 'main.menu-logout', 'javascript: location = app.getUri(''logout'');', '', '', 2, 0);
 /*!40000 ALTER TABLE `MenuItem` ENABLE KEYS */;
 
 
