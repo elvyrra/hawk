@@ -195,7 +195,9 @@ App.prototype.init = function(){
 			}
 		};
 
-		dispatchEvent(new Event("app-ready"));
+		var evt = document.createEvent("Event");
+		evt.initEvent("app-ready", true, false);
+		dispatchEvent(evt);
 		
 	}.bind(this));
 

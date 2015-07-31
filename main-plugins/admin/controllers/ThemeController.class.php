@@ -104,7 +104,7 @@ class ThemeController extends Controller{
 					$input = new ColorInput(array(
 						'name' => $var['name'],
 						'label' => $var['description'],
-						'value' => $options[$var['name']] ? $options[$var['name']] : $var['default']
+						'value' => !empty($options[$var['name']]) ? $options[$var['name']] : $var['default']
 					));
 				break;
 
@@ -119,7 +119,7 @@ class ThemeController extends Controller{
 					$input = new TextInput(array(
 						'name' => $var['name'],
 						'label' => $var['description'],
-						'value' => $options[$var['name']] ? $options[$var['name']] : $var['default']
+						'value' => !empty($options[$var['name']]) ? $options[$var['name']] : $var['default']
 					));
 				break;
 			}

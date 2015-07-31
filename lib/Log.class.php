@@ -14,6 +14,7 @@ class Log{
     const LEVEL_ERROR = 'error';
 
     const MAX_FILE_SIZE = 200000;
+    const MAX_FILES_BY_LEVEL = 9;
 
     /**
      * The Log instances, representing each one a level
@@ -49,15 +50,15 @@ class Log{
 
         if(is_file($this->filename)){
             // The file already exists
-            if(filesize($this->filename) > self::MAX_FILE_SIZE){
+            if(filesize($this->filename) >= self::MAX_FILE_SIZE){
                 // Archive the last file and create a new one
 
                 // rename all archives already existing (keep only last 9 archives)
                 $archives = array_reverse(glob($this->filename . '.*.zip'));
                 foreach($archives as $archive){
-                    $basename = basename($archives);
+                    $basename = basename($archive);
                     preg_match('/^' . preg_quote($this->basename, '/') . '\.(\d+)\.zip$/', $basename, $match);
-                    if($match[1] > 9){
+                    if($match[1] > self::MAX_FILES_BY_LEVEL){
                         unlink($archive);
                     }
                     else{
@@ -66,7 +67,8 @@ class Log{
                 }
 
                 // Create the new archive
-                $zip = ZipArchive::open($this->filename . '.0.zip', ZipArchive::CREATE);
+                $zip = new ZipArchive;
+                $zip->open($this->filename . '.0.zip', ZipArchive::CREATE);
                 $zip->addFile($this->filename);
                 $zip->close();
 

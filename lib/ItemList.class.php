@@ -295,7 +295,7 @@ class ItemList{
 						'class' => ''
 					);
 
-					if($this->selected == $id){
+					if($this->selected === $id){
 						$param[$id]['class'] .= 'selected ';
 					}
 					if($this->lineClass){

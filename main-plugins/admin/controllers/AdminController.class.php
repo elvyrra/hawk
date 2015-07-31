@@ -2,8 +2,10 @@
 
 class AdminController extends Controller{
 	const MAX_LOGO_SIZE = 200000; // 200 Ko
-	const MAX_FAVICON_SIZE = 20000; // 20 Ko
 	
+	/**
+	 * Display and treat application settings
+	 */
 	public function settings(){		
 		
 		$languages = array_map(function($language){ return $language->label; }, Language::getAll('tag'));
@@ -21,7 +23,7 @@ class AdminController extends Controller{
 		$menuItems = array();
 		foreach($menus as $menu){
 			foreach($menu->visibleItems as $item){
-				if(!$item->target || $item->target == 'newtab'){
+				if(!preg_match('/^(javascript\:|#)/', $item->action) && (!$item->target || $item->target == 'newtab')){
 					$menuItems[$item->action] = $menu->label . " &gt; " . $item->label;
 				}
 			}

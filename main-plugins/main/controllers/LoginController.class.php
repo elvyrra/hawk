@@ -27,14 +27,13 @@ class LoginController extends Controller{
 			"id" => "login-form",
 			"method" => "post",
 			"autocomplete" => false,
-			"action" => Router::getUri('LoginController.login'),			
+			"action" => Router::getUri('LoginController.login'),
 			"fieldsets" => array(
 				"form" => array(
-					"nofieldset" => true,			
-					
+									
 					new TextInput(array(
 						"field" => "login",
-						"required" => true,					
+						"required" => true,
 						"default" => $login,
 						"label" => Lang::get('main.login-label'),						
 					)),

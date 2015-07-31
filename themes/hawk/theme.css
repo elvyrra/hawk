@@ -78,10 +78,6 @@ h1,h2,h3,h4,h5,h6{
     background: @bgDanger;
 }
 
-.alert-primary{ 
-    background: @bgPrimary; 
-    color: @colorPrimary;
-}
 .alert-success{ 
     background: @bgSuccess; 
     color: @colorSuccess;
@@ -153,6 +149,8 @@ textarea {
 	border-radius: 4px;
     border: 1px solid #ddd;
     height: 30px;
+    padding-left: 3px;
+    padding-right: 3px;
 }
 
 textarea{
@@ -195,15 +193,17 @@ input[type="file"].filled + label > .file-chosen-icon{
     visibility: visible;
 }
 
-
+/** Radio inputs **/
 input[type="radio"]{
 	margin-right: 4px;
 }
 
+/** Disabled inputs **/
 input[disabled], textarea[disabled], input[readonly], textarea[readonly] {
 	color: rgb(177, 177, 177);
 }
-/* native placeholders */
+
+/** native placeholders **/
 input:-moz-placeholder,
 textarea:-moz-placeholder {
   color: #9ba0a5;
@@ -225,24 +225,14 @@ textarea::-webkit-input-placeholder {
   font-size: 12px;
 }
 
-label{
-	font-weight: normal;	
-	vertical-align: middle;
-	margin: 0;
-}
-
-label.required:after{
-	content: "*";
-	color: #a94442;
-}
 
 fieldset{
-	border : 1px solid #337ab7;
+	border : 1px solid @colorPrimary;
 	box-shadow: none;
 }
 
 legend{
-	color: #337ab7;
+	color: @colorPrimary;
 	border: none;
 	background: none;
 	margin-left: 15px;
@@ -252,23 +242,37 @@ legend{
 	padding: 0 5px;
 }
 
-/* FORMS LAYOUT */
-form > table{
-	width: 100%;
-}
-
-form > table > tbody > tr > td{
-	width: 50%;
-	vertical-align: top;
-}
-
-
 .form-input-wrap{
     margin: 5px;    
 }
 
+label{
+    font-weight: normal;    
+    vertical-align: middle;
+    margin: 0;
+}
+
+label.required:after{
+    content: "*";
+    color: @colorDanger;
+}
+
 
 /* PREPEND & APPEND INPUT */
+.input-group input{
+    border-radius: 4px 0 0 4px;
+}
+.input-group .input-group-addon{
+    border-radius: 4px 0 0 4px;
+}
+
+.input-group input + .input-group-addon{
+    border-radius: 0 4px 4px 0;
+}
+.input-group .input-group-addon + input{
+    border-radius: 0 4px 4px 0;
+}
+
 .input-append input, 
 .input-prepend input, 
 .input-append .uneditable-input, 
@@ -302,20 +306,10 @@ form > table > tbody > tr > td{
 
 .navbar-inverse {
 	margin-bottom: 0px;
+    background: @headerBackground;
+    color: @headerColor;
 }
-.navbar-inverse .navbar-inner {
-	border-radius: 0px;
-	border-bottom: 1px solid #191e23;
 
-	background: #2C3742; /* Old browsers */
-	background: -moz-linear-gradient(top,  #2C3742 0%, #28303a 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#2C3742), color-stop(100%,#28303a)); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(top,  #2C3742 0%,#28303a 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(top,  #2C3742 0%,#28303a 100%); /* Opera 11.10+ */
-	background: -ms-linear-gradient(top,  #2C3742 0%,#28303a 100%); /* IE10+ */
-	background: linear-gradient(to bottom,  #2C3742 0%,#28303a 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2C3742', endColorstr='#28303a',GradientType=0 ); /* IE6-9 */
-}
 .navbar-inverse .btn-navbar {
 	float: left;
 	margin-top: 10px;
@@ -329,28 +323,7 @@ form > table > tbody > tr > td{
 .navbar-inverse .brand strong {
 	font-weight: normal;
 }
-.navbar-inverse .nav > li > a {
-	padding: 0;
-	border-left: 1px solid #101417;
-	color: rgb(214, 214, 214);
-	outline: 0px;
-	height: 25px;
-	transition: background .1s linear;
-	-moz-transition: background .1s linear; /* Firefox 4 */
-	-webkit-transition: background .1s linear; /* Safari and Chrome */
-	-o-transition: background .1s linear;  /* Opera */
-}
-.navbar-inverse .nav > li > a:hover {
-	background: rgba(25, 31, 36,0.6);
-}
 
-
-
-/* TODO: deprecated mobile-menu, ya no se usa, remover despues de migrar todos los htmls al nuevo diseno */
-.navbar-inverse .mobile-menu .nav > li > a {
-	color: #fff;
-	border-left: 0px;
-}
 
 .dropdown-menu{
 	font-size: 1em;
@@ -359,93 +332,10 @@ form > table > tbody > tr > td{
 .dropdown-menu > li > a:focus,
 .dropdown-submenu:hover > a,
 .dropdown-submenu:focus > a {
-	background: rgb(60, 91, 121) !important;
-	color: white;
+	background: @bgInfo;
+	color: @colorInfo;
 }
 
-
-/* PAGINATION */
-
-.pagination {
-	margin: 8px 0;
-}
-.pagination ul > li:last-child > a,
-.pagination ul > li:last-child > span,
-.pagination ul > li:first-child > a,
-.pagination ul > li:first-child > span{
-	font-size: 23px;
-	color: #bcc6d3;
-	padding: 1px 9px 3px 9px;
-}
-.pagination ul > li:last-child > a:hover,
-.pagination ul > li:last-child > span:hover,
-.pagination ul > li:first-child > a:hover,
-.pagination ul > li:first-child > span:hover{
-	color: #4f4f4f;
-}
-.pagination ul > li > a, .pagination ul > li > span{
-	border-color: #d0dde9;
-	color: #4f4f4f;
-	font-weight: 600;
-	padding: 2px 12px;
-	box-shadow: 0px 1px 0px 0px #efefef;
-	transition: background-color .1s linear;
-	-moz-transition: background-color .1s linear; /* Firefox 4 */
-	-webkit-transition: background-color .1s linear; /* Safari and Chrome */
-	-o-transition: background-color .1s linear;  /* Opera */
-}
-.pagination ul > li > a.active{
-	color: #3b9ff3;
-}
-.pagination ul > li > a:hover,
-.pagination ul > li > a:focus,
-.pagination ul > .active > a,
-.pagination ul > .active > span {
-	background-color: #f5f5f5;
-}
-
-/* pagination inverse */
-
-.pagination.inverse ul > li:last-child > a,
-.pagination.inverse ul > li:last-child > span,
-.pagination.inverse ul > li:first-child > a,
-.pagination.inverse ul > li:first-child > span{
-	font-size: 23px;
-	color: #fff;
-	padding: 1px 9px 3px 9px;
-}
-.pagination.inverse ul > li:last-child > a:hover,
-.pagination.inverse ul > li:last-child > span:hover,
-.pagination.inverse ul > li:first-child > a:hover,
-.pagination.inverse ul > li:first-child > span:hover{
-	color: #fff;
-}
-.pagination.inverse ul > li > a, .pagination.inverse ul > li > span{
-	border-top-color: #333e4a;
-	border-bottom-color: #333e4a;
-	border-right-color: #566676;
-	border-left: 0px;
-	color: rgb(241, 241, 241);
-	font-weight: 600;
-	padding: 2px 12px;
-	background: #333e4a;
-	transition: background-color .1s linear;
-	-moz-transition: background-color .1s linear; /* Firefox 4 */
-	-webkit-transition: background-color .1s linear; /* Safari and Chrome */
-	-o-transition: background-color .1s linear;  /* Opera */
-}
-.pagination.inverse ul > li > a.active{
-	color: #3b9ff3;
-	background-color: #212b36;
-	border-right-color: #212b36;
-	margin-left: -1px;
-}
-.pagination.inverse ul > li > a:hover,
-.pagination.inverse ul > li > a:focus,
-.pagination.inverse ul > .active > a,
-.pagination.inverse ul > .active > span {
-	background-color: #212b36;
-}
 
 /* TABLES*/
 
@@ -502,16 +392,11 @@ table th span.line{
 
 
 /*------------------------ Main layout ----------------------*/
-
-
 #main-menu, #footer{        
-    background: #333333;
-    color: #d6d6d6;
     width: 100%;
     border: none;
 }
 #main-menu{
-    /*height: 30px;*/
     min-height: 30px;
     margin-bottom: 5px;
     border-radius: 0;
@@ -535,7 +420,7 @@ table th span.line{
 }
 
 #main-menu .main-menu:hover{
-    background-color: rgba(25, 31, 36,0.6);
+    background-color: #3f3f3f;
 }
 
 #main-menu .dropdown-menu li i.fa{
@@ -571,7 +456,7 @@ table th span.line{
 	max-width: 200px;
 }
 #main-nav-tabs .main-tab-title.active{	
-	background: #ffffff;
+	background: #fff;
 	color: black;	
 }
 #main-nav-tabs .main-tab-title > a{
@@ -649,7 +534,7 @@ table th span.line{
 
 /*--------------------- Tabs content --------------------*/
 .main-tab-pane .page-title{
-	color: #337ab7;
+	color: @colorPrimary;
 	text-align: center;
 	margin: 5px 0;
 }
@@ -747,24 +632,28 @@ a, a:active, a:hover, a:visited, a:focus{
 
 /** The search field ***/
 .list-search-input.not-empty {
-    background-color: #d9edf7;
-    color: #31708f;
+    background-color: @bgInfo;
+    color: @colorInfo;
 }	
 
 .list-line{
     height: 30px;
-    color: @colorText;    
 }
-
-.list-line:hover{
-    background: #f5fafc;
-    color: #6e829B;
+.list-line > td{
+    color: @textColor;    
 }
 
 .list-line.selected{
-    backround: #2C3742;
-    color: white;
+    background: @colorInfo;
 }
+.list-line.selected > td{
+    color: white;    
+}
+
+.list-line.selected:hover > td {
+    color: @textColor;
+}
+
     
 .list-cell-clickable{
     cursor: pointer;
@@ -788,8 +677,8 @@ a, a:active, a:hover, a:visited, a:focus{
 	
 .list-navigation td{
     background-color: transparent;
-    border-right: 1px solid lightgrey;
-    border-left: 1px solid lightgrey;
+    border-right: 1px solid #ddd;
+    border-left: 1px solid #ddd;
     padding-left: 5px;
     padding-right: 5px;
 }
@@ -815,8 +704,6 @@ input[type="text"].list-page-number{
 	top : 50%;
 	margin-top: -125px;
 	height: 250px;
-	background: rgba(255,255,255,0.8);	
-	box-shadow: 0 0px 10px #AAA;
 }
 
 /*------------ Loading -------------------*/
@@ -856,31 +743,9 @@ input[type="text"].list-page-number{
 	height: 100%;
 	display: block;
 	border-radius: 5px;
-	transition: width 200ms;
+	transition: width .2s;
 }
 
-
-/*----------------- Application lgoo ------------------*/
-.logo-thumbnail{
-
-}
-
-.logo-icon{
-
-}
-
-.logo-normal{
-
-}
-
-.logo-big{
-
-}
-
-/*------------------- Templates ------------------------------*/
-.template{
-	display: none;
-}
 
 /*----------------------- Icons -----------------------------*/
 p .fa{
@@ -895,11 +760,10 @@ p .fa{
     margin: 5px;
     height: 100%;    
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-    /*background: #fff;*/
 }
 
 .box .box-header{
-    background: #337ab7;        
+    background: @bgPrimary;        
     font-size: 1.2em;
     color: white;    
     padding-left: 5px;
@@ -924,12 +788,12 @@ p .fa{
 }
 
 .tooltip.input-error .tooltip-inner{
-	background: #f2dede;
-	color: #a94442;
+	background: @bgDanger;
+	color: @colorDanger;
 }
 
 .tooltip.input-error .tooltip-arrow{
-	border-right-color: #f2dede;
+	border-right-color: @bgDanger;
 }
 
 /*------------------- Manage themes page -----------------------*/
