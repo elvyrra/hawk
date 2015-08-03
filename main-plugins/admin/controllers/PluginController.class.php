@@ -1,5 +1,6 @@
 <?php
 
+
 class PluginController extends Controller{
     const TABID = 'plugin-manager';
     /**

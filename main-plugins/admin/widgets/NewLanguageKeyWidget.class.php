@@ -1,5 +1,6 @@
 <?php
 
+
 class NewLanguageKeyWidget extends Widget{
 
     public function __construct(){}

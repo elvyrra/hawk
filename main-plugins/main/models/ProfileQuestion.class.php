@@ -1,5 +1,6 @@
 <?php
 
+
 class ProfileQuestion extends Model{
 	protected static $tablename = "ProfileQuestion";
 	protected static $primaryColumn = 'name';

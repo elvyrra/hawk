@@ -1,5 +1,6 @@
 <?php
 
+
 class MainMenuWidget extends Widget{
 	const EVENT_AFTER_GET_MENUS = 'menu.after_get_items';
 	const EVENT_AFTER_GET_USER_MENU = 'menu.after_get_user_items';

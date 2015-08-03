@@ -1,5 +1,6 @@
 <?php
 
+
 class DatabaseSession implements SessionHandlerInterface{
     private $db, $lifetime;
     private static $data;

@@ -1,5 +1,6 @@
 <?php
 
+
 class NewMediaWidget extends Widget{
     public function __construct(){
         $this->form = ThemeController::getInstance()->addMediaForm();

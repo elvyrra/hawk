@@ -1,16 +1,6 @@
 <?php
-/**********************************************************************
- *    						Crontab.class.js
- *
- *
- * Author:   Julien Thaon & Sebastien Lecocq 
- * Date: 	 Jan. 01, 2014
- * Copyright: ELVYRRA SAS
- *
- * This file is part of Beaver's project.
- *
- *
- **********************************************************************/
+
+
 class Crontab {
     
     // In this class, array instead of string would be the standard input / output format.

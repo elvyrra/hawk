@@ -4,6 +4,7 @@
  * @author Elvyrra SAS
  */
 
+
 /**
  * This class describes checkboxes
  */

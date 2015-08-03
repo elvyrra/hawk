@@ -1,5 +1,5 @@
-
 <?php
+
 
 class Menu extends Model{
 	protected static $tablename = "Menu";

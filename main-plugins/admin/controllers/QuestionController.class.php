@@ -1,5 +1,6 @@
 <?php
 
+
 class QuestionController extends Controller{
 	public function listQuestions(){
 		$questions = ProfileQuestion::getAll();
@@ -191,7 +192,7 @@ class QuestionController extends Controller{
 							'name' => 'parameters',
 							'id' => 'question-form-parameters',
 							'hidden' => true,	
-							'attribtues' => array(
+							'attributes' => array(
 								'data-bind' => 'value: parameters'
 							)
 						)),

@@ -4,14 +4,42 @@
  * @author Elvyrra SAS
  */
 
+
 /**
  * This class describes the behavior of a form fieldset
  */
 class FormFieldset{
-	public $name, $legend, $inputs, $form, $legendId = '';
+	/**
+	 * The fieldset name
+	 */
+	public $name, 
+
+	/**
+	 * The legend of the fieldset
+	 */
+	$legend, 
+
+	/**
+	 * The inputs in this fieldset
+	 */
+	$inputs, 
+
+	/**
+	 * The form this fieldset is associated to
+	 */
+	$form, 
+
+	/**
+	 * The id of the legend tag
+	 */
+	$legendId = '';
 
 	/**
 	 * Constructor
+	 * @param Form $form The form this fieldset is asssociated to
+	 * @param string $name The fieldset name
+	 * @param array $inputs The inputs in this fieldset
+	 * @param array $params The parameters to apply to this fieldset
 	 */
 	public function __construct($form, $name, $inputs= array(), $params = array()){
 		$this->name = $name;		
@@ -27,11 +55,19 @@ class FormFieldset{
 	}
 
 
+	/**
+	 * Set a parameter of the fieldset
+	 * @param string $param the name of the parameter
+	 * @param mixed $value The value to apply
+	 */
 	public function setParam($param, $value){
 		$this->$param = $value;
 	}
 
-
+	/**
+	 * Display the parameter
+	 * @return string The HTML result to display
+	 */
 	public function __toString(){
 		return View::make(ThemeManager::getSelected()->getView(Form::VIEWS_DIR . 'form-fieldset.tpl'), array(
 			'fieldset' => $this,

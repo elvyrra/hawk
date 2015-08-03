@@ -1,16 +1,13 @@
 <?php
-/**********************************************************************
- *    						Form.class.php
- *
- *
- * Author:   Julien Thaon & Sebastien Lecocq 
- * Date: 	 Jan. 01, 2014
- * Copyright: ELVYRRA SAS
- *
- * This file is part of Beaver's project.
- *
- *
- **********************************************************************/
+/**
+ * Form.class.php
+ */
+
+
+
+/**
+ * This class is used to generate, display and treat forms.
+ */
 class Form{
 	const NO_EXIT = false;
 	const EXIT_JSON = true;
@@ -210,6 +207,8 @@ class Form{
 
 	/**
 	 * Set form parameters
+	 * @param mixed $param The parameter name to set. If this parameter is an array, then this function will set all parameters defined by the keys of this array with the associated value
+	 * @param mixed $value The value to apply to the parameter
 	 */
 	public function setParam($param, $value = null){
 		if(is_array($param)){
@@ -295,9 +294,9 @@ class Form{
 	 */
 	public function reload(){
         if($this->upload){
-			$this->getFromInput();
+			Request::parseScriptInput();
 		}
-		
+				
 		// Set default value
 		$data = array();
 		foreach($this->fields as $name => $field){					
@@ -325,6 +324,7 @@ class Form{
 	/**
 	 * Set the values for field
 	 * @param array $data The data to set, where the keys are the names of the field, and the array values, the values to affect
+	 * @param string prefix A prefix to apply on the field name, if it is defined as an array (used internally to the class)
 	 */
 	public function set($data, $prefix = ''){
 		foreach($data as $key => $value){
@@ -362,6 +362,7 @@ class Form{
 
 	/**
 	 * Add a fieldset to the form
+	 * @param FormFieldset $fieldset The fieldset to add to the form
 	 */
 	public function addFieldset(FormFieldset $fieldset){
 		$this->fieldsets[$fieldset->name] = $fieldset;
@@ -409,7 +410,9 @@ class Form{
 	
 	
 	/**
-	 * This method is used when you defin your own template for displaying the form content. It will wrap the form content with the <form> tag, and all the parameters defined for this form
+	 * This method is used when you define your own template for displaying the form content. 
+	 * It will wrap the form content with the <form> tag, and all the parameters defined for this form
+	 * @param string $content The form content to wrap
 	 * @return string The HTML result
 	 */
 	public function wrap($content){
@@ -420,7 +423,7 @@ class Form{
 		));
 	}
 	
-	/*
+	/**
 	 * Display the form 
 	 * @return string The HTML result of form displaying
 	 */

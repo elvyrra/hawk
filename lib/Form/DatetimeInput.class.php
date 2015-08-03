@@ -3,16 +3,35 @@
  * DatetimeInput.class.php
  * @author Elvyrra SAS
  */
+
 /**
  * This class describes date and datetime inputs
  */
 class DatetimeInput extends TextInput{	
-
+	/**
+	 * The maximal date the user can fill
+	 */
 	public $max = null, 
-			$min = null,
-			$format = null,
-			$dbformat = 'Y-m-d';
+
+	/**
+	 * The minimum date the user can fill
+	 */
+	$min = null,
+
+	/**
+	 * The format of the date
+	 */
+	$format = null,
+
+	/**
+	 * The format for database
+	 */
+	$dbformat = 'Y-m-d';
 	
+	/**
+	 * Constructor
+	 * @param array $param The parameters of the input
+	 */
 	public function __construct($param){
 		parent::__construct($param);
 		

@@ -1,5 +1,6 @@
 <?php
 
+
 class Theme{ 
     private static $instance;
     private $name, $data;

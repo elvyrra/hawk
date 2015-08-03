@@ -1,5 +1,6 @@
 <?php
 
+
 class Permission extends Model{
 	protected static $tablename = "Permission";
 	protected static $primaryColumn = "id";

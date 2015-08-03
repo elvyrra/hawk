@@ -98,7 +98,7 @@ Form.prototype.submit = function(){
 			type : this.method,
 			dataType : 'json',
 			data : this.upload ? new FormData(this.node.get(0)) : data, /*** Send all the data contained in the form ***/
-			processData : ! this.upload
+			// processData : ! this.upload
 		})
 		.done(function(results, code, xhr){
 			/*** treat the response ***/

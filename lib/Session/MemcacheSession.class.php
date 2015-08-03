@@ -1,5 +1,6 @@
 <?php
 
+
 class MemcacheSession implements SessionHandlerInterface{    
     private $client;
     

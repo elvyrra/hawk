@@ -4,6 +4,7 @@
  * @author Elvyrra SAS
  */
 
+
 /**
  * This class describes the general behavior of inputs in forms. This class is associated to Form class
  */

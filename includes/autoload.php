@@ -4,6 +4,7 @@
  * @author Elvyrra SAS
  */
 
+
 /**
  * This class describes the autoload behavior of the application
  */
@@ -47,18 +48,34 @@ class Autoload{
         $filename = "$classname.class.php";
 		
 		// Cross any search folder to find out the class file
-        foreach(self::$searchDirectories as $dir){			
-            exec("find $dir -type f -name '$filename'", $files, $return);
-            if(empty($return) && !empty($files)){
-				// The class file has been found, include it
-                include $files[0];
-				
-				// Register this file, associated to the class name, in cache
-                self::$cache[$classname] = $files[0];
-				
+        foreach(self::$searchDirectories as $dir){	
+            if($file = self::findFileIndirectory($filename, $dir)){
+                // The class file has been found, include it
+                include $file;
+
+                // Register this file, associated to the class name, in cache
+                self::$cache[$classname] = $file;
+
                 return true;
             }
         }
+    }
+
+    /**
+     * Find a file in a directory
+     * @param string $basename The basename of the file
+     * @param string $dir The directory to search in
+     */
+    private static function findFileIndirectory($basename, $dir){
+        if(is_file($dir . $basename)){
+            return $dir . $basename;
+        }
+        foreach(glob($dir . '*', GLOB_ONLYDIR | GLOB_MARK) as $subdir){
+            if($result = self::findFileIndirectory($basename, $subdir)){
+                return $result;
+            }
+        }
+        return null;
     }
         
 	/**

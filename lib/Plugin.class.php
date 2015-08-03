@@ -1,16 +1,6 @@
 <?php
-/**********************************************************************
- *    						Plugin.class.php
- *
- *
- * Author:   Julien Thaon & Sebastien Lecocq 
- * Date: 	 Jan. 01, 2014
- * Copyright: ELVYRRA SAS
- *
- * This file is part of Beaver's project.
- * Description : This class is used to manage the plugins
- *
- **********************************************************************/
+
+
 class Plugin{
 	const TABLE = "Plugin";
 	private $name, 

@@ -1,5 +1,6 @@
 <?php
 
+
 class Request{
     private static $clientIp;
 
@@ -53,16 +54,26 @@ class Request{
         return self::$clientIp;
     }
 
-    public function parseBody(){
+    /**
+     * Populate $_POST and $_FILES from php://input
+     */
+    public static function parseScriptInput(){
         $input = file_get_contents("php://input");
+
         if(!empty($input)){
+            // Get data boundary
             preg_match("/^(\-{6}\w+)/i", $input, $m);
             $boundary = $m[1];
+
+            // Remove first boundary to get only data
             $input = str_replace($boundary . '--', '', $input);
+
+            // Put each data in an array
             $data = preg_split('/'.$boundary.'\r?\n/is', $input, -1, PREG_SPLIT_NO_EMPTY);
+
             $_POST = array();
             $_FILES = array();
-            foreach($data as $field){           
+            foreach($data as $field){
                 if(preg_match('/^Content\-Disposition\: form\-data; name="(.+?)"; filename="(.+)"\r?\nContent\-Type: (.+?)\r?\n\r?\n(.*?)\r?\n$/is', $field, $match)){                              
                     $name = $match[1];
                     $filename = $match[2];

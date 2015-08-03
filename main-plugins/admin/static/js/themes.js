@@ -37,9 +37,9 @@ $("#manage-themes-page")
  * Ace editor for Css editing tab
  */
 app.require(["ext/ace/ace.js"], function(){
-	ace.config.set("modePath", app.jsBaseUrl + "ace/");
-	ace.config.set("workerPath", app.jsBaseUrl + "ace/") ;
-	ace.config.set("themePath", app.jsBaseUrl + "ace/"); 
+	ace.config.set("modePath", app.jsBaseUrl + "ext/ace/");
+	ace.config.set("workerPath", app.jsBaseUrl + "ext/ace/") ;
+	ace.config.set("themePath", app.jsBaseUrl + "ext/ace/"); 
 
 	var editor = ace.edit("theme-css-edit");
 	editor.setTheme("ace/theme/chrome");

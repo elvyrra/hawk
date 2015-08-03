@@ -1,5 +1,6 @@
 <?php
 
+
 class AdminController extends Controller{
 	const MAX_LOGO_SIZE = 200000; // 200 Ko
 	

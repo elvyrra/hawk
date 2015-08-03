@@ -1,13 +1,38 @@
 <?php
+/**
+ * View.class.php
+ */
+
+
 
 /**
  * This class describes the behavior of views
  */
 class View{	
-	private $file, $content, $data, $type;
-	private $cached = false;
+	/**
+	 * The source file of the view
+	 */
+	private $file, 
 
-	private $dependencies = array();
+	/**
+	 * The content of the source template
+	 */
+	$content, 
+
+	/**
+	 * The data injected in the view for generation
+	 */
+	$data,
+
+	/**
+	 * Defines if the view already cached or not
+	 */
+	$cached = false,
+
+	/**
+	 * The other views this views depends on
+	 */
+	$dependencies = array();
 	
 	const PLUGINS_VIEW = 'view-plugins/';
 
@@ -22,7 +47,6 @@ class View{
 	
 	/**
 	 * Constructor
-	 * @constructs
 	 * @param string $file The template file to parse
 	 */
 	public function __construct($file){
@@ -60,7 +84,7 @@ class View{
 	/**
 	 * Set data to display in the view
 	 * @param array The data to insert in the view. The keys of the data will become variables in the view
-	 * @return void
+	 * @return View The view itself
 	 */
 	public function set($data = array()){
 		$this->data = $data;
@@ -71,7 +95,7 @@ class View{
 	/**
 	 * Add data to display in the view
 	 * @param array The data to add in the view
-	 * @return void
+	 * @return View The view itself
 	 */
 	public function add($data = array()){
 		$this->data = array_merge($this->data, $data);	
@@ -202,6 +226,12 @@ class ViewException extends Exception{
 	const TYPE_FILE_NOT_FOUND = 1;
 	const TYPE_EVAL = 2;
 	
+	/**
+	 * Constructor
+	 * @param int $type The type of exception 
+	 * @param string $file The source file that caused this exception	 
+	 * @param Exception $previous The previous exception that caused that one
+	 */
 	public function __construct($type, $file, $previous = null){
 		$code = $type;
 		switch($type){
@@ -220,26 +250,5 @@ class ViewException extends Exception{
 		}
 		
 		parent::__construct($message, $code, $previous);
-	}
-
-	public function display(){
-		$display = '<div class="alert alert-danger">
-						<div class="error-title">
-							<i class="fa fa-exclamation-cirle"></i>
-							View Exception
-						</div>
-
-						<div class="error-content">
-							<pre>' . $this->getMessage() . PHP_EOL;
-
-		foreach($this->getTrace() as $i => $line){
-			$display .= 		'#' . $i . ' ' . $line['file'] . ':' . $line['line'] . ' => ' . $line['function'] . '(' . implode(', ', $line['args']) . ')' . PHP_EOL;
-		}
-
-		$display =			'</pre>
-						</div>
-					</div>';
-
-		return $display;
 	}
 }

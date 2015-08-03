@@ -1,5 +1,6 @@
 <?php
 
+
 class LanguageFilterWidget extends Widget{
 	public function __construct($filters){
 		$languages = array();

@@ -2,6 +2,8 @@
 /**
  * HtmlInput.class.php
  */
+
+
 class HtmlInput extends FormInput{
 	const TYPE = 'html';
 	const INDEPENDANT = true;

@@ -1,5 +1,6 @@
 <?php
 
+
 class User extends Model{
 	protected static $tablename = "User";	
 	protected static $primaryColumn = "id";

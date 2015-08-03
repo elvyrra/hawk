@@ -1,21 +1,20 @@
 <?php
-/**********************************************************************
- *    						RadioInput.class.php
- *
- *
- * Author:   Julien Thaon & Sebastien Lecocq 
- * Date: 	 Jan. 01, 2014
- * Copyright: ELVYRRA SAS
- *
- * This file is part of Beaver's project.
- *
- *
- **********************************************************************/
+/**
+ * RadioInput.class.php
+ */
+
+
+
+/**
+ * This class describes the input[type='radio']
+ */
 class RadioInput extends FormInput{	
 	const TYPE = "radio";
 
-	public 	$display = '',
-			$layout = 'horizontal';
+	/**
+	 * The layout of the inputs : 'horizontal' (default), 'vertical'
+	 */
+	public 	$layout = 'horizontal';
 
 }
 

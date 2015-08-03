@@ -1,5 +1,7 @@
 <?php
 
+
+
 class Response{
     private static $content, $header;
     private static $type = 'html';

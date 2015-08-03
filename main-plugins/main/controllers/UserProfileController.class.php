@@ -1,5 +1,6 @@
 <?php
 
+
 class UserProfileController extends Controller{
 
     /** 
@@ -152,7 +153,7 @@ class UserProfileController extends Controller{
                         }
                     }
                     else{
-                        $user->setProfileData($question->name, $form->getData($question->name));
+                        $user->setProfileData($question->name, $form->fields[$question->name]->dbvalue());
                     }
                 }            
 

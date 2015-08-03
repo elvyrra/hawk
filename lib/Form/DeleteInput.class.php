@@ -4,6 +4,8 @@
  * @author Elvyrra SAS
  */
 
+
+
 /**
  * This class describes the "delete" inputs. Delete input are submit inputs used to delete the current edited data in the database
  */

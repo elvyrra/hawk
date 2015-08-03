@@ -1,4 +1,5 @@
 <?php
+
 /*** Initialize the application ***/
 define('SCRIPT_START_TIME', microtime(true));
 

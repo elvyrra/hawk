@@ -1,5 +1,6 @@
 <?php
 
+
 class Role extends Model{
 	public static $tablename = "Role";
 	protected static $primaryColumn = "id";

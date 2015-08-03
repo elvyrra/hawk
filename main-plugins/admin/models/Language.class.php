@@ -1,5 +1,6 @@
 <?php
 
+
 class Language extends Model{
 	protected static $tablename = "Language";
 	protected static $primaryColumn = 'tag';

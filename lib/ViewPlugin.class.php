@@ -1,5 +1,6 @@
 <?php
 
+
 abstract class ViewPlugin{
     public function __construct($params = array()){
         $this->params = $params;

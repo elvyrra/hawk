@@ -3,6 +3,8 @@
  * ErrorHandler.class.php
  */
 
+
+
 /**
  * This class defines the errors and exceptions handlers
  */

@@ -1,5 +1,6 @@
 <?php
 
+
 class Model{
 	// The name of the table containing the data of the model
 	protected static $tablename;

@@ -1,5 +1,6 @@
 <?php
 
+
 class MenuItem extends Model{
 	public static $tablename = "MenuItem";
 	protected static $primaryColumn = "id";

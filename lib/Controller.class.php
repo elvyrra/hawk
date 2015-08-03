@@ -1,16 +1,5 @@
 <?php
-/**********************************************************************
- *    						Controller.class.php
- *
- *
- * Author:   Julien Thaon & Sebastien Lecocq 
- * Date: 	 Jan. 01, 2014
- * Copyright: ELVYRRA SAS
- *
- * This file is part of Mint project.
- *
- *
- **********************************************************************/
+
 	
 class Controller{	
 	private $widgets;

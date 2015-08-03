@@ -1,5 +1,6 @@
 <?php
 
+
 class InstallController extends Controller{
 	
 	public function setLanguage(){

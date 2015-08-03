@@ -79,6 +79,8 @@ $installerContent =
  * {$installerClass}.class.php
  */
 
+
+
 /**
  * This class describes the behavio of the installer for the plugin {$data['name']}
  */

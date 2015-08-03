@@ -4,6 +4,8 @@
  * @author Elvyrra SAS
  */
 
+
+
 /**
  * This class is used to generate and display smart lists, getting data from the database or a given array
  */

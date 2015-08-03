@@ -4,12 +4,22 @@
  * @author Elvyrra SAS
  */
 
+
+
 /**
  * This class permits to treat AJAX uploads 
  */
 class Upload{
+	/**
+	 * The uploaded files
+	 */
 	private $files = array();
 
+	/**
+	 * Get an upload instance by the name of the uplaod
+	 * @param string $name the name of the upload
+	 * @return Upload The upload instance
+	 */
 	public static function getInstance($name){
 		try{
 			return new self($name);
@@ -19,6 +29,10 @@ class Upload{
 		}
 	}
 
+	/**
+	 * Constructor
+	 * @param string $name the name of the upload
+	 */
 	private function __construct($name){
 		if(empty($_FILES[$name])){
 			throw new UploadException();
@@ -46,15 +60,29 @@ class Upload{
 		}
 	}
 
-
+	/**
+	 * Get the uploaded files
+	 * @return array The uploaded files, where each element is a StdClass instance containing the properties : basename, tmpFile, mime, size and extension	  
+	 */
 	public function getFiles(){
 		return $this->files;
 	}
 
+	/**
+	 * Get one of the uploaded files. 
+	 * @param int $index The index of the uploaded files to get. If not set, this function will return the first (or the only one) uploaded file
+	 * @return StdClass The uploaded file at the given index
+	 */
 	public function getFile($index = 0){
 		return $this->files[$index];
 	}
 
+	/**
+	 * Move a uploaded file to a directory
+	 * @param StdClass $file The file to move
+	 * @param string $directory The directory where to move the file
+	 * @param string $basename The basename to apply for the moved file
+	 */
 	public function move($file, $directory, $basename = null){
 		if($basename === null){
 			$basename = $file->basename;
@@ -70,4 +98,7 @@ class Upload{
 	}
 }
 
+/**
+ * This class describes the exceptions throwed by Upload class
+ */
 class UploadException extends Exception{}

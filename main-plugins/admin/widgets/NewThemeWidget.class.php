@@ -1,5 +1,6 @@
 <?php
 
+
 class NewThemeWidget extends Widget{
     public function __construct(){
         $this->form = ThemeController::getInstance()->addThemeForm();

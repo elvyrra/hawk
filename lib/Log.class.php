@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Log.class.php
  */
@@ -41,6 +42,10 @@ class Log{
      */
     $level;
 
+    /**
+     * Constructor
+     * @param string $level The log level - Must be one of these values : 'debug', 'info', 'notice', 'warning', 'error'
+     */
     private function __construct($level){
         if(!in_array($level, self::getLevels())) {
             throw new LogException('The level ' . $level . ' does not exists for logs');
@@ -105,6 +110,7 @@ class Log{
 
     /**
      * Write log
+     * @param string $message The message to write
      */
     private function write($message){
         $trace = debug_backtrace();
@@ -124,6 +130,7 @@ class Log{
 
     /**
      * Get a log instance
+     * @param string $level The level if the logger
      */
     private static function getInstance($level){
         if(!isset(self::$instances[$level])){
@@ -135,6 +142,7 @@ class Log{
 
     /**
      * Log info data. Use this function to log user action like form submission
+     * @param string $message The message to write
      */
     public static function info($message){
         self::getInstance(self::LEVEL_INFO)->write($message);
@@ -142,6 +150,7 @@ class Log{
 
     /**
      * Log debug data. this function is used to log script execution steps
+     * @param string $message The message to write
      */
     public static function debug($message){
         self::getInstance(self::LEVEL_DEBUG)->write($message);
@@ -149,6 +158,7 @@ class Log{
 
     /**
      * Log notice data. This function is used to log anormal non blocking usage
+     * @param string $message The message to write
      */
     public static function notice($message){
         self::getInstance(self::LEVEL_NOTICE)->write($message);
@@ -156,6 +166,7 @@ class Log{
 
     /**
      * Log warning data. this function is used to log actions that didn't work because of user bad action (eg form badly completed)
+     * @param string $message The message to write
      */
     public static function warning($message){
         self::getInstance(self::LEVEL_WARNING)->write($message);
@@ -163,10 +174,15 @@ class Log{
 
     /**
      * Log error data. This function is used to log actions that didn't work because of a script error 
+     * @param string $message The message to write
      */
     public static function error($message){
         self::getInstance(self::LEVEL_ERROR)->write($message);
     }
 }
 
-class LogException extends Exception{}
+
+/**
+ * This class describes the exceptions throwed by Log class
+ */
+class LogException extends \Exception{}

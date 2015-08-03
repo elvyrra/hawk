@@ -3,6 +3,8 @@
  * Session.class.php
  * @author Elvyrra SAS
  */
+
+
 /**
  * This trait is used to manage the user's sessions. It's declared as trait 
  * to be used in custom classes developer could want to develop to extend

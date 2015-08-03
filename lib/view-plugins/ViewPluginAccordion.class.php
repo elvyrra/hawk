@@ -1,5 +1,6 @@
 <?php
 
+
 class ViewPluginAccordion extends ViewPlugin{
 	public function display(){
 		if(!$this->id){

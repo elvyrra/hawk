@@ -1,5 +1,6 @@
 <?php
 
+
 class FileSession implements SessionHandlerInterface{
     private $savePath;
 

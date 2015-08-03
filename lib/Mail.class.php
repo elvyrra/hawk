@@ -3,6 +3,8 @@
  * Mail.class.php
  */
 
+
+
 /**
  * This class use PHPMail library to send mails from Hawk applications
  */

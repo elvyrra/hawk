@@ -1,5 +1,6 @@
 <?php
 
+
 class EventManager{
     private static $events = array();
     const ORDER_LAST = -1;

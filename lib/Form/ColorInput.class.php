@@ -4,6 +4,8 @@
  * @author Elvyrra SAS
  */
 
+
+
 /**
  * This class describes color inputs
  */

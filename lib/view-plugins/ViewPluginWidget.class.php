@@ -1,5 +1,6 @@
 <?php
 
+
 class ViewPluginWidget extends ViewPlugin{
 	public function display(){
 		$classname = $this->class;

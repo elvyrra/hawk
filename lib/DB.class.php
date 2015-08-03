@@ -4,6 +4,8 @@
  * @author Elvyrra SAS
  */
 
+
+
 /**
  * This class is a manager for MySQL connection and queries
  */

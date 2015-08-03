@@ -3,6 +3,8 @@
  * ItemListField.class.php
  */
 
+
+
 /**
  * This class describes the field displayed in a smart list
  */
