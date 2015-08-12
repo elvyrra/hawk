@@ -14,7 +14,7 @@
 		{/foreach} >
 	
 		{if($input->invitation)}
-			<option>{{ $input->invitation }}</option>
+			<option value="{{ $input->emptyValue }}">{{ $input->invitation }}</option>
 		{/if}
 		{foreach($input->options as $v => $l)}
 			<option id="{{$input->id}}-option-{{$v}}" value="{{htmlentities($v,ENT_COMPAT)}}" {{$v == $input->value || is_array($input->value) && in_array($v, $input->value) ? "selected" : ""}}>{{ $l }}</option>

@@ -8,53 +8,121 @@
 
 /**
  * This class is used to generate and display smart lists, getting data from the database or a given array
+ * @package Core\List
  */
-
 class ItemList{
 	/*** Class constants ***/	
 	const DEFAULT_MODEL = 'GenericModel';
 	const ALL_LINES = 'all';
 	const DEFAULT_LINE_CHOICE = 20;
 
+	/**
+	 * The possible choices for the number of lines to display
+	 */
 	public static $lineChoice = array(10, 20, 50, 100);
 	
-	/*** Instance default values ***/
+	/**
+	 * The list control buttons
+	 * @var array
+	 */
 	public 	$controls = array(),
-			$fields = array(),
-			$searches = array(),
-			$sorts = array(),
-			$binds = array(),
-			$lines = self::DEFAULT_LINE_CHOICE,
-			$page = 1,
-			$action,
-			$model = self::DEFAULT_MODEL,
-			$group = array(),
-			$selected = null,
-			$lineClass = null,
-			$style = '',
-			$navigation = true,
-			$navigationClass = '',
-			$noHeader = false,
-			$target = '',
-			$emptyMessage;
+
+	/**
+	 * The list fields
+	 * @var array
+	 */
+	$fields = array(),
+
+	/**
+	 * The user researches in the list
+	 * @var array
+	 */
+	$searches = array(),
+
+	/**
+	 * The user sorts
+	 * @var array
+	 */
+	$sorts = array(),
+
+	/**
+	 * The binded values for the SQL queries
+	 * @var array
+	 */
+	$binds = array(),
+
+	/**
+	 * The number of lines to display
+	 * @var int
+	 */
+	$lines = self::DEFAULT_LINE_CHOICE,
+
+	/**
+	 * The page number to display
+	 * @var int
+	 */
+	$page = 1,
+
+	/**
+	 * The URI called to refresh the list
+	 * @var string 
+	 */
+	$action,
+
+	/**
+	 * The model used to get the data in the database
+	 * @var string
+	 */
+	$model = self::DEFAULT_MODEL,
+
+	/**
+	 * The fields group in the search query
+	 * @var array
+	 */
+	$group = array(),
+
+	/**
+	 * The id of the selected line 
+	 * @var mixed
+	 */
+	$selected = null,
+
+	/**
+	 * The class to apply to the list lines
+	 * @var strnig|function
+	 */
+	$lineClass = null,
+
+	/**
+	 * Defines if the navigation bar of the list must be displayed
+	 * @var bool
+	 */
+	$navigation = true,
+
+	/**
+	 * If set to true, the columns headers are not displayed
+	 * @var bool	 
+	 */
+	$noHeader = false,
+
+	/**
+	 * If not empty, define the CSS selector of the node where to display the list refreshing result
+	 * @var string
+	 */
+	$target = '',
+
+	/**
+	 * Define the message to display if no result are found for the list
+	 * @var string
+	 */
+	$emptyMessage;
+
+
+	/**
+	 * The DB instance used to make the database queries to get the list results
+	 */
 	private $dbo;
 
-	private static $fieldsProperties = array(
-		'field' => null,
-		'class' => null,
-		'title' => null, 
-		'href' => null,
-		'onclick' => null, 
-		'style' => null, 
-		'unit' => null,
-		'display' => null, 
-		'target' => null,
-		'sort' => true,
-		'search' => true,
-		'independant' => false,
-		'hidden' => false,
-	);
-			
 	/**
 	 * Constructor
 	 * @param arary $params The parameter of the list
@@ -88,10 +156,7 @@ class ItemList{
 		$this->dbo= DB::get($model::getDbName());
 		$this->table = $model::getTable();
 		
-		/*** initialize fields default values ***/
-		foreach($this->fields as $name => &$field){
-			$field = new ItemListField($field);			
-		}
+		
 
 		/*** initialize controls ***/
 		foreach($this->controls as &$button){
@@ -125,7 +190,19 @@ class ItemList{
 		}
 		
 		// register the filters in cookie for future list call
-		setcookie("list-{$this->id}", json_encode($cookie), time() + 365 * 24 * 3600, '/');		
+		setcookie('list-' . $this->id, json_encode($cookie), time() + 365 * 24 * 3600, '/');	
+
+		/*** initialize fields default values ***/
+		foreach($this->fields as $name => &$field){
+			$field = new ItemListField($name, $field, $this);
+			if(!empty($this->searches[$name])){
+				$field->searchValue = $this->searches[$name];
+			}
+
+			if(!empty($this->sorts[$name])){
+				$field->sortValue = $this->sorts[$name];
+			}
+		}	
 	}
 	
 	/**
@@ -165,28 +242,23 @@ class ItemList{
 			
 		/* insert the reference if not present in the fields **/
 		if(!isset($this->fields[$this->refAlias])){
-			$this->fields[$this->refAlias] = new ItemListField(array(
+			$this->fields[$this->refAlias] = new ItemListField($this->refAlias, array(
 				'field' => $this->refField,
 				'hidden' => true
-			));
+			), $this);
 		}
 		
 		/*** Prepare the fields to research ***/
 		$searches = array();
 		foreach($this->fields as $name => &$field){
 			if(!$field->independant){
-
-				if(!$field->field){
-					$field->field = $name;
-				}
-				
 				$fields[$this->dbo->formatField($field->field)] = $this->dbo->formatField($name);
 				
 				/*** Get the pattern condition ***/			
-				$pattern = !empty($this->searches[$name]) ? $this->searches[$name] : '';
-				if($pattern){
-					$where[] = DBExample::make(array($field->field => array('$like' => "%$pattern%")), $this->binds);
-				}	
+				$sql = $field->getSearchCondition($this->binds);
+				if($sql){
+					$where[] = $sql;
+				}
 			}
 		}
 
@@ -213,7 +285,8 @@ class ItemList{
 				'binds' => $this->binds,
 				'orderby' => $this->sorts,
 				'group' => $this->group,
-				'limit' => "$this->start, $this->lines",
+				'start' => $this->start,
+				'limit' => $this->lines,
 				'index' => $this->refAlias,
 				'return' => $this->model
 			);
@@ -306,34 +379,7 @@ class ItemList{
 					}
 
 					foreach($this->fields as $name => $field){
-						$cell = array(
-							'class' => '',
-							'style' => '',
-							'display' => !empty($line->$name) ? $line->$name : ''
-						);
-
-						foreach(self::$fieldsProperties as $prop => $default){
-							if(!is_null($field->$prop)){
-								if(is_callable($field->$prop)){
-									$func = $field->$prop;
-									$cell[$prop] = $func(!empty($line->$name) ? $line->$name : null, $field, $line);									
-								}
-								else{
-									$cell[$prop] = $field->$prop;									
-								}
-							}						
-						}
-
-						$cell['class'] .= " list-cell-$this->id-$name ";
-						if($field->onclick || $field->href){
-							$cell['class'] .= " list-cell-clickable";
-						}							 
-								
-						if($field->hidden) {
-							$cell['class'] = ' list-cell-hidden';
-						}
-
-						$data[$id][$name] = $cell;
+						$data[$id][$name] = $field->displayCell($id);
 					}
 				}
 			}

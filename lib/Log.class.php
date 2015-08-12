@@ -6,6 +6,7 @@
 
 /**
  * This class is used to log data in /logs directory. You can use it to log the action of the users on the application, for example to make stats.
+ * @package Core
  */
 class Log{
     const LEVEL_DEBUG = 'debug';

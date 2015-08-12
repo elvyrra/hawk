@@ -2,11 +2,13 @@
 /**
  * CheckboxInput.class.php
  * @author Elvyrra SAS
+ * @license MIT
  */
 
 
 /**
  * This class describes checkboxes
+ * @package Form\Input
  */
 class CheckboxInput extends FormInput{
 
@@ -14,7 +16,7 @@ class CheckboxInput extends FormInput{
 	
 	/**
 	 * display the checkbox
-	 * @return string The HTML result of displaying
+	 * @return string The displayed HTML
 	 */
 	public function __toString(){	
 		if($this->value){
@@ -32,4 +34,3 @@ class CheckboxInput extends FormInput{
         return isset($_POST[$this->name]) ? '1' : '0';		
 	}
 }
-/******************* (C) COPYRIGHT 2014 ELVYRRA SAS *********************/

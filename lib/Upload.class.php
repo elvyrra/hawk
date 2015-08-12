@@ -8,6 +8,7 @@
 
 /**
  * This class permits to treat AJAX uploads 
+ * @package Core
  */
 class Upload{
 	/**

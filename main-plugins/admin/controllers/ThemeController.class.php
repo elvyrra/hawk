@@ -7,6 +7,7 @@ class ThemeController extends Controller{
 	 * Display the main page of themes
 	 */
 	public function index(){
+		
 		$tabs = array(
 			'select' => $this->compute('listThemes'),
 			'customize' => $this->compute('customize'),

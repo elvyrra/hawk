@@ -1,10 +1,26 @@
 <?php
+/**
+ * TextareaInput.class.php
+ * @author Elvyrra SAS
+ * @license MIT
+ */
 
-
+/**
+ * This class describes the behavior of textareas
+ * @package Form\Input
+ */
 class TextareaInput extends FormInput{
 	const TYPE = 'textarea';
 
-	public 	$rows, $cols;
-}
+	/**
+	 * The attribute 'rows'
+	 * @var int
+	 */
+	public 	$rows, 
 
-/******************* (C) COPYRIGHT 2014 ELVYRRA SAS *********************/
+	/**
+	 * The attribute 'cols'
+	 * @var int
+	 */
+	$cols;
+}

@@ -1,19 +1,25 @@
 <?php
 /**
  * IntegerInput.class.php
+ * @author Elvyrra SAS
  */
 
-
+/**
+ * This class describes the behavior of inputs that value must be an integer
+ * @package Form\Input
+ */
 class IntegerInput extends NumberInput{
-	public function __construct($param){
-		parent::__construct($param);
-		
-		$this->pattern = "/^[\-]?\d*$/";
-	}
-	
+	/**
+	 * The input pattern
+	 * @var string
+	 */
+	public $pattern = '/^[\-]?\d*$/';
+
+	/**
+	 * Return the input value, formatted for the SQL database
+	 * @return int The formatted value
+	 */
 	public function dbvalue(){
 	    return (int)($this->value);   
 	}
 }
-
-/******************* (C) COPYRIGHT 2014 ELVYRRA SAS *********************/

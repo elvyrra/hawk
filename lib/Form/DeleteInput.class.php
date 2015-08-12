@@ -8,11 +8,11 @@
 
 /**
  * This class describes the "delete" inputs. Delete input are submit inputs used to delete the current edited data in the database
+ * @package Form\Input
  */
 class DeleteInput extends ButtonInput{
 	const TYPE = "submit";
 	const INDEPENDANT = true;
-	const NO_LABEL = true;
 	
 	/**
 	 * Display the input

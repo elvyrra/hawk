@@ -1,12 +1,13 @@
 <?php
 /**
  * View.class.php
+ * @author Elvyrra SAS
  */
-
-
+ 
 
 /**
  * This class describes the behavior of views
+ * @package View
  */
 class View{	
 	/**
@@ -41,8 +42,10 @@ class View{
 	const BLOCK_END_REGEX = '#\{\/(if|for|foreach|while)\s*\}#is';
 	const ECHO_REGEX = '#\{{2}\s*(.+?)\}{2}#is';
 
-	const PLUGIN_REGEX = '#\{(\w+)((\s+\w+\=([\'"])((?:\\\"|.)*?)\\4)*)\s*\}#';
-	const PLUGIN_ARGUMENTS_REGEX = '#(\w+)\=([\'"])(\{?)((?:\\\"|.)*?)(\}?)\\2#';
+	const ASSIGN_REGEX = '#\{assign\s+name=(["\'])(\w+)\\1\s*\}(.*?)\{\/assign\}#ims';
+
+	const PLUGIN_REGEX = '#\{(\w+)((\s+\w+\=([\'"])((?:\\\"|\\\'|.)*?)\\4)*)\s*\}#';
+	const PLUGIN_ARGUMENTS_REGEX = '#(\w+)\=([\'"])(\{?)((?:\\\"|\\\'|.)*?)(\}?)\\2#';
 	
 	
 	/**
@@ -57,7 +60,7 @@ class View{
 		
 		$this->file = $file;
 		
-		$this->fileCache = new FileCache($this->file, 'views', 'php');
+		$this->fileCache = new FileCache($this->file, 'views');
 
 		$this->content = file_get_contents($file);				
 		$this->getDependencies();
@@ -120,7 +123,8 @@ class View{
 		$replaces = array(
 			self::BLOCK_START_REGEX => "<?php $1 $2 : ?>", // structure starts
 			self::BLOCK_END_REGEX => "<?php end$1; ?>", // structures ends
-			self::ECHO_REGEX => "<?php echo $1; ?>" // echo
+			self::ECHO_REGEX => "<?php echo $1; ?>", // echo
+			self::ASSIGN_REGEX => "<?php ob_start(); ?>$3<?php \$$2 = ob_get_clean(); ?>" // assign template part in variable
 		);		
 		$this->content = preg_replace(array_keys($replaces), $replaces, $this->content);
 		

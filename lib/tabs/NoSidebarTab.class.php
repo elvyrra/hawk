@@ -1,12 +1,12 @@
 <?php
 /**
  * NoSidebarTab.class.php
+ * @author Elvyrra SAS
  */
-
-
 
 /**
  * This class is used to display a whole tab without sidebar
+ * @package TabLayout
  */
 class NoSidebarTab extends View{
 

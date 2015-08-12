@@ -5,19 +5,27 @@
  */
 
 
-
-
+/**
+ * This class describes email inputs behavior
+ * @package Form\Input
+ */
 class EmailInput extends TextInput{
 
 	/**
 	 * Constructor
-	 * @param 
+	 * @param array $param The input parameters
 	 */
 	public function __construct($param){
 		parent::__construct($param);
 		$this->pattern = "/^[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]{2,}\.[a-z]{2,4}$/";
 	}
 	
+
+	/**
+	 * Check the format of the submitted value
+	 * @param Form $form The form the input is associated with
+	 * @return boolean true if the submitted value is a correct email, else false
+	 */
 	public function check(&$form = null){		
 		if(parent::check($form)){			
 			if(!empty($this->compare) && $form){			
@@ -32,4 +40,3 @@ class EmailInput extends TextInput{
 			return false;
 	}
 }
-/******************* (C) COPYRIGHT 2014 ELVYRRA SAS *********************/

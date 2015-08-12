@@ -6,6 +6,7 @@
 
 /**
  * This class uses dompdf to generate PDF from HTML templates
+ * @package Utils
  */
 class PDF{
     /**

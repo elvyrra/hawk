@@ -1,21 +1,71 @@
 <?php
+/**
+ * Lang.class.php
+ * @author Elvyrra SAS
+ * @license MIT
+ */
 
-
+/**
+ * This class is used to manage translations
+ * @package Core
+ */
 class Lang{
+
 	const DEFAULT_LANGUAGE = 'en';
 	const ORIGIN_CACHE_FILE = CACHE_DIR . 'lang-file-paths.php';
 	const CACHE_DIR = CACHE_DIR . 'lang/';
 	const TRANSLATIONS_DIR = USERFILES_PLUGINS_DIR . 'admin/translations/';
 
-	private static $langs = array(), $usedLanguage = ''; // This array contains all textdomains
-	
-	private static $originCache = array();
-
-	private $plugin, $lang, $originFile, $translatedFile, $cacheFile;
 	/**
-	 * @constructs
-	 * @param {string} $plugin - The plugin of the file
-	 * @param {string} $lang - The language of the file
+	 * The language keys with their translations
+	 * @var array
+	 */
+	private static $langs = array(), 
+
+	/**
+	 * The currently used language
+	 * @var string
+	 */
+	$usedLanguage = '',
+	
+	/**
+	 * The cache containing the source files paths
+	 * @var array
+	 */
+	$originCache = array();
+
+	/**
+	 * The plugin of the language file
+	 * @var string
+	 */
+	private $plugin, 
+
+	/**
+	 * The language of the language file
+	 * @var string
+	 */
+	$lang, 
+
+	/**
+	 * The source file
+	 * @var string
+	 */
+	$originFile, 
+
+	/**
+	 * The path of the file containing the custom translations 
+	 */
+	$translatedFile, 
+
+	/**
+	 * The path of the PHP cache file 
+	 */
+	$cacheFile;
+
+	/**
+	 * Constructor
+	 * @param string $plugin The plugin of the file
+	 * @param string $lang The language of the file
 	 */
 	private function __construct($plugin, $lang){
 		$this->plugin = $plugin;
@@ -29,7 +79,7 @@ class Lang{
 
 	/**
 	 * Find the origin language file
-	 * @return {string} - The path of the origin language file
+	 * @return string The path of the origin language file
 	 */
 	private function getOriginFile(){
 		if(is_file(self::ORIGIN_CACHE_FILE) && empty(self::$originCache)){
@@ -60,7 +110,7 @@ class Lang{
 
 	/**
 	 * Find the translated file in userfiles directory
-	 * @return {string} path - The path of the file
+	 * @return string path The path of the file
 	 */
 	private function getTranslatedFile(){		
 		return self::TRANSLATIONS_DIR . $this->plugin . '.' . $this->lang . '.lang';
@@ -68,7 +118,7 @@ class Lang{
 
 	/**
 	 * Find the cache file, containing the PHP version of the language files
-	 * @return {string} path - The path of the cache file
+	 * @return string path The path of the cache file
 	 */
 	private function getCacheFile(){
 		return self::CACHE_DIR . $this->plugin . '.' . $this->lang . '.php';
@@ -77,8 +127,8 @@ class Lang{
 
 	/**
 	 * Parse a language file 
-	 * @param {string} the file to parse
-	 * @return {array} the language keys of the language file
+	 * @param string The file to parse
+	 * @return array The language keys of the language file
 	 */
 	private function parse($file){		
 		return is_file($file) ? parse_ini_string(file_get_contents($file)) : array();
@@ -102,9 +152,9 @@ class Lang{
 	
 	/**
 	 * Load a language file 
-	 * @param {string} $plugin - The plugin to load
-	 * @param {string} $language - The language to get the translations in
-	 * @param {string} $force - If set to true, force to reload the translations
+	 * @param string $plugin The plugin to load
+	 * @param string $language The language to get the translations in
+	 * @param string $force If set to true, force to reload the translations
 	 */
 	private static function load($plugin, $language = LANGUAGE, $force = false){
 		if(!isset(self::$langs[$plugin]) || $force){
@@ -131,9 +181,9 @@ class Lang{
 
 	/**
 	 * Get the translations of a language file
-	 * @param {string} $plugin - The plugin to load
-	 * @param {string} $language - The language to get the translations in
-	 * @param {string} $force - If set to true, force to reload the translations
+	 * @param string $plugin The plugin to load
+	 * @param string $language The language to get the translations in
+	 * @param string $force If set to true, force to reload the translations
 	 */
 	public static function keys($plugin, $language = LANGUAGE, $reload = false){
 		if(!isset(self::$langs[$plugin]) || $reload || $language != self::$usedLanguage){
@@ -156,7 +206,7 @@ class Lang{
 
 	/**
 	 * Check if a language key exists 
-	 * @param {String} $langKey - the key to check existence
+	 * @param string $langKey The key to check existence
 	 */
 	public static function exists($langKey){
 		list($plugin, $key) = explode('.', $langKey);
@@ -173,11 +223,11 @@ class Lang{
     
     /**
      * get the translation of a language key in the given language
-     * @param {String} $langKey - The key to get the translation
-     * @param {Array} $param - On associative array containing the variables value in the translation
-     * @param {mixed} $number - A number describing the singular or plural version of the translation
-     * @param {string} $language - the language to get the translation. By default the current language
-     * @return {String} - The translation
+     * @param string $langKey The key to get the translation
+     * @param array $param On associative array containing the variables value in the translation
+     * @param mixed $number A number describing the singular or plural version of the translation
+     * @param string $language The language to get the translation. By default the current language
+     * @return string The translation
      */
     public static function get($langKey, $param = array(), $number = 0, $language = LANGUAGE){
 		list($plugin, $key) = explode('.', $langKey);
@@ -223,8 +273,8 @@ class Lang{
 
 	/**
 	 * Add language keys to Javascript
-	 * @param {String} $key1 - The first key
-	 * @param {String} $key2 .....
+	 * @param string $key1 The first key
+	 * @param string $key2 .....
 	 */
 	public static function addKeysToJavascript(){
 		$keys = func_get_args();
@@ -244,8 +294,8 @@ class Lang{
 
 	/**
 	 * Get the translations data the user customized on the interface
-	 * @param {string} $plugin - The plugin name
-	 * @param {string} $language - The language tag
+	 * @param string $plugin The plugin name
+	 * @param string $language The language tag
 	 */
 	public static function getUserTranslations($plugin, $language){
 		$lang = new self($plugin, $language);
@@ -255,9 +305,9 @@ class Lang{
 
 	/**
 	 * Save translated data the user customized on the interface
-	 * @param {string} $plugin - The plugin name
-	 * @param {string} $language - The language tag
-	 * @param {array} $data - The translations to save
+	 * @param string $plugin The plugin name
+	 * @param string $language The language tag
+	 * @param array $data The translations to save
 	 */
 	public static function saveUserTranslations($plugin, $language, $data){
 		$lang = new self($plugin, $language);

@@ -7,6 +7,7 @@
 
 /**
  * This class is used to access and set application options
+ * @package Core
  */
 class Option{
 	/**

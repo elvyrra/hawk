@@ -1,12 +1,12 @@
 <?php
 /**
  * ViewPluginButton.class.php
+ * @author Elvyrra SAS
  */
 
-
-
 /**
- * this class is used in views to display a button
+ * This class is used in views to display a button
+ * @package View\Plugins
  */
 class ViewPluginButton extends ViewPlugin{
 	/**

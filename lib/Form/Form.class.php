@@ -3,10 +3,9 @@
  * Form.class.php
  */
 
-
-
 /**
  * This class is used to generate, display and treat forms.
+ * @package Form
  */
 class Form{
 	const NO_EXIT = false;
@@ -135,6 +134,11 @@ class Form{
 	 * The action that is performed on form submission
 	 */
 	$dbaction = self::ACTION_REGISTER;
+
+	/**
+	 * Form instances
+	 */
+	private static $instances = array();
 	
 
 	/**
@@ -201,9 +205,26 @@ class Form{
         }
 
 		// get the data of the form to display or register
-        $this->reload();		
+        $this->reload();
+
+        self::$instances[$this->id] = $this;		
 	}
 	
+
+	/**
+	 * Get a form instance
+	 * @static
+	 * @param string $id the form id to get
+	 * @return Form The form instance
+	 */
+	public static function getInstance($id){
+		if(isset(self::$instances[$id])){
+			return self::$instances[$id];						
+		}
+		else{
+			return null;
+		}
+	}
 
 	/**
 	 * Set form parameters
@@ -222,73 +243,6 @@ class Form{
 	}
 
 
-	/**
-	 * Get the POST and FILES data from php://input. This is used for AJAX uploads
-	 */
-	public function getFromInput(){		
-		$input = file_get_contents("php://input");
-		if(!empty($input)){
-			preg_match("/^(\-{6}\w+)/i", $input, $m);
-			$boundary = $m[1];
-			$input = str_replace($boundary . '--', '', $input);
-			$data = preg_split('/'.$boundary.'\r?\n/is', $input, -1, PREG_SPLIT_NO_EMPTY);
-			$_POST = array();
-			$_FILES = array();
-			foreach($data as $field){			
-				if(preg_match('/^Content\-Disposition\: form\-data; name="(.+?)"; filename="(.+)"\r?\nContent\-Type: (.+?)\r?\n\r?\n(.*?)\r?\n$/is', $field, $match)){								
-					$name = $match[1];
-					$filename = $match[2];
-					$mime = $match[3];
-					$content = $match[4];
-					$tmpname = uniqid('/tmp/');
-					file_put_contents($tmpname, $content);
-					if(preg_match('/^(\w+)\[(.*)\]$/', $name, $m)){
-						if(!isset($_FILES[$m[1]]))
-							$_FILES[$m[1]] = array();
-						if(empty($m[2])){
-							$_FILES[$m[1]]['name'][] = $filename;
-							$_FILES[$m[1]]['type'][] = $mime;
-							$_FILES[$m[1]]['tmp_name'][] = $tmpname;
-							$_FILES[$m[1]]['error'][] = UPLOAD_ERR_OK;
-							$_FILES[$m[1]]['size'][] = filesize($tmpname);
-						}
-						else{
-							$_FILES[$m[1]]['name'][$m[2]] = $filename;
-							$_FILES[$m[1]]['type'][$m[2]] = $mime;
-							$_FILES[$m[1]]['tmp_name'][$m[2]] = $tmpname;
-							$_FILES[$m[1]]['error'][$m[2]] = UPLOAD_ERR_OK;
-							$_FILES[$m[1]]['size'][$m[2]] = filesize($tmpname);
-						}
-					}
-					else{
-						$_FILES[$name]['name'] = $filename;
-						$_FILES[$name]['type'] = $mime;
-						$_FILES[$name]['tmp_name'] = $tmpname;
-						$_FILES[$name]['error'] = UPLOAD_ERR_OK;
-						$_FILES[$name]['size'] = filesize($tmpname);
-					}
-				}
-				elseif(preg_match('/^Content\-Disposition\: form\-data; name="(.+?)"\r?\n\r?\n(.*?)\r?\n$/is', $field, $match)){				
-					$name = $match[1];
-					$value = $match[2];				
-					if(preg_match('/^(\w+)\[(.*)\]$/', $name, $m)){
-						if(!isset($_POST[$m[1]]))
-							$_POST[$m[1]] = array();
-						if(empty($m[2])){
-							$_POST[$m[1]][] = $value;
-						}
-						else{
-							$_POST[$m[1]][$m[2]] = $value;
-						}
-					}
-					else{
-						$_POST[$name] = $value;
-					}
-				}
-			}
-		}
-	}
-	
 	/**
 	 * Reload the form data
 	 */
@@ -424,10 +378,18 @@ class Form{
 	}
 	
 	/**
-	 * Display the form 
+	 * Display the form (alias of display method)
 	 * @return string The HTML result of form displaying
 	 */
 	public function __toString(){
+		return $this->display();
+	}
+
+	/**
+	 * Display the form
+	 * @return string The HTML result of form displaying
+	 */
+	public function display(){
 		try{			
 			if(empty($this->fieldsets)){				
 				// Generate a fake fieldset, to keep the same engine for forms that have fieldsets or not
@@ -450,7 +412,6 @@ class Form{
 			ErrorHandler::exception($e);
 		}
 	}
-	
 	
 
 	/**

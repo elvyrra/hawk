@@ -1,16 +1,21 @@
 <?php
 /**
-  * Crypto.class.php
-  */ 
-
-
+ * Crypto.class.php
+ * @author Elvyrra SAS
+ */ 
 
 /**
  * This class contains cryptography functions
+ * @package Security
  */
 class Crypto{
+
 	/**
-	 * Encode with AES 256 algorithm
+	 * Encode a string with AES 256 algorithm
+	 * @param string $data The data to encrypt
+	 * @param string $key The encryption key
+	 * @param string $iv The initialization vector for encryption
+	 * @return string The encrypted data
 	 */
 	public static function aes256Encode($data, $key = CRYPTO_KEY, $iv = CRYPTO_IV){
 		$block = mcrypt_get_block_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
@@ -24,6 +29,10 @@ class Crypto{
 
 	/**
 	 * Decode with AES 256 algorithm
+	 * @param string $data The data to decrypt
+	 * @param string $key The decryption key
+	 * @param string $iv The initialization vector for decryption
+	 * @return string The decrypted data
 	 */
 	public static function aes256Decode($data, $key = CRYPTO_KEY, $iv = CRYPTO_IV){
 		$code = base64_decode($data);
@@ -35,9 +44,12 @@ class Crypto{
 	
 	/**
 	 * Hash a string with a salt
+	 * @param string $data The data to hash
+	 * @param string $salt The salt to use before hashing
+	 * @param string The hashed data
 	 */
-	public static function saltHash($password, $salt = CRYPTO_SALT){
-		return sha1($salt . $password . $salt);
+	public static function saltHash($data, $salt = CRYPTO_SALT){
+		return sha1($salt . $data . $salt);
 	}
 
 

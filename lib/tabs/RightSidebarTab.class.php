@@ -1,12 +1,12 @@
 <?php
 /**
  * RightSidebarTab.class.php
+ * @author Elvyrra SAS
  */
-
-
 
 /**
  * This class is used to display a whole tab with a sidebar on right
+ * @package TabLayout
  */
 class RightSidebarTab extends View{
 	/**

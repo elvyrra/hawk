@@ -6,6 +6,7 @@
 
 /**
  * This class describes date and datetime inputs
+ * @package Form\Input
  */
 class DatetimeInput extends TextInput{	
 	/**
@@ -100,6 +101,7 @@ class DatetimeInput extends TextInput{
 
 	/**
 	 * Return the input value in the database format
+	 * @return string The formatted value
 	 */
 	public function dbvalue(){
 		$date = DateTime::createFromFormat($this->format, $this->value);

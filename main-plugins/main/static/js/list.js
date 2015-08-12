@@ -1,15 +1,6 @@
-/**********************************************************************
- *    						ItemList.js
- *
- *
- * Author:   Julien Thaon & Sebastien Lecocq 
- * Date: 	 Jan. 01, 2014
- * Copyright: ELVYRRA SAS
- *
- * This file is part of Beaver's project.
- *
- *
- **********************************************************************/
+/**	
+ * This class describe the client behavior of the item lists
+ */
 var List = function(data){
 	for(var i in data)
 		this[i] = data[i];

@@ -1,9 +1,34 @@
 <?php
+/**
+ * DBExample.class.php
+ * @author Elvyrra SAS
+ * @license MIT
+ */
 
-
+/**
+ * This class is used to construct SQL WHERE expressions from arrays. 
+ * This can be useful to build simple conditions without writing SQL query and manage binding values
+ * This class is used in classes Model, Form, ItemList to get data from the database.
+ * Example : To make the expression 'field1 = "value1" AND (field2 IS NOT NULL OR field3 < 12)', create an DBExample like :
+ * new DBExample(array(
+ *		array('field1' => "value1"),
+ *		array('$or' => array(
+ *			'field2' => '$notnull',
+ *			'field3' => array('$lt' => 12)
+ *		))
+ * ))
+ * @package Core
+ */
 class DBExample{
-	public $example;
+	/**
+	 * The example content 
+	 * @var array
+	 */
+	public $example = array();
 	
+	/**
+	 * The supported binary operators
+	 */
 	private static $binaryOperators = array(
 		'$ne' => '<>',
 		'$lt' => '<',
@@ -16,27 +41,56 @@ class DBExample{
 		'$nin' => 'NOT IN'
 	);
 	
+	/**
+	 * The supported unary operators
+	 */
 	private static $unaryOperators = array(
 		'$null'  => 'IS NULL',
 		'$notnull' => 'IS NOT NULl'
 	);
 	
+	/**
+	 * Constructor
+	 * @param array $example The DBExample structure
+	 */
 	public function __construct($example){
 		$this->example = $example;
 	}
 	
+	/**
+	 * Create a DBExample and parse it
+	 * @param array $example The DBExample structure
+  	 * @param array $binds This variables, passed by reference, will be filled with the binded values during example parsing
+  	 * @return string the parsed SQL expression
+	 */
 	public static function make($example, &$binds){
 		$instance = new self($example);
 		return $instance->parse($binds);
 	}
 	
+
+	/**
+	 * Parse the example to create the corresponding SQL expression
+	 * @param array $binds This variable, passed by reference, will be filled with the binded values during example parsing
+	 * @return string the parsed SQL expression
+	 */
 	public function parse(&$binds){		
 		return $this->parseElements($binds);
 	}
 
+
+	/**
+	 * Parse a substructure. This method is used internally and recursively by the method parse
+	 * @param array $binds The binded values, filles during parsing
+	 * @param array $elements The substructure to parse
+	 * @param string $operator The operator to separate the parsed substructures
+	 * @param string $upperKey The key of the parent structure. For example, if you parse array('$gt' => 3), in the whole structure array('field' => array('$gt' => 3)), $upperKey will be set to 'field'
+	 * @return string The SQL expression, result of the elements parsing 
+	 */
 	private function parseElements(&$binds = null, $example = null, $operator = 'AND', $upperKey = null){
-		if($example === null)
+		if($example === null){
 			$example = $this->example;
+		}
 		if(empty($binds)){
 			$binds = array();
 		}
@@ -123,9 +177,11 @@ class DBExample{
 			return implode(" $operator ", $elements);
 		}
 	}
-	
-		
 }
 
+
+/**
+ * This class describes the behavior of the exceptions throwed by DBExample class
+ */
 class DBExampleException extends Exception{	
 }

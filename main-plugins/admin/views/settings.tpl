@@ -1,69 +1,73 @@
-{{ $form->fieldsets['_submits'] }}
+{assign name="formContent"}
+	{{ $form->fieldsets['_submits'] }}
 
-<div role="tabpanel" id="settings-form-tabs" >	
-	<ul class="nav nav-tabs" role="tablist">
-		<li role="presentation"><a href="#settings-form-tab-main" aria-controls="settings-form-tab-main" role="tab" data-toggle="tab">{text key="admin.settings-main-legend"}</a></li>
-		<li role="presentation"><a href="#settings-form-tab-home" aria-controls="settings-form-tab-main" role="tab" data-toggle="tab">{text key="admin.settings-home-legend"}</a></li>
-		<li role="presentation"><a href="#settings-form-tab-users" aria-controls="settings-form-tab-main" role="tab" data-toggle="tab">{text key="admin.settings-users-legend"}</a></li>
-		<li role="presentation"><a href="#settings-form-tab-email" aria-controls="settings-form-tab-main" role="tab" data-toggle="tab">{text key="admin.settings-email-legend"}</a></li>		
-	</ul>
-	
-	<!-- Tab panes -->
-	<div class="tab-content">
-		<div role="tabpanel" class="tab-pane" id="settings-form-tab-main">
-			{{ $form->fieldsets['main'] }}
-		</div>
+	<div role="tabpanel" id="settings-form-tabs" >	
+		<ul class="nav nav-tabs" role="tablist">
+			<li role="presentation"><a href="#settings-form-tab-main" aria-controls="settings-form-tab-main" role="tab" data-toggle="tab">{text key="admin.settings-main-legend"}</a></li>
+			<li role="presentation"><a href="#settings-form-tab-home" aria-controls="settings-form-tab-main" role="tab" data-toggle="tab">{text key="admin.settings-home-legend"}</a></li>
+			<li role="presentation"><a href="#settings-form-tab-users" aria-controls="settings-form-tab-main" role="tab" data-toggle="tab">{text key="admin.settings-users-legend"}</a></li>
+			<li role="presentation"><a href="#settings-form-tab-email" aria-controls="settings-form-tab-main" role="tab" data-toggle="tab">{text key="admin.settings-email-legend"}</a></li>		
+		</ul>
 		
-		<div role="tabpanel" class="tab-pane" id="settings-form-tab-home">
-		{{ $form->fields['main.home-page-type'] }}
+		<!-- Tab panes -->
+		<div class="tab-content">
+			<div role="tabpanel" class="tab-pane" id="settings-form-tab-main">
+				{{ $form->fieldsets['main'] }}
+			</div>
+			
+			<div role="tabpanel" class="tab-pane" id="settings-form-tab-home">
+			{{ $form->fields['main.home-page-type'] }}
 
-		<div data-bind="visible: homePage.type() == 'custom'">
-			{{ $form->fields['main.home-page-html'] }}
-		</div>
+			<div data-bind="visible: homePage.type() == 'custom'">
+				{{ $form->fields['main.home-page-html'] }}
+			</div>
 
-		<div data-bind="visible: homePage.type() == 'page'">
-			{{ $form->fields['main.home-page-item'] }}
-		</div>
+			<div data-bind="visible: homePage.type() == 'page'">
+				{{ $form->fields['main.home-page-item'] }}
+			</div>
 
-		{{ $form->fields['main.open-last-tabs'] }}
-		</div>
-		
-		<div role="tabpanel" class="tab-pane" id="settings-form-tab-users">
-			{{ $form->fields['main.allow-guest'] }}		
-			{{ $form->fields['roles.default-role'] }}
+			{{ $form->fields['main.open-last-tabs'] }}
+			</div>
+			
+			<div role="tabpanel" class="tab-pane" id="settings-form-tab-users">
+				{{ $form->fields['main.allow-guest'] }}		
+				{{ $form->fields['roles.default-role'] }}
 
-			{{ $form->fields['main.open-register'] }}	
-			<div data-bind="visible: parseInt(register.open())">
-				<div class="clearfix"></div>	
-				<h3>{text key="admin.settings-register-options"}</h3>
-				{{ $form->fields['main.confirm-register-email'] }}	
-				<div data-bind="visible: register.checkEmail">	
-					{{ $form->fields['main.confirm-email-content'] }}	
+				{{ $form->fields['main.open-register'] }}	
+				<div data-bind="visible: parseInt(register.open())">
+					<div class="clearfix"></div>	
+					<h3>{text key="admin.settings-register-options"}</h3>
+					{{ $form->fields['main.confirm-register-email'] }}	
+					<div data-bind="visible: register.checkEmail">	
+						{{ $form->fields['main.confirm-email-content'] }}	
+					</div>
+					
+					<div class="clearfix"></div>
+					<h3>{text key="admin.settings-terms-options"}</h3>
+					{{ $form->fields['main.confirm-register-terms'] }}		
+					<div data-bind="visible: register.checkTerms">	
+						{{ $form->fields['main.terms'] }}	
+					</div>
 				</div>
-				
-				<div class="clearfix"></div>
-				<h3>{text key="admin.settings-terms-options"}</h3>
-				{{ $form->fields['main.confirm-register-terms'] }}		
-				<div data-bind="visible: register.checkTerms">	
-					{{ $form->fields['main.terms'] }}	
+			</div>
+			
+			<div role="tabpanel" class="tab-pane" id="settings-form-tab-email">
+				{{ $form->fields['main.mailer-from'] }}
+				{{ $form->fields['main.mailer-from-name'] }}
+				{{ $form->fields['main.mailer-type'] }}
+
+				<div data-bind="visible: mail.type() == 'smtp' || mail.type() == 'pop3'">
+					{{ $form->fields['main.mailer-host'] }}
+					{{ $form->fields['main.mailer-port'] }}
+					{{ $form->fields['main.mailer-username'] }}
+					{{ $form->fields['main.mailer-password'] }}				
+				</div>
+				<div data-bind="visible: mail.type() == 'smtp'">
+					{{ $form->fields['main.smtp-secured'] }}
 				</div>
 			</div>
-		</div>
-		
-		<div role="tabpanel" class="tab-pane" id="settings-form-tab-email">
-			{{ $form->fields['main.mailer-from'] }}
-			{{ $form->fields['main.mailer-from-name'] }}
-			{{ $form->fields['main.mailer-type'] }}
+		</div>			  
+	</div>
+{/assign}
 
-			<div data-bind="visible: mail.type() == 'smtp' || mail.type() == 'pop3'">
-				{{ $form->fields['main.mailer-host'] }}
-				{{ $form->fields['main.mailer-port'] }}
-				{{ $form->fields['main.mailer-username'] }}
-				{{ $form->fields['main.mailer-password'] }}				
-			</div>
-			<div data-bind="visible: mail.type() == 'smtp'">
-				{{ $form->fields['main.smtp-secured'] }}
-			</div>
-		</div>
-	</div>			  
-</div>
+{form id="{$form->id}" content="{$formContent}"}

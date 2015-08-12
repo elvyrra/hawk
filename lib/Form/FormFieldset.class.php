@@ -7,6 +7,7 @@
 
 /**
  * This class describes the behavior of a form fieldset
+ * @package Form
  */
 class FormFieldset{
 	/**

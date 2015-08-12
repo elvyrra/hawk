@@ -1,12 +1,12 @@
 <?php
 /**
  * LeftSidebarTab.class.php
+ * @author Elvyrra SAS
  */
-
-
 
 /**
  * This class is used to display a whole tab with a sidebar on left
+ * @package TabLayout
  */
 class LeftSidebarTab extends View{
 	

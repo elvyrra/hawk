@@ -7,6 +7,7 @@
 
 /**
  * This class describes the general behavior of inputs in forms. This class is associated to Form class
+ * @package Form\Input
  */
 class FormInput{
     /**
@@ -189,10 +190,16 @@ class FormInput{
      */
     public $independant = false;
 
+    /**
+     * Define if the input data has to be inserted in database when the form is submitted
+     */
     public $insert = true;
     
-    const NO_LABEL = false;
+    /**
+     * This constant is used to force the property $independant for all instances of a input class that extends this class
+     */
     const INDEPENDANT = false;
+    
     /**
      * Constructor
      * @param array $param The input parameters. This arguments is an associative array where each key is the name of a property of this class     
@@ -223,6 +230,8 @@ class FormInput{
 
     /**
      * Set the input parameters
+     * @param string|array $param If set as a string, the name of the parameter to set. If an array, a set of parameters
+     * @param mixed $value The value to set, in case the parameter $param is a string
      */
     public function setParam($param, $value = null){
         if(is_array($param)){
@@ -260,7 +269,7 @@ class FormInput{
     			unset($this->errorAt);
     		}
 
-    		$inputLabel = ! static::NO_LABEL && $this->label ? View::make(ThemeManager::getSelected()->getView(Form::VIEWS_DIR . 'form-input-label.tpl'), array(
+    		$inputLabel = $this->label ? View::make(ThemeManager::getSelected()->getView(Form::VIEWS_DIR . 'form-input-label.tpl'), array(
     			'input' => $this
     		)) : '';
     		
@@ -282,7 +291,7 @@ class FormInput{
 
     /**
      * Check the submitted value of the input
-     * @param Form &$form The form to apply the errors in case of check failure
+     * @param Form &$form The form the input is associated with
      * @return bool True if the submitted value is valid, else false
      */
 	public function check(&$form = null){				

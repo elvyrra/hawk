@@ -9,10 +9,27 @@
  * This trait is used to manage the user's sessions. It's declared as trait 
  * to be used in custom classes developer could want to develop to extend
  * the session management (manage licences, number of simultaneous connections, ...)
+ * @package Core
  */
 trait Session{
-	static $connected, $admin, $root, $user;
+	/**
+	 * Static variable that registers the connected state of the current user
+	 * @static
+	 * @var boolean
+	 */
+	static $connected, 
+
+	/**
+	 * Static variable that registers the current user of the session
+	 * @static
+	 * @var User
+	 */
+	$user;
 	
+	/**
+	 * Get the user of the current session
+	 * @return User the user of the current session
+	 */
 	public static function getUser(){
 		if(isset(self::$user)){
 			return self::$user;
@@ -47,9 +64,14 @@ trait Session{
 		return self::$connected;
 	}
 
+
+	/**
+	 * Check if the user is allowed to make action
+	 * @param string $action The name of the permission to check
+	 * @return boolean True if the user is allowed to perform this action, False in other case
+	 */
 	public static function isAllowed($action){
 		return self::getUser()->isAllowed($action);
 	}
 }
 
-/******************* (C) COPYRIGHT 2014 ELVYRRA SAS *********************/

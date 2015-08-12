@@ -7,6 +7,7 @@
 
 /**
  * This class describes the input[type='radio']
+ * @package Form\Input
  */
 class RadioInput extends FormInput{	
 	const TYPE = "radio";

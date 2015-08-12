@@ -1,31 +1,67 @@
 <?php
+/**
+ * Plugin.class.php
+ * @author Elvyrra SAS
+ */
 
-
+/**
+ * This class describes the behavior of the application plugins
+ * @package Core\Plugin
+ */
 class Plugin{
+	/**
+	 * The table in the database where the plugins data are registered
+	 */
 	const TABLE = "Plugin";
+
+	/**
+	 * The plugin name
+	 */
 	private $name, 
-			$definition = array(),
-			$config = array(),
-			$options = array();
+
+	/**
+	 * The plugin definition, described in the file manifest.json, at the root directory of the plugin
+	 */
+	$definition = array(),
+
+
+	/**
+	 * The plugin optionsn defined in the table Options
+	 */
+	$options = array();
+
+	/**
+	 * The root directory of the plugin
+	 */
 	private $rootDir,
-			$removable,
-			$active;
+
+	/**
+	 * Defines if the plugin can be removed or uninstalled
+	 */
+	$removable,
+
+	/**
+	 * Defines the active/inactive state of the plugin
+	 */
+	$active;
 	
-	
+	/**
+	 * The application main plugins, not removable or editable, used for the application core
+	 */
 	private static $mainPlugins = array('main', 'install', 'admin');
+
+	/**
+	 * The plugin instances
+	 */
 	private static $instances = array();
 	
-	/*	 
-	 * Create a plugin instance from it configuration
-	 * @param {String} $name - The plugin name, correspongin to the directory name
+	/**	 
+	 * Constructor
+	 * @param string $name The plugin name, corresponding to the directory name
+	 * @param array $config The plugin configuration
 	 */
-	private function __construct($name, $config = array()){
-		$this->name = $name;
-		if(is_array($config)){
-			foreach($config as $key => $value){
-				$this->$key = $value;
-			}
-		}
+	private function __construct($name){
+		$this->name = $name;		
 		$this->rootDir = ($this->isMainPlugin() ? MAIN_PLUGINS_DIR : PLUGINS_DIR) . $this->name . '/';
 		
 		if(!$this->isMainPlugin()){
@@ -42,15 +78,14 @@ class Plugin{
 	}
 	
 	/**
-	 * Create a plugin instance from it name
-	 * @param {string} $name - the name of the plugin, and the directory plugins dir
-	 * @param {array} $config - the plugin configuration in the database
-	 * @return {Plugin} - the instance of the wanted plugin
+	 * Get a plugin instance from it name
+	 * @param string $name The plugin name to instance
+	 * @return Plugin The instance of the wanted plugin
 	 */
-	public static function get($name, $config= array()){
+	public static function get($name){
 		try{			
 			if(!isset(self::$instances[$name])){				
-				self::$instances[$name] = new self($name, $config);
+				self::$instances[$name] = new self($name);
 			}
 
 			return self::$instances[$name];
@@ -62,8 +97,8 @@ class Plugin{
 	
 
 	/** 
-	 * Get the plugin containing the file where this function was called
-	 * @return {Plugin} - The current plugin
+	 * Get the plugin containing the file where this function is called
+	 * @return Plugin - The current plugin
 	 */
 	public static function current(){
 		$trace = debug_backtrace()[0]['file'];
@@ -84,8 +119,8 @@ class Plugin{
 
 	/** 
 	  * get all the plugins
-	  * @param {bool} $noMain - if true, no get the main plugins
-	  * @return {Array} - The list of plugin instances
+	  * @param bool $noMain If true, no get the main plugins
+	  * @return array The list of plugin instances
 	  */
 	public static function getAll($noMain = false){
 		$plugins = array();
@@ -94,13 +129,18 @@ class Plugin{
 		$configs = DB::get(MAINDB)->select(array(
 			'from' => self::TABLE,
 			'index' => 'name',			
+			'return' => DB::RETURN_OBJECT
 		));
 
 		foreach($dirs as $dir){
-			foreach(glob($dir . '*') as $dir){
+			foreach(glob($dir . '*', GLOB_ONLYDIR) as $dir){
 				$name = basename($dir);
-				$config = isset($configs[$name]) ? $configs[$name] : array();
-				$plugins[$name] = self::get($name, $config);
+				$config = isset($configs[$name]) ? $configs[$name] : null;
+				
+				$plugin = self::get($name);
+				$plugin->active = isset($config->active) ? $config->active : false;
+				$plugin->removable = isset($config->removable) ? $config->removable : false;
+				$plugins[$name] = $plugin;
 			}
 		}
 		
@@ -110,7 +150,7 @@ class Plugin{
 
 	/**
 	 * Get all the active plugins
-	 * @return {Array} - The list of plugin instances
+	 * @return array The list of plugin instances
 	 */
 	public static function getActivePlugins(){
 		$configs = DB::get(MAINDB)->select(array(
@@ -129,16 +169,19 @@ class Plugin{
 
 	/**
 	 * Get the main plugins
-	 * @return {Array} - The list of plugin instances
+	 * @return array - The list of plugin instances
 	 */
 	public static function getMainPlugins(){
-		return array_map(function($name){ return new self($name); }, self::$mainPlugins);
+		return array_map(function($name){ 
+			return new self($name); 
+		}, self::$mainPlugins);
 	}
 	
 	
 	
 	/** 
-	 * get the plugin name
+	 * Get the plugin name
+	 * @return string The plugin name
 	 */
 	public function getName(){
 		return $this->name;
@@ -147,13 +190,15 @@ class Plugin{
 
 	/**
 	 * Check if the plugin is a main plugin
+	 * @return boolean True if the plugin is a main plugin (main, install or admin), else False
 	 */
 	public function isMainPlugin(){
 		return in_array($this->name, self::$mainPlugins);
 	}
 
-	/*
-	 * Get the configuration from the database	 
+	/**
+	 * Get the plugin options
+	 * @return array The plugin options, where keys are the options names, and values, the values for each option
 	 */
 	public function getOptions(){
 		if(!isset($this->options)){			
@@ -166,6 +211,8 @@ class Plugin{
 
 	/**
 	 * Get the plugin data from the manifest
+	 * @param string $prop If set, the method will return the value of the definition property $prop, else it will return the whole definition array
+	 * @return mixed The plugin definition property if $prop is set, or the whoel plugin definition if $prop is not set
 	 */
 	public function getDefinition($prop = null){
 		return $prop ? $this->definition[$prop] : $this->definition;
@@ -174,6 +221,7 @@ class Plugin{
 
 	/**
 	 * Return the root directory of the plugin
+	 * @return string the root directory of the plugin
 	 */
 	public function getRootDir(){
 		return $this->rootDir;
@@ -181,7 +229,9 @@ class Plugin{
 	
 
 	/** 
-	 * Returns the start file of the plugin
+	 * Returns the start file of the plugin. 
+	 * The start file is the file start.php, at the root of the plugin directory, that defines the routes, widgets, and event listenter of the plugin.
+	 * @return string The file path of the plugin start file
 	 */
 	public function getStartFile(){
 		return $this->getRootDir() . 'start.php';
@@ -190,6 +240,7 @@ class Plugin{
 
 	/**
 	 * Returns the directory of the plugin containing the controllers
+	 * @return string The directory containing controllers classes of the plugin
 	 */
 	public function getControllersDir(){
 		return $this->rootDir . 'controllers/';
@@ -198,6 +249,7 @@ class Plugin{
 
 	/**
 	 * Return the directory containing the plugin models
+	 * @return string The directory containing models classes of the plugin
 	 */
 	public function getModelsDir(){
 		return $this->rootDir . 'models/';
@@ -206,6 +258,7 @@ class Plugin{
 
 	/**
 	 * Return the directory containing the plugin widgets
+	 * @return string The directory containing the widgets classes of the plugin
 	 */
 	public function getWidgetsDir(){
 		return $this->rootDir . 'widgets/';
@@ -214,6 +267,7 @@ class Plugin{
 
 	/**
 	 * Return the directory containing the plugin views
+	 * @return string The directory contaning the plugin views
 	 */
 	public function getViewsDir(){
 		return $this->rootDir . 'views/';	
@@ -222,6 +276,8 @@ class Plugin{
 
 	/**
 	 * Return the full path of a view in the plugin
+	 * @param string $view The basename of the view file to get in the plugin
+	 * @return string The full path of the view file
 	 */
 	public function getView($view){
 		// Check if the view is overriden in the current theme
@@ -238,6 +294,7 @@ class Plugin{
 
 	/**
 	 * Return the directory containing the plugin static files (js, css, images)
+	 * @return string The directory contanining the plugin static files
 	 */
 	public function getStaticDir(){
 		return $this->rootDir . 'static/';
@@ -246,6 +303,7 @@ class Plugin{
 
 	/**
 	 * Return the url where to find out the plugin static files
+	 * @return string The URL to get the plugin static files
 	 */
 	public function getStaticUrl(){
 		return ROOT_URL . str_replace(ROOT_DIR, '', $this->rootDir) . 'static/';
@@ -253,7 +311,8 @@ class Plugin{
 	
 
 	/**
-	 * Return the directory containing the plugin js files
+	 * Return the directory containing the plugin JavaScript files
+	 * @return string The directory contaning the plugin JavaScript files
 	 */
 	public function getJsDir(){
 		return $this->getStaticDir() . 'js/';
@@ -261,7 +320,8 @@ class Plugin{
 	
 
 	/**
-	 * Return the url where to find out the plugin js files
+	 * Return the url where to find out the plugin JavaScript files
+	 * @return string The URL of the plugin JavaScript files directory
 	 */
 	public function getJsUrl(){
 		return $this->getStaticUrl() . 'js/';
@@ -269,7 +329,8 @@ class Plugin{
 	
 
 	/**
-	 * Return the directory containing the plugin css files
+	 * Return the directory containing the plugin CSS files
+	 * @return string The directory contaning the plugin CSS files
 	 */
 	public function getCssDir(){
 		return $this->getStaticDir() . 'css/';
@@ -278,6 +339,7 @@ class Plugin{
 
 	/**
 	 * Return the url where to find out the plugin css files
+	 * @return string The URL of the plugin CSS files directory
 	 */
 	public function getCssUrl(){
 		return $this->getStaticUrl() . 'css/';
@@ -286,6 +348,7 @@ class Plugin{
 
 	/**
 	 * Return the directory containing the plugin language files
+	 * @return string The directory contaning the plugin language files
 	 */
 	public function getLangDir(){
 		return $this->rootDir . 'lang/';
@@ -293,7 +356,8 @@ class Plugin{
 
 
 	/**
-	 * Return the directory containing the plugin files due to user (uploads)
+	 * Return the directory containing the plugin files due to user actions
+	 * @return string The directory contaning the user files of the plugin
 	 */
 	public function getUserfilesDir(){
 		return USERFILES_PLUGINS_DIR . $this->name . '/';
@@ -302,6 +366,7 @@ class Plugin{
 
 	/**
 	 * Return the directory containing the url to request user files
+	 * @return string The URL of the directory containing the user files of the plugin
 	 */
 	public function getUserfilesUrl(){
 		return USERFILES_PLUGINS_URL . $this->name . '/';
@@ -310,12 +375,17 @@ class Plugin{
 
 	/**
 	 * Check if the plugin is installed. The plugin is installed if it appears in the database
+	 * @return boolean True if the plugin is installed, False else
 	 */
 	public function isInstalled(){
 		return (bool) DB::get(MAINDB)->count(self::TABLE, 'name = :name', array('name' => $this->name));
 	}
 	
 
+	/**
+	 * Instance the plugin installer
+	 * @return PluginInstaller The instance of the plugin installer
+	 */
 	public function getInstallerInstance(){
 		if(isset($this->manager)){
 			return $this->manager;
@@ -357,6 +427,7 @@ class Plugin{
 
 	/**
 	 * Check if the plugin is active
+	 * @return boolean True if the plugin is active, False else
 	 */
 	public function isActive(){
 		return $this->active;
@@ -388,15 +459,5 @@ class Plugin{
 		$this->getInstallerInstance()->deactivate();
 
 		Log::notice('The plugin ' . $this->name . ' has been deactivated');
-	}
-	
-
-	/**
-	 * Import the language files of the plugin in the database
-	 */
-	public function importLanguageFiles(){
-		foreach(glob($this->getLangDir().'*') as $file){
-			Language::importFile($file);
-		}		
 	}
 }

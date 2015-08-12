@@ -1,46 +1,74 @@
 <?php
+/**
+ * Request.class.php
+ * @author Elvyrra SAS
+ */
 
-
+/**
+ * This class define methods to get HTTP request information 
+ * @package Core
+ */
 class Request{
+    /**
+     * The clientIp, registered as static variable, to avoid to calculate it each time
+     * @static
+     */
     private static $clientIp;
 
+    /**
+     * Get the HTTP request method
+     * @static
+     * @return string the HTTP request method
+     */
     public static function method(){        
         return strtolower($_SERVER['REQUEST_METHOD']);
     }
     
+
+    /**
+     * Get the HTTP request URI
+     * @static
+     * @return string The HTTP request URI 
+     */
     public static function uri(){
         return $_SERVER['REQUEST_URI'];
     }
     
+
+    /**
+     * Check if the request is an AJAX request
+     * @static
+     * @return true if the request is an AJAX request else false
+     */
     public static function isAjax(){
         return ( isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtoupper($_SERVER['HTTP_X_REQUESTED_WITH']) === 'XMLHTTPREQUEST' );
     }
     
-    public static function isPost(){
-        return self::method() == 'post';
-    }
-    
+
+    /**
+     * Get the client IP address.
+     * @static
+     * @return string The IPV4 address of the client that performed the HTTP request
+     */    
     public static function clientIp(){
         if(isset(self::$clientIp)){
             return self::$clientIp;
         }
 
         if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            // L'utilisateur est derrière un proxy qui accepte le header HTTP_X_FORWARDED_FOR
+            // The user is behind a proxy that transmit HTTP_X_FORWARDED_FOR header
             if ( ! preg_match('![0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}!', $_SERVER['HTTP_X_FORWARDED_FOR']) ){
-                // Le format renvoyé par HTTP_X_FORWARDED_FOR n'est pas correct
+                // The format of HTTP_X_FORWARDED_FOR header is not correct
                 self::$clientIp = $_SERVER['REMOTE_ADDR'];
                 return self::$clientIp;
             }
             else{
-
-                /*** on récupère chaque IP renseignée dans HTTP_X_FORWARDED_FOR ***/
+                // Get the last public IP in HTTP_X_FORWARDED_FOR header
                 $chain = explode(',', preg_replace('/[^0-9,.]/', '', $_SERVER['HTTP_X_FORWARDED_FOR']));
                 for($i  = count($chain) - 1; $i >= 0; $i --){
                     $ip = $chain[$i];
 
                     if((!preg_match("!^(192\.168|10\.0\.0)!", $ip) && $ip != "127.0.0.1") || $i == 0){                                    
-                        // L'adresse est une IP de réseau local, on ne retourne pas cette valeur
                         self::$clientIp = $ip;
                         return self::$clientIp;
                         
@@ -49,10 +77,11 @@ class Request{
             }
         }
     
-        // le header HTTP_X_FORWARDED_FOR n'est pas supporté par le proxy de l'utilisateur ou aucune adresse non locale n'a été trouvée
+        // HTTP_X_FORWARDED_FOR header has not been transmitted, get the REMOTE_ADDR header
         self::$clientIp = $_SERVER['REMOTE_ADDR'];
         return self::$clientIp;
     }
+
 
     /**
      * Populate $_POST and $_FILES from php://input

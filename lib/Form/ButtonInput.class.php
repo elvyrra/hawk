@@ -2,12 +2,14 @@
 /**
  * ButtonInput.class.php
  * @author Elvyrra SAS
+ * @license MIT
  */
 
 
 
 /**
  * This class describes the button inputs in form (button, delete, dans submit)
+ * @package Form\Input
  */
 class ButtonInput extends FormInput{
 	// the type of the input
@@ -15,9 +17,6 @@ class ButtonInput extends FormInput{
 	// this type of input is independant, so not inserted in database
 	const INDEPENDANT = true;
 
-	// this type of input has no label
-	const NO_LABEL = true;
-	
 	/**
 	 * Defines the icons for most common buttons
 	 * @static array $defaultIcons
@@ -34,11 +33,15 @@ class ButtonInput extends FormInput{
 		'send' => 'mail-closed'	
 	);
 
+	/**
+	 * Defines if the input has to be displayed on a new line. For button inputs, this property is defaulty set to false
+	 * @var boolean
+	 */
 	public $nl = false;
 	
 	/**
 	 * Display the input 
-	 * @return string The HTML result of the input displaying
+	 * @return string The dislayed HTML
 	 */
 	public function __toString(){
 		if(!empty($this->notDisplayed)){
@@ -79,7 +82,7 @@ class ButtonInput extends FormInput{
 
 	/**
 	 * Check the submitted value
-	 * @param Form $form The form to apply the errors if the value is not valid
+	 * @param Form $form The form the input is associated with
 	 * @return bool This function always return true, because no value is expected from a button
 	 */
 	public function check(&$form = null){

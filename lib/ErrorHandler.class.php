@@ -4,13 +4,20 @@
  */
 
 
-
 /**
  * This class defines the errors and exceptions handlers
+ * @package Core
  */
-
 class ErrorHandler {
 
+	/**
+	 * Handler an error
+	 * @param int $no The error number
+	 * @param string $str The error message
+	 * @param string $file The file that throwed the error
+	 * @param int $line The line in the file where the error was throwed
+	 * @param array $context All the variables in the error context
+	 */
 	public static function error($no, $str, $file, $line, $context){	
 		if (!(error_reporting() & $no)) {
 	        // This error code is not in error_reporting
@@ -71,6 +78,11 @@ class ErrorHandler {
 		}
 	}
 
+
+	/**
+	 * Handle an non catched exception
+	 * @param Exception $e The throwed exception
+	 */
 	public static function exception($e){
 		$param = array(
 			'level' => 'danger',

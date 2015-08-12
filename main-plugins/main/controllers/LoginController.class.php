@@ -96,9 +96,10 @@ class LoginController extends Controller{
 						array('password' => $hash),						
 					)					
 				));
+
 				$user = User::getByExample($example);
 					
-				if($user){
+				if($user){					
 					if(!$user->active){
 						// The user is not active					
 						$form->response(Form::STATUS_ERROR, Lang::get('main.login-error-inactive-user'));

@@ -7,6 +7,7 @@
 
 /**
  * This class is used to treat images. This class can resize images, or compress them
+ * @package Utils
  */
 class Image{
 	/**

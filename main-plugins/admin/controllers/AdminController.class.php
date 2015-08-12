@@ -300,9 +300,9 @@ class AdminController extends Controller{
 		if(!$form->submitted()){
 			$this->addCss(Plugin::current()->getCssUrl() . 'settings.css');
 
-			$page = $form->wrap(View::make(Plugin::current()->getViewsDir() . 'settings.tpl', array(
+			$page = View::make(Plugin::current()->getViewsDir() . 'settings.tpl', array(
 				'form' => $form,	
-			)));
+			));
 			
 			$this->addJavaScript(Plugin::current()->getJsUrl() . 'settings.js');
 			return NoSidebarTab::make(array(

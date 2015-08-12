@@ -464,7 +464,7 @@ App.prototype.getUri = function(method, args){
 	}
 	
 	if(route !== null){
-		var url = route.originalUrl;
+		var url = route.url;
 		if(args){
 			for(var j in args){
 				url = url.replace("{" + j + "}", args[j]);

@@ -225,6 +225,7 @@ class QuestionController extends Controller{
 						)),
 
 						new HtmlInput(array(
+							'name' => 'parameters-description',
 							'value' => "<p class='alert alert-info'><i class='fa fa-exclamation-circle'></i>" . Lang::get('admin.profile-question-form-translation-description') . "</p>"
 						)),
 

@@ -7,6 +7,7 @@
 
 /**
  * This class manage the installed themes
+ * @package Core\Theme
  */
 class ThemeManager{
     const DEFAULT_THEME = 'hawk';
