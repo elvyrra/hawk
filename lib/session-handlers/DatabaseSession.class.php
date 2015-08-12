@@ -13,7 +13,7 @@ class DatabaseSession implements SessionHandlerInterface{
      * The DB instance used to get and set data
      * @var DB
      */
-    private $db, 
+    private $db;
 
     /**
      * The name of the table containing the sessions

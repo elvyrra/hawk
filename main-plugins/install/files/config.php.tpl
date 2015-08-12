@@ -19,7 +19,8 @@ Conf::set(array(
         ),  
     ),
     'session' => array(
-        'engine' => '{{ $sessionEngine }}'
+        'engine' => '{{ $sessionEngine }}',
+        'lifetime' => 0
     ),
 ));
 
