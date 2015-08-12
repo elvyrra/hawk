@@ -65,13 +65,12 @@ class Request{
             else{
                 // Get the last public IP in HTTP_X_FORWARDED_FOR header
                 $chain = explode(',', preg_replace('/[^0-9,.]/', '', $_SERVER['HTTP_X_FORWARDED_FOR']));
-                for($i  = count($chain) - 1; $i >= 0; $i --){
+                for($i = 0 ; $i <= count($chain); $i ++){
                     $ip = $chain[$i];
 
-                    if((!preg_match("!^(192\.168|10\.0\.0)!", $ip) && $ip != "127.0.0.1") || $i == 0){                                    
+                    if((!preg_match("!^(192\.168|10\.0\.0)!", $ip) && $ip != "127.0.0.1") || $i == count($chain) - 1){
                         self::$clientIp = $ip;
-                        return self::$clientIp;
-                        
+                        return self::$clientIp;                        
                     }
                 }
             }
