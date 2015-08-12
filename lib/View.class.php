@@ -53,13 +53,14 @@ class View{
 	 * @param string $file The template file to parse
 	 */
 	public function __construct($file){
-		/*** The selector can be a filename or a plain/html text ***/
 		if(!is_file($file)){
+			// The source file does not exist
 			throw new ViewException(ViewException::TYPE_FILE_NOT_FOUND, $file);
 		}
 		
 		$this->file = $file;
 		
+		// Get the cache file containing the precompiled 
 		$this->fileCache = new FileCache($this->file, 'views');
 
 		$this->content = file_get_contents($file);				
@@ -68,8 +69,6 @@ class View{
 			$this->parse();
 			$this->fileCache->set($this->content);
 		}
-		
-		$this->include = $this->fileCache->get();
 	}
 	
 
@@ -115,7 +114,7 @@ class View{
 		$this->content = preg_replace_callback(self::IMPORT_REGEX, function($m){
 			$view = $this->dependencies[$m[2]];
 			
-			return "<?php include '" . $view->fileCache->get() . "'; ?>";
+			return "<?php include '" . $view->fileCache->getFile() . "'; ?>";
 		
 		} , $this->content);
 		

@@ -71,17 +71,8 @@ class FileCache{
 	 * Get the cache file if exists
 	 * @return string The full path of the cache file, or FALSE if the cache file does not exists
 	 */
-	public function get(){		
-		return is_file($this->cache_file) ? realpath($this->cache_file) : false;
-	}
-
-
-	/**
-	 * Get the cache file if exists
-	 * @return string The full path of the cache file, or FALSE if the cache file does not exists
-	 */
 	public function getFile(){
-		return $this->get();
+		return is_file($this->cache_file) ? realpath($this->cache_file) : false;
 	}
 	
 
@@ -101,7 +92,7 @@ class FileCache{
 	 * @return bool TRUE if the file is cached, i.e the cache file does not exist or it mtime is lower the source mtime
 	 */
 	public function isCached(){
-		$cacheFile = $this->get();	
+		$cacheFile = $this->getFile();	
 		return $cacheFile !== false && filemtime($cacheFile) > filemtime($this->source);
 	}	
 }
