@@ -1,13 +1,10 @@
-<FilesMatch "^.*\.(php|tpl|json)$">
-  	Order  allow,deny
-  	Deny   from All	
-</FilesMatch>
-
-<FilesMatch "^index\.php$">
-  	Order  allow,deny
-  	Allow   from All	
-</FilesMatch>
-
 RewriteEngine on
+
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.*)$ index.php [L]
+
+# Forbid access to script files, except index.php
+RewriteRule ^((?!index).)*\.(php|tpl|json|lang|ini|xml|gitignore)$ - [F,L,NC]
+
+# Forbid access to directories not accessible throw HTTP
+RewriteRule ^(?!main\-plugins|plugins|themes|userfiles|index).*$ - [F,L,NC]
