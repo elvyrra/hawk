@@ -14,5 +14,5 @@ Hawk installation is very easy to perform. There are two ways to install Hawk :
 2. Type ```git clone  https://github.com/elvyrra/hawk.git ```
 3. Type your site URL in your favorite browser, and fill the displayed forms
 
-
+NOTA BENE : THIS PROJECT IS NEW, THE DOWNLOAD PLATFORMS FOR PLUGINS AND THEMES IS NOT AVAILABLE YET. WE DON'T RECOMMEND TO USE IT FOR THE MOMENT IF YOU'RE NOT WEB DEVELOPPER. THE PLATFORM WILL BE AVAILABLE IN THE NEXT FEW MONTHS
 
