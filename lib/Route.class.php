@@ -9,6 +9,7 @@
  * @package Core\Router
  */
 class Route{
+	use Utils;
 
 	/**
 	 * The route data, declared like '{dataname}' in the route definition
@@ -61,9 +62,7 @@ class Route{
 	 * @param array $param The route parameters, containing the pattern rules, the default values, the action associated with this route
 	 */
 	public function __construct($url, $param){
-		foreach($param as $key => $value){
-			$this->$key = $value;
-		}
+		$this->map($param);
 		
 		$this->args = array();
 		$this->url = $url;		

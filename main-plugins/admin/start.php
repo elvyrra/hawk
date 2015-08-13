@@ -8,7 +8,7 @@ Router::auth(Request::isAjax() && Session::isConnected(), function(){
 
 		Router::get('manage-users', '/admin/users', array('action' => 'UserController.index'));	
 		// Users list
-		Router::any('list-users', '/admin/users/list', array('action' => 'UserController.listUsers'));
+		Router::get('list-users', '/admin/users/list', array('action' => 'UserController.listUsers'));
 		// Add / Edit a user
 		Router::any('edit-user', '/admin/users/{username}', array('where' => array('username' => '\w+'), 'action' => 'UserController.edit'));
 		// Remove a user
@@ -17,7 +17,7 @@ Router::auth(Request::isAjax() && Session::isConnected(), function(){
 		Router::get('activate-user', '/admin/users/{username}/activate/{value}', array('where' => array('username' => '\w+', 'value' => '0|1'), 'action' => 'UserController.activate'));
 
 		/*** Manage roles and permissions ***/
-		Router::any('list-roles', '/admin/roles/list', array('action' => 'RoleController.listRoles'));		
+		Router::get('list-roles', '/admin/roles/list', array('action' => 'RoleController.listRoles'));		
 		// Add / Edit a role
 		Router::any('edit-role', '/admin/roles/{roleId}', array('where' => array('roleId' => '\-?\d+'), 'action' => 'RoleController.edit'));
 		// Remove a role
@@ -93,7 +93,7 @@ Router::auth(Request::isAjax() && Session::isConnected(), function(){
 	Router::auth(Session::isAllowed('admin.languages') || Session::isAllowed('admin.all'), function(){
 		// list all the supported languages
 		Router::any('manage-languages', '/admin/languages/', array('action' => 'LanguageController.index'));		
-		Router::any('language-keys-list', '/admin/languages/keys', array('action' => 'LanguageController.listKeys'));
+		Router::get('language-keys-list', '/admin/languages/keys', array('action' => 'LanguageController.listKeys'));
 		
 		// Save the translations
 		Router::post('save-language-keys', '/admin/languages/keys/save', array('action' => 'LanguageController.editKeys'));

@@ -507,5 +507,5 @@ App.prototype.setRootUrl = function(url){
 window.app = new App(); 
 
 app.ready(function(){
-	ko.applyBindings(app, $("body").get(0));   
+	ko.applyBindings(app);   
 });

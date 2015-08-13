@@ -7,7 +7,6 @@ if(!is_file(INCLUDES_DIR . 'config.php')){
 	touch(INCLUDES_DIR . 'config.php');
 }
 require INCLUDES_DIR . 'config.php';
-require INCLUDES_DIR . 'functions.php';
 require INCLUDES_DIR . 'error-handler.php';
 
 define("ROOT_URL", (string) Conf::get('rooturl') . '/');

@@ -8,6 +8,8 @@
  * @package Core
  */
 class Model{
+    use Utils;
+
     /**
      * The table name containing the data in database
      * @var string
@@ -37,12 +39,10 @@ class Model{
      * @param array $data The initial data to set. These data will be registered in $dbvars
      */
 	public function __construct($data = array()){
-        foreach($data as $key => $value){
-            $this->$key = $value;
-        }
+        $this->map($data);
         
 		foreach(get_object_vars($this) as $key => $value){
-			if($key != 'dbvars'){
+			if($key != 'dbvars' && !in_array($key, $this->dbvars)){
 				$this->dbvars[] = $key;
 			}
 		}

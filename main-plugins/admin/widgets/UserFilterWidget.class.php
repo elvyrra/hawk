@@ -53,14 +53,7 @@ class UserFilterWidget extends Widget{
 							'active' => Lang::get('admin.user-filter-status-active'),
 							'inactive' => Lang::get('admin.user-filter-status-inactive')
 						),
-					)),
-
-					new SelectInput(array(
-						'name' => 'roleId',
-						'label' => Lang::get('admin.user-filter-roleId-label'),
-						'value' => $filters['roleId'],
-						'options' => $roles
-					))
+					))					
 				)
 			)
 

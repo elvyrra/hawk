@@ -12,9 +12,9 @@
 class Lang{
 
 	const DEFAULT_LANGUAGE = 'en';
-	const ORIGIN_CACHE_FILE = CACHE_DIR . 'lang-file-paths.php';
-	const CACHE_DIR = CACHE_DIR . 'lang/';
-	const TRANSLATIONS_DIR = USERFILES_PLUGINS_DIR . 'admin/translations/';
+	const ORIGIN_CACHE_FILE = 'lang-file-paths.php';
+	const CACHE_DIR = 'lang/';
+	const TRANSLATIONS_DIR = 'admin/translations/';
 
 	/**
 	 * The language keys with their translations
@@ -82,8 +82,8 @@ class Lang{
 	 * @return string The path of the origin language file
 	 */
 	private function getOriginFile(){
-		if(is_file(self::ORIGIN_CACHE_FILE) && empty(self::$originCache)){
-			self::$originCache = include self::ORIGIN_CACHE_FILE;
+		if(is_file(CACHE_DIR . self::ORIGIN_CACHE_FILE) && empty(self::$originCache)){
+			self::$originCache = include CACHE_DIR . self::ORIGIN_CACHE_FILE;
 		}
 
 		if(isset(self::$originCache["$this->plugin.$this->lang"])){
@@ -113,7 +113,7 @@ class Lang{
 	 * @return string path The path of the file
 	 */
 	private function getTranslatedFile(){		
-		return self::TRANSLATIONS_DIR . $this->plugin . '.' . $this->lang . '.lang';
+		return USERFILES_PLUGINS_DIR . self::TRANSLATIONS_DIR . $this->plugin . '.' . $this->lang . '.lang';
 	}
 
 	/**
@@ -121,7 +121,7 @@ class Lang{
 	 * @return string path The path of the cache file
 	 */
 	private function getCacheFile(){
-		return self::CACHE_DIR . $this->plugin . '.' . $this->lang . '.php';
+		return CACHE_DIR . self::CACHE_DIR . $this->plugin . '.' . $this->lang . '.php';
 	}
 
 
@@ -141,8 +141,8 @@ class Lang{
 	private function build(){				
 		if(!is_file($this->cacheFile) || (is_file($this->originFile) && filemtime($this->cacheFile) < filemtime($this->originFile)) || (is_file($this->translatedFile) && filemtime($this->cacheFile) < filemtime($this->translatedFile))){
 			$data = array_merge($this->parse($this->originFile), $this->parse($this->translatedFile));
-			if(!is_dir(self::CACHE_DIR)){
-				mkdir(self::CACHE_DIR, 0755);
+			if(!is_dir(CACHE_DIR . self::CACHE_DIR)){
+				mkdir(CACHE_DIR . self::CACHE_DIR, 0755);
 			}
 			file_put_contents($this->cacheFile, '<?php return ' . var_export($data, true) . ';' );
 		}
@@ -198,7 +198,7 @@ class Lang{
 	 * Save the cache fil containing the origin paths
 	 */
 	public static function saveOriginCache(){
-		file_put_contents(self::ORIGIN_CACHE_FILE, '<?php return ' . var_export(self::$originCache, true) . ';');
+		file_put_contents(CACHE_DIR . self::ORIGIN_CACHE_FILE, '<?php return ' . var_export(self::$originCache, true) . ';');
 	}
 
 

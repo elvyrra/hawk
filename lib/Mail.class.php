@@ -10,6 +10,8 @@
  * @package Utils
  */
 class Mail{
+	use Utils;
+
 	/**
 	 * The PHPMailer instance
 	 */
@@ -39,10 +41,8 @@ class Mail{
 			$param['Secure'] = Option::get('main.smtp-secured');
 		}
 
-		foreach($param as $key => $value){
-			$this->mailer->$key = $value;
-		}
-
+		$this->maps($param, $this->mailer);
+		
 		$this->mailer->CharSet = 'utf-8';
 	}
 

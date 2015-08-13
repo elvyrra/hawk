@@ -11,6 +11,8 @@
  * @package View\Plugins
  */
 abstract class ViewPlugin{
+    use Utils;
+
 	/**
 	 * The plugin instance parameters
 	 */
@@ -22,9 +24,7 @@ abstract class ViewPlugin{
 	 */
     public function __construct($params = array()){
         $this->params = $params;
-        foreach($params as $key => $value){
-            $this->$key = $value;
-        }
+        $this->map($params);
     }
 
 	/**

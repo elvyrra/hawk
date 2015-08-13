@@ -8,6 +8,8 @@
  * @package Form
  */
 class Form{
+	use Utils;
+
 	const NO_EXIT = false;
 	const EXIT_JSON = true;
 	    
@@ -233,9 +235,7 @@ class Form{
 	 */
 	public function setParam($param, $value = null){
 		if(is_array($param)){
-			foreach($param as $key => $val){
-				$this->setParam($key, $val);
-			}
+			$this->map($param);
 		}
 		else{
 			$this->$param = $value;

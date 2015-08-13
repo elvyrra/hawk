@@ -95,7 +95,17 @@ class UserController extends Controller{
 				'roleId' => array(
 					'label' => Lang::get('admin.users-list-roleId-label'),
 					'sort' => false,
-					'search' => false,
+					'search' => array(
+						'type' => 'select',
+						'options' => call_user_func(function(){
+							$options = array();
+							foreach(Role::getAll('id', array('id')) as $id => $role){
+								$options[$id] = Lang::get('roles.role-' . $id . '-label');
+							}
+							return $options;
+						}),
+						'invitation' => Lang::get('admin.user-filter-status-all')
+					),
 					'display' => function($value){
 						return Lang::get('roles.role-' . $value . '-label');
 					}

@@ -11,6 +11,8 @@
  * @package Core
  */
 class DB{
+	use Utils;
+
 	/**
 	 * List of servers to connect
 	 */
@@ -78,9 +80,8 @@ class DB{
 	 * @param array $data - the connection properties, with keys host, dbname, username, password
 	 */
 	public function __construct($data) {        
-		foreach($data as $key => $value){
-			$this->$key = $value;
-		}
+		$this->map($data);
+		
 		if(strpos($this->host, ':') !== false){
 			list($this->host, $this->port) = explode(':', $this->host, 2);
 		}

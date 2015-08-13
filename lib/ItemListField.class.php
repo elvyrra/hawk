@@ -168,11 +168,64 @@ class ItemListField {
 
 
 	/**
+	 * Display the search field in the list header
+	 * @return string The HTML result to display
+	 */
+	public function displaySearchInput(){
+		if($this->search){
+			if(!is_array($this->search)){
+				$this->search = array(
+					'type' => 'text'
+				);
+			}
+
+			switch($this->search['type']){
+				case 'select' :
+					$input = new SelectInput(array(
+						'options' => $this->search['options'],
+						'invitation' => isset($this->search['invitation']) ? $this->search['invitation'] : null,
+						'emptyValue' => isset($this->search['emptyValue']) ? $this->search['emptyValue'] : null,
+						'attributes' => array(
+							'data-bind' => 'value: search',
+						)
+					));
+					break;
+
+				case 'checkbox' :
+					$input = new CheckboxInput(array(
+						'attributes' => array(
+							'data-bind' => 'checked: search',
+						)
+					));
+					break;
+
+				
+				case 'text' :
+				default :
+					$input = new TextInput(array(
+						'after' => '<i class="fa fa-times-circle clean-search" data-bind="click: function(data){ data.search(null); }, visible: search()"></i>',
+						'attributes' => array(
+							'data-bind' => "textInput: search, css : search() ? 'alert-info not-empty' : 'empty'",
+						)
+					));
+					break;
+			}
+			$input->attributes['data-field'] = $this->name;
+			$input->class = ' list-search-input';
+
+			return $input->__toString();
+		}
+		else{
+			return '';
+		}
+	}
+
+	/**
 	 * Display the field header
 	 * @return string The HTML result to display	 
 	 */
 	public function displayHeader(){
-		return View::make(ThemeManager::getSelected()->getView('item-list-field-header.tpl'), array(
+		return View::make(ThemeManager::getSelected()->getView('item-list/field-header.tpl'), array(
 			'field' => $this,
 		));
 	}
@@ -210,7 +263,7 @@ class ItemListField {
 			$cell->content .= ' ' . $cell->unit;
 		}
 
-		return View::make(ThemeManager::getSelected()->getView('item-list-cell.tpl'), array(
+		return View::make(ThemeManager::getSelected()->getView('item-list/result-cell.tpl'), array(
 			'cell' => $cell,
 			'field' => $this
 		));

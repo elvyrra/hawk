@@ -11,6 +11,8 @@
  * @package Core\List
  */
 class ItemList{
+	use Utils;
+
 	/*** Class constants ***/	
 	const DEFAULT_MODEL = 'GenericModel';
 	const ALL_LINES = 'all';
@@ -121,7 +123,14 @@ class ItemList{
 	/**
 	 * The DB instance used to make the database queries to get the list results
 	 */
-	private $dbo;
+	private $dbo,
+
+	/**
+	 * Define if the list refreshing or displayed for the first time
+	 * @var boolean
+	 */
+	$refresh = false;
+
 
 	/**
 	 * Constructor
@@ -130,12 +139,11 @@ class ItemList{
 	public function __construct($params){
 		/*** Default values ***/		
 		$this->emptyMessage = Lang::get('main.list-no-result');
-		$this->action = $_SERVER['REQUEST_URI'];		
+		$this->action = $_SERVER['REQUEST_URI'];
+		$this->refresh = empty($_GET['refresh']) ? false : true;
 		
 		/*** Get the values from the parameters array **/
-		foreach($params as $key => $value){
-			$this->$key = $value;
-		}
+		$this->map($params);
 		
 		$model = $this->model;
 		
@@ -180,18 +188,8 @@ class ItemList{
 			if(isset($cookie[$name])){
 				$this->$name = $cookie[$name];
 			}
-			
-			if(isset($_POST[$name])){
-				$this->$name = json_decode($_POST[$name],true);
-			}
-
-			// to register in cookie the current filters
-			$cookie[$name] = $this->$name;
 		}
 		
-		// register the filters in cookie for future list call
-		setcookie('list-' . $this->id, json_encode($cookie), time() + 365 * 24 * 3600, '/');	
-
 		/*** initialize fields default values ***/
 		foreach($this->fields as $name => &$field){
 			$field = new ItemListField($name, $field, $this);
@@ -384,7 +382,8 @@ class ItemList{
 				}
 			}
 			
-			return View::make(ThemeManager::getSelected()->getView("item-list.tpl"), array(			
+			$tplFile = $this->refresh ? 'result.tpl' : 'list.tpl';
+			return View::make(ThemeManager::getSelected()->getView('item-list/' . $tplFile), array(			
 				'list' => $this,
 				'data' => $data,
 				'linesParameters' => $param,

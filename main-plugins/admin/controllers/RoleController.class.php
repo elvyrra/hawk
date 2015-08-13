@@ -71,7 +71,9 @@ class RoleController extends Controller{
 						if($line->id != 0){
 							return "<input type='checkbox' class='set-default-role' value='{$line->id}' " .($defaultRole == $line->id ? "checked disabled" : "") . " />";
 						}
-					}
+					},
+					'search' => false,
+					'sort' => false,
 				)				
 			)
 		);

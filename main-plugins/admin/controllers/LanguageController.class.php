@@ -213,6 +213,7 @@ class LanguageController extends Controller{
 	
 	/**
 	 * Display the list of the translation keys
+	 * @param array $filters The filters to display the list
 	 */
 	public function listKeys($filters = array()){
 		if(empty($filters)){
@@ -222,7 +223,7 @@ class LanguageController extends Controller{
 		
 		// Find all files in main-plugin, plugins dans userfiles
 		$files = array();
-		$dirs = array(MAIN_PLUGINS_DIR, PLUGINS_DIR, Lang::TRANSLATIONS_DIR);
+		$dirs = array(MAIN_PLUGINS_DIR, PLUGINS_DIR, USERFILES_PLUGINS_DIR . Lang::TRANSLATIONS_DIR);
 		foreach($dirs as $dir){
 			$result = array();
 			exec('find ' . $dir . ' -name "*.*.lang"', $result);
@@ -236,7 +237,7 @@ class LanguageController extends Controller{
 				if(empty($files[$plugin][$language])){
 					$files[$plugin][$language] = array();
 				}
-				$files[$plugin][$language][$dir == Lang::TRANSLATIONS_DIR ? 'translation' : 'origin'] = $file;
+				$files[$plugin][$language][$dir == USERFILES_PLUGINS_DIR . Lang::TRANSLATIONS_DIR ? 'translation' : 'origin'] = $file;
 			}
 		}
 

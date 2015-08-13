@@ -11,6 +11,8 @@
  * @package Core
  */
 class Controller{	
+	use Utils;
+
 	/**
 	 * The current used controller. This static property is used to know which is the current controller associated to the current route
 	 */
@@ -25,9 +27,8 @@ class Controller{
 	 * @param array $param The parameters of the controller. This parameter is set by the router with the parameters defined in the routes as '{paramName}'
 	 */
 	public function __construct($param = array()){		
-		foreach($param as $key => $value){
-			$this->$key = $value;
-		}	
+		$this->map($param);
+			
 		$this->theme = ThemeManager::getSelected();
 		self::$currentController = $this;
 	}

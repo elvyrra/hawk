@@ -10,6 +10,8 @@
  * @package Form\Input
  */
 class FormInput{
+    use Utils;
+
     /**
      * uniqid used to generate uniq id for input HTML nodes, when is is not specified
      */
@@ -235,9 +237,7 @@ class FormInput{
      */
     public function setParam($param, $value = null){
         if(is_array($param)){
-            foreach($param as $key => $val){
-                $this->setParam($key, $val);
-            }
+            $this->map($param);
         }
         else{
             $this->$param = $value;

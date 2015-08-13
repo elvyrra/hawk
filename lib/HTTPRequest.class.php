@@ -8,7 +8,8 @@
  * @package Utils
  */
 class HTTPrequest{
-	
+	use Utils;
+
 	const METHOD_POST = 'POST';
 	const METHOD_GET = 'GET';
 	const METHOD_PUT = 'PUT';
@@ -93,9 +94,7 @@ class HTTPrequest{
 	 *						- 'contentType' (optionnal) : The request content type	 
 	 */
 	public function __construct($options){
-		foreach($options as $key => $value){
-			$this->$key = $value;
-		}
+		$this->map($options);
 
 		$this->setDataType($this->dataType);
 		$this->setContentType($this->contentType);

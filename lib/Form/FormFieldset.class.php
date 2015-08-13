@@ -10,6 +10,8 @@
  * @package Form
  */
 class FormFieldset{
+	use Utils;
+
 	/**
 	 * The fieldset name
 	 */
@@ -47,9 +49,8 @@ class FormFieldset{
 		$this->form = $form;
 		$this->id = $form->id . '-' . $this->name . '-fieldset';
 		$this->inputs = $inputs;
-		foreach($params as $key => $value){
-			$this->$key = $value;
-		}
+		$this->map($params);
+
 		if($this->legend){
 			$this->legendId = $form->id . '-' . $this->name . '-legend';
 		}
