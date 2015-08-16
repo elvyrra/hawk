@@ -211,15 +211,30 @@ class InstallController extends Controller{
 				 */
 				$tmpfile = tempnam(sys_get_temp_dir(), '');	
 
+				DB::add('tmp', array(
+					array(
+						'host' => $form->getData('db[host]'),
+						'username' => $form->getData('db[username]'),
+						'password' => $form->getData('db[password]')
+					)
+				));
+
+				try{
+					DB::get('tmp');
+				}
+				catch(DBException $e){
+					$form->response(Form::STATUS_ERROR, Lang::get('install.install-connection-error'));
+				}
+
 				$param = array(
 					'{{ $dbname }}' => $form->getData('db[dbname]'),
 					'{{ $language }}' => $this->language,
 					'{{ $timezone }}' => $form->getData('timezone'),
-					'{{ $title }}' => $form->getData('title'),
-					'{{ $email }}' => $form->getData('admin[email]'),
-					'{{ $login }}' => $form->getData('admin[login]'),
-					'{{ $password }}' => Crypto::saltHash($form->getData('admin[password]'), $salt),
-					'{{ $ip }}' => Request::clientIp()
+					'{{ $title }}' => Db::get('tmp')->connection->quote($form->getData('title')),
+					'{{ $email }}' => Db::get('tmp')->connection->quote($form->getData('admin[email]')),
+					'{{ $login }}' => Db::get('tmp')->connection->quote($form->getData('admin[login]')),
+					'{{ $password }}' => Db::get('tmp')->connection->quote(Crypto::saltHash($form->getData('admin[password]'), $salt)),
+					'{{ $ip }}' => Db::get('tmp')->connection->quote(Request::clientIp())
 				);
 				$sql = strtr(file_get_contents(Plugin::current()->getRootDir() . 'files/install.sql.tpl'), $param);
 				file_put_contents($tmpfile, $sql);

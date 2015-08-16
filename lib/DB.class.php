@@ -565,7 +565,8 @@ class DB{
 	public function getLogs(){
 		return $this->logs;
 	}
-	
+
+
 }
 
 

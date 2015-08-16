@@ -28,4 +28,5 @@ settings-admin-passagain-label = "Retype your password"
 install-button = "Install Hawk"
 
 install-error = "An error occured while installing your Hawk instance"
+install-connection-error = "The data your mentionned for the database connection are wrong."
 install-success = "Hawk has been successfully installed"

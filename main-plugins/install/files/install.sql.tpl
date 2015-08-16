@@ -80,8 +80,8 @@ INSERT INTO `Option` (`plugin`, `key`, `value`) VALUES
 	('main', 'allow-guest', '0'),
 	('main', 'language', '{{ $language }}'),
 	('main', 'selected-theme', 'hawk'),
-	('main', 'timezone', '{{ $timezone }}'),
-	('main', 'title', '{{ $title }}'),
+	('main', 'timezone', '{{ $timezone }}''),
+	('main', 'title', {{ $title }}),
 	('main', 'home-page-type', 'custom'),
 	('roles', 'default-role', '1');
 /*!40000 ALTER TABLE `Option` ENABLE KEYS */;
@@ -208,7 +208,7 @@ CREATE TABLE IF NOT EXISTS `User` (
 /*!40000 ALTER TABLE `User` DISABLE KEYS */;
 INSERT INTO `User` (`id`, `email`, `username`, `password`, `active`, `createTime`, `createIp`, `roleId`) VALUES
 	(0, '', 'guest', '', 0, 0, '', 0),
-	(1, '{{ $email }}', '{{ $login }}', '{{ $password }}', 1, UNIX_TIMESTAMP(), '{{ $ip }}', 1);	
+	(1, {{ $email }}, {{ $login }}, {{ $password }}, 1, UNIX_TIMESTAMP(), {{ $ip }}, 1);	
 /*!40000 ALTER TABLE `User` ENABLE KEYS */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
