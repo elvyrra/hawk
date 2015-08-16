@@ -573,7 +573,7 @@ class DB{
 	 * @param int $type The data type
 	 * @return string The quoted string
 	 */
-	public function quote($str, $type = PDO::PARAM_STRING){
+	public function quote($str, $type = PDO::PARAM_STR){
 		return $this->connection->quote($str, $type);
 	}
 }
