@@ -1,21 +1,16 @@
-/**********************************************************************
- *    						utils.js
- *
- *
- * Author:   Julien Thaon & Sebastien Lecocq 
- * Date: 	 Jan. 01, 2014
- * Copyright: ELVYRRA SAS
- *
- * This file is part of Beaver's project.
- *
- *
- **********************************************************************/
+/**
+ * Format a number with a given number of decimals, and a custom separator
+ */
 Number.prototype.format = function(decimals, decimalSeparator){	
 	var output = this.toFixed(decimals);
 	output = output.replace(".",decimalSeparator);
 	return output;
 };
 
+
+/**
+ * Inherit a class
+ */
 Function.prototype.extend = function(parent){
 	var child = this;
 	child.prototype = parent;
@@ -24,6 +19,10 @@ Function.prototype.extend = function(parent){
 	child.prototype.constructor = child;
 };
 
+
+/**
+ * Search a key corresponding to a given value 
+ */
 Object.getKeyByValue= function(obj, value ) {
     for( var prop in obj ) {
         if( obj[ prop ] === value ){
@@ -33,25 +32,57 @@ Object.getKeyByValue= function(obj, value ) {
 	return null;
 };
 
+
+/**
+ * Make a query string from an object
+ */
 Object.toQueryString = function(object){
 	var params = [];
 	for(var i in object){
-		params.push(i + "=" + encodeURIComponent(object[i]));
+		params.push(encodeURIComponent(i) + "=" + encodeURIComponent(object[i]));
 	}
 
 	return "?" + params.join("&");
 };
 
+/**
+ * Get the max value of an array
+ */
 Array.prototype.max = function(){
 	return Math.max.apply(null, this);
 };
 
+/**
+ * Get the min value of an array
+ */
 Array.prototype.min = function(){
 	return Math.max.apply(null, this);
 };
 
-history.empty = function(){
-	history.go(-history.length);
-};
 
-/******************* (C) COPYRIGHT 2014 ELVYRRA SAS *********************/
+/**
+ * KO binding for ace
+ */
+ko.bindingHandlers.ace = {
+    init : function(element, valueAccessor, allBindings, viewModel, bindingContext){
+        var value = valueAccessor();
+        param = ko.unwrap(value);
+
+        app.require(["ext/ace/ace.js"], function(){
+            ace.config.set("modePath", app.jsBaseUrl + "ext/ace/");
+            ace.config.set("workerPath", app.jsBaseUrl + "ext/ace/") ;
+            ace.config.set("themePath", app.jsBaseUrl + "ext/ace/"); 
+
+            var editor = ace.edit(element);
+            editor.setTheme("ace/theme/" + (param.theme || 'chrome'));
+            editor.getSession().setMode("ace/mode/" + (param.mode || "js"));
+            editor.setShowPrintMargin(false);
+
+            editor.getSession().on("change", function(event){
+                var value = editor.getValue();
+                param.change(event, value, editor);                
+            }); 
+        });
+    },
+}
+

@@ -33,7 +33,7 @@ var App = function(){
 App.prototype.require = function(scripts, callback){
 	var remaining = scripts.length;
 	if(typeof scripts === "string"){
-		throw new Error("min.require expects the first argument to be array, string given");
+		throw new Error("app.require expects the first argument to be array, string given");
 	}
 	if(! scripts.length){
 		return callback();
