@@ -230,11 +230,11 @@ class InstallController extends Controller{
 					'{{ $dbname }}' => $form->getData('db[dbname]'),
 					'{{ $language }}' => $this->language,
 					'{{ $timezone }}' => $form->getData('timezone'),
-					'{{ $title }}' => Db::get('tmp')->connection->quote($form->getData('title')),
-					'{{ $email }}' => Db::get('tmp')->connection->quote($form->getData('admin[email]')),
-					'{{ $login }}' => Db::get('tmp')->connection->quote($form->getData('admin[login]')),
-					'{{ $password }}' => Db::get('tmp')->connection->quote(Crypto::saltHash($form->getData('admin[password]'), $salt)),
-					'{{ $ip }}' => Db::get('tmp')->connection->quote(Request::clientIp())
+					'{{ $title }}' => Db::get('tmp')->quote($form->getData('title')),
+					'{{ $email }}' => Db::get('tmp')->quote($form->getData('admin[email]')),
+					'{{ $login }}' => Db::get('tmp')->quote($form->getData('admin[login]')),
+					'{{ $password }}' => Db::get('tmp')->quote(Crypto::saltHash($form->getData('admin[password]'), $salt)),
+					'{{ $ip }}' => Db::get('tmp')->quote(Request::clientIp())
 				);
 				$sql = strtr(file_get_contents(Plugin::current()->getRootDir() . 'files/install.sql.tpl'), $param);
 				file_put_contents($tmpfile, $sql);
