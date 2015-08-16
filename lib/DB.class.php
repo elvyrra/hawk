@@ -99,7 +99,7 @@ class DB{
 			$this->connection->query('SET NAMES "'.$this->charset.'"');
         }
         catch(PDOException $e) {
-            throw new DBException($e->getMessage(), DBException::CONNECTION_ERROR, $host);
+            throw new DBException($e->getMessage(), DBException::CONNECTION_ERROR, $this->host);
         }
     }
 	
