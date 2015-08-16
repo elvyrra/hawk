@@ -80,7 +80,7 @@ INSERT INTO `Option` (`plugin`, `key`, `value`) VALUES
 	('main', 'allow-guest', '0'),
 	('main', 'language', '{{ $language }}'),
 	('main', 'selected-theme', 'hawk'),
-	('main', 'timezone', '{{ $timezone }}''),
+	('main', 'timezone', '{{ $timezone }}'),
 	('main', 'title', {{ $title }}),
 	('main', 'home-page-type', 'custom'),
 	('roles', 'default-role', '1');
