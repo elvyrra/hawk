@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `Menu` (
   `order` int(2) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*!40000 ALTER TABLE `Menu` DISABLE KEYS */;
 INSERT INTO `Menu` (`id`, `name`, `labelKey`, `order`) VALUES
@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS `MenuItem` (
   UNIQUE KEY `menuId_2` (`menuId`,`name`),
   KEY `menuId` (`menuId`),
   CONSTRAINT `MenuItem_ibfk_1` FOREIGN KEY (`menuId`) REFERENCES `Menu` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*!40000 ALTER TABLE `MenuItem` DISABLE KEYS */;
 INSERT INTO `MenuItem` (`id`, `menuId`, `name`, `labelKey`, `action`, `actionParameters`, `target`, `order`, `permissionId`) VALUES
@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS `Permission` (
   `availableForGuests` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `plugin` (`plugin`,`key`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*!40000 ALTER TABLE `Permission` DISABLE KEYS */;
 INSERT INTO `Permission` (`id`, `plugin`, `key`, `availableForGuests`) VALUES
@@ -142,7 +142,7 @@ CREATE TABLE IF NOT EXISTS `ProfileQuestionValue` (
   UNIQUE KEY `question_2` (`question`,`userId`),
   KEY `question` (`question`),
   CONSTRAINT `ProfileQuestionValue_ibfk_1` FOREIGN KEY (`question`) REFERENCES `ProfileQuestion` (`name`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE IF NOT EXISTS `Role` (
@@ -152,7 +152,7 @@ CREATE TABLE IF NOT EXISTS `Role` (
   `color` varchar(32) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*!40000 ALTER TABLE `Role` DISABLE KEYS */;
 INSERT INTO `Role` (`id`, `name`, `removable`, `color`) VALUES
@@ -172,7 +172,7 @@ CREATE TABLE IF NOT EXISTS `RolePermission` (
   KEY `permissionId` (`permissionId`),
   CONSTRAINT `RolePermission_ibfk_1` FOREIGN KEY (`roleId`) REFERENCES `Role` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `RolePermission_ibfk_2` FOREIGN KEY (`permissionId`) REFERENCES `Permission` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*!40000 ALTER TABLE `RolePermission` DISABLE KEYS */;
 INSERT INTO `RolePermission` (`roleId`, `permissionId`, `value`) VALUES
@@ -203,7 +203,7 @@ CREATE TABLE IF NOT EXISTS `User` (
   `roleId` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*!40000 ALTER TABLE `User` DISABLE KEYS */;
 INSERT INTO `User` (`id`, `email`, `username`, `password`, `active`, `createTime`, `createIp`, `roleId`) VALUES
