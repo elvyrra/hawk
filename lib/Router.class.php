@@ -255,14 +255,8 @@ class Router{
 			return str_replace($rooturl, '', $fullUrl);
 		}
 
-		$route = null;
-		if(isset(self::$routes[$method])){
-			$route = self::$routes[$method];
-		}
-		elseif(isset(self::$actions[$method])){
-			$route = self::$actions[$method];
-		}
-		
+		$route = self::getRouteByAction($method);
+				
 		if(empty($route)){
 			return self::INVALID_URL;
 		}
@@ -294,6 +288,25 @@ class Router{
 	 */
     public static function getUrl($method = '', $args = array()){
         return preg_replace('#/$#', '',Conf::get('rooturl')) . self::getUri($method, $args);
+    }
+
+
+    /**
+     * Get a route by action
+     * @param string $method The route name of the controller method, formatted like this : 'ControllerClass.method'
+	 * @param array $args The route arguments, where keys define the parameters names and values, the values to affect.
+	 * @return Route The route corresponding to research
+     */
+    public static function getRouteByAction($method){
+    	$route = null;
+		if(isset(self::$routes[$method])){
+			return self::$routes[$method];
+		}
+		elseif(isset(self::$actions[$method])){
+			return self::$actions[$method];
+		}
+		
+		return null;
     }
 	
 }

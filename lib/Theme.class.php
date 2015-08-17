@@ -20,7 +20,14 @@ class Theme{
      * The theme manifest data
      * @var array
      */
-    $data;
+    $data,
+
+    /**
+     * The parent theme name
+     * @var Theme
+     */
+    $parent = null;
+
     
     /**
      * The theme css file basename
@@ -45,6 +52,13 @@ class Theme{
         $this->name = $name;
 
         $this->getData();
+
+        if(isset($this->data['extends'])){
+            $this->parent = ThemeManager::get($this->data['extends']);
+        }
+        elseif($this->name != ThemeManager::DEFAULT_THEME){
+            $this->parent = ThemeManager::get(ThemeManager::DEFAULT_THEME);
+        }
     }
 
 
@@ -112,7 +126,11 @@ class Theme{
      * @return string
      */
     public function getBaseCssFile(){
-        return $this->getRootDirname() . self::CSS_BASENAME;
+        $file = $this->getRootDirname() . self::CSS_BASENAME;
+        if(!is_file($file) && $this->parent){
+            $file = $this->parent->getBaseCssFile();
+        }
+        return $file;
     }
     
 
@@ -272,9 +290,9 @@ class Theme{
     public function getView($filename){
         $file = $this->getViewsDir() . $filename;
         
-        if(!is_file($file) && $this->name != ThemeManager::DEFAULT_THEME){
+        if(!is_file($file) && $this->parent){
             // The view does not exists in the theme, and the theme is not the default one, Try to get the view file in the default theme
-            $file = ThemeManager::get(ThemeManager::DEFAULT_THEME)->getView($filename);
+            $file = $this->parent->getView($filename);
         }
         
         return $file;

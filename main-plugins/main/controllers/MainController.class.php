@@ -50,20 +50,38 @@ class MainController extends Controller{
 
 
 	public function newTab(){
-		switch(Option::get('main.home-page-type')){
-			case 'custom' :
-				$page = View::makeFromString(Option::get('main.home-page-html'));
+		$type = Option::get('main.home-page-type');
 
-				return '<input type="hidden" class="page-name" value="' . htmlentities(Lang::get('main.new-tab-page-name'), ENT_QUOTES) . '" />'. $page;
-			break;
+		// Display a page of the application
+		if($type == 'page'){
+			$page = Option::get('main.home-page-item');
+			$route = Router::getRouteByAction($page);
 
-			case 'page' :
-				Response::redirectToAction(Option::get('main.home-page-item'));
-			break;
+			if($route && $route->isAccessible()){
+				Response::redirectToAction($page);
+				return;
+			}
+			else{
+				// The route is not accessible
+				if(Option::get('main.home-page-html')){
+					// Display a custom page
+					$type = 'custom';
+				}
+			}
+		}
 
-			default :
-				return '<input type="hidden" class="page-name" value="' . htmlentities(Lang::get('main.new-tab-page-name'), ENT_QUOTES) . '" />';
-		}		
+		// Display a custom page
+		if($type == 'custom'){
+			$page = View::makeFromString(Option::get('main.home-page-html'));
+		}
+		else{
+			// Display the default new tab page
+			$page = '';
+		}
+
+		return View::make(ThemeManager::getSelected()->getView('new-tab.tpl'), array(
+			'custom' => $page
+		));
 	}
 	
 	public function page404(){

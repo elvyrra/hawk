@@ -34,7 +34,8 @@
 		<script type="text/javascript" src="{{ $mainJsUrl }}ext/bootstrap-colorpicker.min.js"></script>
 		<script type="text/javascript" src="{{ $mainJsUrl }}ext/bootstrap-datepicker.min.js"></script>
 		<script type="text/javascript" src="{{ $mainJsUrl }}ext/knockout-3.3.0.js"></script>
-		<script type="text/javascript" src="//cdn.ckeditor.com/4.4.7/full/ckeditor.js"></script>
+		<!-- <script type="text/javascript" src="//cdn.ckeditor.com/4.4.7/full/ckeditor.js"></script> -->
+		<script type="text/javascript" src="{{ $mainJsUrl }}ext/ckeditor/ckeditor.js"></script>
 		
 		<script type="text/javascript" id="main-js-script" src="{{ $mainJsUrl }}app.js"></script>
 		

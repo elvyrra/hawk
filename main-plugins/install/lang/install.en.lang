@@ -8,7 +8,7 @@ settings-rooturl-label = "Application URL"
 settings-timezone-label = "Your timezone"
 settings-session-label = "Session engine"
 settings-session-file-value = "File"
-settings-session-file-value = "Database"
+settings-session-database-value = "Database"
 settings-version-label = "Version"
 
 

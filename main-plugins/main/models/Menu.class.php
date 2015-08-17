@@ -5,6 +5,8 @@ class Menu extends Model{
 	protected static $tablename = "Menu";
 	protected static $primaryColumn = "id";
 
+	public $visibleItems = array();
+	
 	public function __construct($data = array()){
 		parent::__construct($data);
 

@@ -177,8 +177,14 @@ class ThemeController extends Controller{
 			'id' => 'theme-css-form',
 			'action' => Router::getUri('theme-css'),
 			'fieldsets' => array(
-				'_submits' => array(
+				'_submits' => array(			
+					new HtmlInput(array(
+						'name' => 'desctiption',
+						'value' => Lang::get('admin.theme-css-description'),
+					)),
+
 					new SubmitInput(array(
+						'class' => 'pull-right',
 						'name' => 'valid',
 						'value' => Lang::get('main.valid-button'),					
 					))

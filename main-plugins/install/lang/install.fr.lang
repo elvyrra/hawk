@@ -8,7 +8,7 @@ settings-rooturl-label = "URL de l'application"
 settings-timezone-label = "Votre fuseau horaire"
 settings-session-label = "Moteur de session"
 settings-session-file-value = "Fichier"
-settings-session-file-value = "Base de données"
+settings-session-database-value = "Base de données"
 settings-version-label = "Version"
 
 settings-database-legend = "Connexion à la base de données"

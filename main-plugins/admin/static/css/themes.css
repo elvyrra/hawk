@@ -30,9 +30,9 @@
 
 #theme-css-edit{
 	display: block;	
-	position: absolute;
-	width: 100%;
-	height: 800px;
+  	position: fixed;
+ 	width: 95%;
+  	height: calc(100% - 200px);
 }
 
 .delete-theme-media{
