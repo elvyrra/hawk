@@ -192,7 +192,7 @@ class UserController extends Controller{
 						'name' => 'password',
 						'required' => true,
 						'label' => Lang::get('admin.user-form-password-label'),
-						'encrypt' => array('Crypto', 'salt_hash')
+						'encrypt' => array('Crypto', 'saltHash')
 					)),
 
 					$user ? null : 
