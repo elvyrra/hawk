@@ -79,7 +79,7 @@ class View{
 		preg_match_all(self::IMPORT_REGEX, $this->content, $matches, PREG_SET_ORDER);
 		foreach($matches as $match){
 			$file = $match[2];
-			$this->dependencies[$file] = new View($file{0} == '/' ? ROOT_DIR : dirname(realpath($this->file)) . '/' . $file);
+			$this->dependencies[$file] = new View(($file{0} == '/' ? ROOT_DIR : dirname(realpath($this->file))) . '/' . $file);
 		}
 	}
 
