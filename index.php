@@ -10,16 +10,6 @@ require ROOT_DIR . 'start.php';
 
 Log::debug('script has been Initialized');
 
-/*** Open the session ***/
-$sessionInterface = ucfirst(SESSION_ENGINE) . 'Session';
-if(!empty($sessionInterface)){
-    $handler = new $sessionInterface();
-    session_set_save_handler($handler);
-
-    session_set_cookie_params((int) Conf::get('session.lifetime'), '/');
-    session_start();
-}
-
 EventManager::trigger(new Event('process-start'));
 
 
@@ -44,12 +34,12 @@ Router::route();
 
 Log::debug('end of script');
 $event = new Event('process-end', array(
-	'output' => phpQuery::newDocument(Response::get()), 
+	'output' => Response::get(), 
 	'execTime' => microtime(true) - SCRIPT_START_TIME
 ));
 EventManager::trigger($event);
 
-Response::set($event->getData('output')->htmlOuter());
+Response::set($event->getData('output'));
 
 /*** Return the response to the client ***/
 Response::end();

@@ -24,6 +24,7 @@ plugins-advert-menu-changed = "The main menu changed. Refresh your page to see t
 plugins-list-controls-label = "Plugin"
 plugins-list-description-label = "Description"
 profile-question-avatar-label = "Avatar"
+profile-question-language-label = "Language"
 profile-question-form-displayInProfile-label = "Display on the profile"
 profile-question-form-displayInRegister-label = "Display on the register form"
 profile-question-form-general-legend = "Global data"

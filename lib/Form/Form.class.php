@@ -432,7 +432,7 @@ class Form{
 			Log::warning(Session::getUser()->username . ' has badly completed the form ' . $this->id);
 			if($exit){
 				/*** The form check failed ***/
-				$this->response(self::STATUS_CHECK_ERROR, Lang::get('form.error-fill'));
+				return $this->response(self::STATUS_CHECK_ERROR, Lang::get('form.error-fill'));
 			}
 			else{
 				$this->addReturn('message', Lang::get('form.error-fill'));
@@ -500,7 +500,7 @@ class Form{
 			Log::info(Session::getUser()->username . ' has updated the data on the form ' . $this->id);
 			if($exit){
 				// output the response
-				$this->response(self::STATUS_SUCCESS, $success ? $success : Lang::get('form.success-register'));
+				return $this->response(self::STATUS_SUCCESS, $success ? $success : Lang::get('form.success-register'));
 			}
 			return $this->object->$id;	
 		}
@@ -508,7 +508,7 @@ class Form{
 			$this->status = self::STATUS_ERROR;			
 			Log::error('An error occured while registering data on the form ' . $this->id . ' : ' . $e->getMessage());
 			if($exit){
-				$this->response(self::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : ($error ? $error : Lang::get('form.error-register')));
+				return $this->response(self::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : ($error ? $error : Lang::get('form.error-register')));
 			}
 			throw $e;
 		}	
@@ -545,7 +545,7 @@ class Form{
 			
 			Log::info('The delete action on the form ' . $this->id . ' was successflully completed');
 			if($exit){
-				$this->response(self::STATUS_SUCCESS, $success ? $success : Lang::get('form.success-delete'));
+				return $this->response(self::STATUS_SUCCESS, $success ? $success : Lang::get('form.success-delete'));
 			}
 			return $this->object->$id;
 		}
@@ -554,7 +554,7 @@ class Form{
 			Log::error('An error occured while deleting the element of the form ' . $this->id . ' : ' . $e->getMessage());
 			
 			if($exit){
-				$this->response(self::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : ($error ? $error : Lang::get('form.error-delete')));
+				return $this->response(self::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : ($error ? $error : Lang::get('form.error-delete')));
 			}
 			throw $e;
 		}
@@ -586,16 +586,17 @@ class Form{
 	
 
 	/**
-	 * Output the response of the form (generally when submitted)
+	 * Return the response of the form (generally when submitted), and set the Response HTTP code corresponding to the response, and the response type as JSON
 	 * @param string $status The status to output. You can use the class constants STATUS_SUCCESS, STATUS_CHECK_ERROR or STATUS_ERROR
 	 * @param string $message The message to output. If not set, the default message corresponding to the status will be output
+	 * @return array The response result, that will be displayed as json when the script ends
 	 */
 	public function response($status, $message = ''){
 		$response = array();
 		switch($status){
 			case self::STATUS_SUCCESS :
 				// The form has been submitted correctly
-				http_response_code(self::HTTP_CODE_SUCCESS);
+				Response::setHttpCode(self::HTTP_CODE_SUCCESS);
 				if(! $this->nomessage){
 					$response['message'] = $message ? $message : Lang::get('form.'.$status.'-'.$this->dbaction);
 				}
@@ -604,22 +605,21 @@ class Form{
 			
 			case self::STATUS_CHECK_ERROR :
 				// An error occured while checking field syntaxes
-				http_response_code(self::HTTP_CODE_CHECK_ERROR);
+				Response::setHttpCode(self::HTTP_CODE_CHECK_ERROR);
 				$response['message'] = $message ? $message : Lang::get('form.error-fill');
 				$response['errors'] = $this->errors;			
 				break;
 			
 			case self::STATUS_ERROR :
 			default :
-				http_response_code(self::HTTP_CODE_ERROR);
+				Response::setHttpCode(self::HTTP_CODE_ERROR);
 				$response['message'] = $message ? $message : Lang::get('form.'.$status.'-'.$this->dbaction);
 				$response['errors'] = $this->errors;
 				break;
 		}
 		
 		Response::setJson();
-		Response::set($response);
-		Response::end();
+		return $response;
 	}
 	
     

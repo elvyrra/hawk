@@ -278,16 +278,14 @@ class Lang{
 	 */
 	public static function addKeysToJavascript(){
 		$keys = func_get_args();
-		Widget::add(Router::getCurrentAction(), Controller::AFTER_ACTION, function($event) use($keys){
 			
-			$script = "";
-			foreach($keys as $key){
-				list($plugin, $langKey) = explode(".", $key);
-				$script .= "Lang.set('$key', '" . addcslashes(self::get($key), "'") . "');";
-			}
-			
-			pq("*:first")->before("<script type='text/javascript'> $script </script>");			
-		});		
+		$script = "";
+		foreach($keys as $key){
+			list($plugin, $langKey) = explode(".", $key);
+			$script .= "Lang.set('$key', '" . addcslashes(self::get($key), "'") . "');";
+		}
+		
+		Router::getCurrentController()->addJavaScriptInline($script);			
 	}
 
 

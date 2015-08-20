@@ -128,7 +128,8 @@ CREATE TABLE IF NOT EXISTS `ProfileQuestion` (
 
 /*!40000 ALTER TABLE `ProfileQuestion` DISABLE KEYS */;
 INSERT INTO `ProfileQuestion` (`name`, `type`, `parameters`, `editable`, `displayInRegister`, `displayInProfile`, `order`) VALUES
-	('avatar', 'file', '', 0, 1, 1, 2),
+	('language', 'select', '{"options":[],"required":true}'),
+  ('avatar', 'file', '', 0, 1, 1, 2),
 	('realname', 'text', '{"required" : true}', 0, 1, 1, 1);
 /*!40000 ALTER TABLE `ProfileQuestion` ENABLE KEYS */;
 

@@ -158,10 +158,10 @@ class ThemeController extends Controller{
 
 				$theme->buildCssFile(true);
 				$form->addReturn('href', $theme->getBaseCssUrl() . '?' . time());
-				$form->response(Form::STATUS_SUCCESS);
+				return $form->response(Form::STATUS_SUCCESS);
 			}
 			catch(Exception $e){
-				$form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : '');
+				return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : '');
 			}
 		}
 	}
@@ -215,7 +215,7 @@ class ThemeController extends Controller{
 
 			$form->addReturn('href', ThemeManager::getSelected()->getCustomCssUrl() . '?' . time());
 
-			$form->response(Form::STATUS_SUCCESS);
+			return $form->response(Form::STATUS_SUCCESS);
 		}
 	}
 
@@ -325,7 +325,7 @@ class ThemeController extends Controller{
 				$uploader->move($file, ThemeManager::getSelected()->getMediasDir());
 			}
 
-			$form->response(Form::STATUS_SUCCESS);
+			return $form->response(Form::STATUS_SUCCESS);
 		}
 	}
 
@@ -385,7 +385,7 @@ class ThemeController extends Controller{
 				$zip->close();
 			}
 
-			$form->response(Form::STATUS_SUCCESS);
+			return $form->response(Form::STATUS_SUCCESS);
 		}
 	}
 

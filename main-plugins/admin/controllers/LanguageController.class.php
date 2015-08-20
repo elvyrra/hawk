@@ -103,11 +103,11 @@ class LanguageController extends Controller{
 				}
 				
 				Log::info('The translations has been updated');
-				$form->response(Form::STATUS_SUCCESS, Lang::get('language.update-keys-success'));
+				return $form->response(Form::STATUS_SUCCESS, Lang::get('language.update-keys-success'));
 			}
 			catch(DBException $e){
 				Log::error('An error occured while updating translations : ' . $e->getMessage());
-				$form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get('language.update-keys-error'));
+				return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get('language.update-keys-error'));
 			}
 		}
 	}
@@ -170,7 +170,7 @@ class LanguageController extends Controller{
 				$key = self::DEFAULT_KEY_PLUGIN . '.' . $form->getData('key');
 				if(Lang::exists($key)){
 					$form->error('key', Lang::get('language.key-already-exists'));
-					$form->response(Form::STATUS_CHECK_ERROR);
+					return $form->response(Form::STATUS_CHECK_ERROR);
 				}
 
 				foreach(Language::getAll() as $language){
@@ -186,11 +186,11 @@ class LanguageController extends Controller{
 				}
 
 				Log::info('A new language key has been added');
-				$form->response(Form::STATUS_SUCCESS);
+				return $form->response(Form::STATUS_SUCCESS);
 			}
 			catch(Exception $e){
 				Log::error('An error occured while adding a language key : ' . $e->getMessage());
-				$form->response(Form::STATUS_ERROR);
+				return $form->response(Form::STATUS_ERROR);
 			}
 		}
 	}
@@ -230,10 +230,11 @@ class LanguageController extends Controller{
 
 			foreach($result as $file){
 				list($plugin, $language, $ext) = explode('.', basename($file));
-
+				
 				if(empty($files[$plugin])){
 					$files[$plugin] = array();
 				}
+
 				if(empty($files[$plugin][$language])){
 					$files[$plugin][$language] = array();
 				}
@@ -244,27 +245,25 @@ class LanguageController extends Controller{
 		$keys = array();
 		foreach($files as $plugin => $languages){					
 			foreach($languages as $tag => $paths){
-				if($tag == Lang::DEFAULT_LANGUAGE || $tag == $filters['tag']){
-					foreach($paths as $name => $file){
-						$translations = parse_ini_file($file);
-						foreach ($translations as $key => $value) {							
-							if(!is_array($value)){
-								// This is a single key
-								$langKey = "$plugin.$key";
+				foreach($paths as $name => $file){
+					$translations = parse_ini_file($file);
+					foreach ($translations as $key => $value) {							
+						if(!is_array($value)){
+							// This is a single key
+							$langKey = "$plugin.$key";
+							if(empty($keys[$langKey])){
+								$keys[$langKey] = array();
+							}
+							$keys[$langKey][$tag] = $value;
+						}
+						else{
+							// This is a multiple key
+							foreach($value as $multiplier => $val){
+								$langKey = $plugin . '.' . $key . '[' . $multiplier . ']';
 								if(empty($keys[$langKey])){
 									$keys[$langKey] = array();
 								}
-								$keys[$langKey][$tag] = $value;
-							}
-							else{
-								// This is a multiple key
-								foreach($value as $multiplier => $val){
-									$langKey = $plugin . '.' . $key . '[' . $multiplier . ']';
-									if(empty($keys[$langKey])){
-										$keys[$langKey] = array();
-									}
-									$keys[$langKey][$tag] = $val;
-								}
+								$keys[$langKey][$tag] = $val;
 							}
 						}
 					}
@@ -491,12 +490,12 @@ class LanguageController extends Controller{
 					}
 					
 					Log::info('Language files were successfully imported');
-					$form->response(Form::STATUS_SUCCESS);
+					return $form->response(Form::STATUS_SUCCESS);
 				}
 				catch(Exception $e){
 					Log::error('An error occured whiel importing language files : ' . $e->getMessage());
 					$form->error('files[]', $e->getMessage());					
-					$form->response(Form::STATUS_CHECK_ERROR);
+					return $form->response(Form::STATUS_CHECK_ERROR);
 				}
 			}		
 		}		

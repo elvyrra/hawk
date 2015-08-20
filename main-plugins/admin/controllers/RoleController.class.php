@@ -169,7 +169,7 @@ class RoleController extends Controller{
 				if($key){
 					$key->delete();
 				}
-				$form->response(Form::STATUS_SUCCESS);
+				return $form->response(Form::STATUS_SUCCESS);
 			}
 			else{
 				if($form->check()){
@@ -185,10 +185,10 @@ class RoleController extends Controller{
 							));
 						}
 						
-						$form->response(Form::STATUS_SUCCESS);
+						return $form->response(Form::STATUS_SUCCESS);
 					}
 					catch(Exception $e){
-						$form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : "");
+						return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : "");
 					}
 				}
 			}			

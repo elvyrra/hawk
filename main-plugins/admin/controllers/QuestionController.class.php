@@ -126,10 +126,10 @@ class QuestionController extends Controller{
 					$question->update();
 				}
 				
-				$form->response(Form::STATUS_SUCCESS);
+				return $form->response(Form::STATUS_SUCCESS);
 			}
 			catch(Exception $e){
-				$form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : '');
+				return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : '');
 			}
 		}
 	}
@@ -291,7 +291,7 @@ class QuestionController extends Controller{
 				if($form->submitted() == "delete"){
 					$this->compute('delete');					
 
-					$form->response(Form::STATUS_SUCCESS);
+					return $form->response(Form::STATUS_SUCCESS);
 				}
 				else{
 					if($form->check()){					
@@ -311,12 +311,10 @@ class QuestionController extends Controller{
 									$keys['admin']['profile-question-' . $form->getData("name") . '-option-' . $i] = trim($option);
 								}
 							}	
-							foreach(Language::getAll() as $language){
-								$language->saveTranslations($keys);
-							}
-						}					
+							Language::current()->saveTranslations($keys);
+						}
 
-						$form->response(Form::STATUS_SUCCESS);		
+						return $form->response(Form::STATUS_SUCCESS);		
 					}
 				}
 			}

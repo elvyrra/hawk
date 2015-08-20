@@ -368,12 +368,12 @@ class AdminController extends Controller{
 					
 					// Register the favicon
 					Log::info('The options of the application has been updated by ' . Session::getUser()->username);
-					$form->response(Form::STATUS_SUCCESS, Lang::get('admin.settings-save-success'));
+					return $form->response(Form::STATUS_SUCCESS, Lang::get('admin.settings-save-success'));
 				}
 			}
 			catch(Exception $e){
 				Log::error('An error occured while updating application options');
-				$form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get('admin.settings-save-error'));
+				return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get('admin.settings-save-error'));
 			}
 		}
 	}

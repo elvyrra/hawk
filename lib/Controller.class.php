@@ -59,18 +59,14 @@ class Controller{
 		$result = $this->$method();
 		if(Response::getType() == 'html'){
 			// Create a phpQuery object to be modified by event listeners (widgets)
-			$dom = phpQuery::newDocument($result);
-		}
-		else{			
-			$dom = $result;
+			$result = phpQuery::newDocument($result);
 		}
 				
 		/*** Load the widgets after calling the controller method ***/		
-		$event = new Event(get_called_class() . '.' . $method . '.' . self::AFTER_ACTION, array('controller' => $this, 'result' => $dom));
+		$event = new Event(get_called_class() . '.' . $method . '.' . self::AFTER_ACTION, array('controller' => $this, 'result' => $result));
 		EventManager::trigger($event);
 		
 		$result = $event->getData('result');
-		
 		if( $result instanceof phpQuery){			
 			return $result->htmlOuter();
 		}
@@ -81,13 +77,24 @@ class Controller{
 
 
 	/**
+	 * Add static content at the end of the DOM
+	 * @param string $content The content to add
+	 */
+	private function addContentAtEnd($content){	
+		Widget::add(Router::getCurrentAction(), Controller::AFTER_ACTION, function($event) use($content){			
+			if(Response::getType() === 'html'){	
+				$dom = $event->getData('result');
+				$dom->find("*:last")->after($content);
+			}
+		});
+	}
+
+	/**
 	 * Add a link tag for CSS inclusion at the end of the HTML result to return to the client
 	 * @param string $url The URL of the css file to load
 	 */
 	public function addCss($url){
-		Widget::add(Router::getCurrentAction(), Controller::AFTER_ACTION, function($event) use($url){
-			pq("*:last")->after("<link rel='stylesheet' property='stylesheet' type='text/css' href='$url' />");
-		});
+		$this->addContentAtEnd("<link rel='stylesheet' property='stylesheet' type='text/css' href='$url' />");
 	}
 
 	/**
@@ -95,9 +102,7 @@ class Controller{
 	 * @param string $style The CSS code to insert
 	 */
 	public function addCssInline($style){
-		Widget::add(Router::getCurrentAction(), Controller::AFTER_ACTION, function($event) use($style){
-			pq("*:last")->after("<style type='text/css'>$style</style>");
-		});
+		$this->addContentAtEnd("<style type='text/css'>$style</style>");
 	}
 
 	/**
@@ -105,9 +110,7 @@ class Controller{
 	 * @param string $url The URL of the JavaScript file to load
 	 */
 	public function addJavaScript($url){
-		Widget::add(Router::getCurrentAction(), Controller::AFTER_ACTION, function($event) use($url){
-			pq("*:last")->after("<script type='text/javascript' src='$url'></script>");
-		});
+		$this->addContentAtEnd("<script type='text/javascript' src='$url'></script>");
 	}
 
 
@@ -116,8 +119,6 @@ class Controller{
 	 * @param string $script The JavaScript code to insert
 	 */
 	public function addJavaScriptInline($script){
-		Widget::add(Router::getCurrentAction(), Controller::AFTER_ACTION, function($event) use($script){
-			pq("*:last")->after("<script type='text/javascript'>$script</script>");
-		});	
+		$this->addContentAtEnd("<script type='text/javascript'>$script</script>");
 	}
 }

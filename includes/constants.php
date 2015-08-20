@@ -31,7 +31,10 @@ define('ENCODING', 'utf-8');
 // Allowed image types
 define('ALLOWED_IMAGE_UPLOAD_TYPES', 'image/png image/jpeg image/jpg image/bpm image/gif image/tif');
 
-// Default confirugation values
+// Default configuration values
 define('DEFAULT_HTML_TITLE', 'Hawk');
 define('DEFAULT_SESSION_ENGINE', 'file');
 define('DEFAULT_TIMEZONE', date_default_timezone_get());
+
+// Hawk API base URL
+define('HAWK_API_BASE_URL', 'http://hawk.elvyrra.com/api/');

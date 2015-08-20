@@ -223,7 +223,7 @@ class InstallController extends Controller{
 					DB::get('tmp');
 				}
 				catch(DBException $e){
-					$form->response(Form::STATUS_ERROR, Lang::get('install.install-connection-error'));
+					return $form->response(Form::STATUS_ERROR, Lang::get('install.install-connection-error'));
 				}
 
 				$param = array(
@@ -243,10 +243,10 @@ class InstallController extends Controller{
 				system('mysql --host=' . $host . ($port ? ' --port=' . $port : '') . ' --user=' . $form->getData('db[username]') . ' --pass=' . $form->getData('db[password]') . ' < ' . $tmpfile . ' 2>&1', $return);
 
 				if($return){
-					$form->response(Form::STATUS_ERROR, Lang::get('install.install-error'));
+					return $form->response(Form::STATUS_ERROR, Lang::get('install.install-error'));
 				}
 				else{
-					$form->response(Form::STATUS_SUCCESS, Lang::get('install.install-success'));
+					return $form->response(Form::STATUS_SUCCESS, Lang::get('install.install-success'));
 				}
 			}
 		}

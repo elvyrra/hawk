@@ -11,53 +11,37 @@
 		</div>
 
 		<div class="collapse navbar-collapse" id="main-menu-collapse">
-			<ul class="nav navbar-nav">
-				{foreach($menus as $menu)}					
-					<li class="dropdown main-menu" id="main-menu-{{ $menu->id }}" data-menu="{{ $menu->name }}">
-						<div class="dropdown-toggle main-menu-title" type="button" id="main-menu-title-{{ $menu->id }}" data-toggle="dropdown">
-							{{ $menu->label }}
-							<i class="fa fa-caret-down"></i>
-						</div>
-						<ul class="dropdown-menu" role="menu" aria-labelledby="main-menu-title-{{ $menu->id }}" id="main-menu-items-{{ $menu->id }}">
-							{foreach($menu->visibleItems as $item)}
-								<li role="presentation" class="main-menu-item" id="main-menu-item-{{ $item->id }}" data-item="{{ $item->name }}">
-									<a role="menuitem" href="{{ $item->url }}" {if(!empty($item->target))} target="{{ !empty($item->target) ? $item->target : '' }}" {/if}> 
-										{{ $item->label }}
+			{foreach($groups as $position => $menus)}
+				<ul class="nav navbar-nav navbar-{{ $position }}">
+					{foreach($menus as $menu)}	
+						{if($menu->visibleItems)}
+							<li class="dropdown main-menu" id="main-menu-{{ $menu->id }}">
+								<div class="dropdown-toggle main-menu-title" type="button" id="main-menu-title-{{ $menu->id }}" data-toggle="dropdown">
+									{{ $menu->label }}
+									<i class="fa fa-caret-down"></i>
+								</div>
+								<ul class="dropdown-menu" role="menu" aria-labelledby="main-menu-title-{{ $menu->id }}" id="main-menu-items-{{ $menu->id }}">
+									{foreach($menu->visibleItems as $item)}
+										<li role="presentation" class="main-menu-item" id="main-menu-item-{{ $item->id }}" data-item="{{ $item->name }}">
+											<a role="menuitem" href="{{ htmlentities($item->url, ENT_QUOTES) }}" {if(!empty($item->target))} target="{{ $item->target }}" {/if}> 
+												{{ $item->label }}
+											</a>
+										</li>					
+									{/foreach}					
+								</ul>
+							</li>
+						{else}
+							<li class="main-menu" id="main-menu-{{ $menu->id }}">
+								<div class="main-menu-title" type="button" id="main-menu-title-{{ $menu->id }}">
+									<a href="{{ htmlentities($menu->url, ENT_QUOTES) }}" {if(!empty($menu->target))} target="{{ $menu->target }}" {/if}>
+										{{ $menu->label }}
 									</a>
-								</li>					
-							{/foreach}					
-						</ul>
-					</li>
-				{/foreach}
-			</ul>
-
-			<ul class="nav navbar-nav navbar-right">
-				{if(Session::isConnected())}
-					{foreach($userMenus as $menu)}						
-						<li class="dropdown main-menu" id="main-user-menu-{{ $menu->name }}" data-menu="{{ $menu->name }}">
-							<div class="dropdown-toggle main-menu-title" id="main-user-menu-title-{{ $menu->name }}" data-toggle="dropdown">
-								{{ $menu->label }}
-								<i class="fa fa-caret-down"></i>
-							</div>
-							<ul class="dropdown-menu" role="menu" aria-labelledby="main-user-menu-title-{{ $menu->name }}" id="main-menu-items-{{ $menu->name }}">
-								{foreach($menu->visibleItems as $item)}
-									<li role="presentation" class="main-menu-item" id="main-user-menu-item-{{ $item->name }}" data-item="{{ $item->name }}">
-										<a role="menuitem" href="{{ $item->url }}" {if(!empty($item->target))} target="{{ !empty($item->target) ? $item->target : '' }}" {/if}> 
-											{{ $item->label }}
-										</a>
-									</li>					
-								{/foreach}					
-							</ul>
-						</li>
+								</div>
+							</li>
+						{/if}
 					{/foreach}
-				{else}
-					<li class="main-menu" >						
-						<div class="main-menu-title" href="{uri action="LoginController.login"}" target="dialog">
-							<i class="fa fa-sign-in"></i> {text key="main.login"}
-						</div>
-					</li>
-				{/if}
-			</ul>
+				</ul>
+			{/foreach}
 		</div>
 	</div>
 </nav>
