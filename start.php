@@ -48,11 +48,13 @@ if(!empty($sessionInterface)){
 if(!empty($_COOKIE['language'])){
     define('LANGUAGE', $_COOKIE['language']);
 }
-elseif(Session::getUser()->getProfileData('language')){
-    define('LANGUAGE', Session::getUser()->getProfileData('language'));
-}
-elseif(Conf::has('db') && Option::get('main.language')){
-    define('LANGUAGE', Option::get('main.language'));
+elseif(Conf::has('db')){
+    if(Session::getUser()->getProfileData('language')){
+        define('LANGUAGE', Session::getUser()->getProfileData('language'));
+    }
+    elseif(Option::get('main.language')){
+        define('LANGUAGE', Option::get('main.language'));
+    }
 }
 else{
     define('LANGUAGE', Lang::DEFAULT_LANGUAGE);
