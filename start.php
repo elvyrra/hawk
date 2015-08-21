@@ -30,16 +30,34 @@ if(Conf::has('db')){
         exit(DEBUG_MODE ? $e->getMessage() : Lang::get('main.connection-error'));
     }
 }
+
 /*** Get the session system ***/
 define('SESSION_ENGINE', Conf::has('session.engine') ? Conf::get('session.engine') : DEFAULT_SESSION_ENGINE);
 
+/*** Open the session ***/
+$sessionInterface = ucfirst(SESSION_ENGINE) . 'Session';
+if(!empty($sessionInterface)){
+    $handler = new $sessionInterface();
+    session_set_save_handler($handler);
+
+    session_set_cookie_params((int) Conf::get('session.lifetime'), '/');
+    session_start();
+}
+
 /*** Constants depending to the options ***/
-define("LANGUAGE", Conf::has('db') && Option::get('main.language') ? Option::get('main.language') : Lang::DEFAULT_LANGUAGE);
+if(!empty($_COOKIE['language'])){
+    define('LANGUAGE', $_COOKIE['language']);
+}
+elseif(Session::getUser()->getProfileData('language')){
+    define('LANGUAGE', Session::getUser()->getProfileData('language'));
+}
+elseif(Conf::has('db') && Option::get('main.language')){
+    define('LANGUAGE', Option::get('main.language'));
+}
+else{
+    define('LANGUAGE', Lang::DEFAULT_LANGUAGE);
+}
     
 /*** Timezone ***/
 define("TIMEZONE", Conf::has('db') && Option::get('main.timezone') ? Option::get('main.timezone')  : DEFAULT_TIMEZONE);
 date_default_timezone_set(TIMEZONE);
-
-
-
-?>

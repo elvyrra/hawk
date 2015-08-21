@@ -102,7 +102,7 @@ class LoginController extends Controller{
 				if($user){					
 					if(!$user->active){
 						// The user is not active					
-						$form->response(Form::STATUS_ERROR, Lang::get('main.login-error-inactive-user'));
+						return $form->response(Form::STATUS_ERROR, Lang::get('main.login-error-inactive-user'));
 					}
 					
 					// The user can be connected 
@@ -117,10 +117,10 @@ class LoginController extends Controller{
 						setcookie(sha1("password"), Crypto::aes256Encode($form->getData('password')), time() + 3600 * 24 *7, '/');
 					}
 					
-					$form->response(Form::STATUS_SUCCESS, Lang::get('main.login-success'));
+					return $form->response(Form::STATUS_SUCCESS, Lang::get('main.login-success'));
 				}
 				else{					
-					$form->response(Form::STATUS_ERROR, Lang::get('main.login-error-authentication'));
+					return $form->response(Form::STATUS_ERROR, Lang::get('main.login-error-authentication'));
 				}			
 			}			
 		}
@@ -297,15 +297,15 @@ class LoginController extends Controller{
 							 ->subject(Lang::get('main.register-email-title', array('sitename' => Option::get('main.title'))))
 							 ->send();
 						
-						$form->response(Form::STATUS_SUCCESS, Lang::get('main.register-send-email-success'));
+						return $form->response(Form::STATUS_SUCCESS, Lang::get('main.register-send-email-success'));
 					}
 					else{
 						// validate the registration
-						$form->response(Form::STATUS_SUCCESS, Lang::get('main.register-success'));
+						return $form->response(Form::STATUS_SUCCESS, Lang::get('main.register-success'));
 					}
 				}
 				catch(Exception $e){
-					$form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get('main.register-error') );
+					return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get('main.register-error') );
 				}
 			}		
 		}

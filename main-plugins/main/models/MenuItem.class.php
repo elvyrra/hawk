@@ -68,8 +68,10 @@ class MenuItem extends Model{
 		}
 
 		// Insert the menu item
-		$menu = parent::add($data);	
+		$item = parent::add($data);	
 
-		return $menu;
+		EventManager::trigger(new Event('menu.added', array('item' => $item)));
+
+		return $item;
 	}
 }

@@ -5,7 +5,6 @@ Router::get('new-tab', '/newtab', array('auth' => Request::isAjax() && (Session:
 	
 Router::auth(Session::isConnected(), function(){
 	Router::auth(Request::isAjax(), function(){
-		// Router::get('user-profile', '/profile/{userId}', array('where' => array('userId' => '\d+'), 'action' => 'UserProfileController.display'));
 		Router::any('edit-profile', '/profile/edit/{userId}', array('where' => array('userId' => '\d+'), 'default' => array('userId' => Session::getUser()->id), 'action' => 'UserProfileController.edit'));
 		Router::any('change-password', '/profile/change-password', array('action' => 'UserProfileController.changePassword'));
 	});

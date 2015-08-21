@@ -5,9 +5,10 @@ class MainMenuWidget extends Widget{
 	const EVENT_AFTER_GET_MENUS = 'menu.after_get_items';
 	const EVENT_AFTER_GET_USER_MENU = 'menu.after_get_user_items';
 
-	const USER_MENU_NAME = 'user';
-	const ADMIN_MENU_NAME = 'admin';
+	const USER_MENU_ID = 1;
+	const ADMIN_MENU_ID = 2;
 	
+
 	/**
 	 * Display the main menu
 	 * */
@@ -15,31 +16,22 @@ class MainMenuWidget extends Widget{
 		$user = Session::getUser();
 		$menus = $userMenus = array();
 
-		if(Session::isConnected()) {
-			unset($userMenus['user']);
-		}
-	
-		$event = new Event(self::EVENT_AFTER_GET_USER_MENU, array(
-			'menus' => $userMenus
-		));
-		$userMenus = $event->getData('menus');
-
 		if($user->canAccessApplication()){			
 			// Get the menus 
-			$menus = Menu::getAvailableMenus($user, 'name');
+			$menus = Menu::getAvailableMenus($user);
 
 			// Get the user menu
 			if(Session::isConnected()){
-				$menus[self::USER_MENU_NAME]->label = $user->getUsername();
-				$userMenus[self::USER_MENU_NAME] = $menus[self::USER_MENU_NAME];				
+				$menus[self::USER_MENU_ID]->label = $user->getUsername();
+				$userMenus[self::USER_MENU_ID] = $menus[self::USER_MENU_ID];				
 			}
 			// remove the user menu from applications menus
-			unset($menus[self::USER_MENU_NAME]);
+			unset($menus[self::USER_MENU_ID]);
 
 			// put the admin menu in user menu
-			if(!empty($menus[self::ADMIN_MENU_NAME])){
-				$userMenus[self::ADMIN_MENU_NAME] = $menus[self::ADMIN_MENU_NAME];
-				unset($menus[self::ADMIN_MENU_NAME]);
+			if(!empty($menus[self::ADMIN_MENU_ID])){
+				$userMenus[self::ADMIN_MENU_ID] = $menus[self::ADMIN_MENU_ID];
+				unset($menus[self::ADMIN_MENU_ID]);
 			}
 
 			// Trigger an event to add or remove menus from plugins 
@@ -47,16 +39,28 @@ class MainMenuWidget extends Widget{
 				'menus' => $menus,
 				'userMenus' => $userMenus
 			));
+
 			EventManager::trigger($event);
 			$menus = $event->getData('menus');
 			$userMenus = $event->getData('userMenus');
 		}
+		else{
+			$userMenus = array(
+				new Menu(array(
+					'id' => uniqid(),
+					'labelKey' => 'main.login',
+					'action' => 'login',
+					'target' => 'dialog',
+				))
+			);
+		}
 
 
 		return View::make(ThemeManager::getSelected()->getView('main-menu.tpl'), array(
-			'menus' => $menus,
-			'user' => $user,
-			'userMenus' => $userMenus,
+			'groups' => array(
+				'left' => $menus,
+				'right' => $userMenus
+			),
 			'logo' => Option::get('main.logo') ? USERFILES_PLUGINS_URL . 'main/' . Option::get('main.logo') : ''
 		));
 	}

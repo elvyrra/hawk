@@ -26,4 +26,5 @@ settings-admin-passagain-label = "Confirmation du mot de passe"
 install-button = "Installer Hawk"
 
 install-error = "Une erreur est survenue pendant l'installation de Hawk"
+install-connection-error = "Les données que vous avez renseignées pour la connexion à la base de données sont erronées."
 install-success = "Hawk a été correctement installé"

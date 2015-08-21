@@ -43,7 +43,6 @@
 		model.parameters = ko.computed(function(){
 			return JSON.stringify({
 				required : this.required(),
-				// label : this.label(),
 				options : this.options() ? this.options().split("\n") : [],
 				min : this.minDate(),
 				max : this.maxDate()

@@ -3,43 +3,6 @@
 
 class UserProfileController extends Controller{
 
-    /** 
-     * Display the list of the users 
-     */
-    public function listUsers(){
-        $example = array('id' => array('$ne' => 0));
-        $filter = (new UserFilterWidget())->getFilter();
-        switch($filter){
-            case 'inactive' :
-                $example['active'] = 0;
-                break;
-
-            case 'active' :
-                $example['active'] = 1;
-                break;
-        }
-        $users = User::getListByExample(new DBExample($example));
-        
-        foreach($users as $user){
-            $user->color = Role::getById($user->roleId)->color;
-            $user->getProfileData();
-        }   
-        
-        $questions = ProfileQuestion::getDisplayProfileQuestions();
-        if(Option::get('user.display-realname')){
-            unset($questions['realname']);
-        }
-        unset($questions['avatar']);
-
-        return View::make(Plugin::current()->getView("users-list.tpl"), array(
-            'users' => $users,
-            'questions' => $questions,
-        ));
-    }
-    
-
-
-
     /**
      * Create or edit an user
      */
@@ -106,7 +69,13 @@ class UserProfileController extends Controller{
             'onsuccess' => 'app.dialog("close")',
         );
 
+        // Get the user profile questions
         $questions = ProfileQuestion::getAll('name', array(), array('order' => DB::SORT_ASC));
+
+        
+        
+
+        // Generate the question fields
         foreach($questions as $question){
             $classname = ucwords($question->type) . 'Input';
             $field = json_decode($question->parameters, true);
@@ -123,7 +92,20 @@ class UserProfileController extends Controller{
                     $field['value'] = $user->getProfileData($question->name);
                 }
             }
+            
+            if($question->name == 'language'){
+                // Get language options
+                $languages = Language::getAll();
+                $options = array();
+                foreach($languages as $language){
+                    $options[$language->tag] = $language->label;
+                }
+                $field['options'] = $options;
+            }
+
+
             $param['fieldsets']['profile'][] = new $classname($field);
+
         }
         
         $form = new Form($param);
@@ -158,10 +140,10 @@ class UserProfileController extends Controller{
                 }            
 
                 $user->saveProfile();
-                $form->response(Form::STATUS_SUCCESS, Lang::get('main.user-profile-update-success'));
+                return $form->response(Form::STATUS_SUCCESS, Lang::get('main.user-profile-update-success'));
             }
             catch(Exception $e){
-                $form->response(Form::STATUS_ERROR, Lang::get('main.user-profile-update-error'));
+                return $form->response(Form::STATUS_ERROR, Lang::get('main.user-profile-update-error'));
             }
         }
         
@@ -225,16 +207,16 @@ class UserProfileController extends Controller{
             if($form->check()){
                 $me = Session::getUser();
                 if($me->password != Crypto::saltHash($form->getData('current-password'))){
-                    $form->response(Form::STATUS_ERROR, Lang::get('main.update-password-bad-current-password'));
+                    return $form->response(Form::STATUS_ERROR, Lang::get('main.update-password-bad-current-password'));
                 }
                 try{
                     $me->set('password', Crypto::saltHash($form->getData('new-password')));
                     $me->save();
 
-                    $form->response(Form::STATUS_SUCCESS, Lang::get('main.update-password-success'));
+                    return $form->response(Form::STATUS_SUCCESS, Lang::get('main.update-password-success'));
                 }
                 catch(Exception $e){
-                    $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get('main.update-password-error'));
+                    return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get('main.update-password-error'));
                 }
 
             }

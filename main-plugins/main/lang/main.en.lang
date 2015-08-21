@@ -25,7 +25,7 @@ list-results-number[1] = "1 result"
 list-results-number[p] = "{number} results"
 list-sort-asc = "A > Z"
 list-sort-desc = "Z > A"
-login = "Connect"
+login = "<i class=\"fa fa-sign-in\"></i> Connect"
 login-error-authentication = "The login or the password is not correct"
 login-error-inactive-user = "This account is not active on this application"
 login-form-title = "Connection"
@@ -79,7 +79,7 @@ update-password-success = "Your password has been successfully updated."
 user-profile-update-success = "Your profile was successfully updated"
 user-profile-update-error = "An error occured while updating your profile"
 register-email-title = "Validate your registration on {sitename}"
-register-email-content = "<p>You have just registered on {sitename}, and we thank you for that </p>\
+register-email-content = "<p>You have just registered on {sitename}, and we thank you for that. </p>\
 <p>To validate your registration, please click on the link below :</p>\
 <a href=\"{uri}\">{uri}</a>\
 <p> We hope to see you soon on {sitename} </p>\

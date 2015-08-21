@@ -98,7 +98,7 @@ App.prototype.init = function(){
 			var data = {};
 
 			var target = $(node).attr('target');
-			if(event.which == 2 && ! target){
+			if((event.which == 2 || !this.tabset.tabs().length) && ! target) {
 				target = "newtab";
 			}
 			switch(target) {

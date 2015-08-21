@@ -211,15 +211,30 @@ class InstallController extends Controller{
 				 */
 				$tmpfile = tempnam(sys_get_temp_dir(), '');	
 
+				DB::add('tmp', array(
+					array(
+						'host' => $form->getData('db[host]'),
+						'username' => $form->getData('db[username]'),
+						'password' => $form->getData('db[password]')
+					)
+				));
+
+				try{
+					DB::get('tmp');
+				}
+				catch(DBException $e){
+					return $form->response(Form::STATUS_ERROR, Lang::get('install.install-connection-error'));
+				}
+
 				$param = array(
 					'{{ $dbname }}' => $form->getData('db[dbname]'),
 					'{{ $language }}' => $this->language,
 					'{{ $timezone }}' => $form->getData('timezone'),
-					'{{ $title }}' => $form->getData('title'),
-					'{{ $email }}' => $form->getData('admin[email]'),
-					'{{ $login }}' => $form->getData('admin[login]'),
-					'{{ $password }}' => Crypto::saltHash($form->getData('admin[password]'), $salt),
-					'{{ $ip }}' => Request::clientIp()
+					'{{ $title }}' => Db::get('tmp')->quote($form->getData('title')),
+					'{{ $email }}' => Db::get('tmp')->quote($form->getData('admin[email]')),
+					'{{ $login }}' => Db::get('tmp')->quote($form->getData('admin[login]')),
+					'{{ $password }}' => Db::get('tmp')->quote(Crypto::saltHash($form->getData('admin[password]'), $salt)),
+					'{{ $ip }}' => Db::get('tmp')->quote(Request::clientIp())
 				);
 				$sql = strtr(file_get_contents(Plugin::current()->getRootDir() . 'files/install.sql.tpl'), $param);
 				file_put_contents($tmpfile, $sql);
@@ -228,10 +243,10 @@ class InstallController extends Controller{
 				system('mysql --host=' . $host . ($port ? ' --port=' . $port : '') . ' --user=' . $form->getData('db[username]') . ' --pass=' . $form->getData('db[password]') . ' < ' . $tmpfile . ' 2>&1', $return);
 
 				if($return){
-					$form->response(Form::STATUS_ERROR, Lang::get('install.install-error'));
+					return $form->response(Form::STATUS_ERROR, Lang::get('install.install-error'));
 				}
 				else{
-					$form->response(Form::STATUS_SUCCESS, Lang::get('install.install-success'));
+					return $form->response(Form::STATUS_SUCCESS, Lang::get('install.install-success'));
 				}
 			}
 		}

@@ -5,16 +5,30 @@ class Menu extends Model{
 	protected static $tablename = "Menu";
 	protected static $primaryColumn = "id";
 
-	public $visibleItems = array();
-	
+	/**
+	 * Constructor
+	 * @param array $data the menu data	 
+	 */
 	public function __construct($data = array()){
 		parent::__construct($data);
+
+		$this->visibleItems = array();
 
 		if(!empty($this->labelKey)){
 			$this->label = Lang::get($this->labelKey);
 		}
+
+		if(!empty($this->action)){
+			$params = !empty($this->actionParameters) ? json_decode($this->actionParameters, true) : array();
+			$this->url = Router::getUri($this->action, $params);
+
+			if($this->url == Router::INVALID_URL){
+				$this->url = $this->action;
+			}
+		}
 	}
 		
+
 	public static function getAvailableMenus($user = null, $index = null){
 		if($user === null){
 			$user = Session::getUser();
@@ -41,39 +55,37 @@ class Menu extends Model{
 		}
 		
 		$menus = array_filter($menus, function($menu){
-			return count($menu->visibleItems) > 0;
+			return $menu->action || count($menu->visibleItems) > 0;
 		});
 
 		return $menus;
 	}
 
-	public static function getByName($name){
-		return self::getByExample(new DBExample(array('name' => $name)));
+	public static function getByName($plugin, $name){
+		return self::getByExample(new DBExample(array('plugin' => $plugin, 'name' => $name)));
 	}
 	
-	public static function add($name, $labelKey, $order = -1){
-		if($order === -1){
-			$order = DB::get(self::$dbname)->select(array(
+	public static function add($data){
+		if(empty($data['plugin']) || empty($data['name'])){
+			throw new Exception("To add a new menu, you must specify at least the plugin and the name of the menu");
+		}
+
+		if(!isset($data['order']) || $data['order'] === -1){
+			$data['order'] = DB::get(self::$dbname)->select(array(
 				'fields' => array('COALESCE(MAX(`order`), 0) + 1' => 'newOrder'),
-				'from' => self::$tablename,				
+				'from' => self::$tablename,
 				'one' => true,
 				'return' => DB::RETURN_OBJECT
 			))->newOrder;
 		}
 		else{
 			// First update the menus which order is greater than the one you want to include
-			$sql = 'UPDATE ' . self::$tablename . ' SET order=order + 1  WHERE order >= :order';
-			DB::get(self::$dbname)->query($sql, array('order' => $order));
+			$sql = 'UPDATE ' . self::$tablename . ' SET `order` = `order` + 1  WHERE order >= :order';
+			DB::get(self::$dbname)->query($sql, array('order' => $data['order']));
 		}
 
-		// Insert the menu
-		$menu = parent::add(array(
-			'name' => $name, 
-			'labelKey' => $labelKey,
-			'order' => $order
-		));	
-
-		EventManager::trigger(new Event('menu.added', array('name' => $name, 'title' => Lang::get($labelKey))));
+		// Insert the menu item
+		$menu = parent::add($data);	
 
 		return $menu;
 	}

@@ -666,6 +666,7 @@ a, a:active, a:hover, a:visited, a:focus{
 .list-search-input.not-empty {
     background-color: @bgInfo;
     color: @colorInfo;
+    padding-right: 16px;
 }	
 
 .list-line{
