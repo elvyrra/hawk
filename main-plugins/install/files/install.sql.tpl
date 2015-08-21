@@ -24,17 +24,22 @@ INSERT INTO `Language` (`tag`, `label`, `isDefault`, `active`) VALUES
 
 CREATE TABLE IF NOT EXISTS `Menu` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `plugin` VARCHAR(32) NOT NULL DEFAULT '0',
   `name` varchar(64) NOT NULL,
   `labelKey` varchar(128) NOT NULL,
+  `action` VARCHAR(128) NOT NULL,
+  `actionParameters` VARCHAR(1024) NOT NULL,
+  `target` VARCHAR(64) NOT NULL
   `order` int(2) NOT NULL,
+  `permissionId` INT(11) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`)
+  UNIQUE INDEX `Index 2` (`plugin`, `name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*!40000 ALTER TABLE `Menu` DISABLE KEYS */;
-INSERT INTO `Menu` (`id`, `name`, `labelKey`, `order`) VALUES
-(1, 'user', 'user.username', 1),
-(2, 'admin', 'main.menu-admin-title', 0);
+INSERT INTO `Menu` (`id`, `plugin`, `name`, `labelKey`, `action`, `actionParameters`, `target`, `order`, `permissionId`) VALUES
+(1, 'main', 'user', 'user.username', '', '', '', 1, 0),
+(2, 'admin', 'admin', 'main.menu-admin-title', '', '', '', 0, 0);
 /*!40000 ALTER TABLE `Menu` ENABLE KEYS */;
 
 
