@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `Menu` (
   `labelKey` varchar(128) NOT NULL,
   `action` VARCHAR(128) NOT NULL,
   `actionParameters` VARCHAR(1024) NOT NULL,
-  `target` VARCHAR(64) NOT NULL
+  `target` VARCHAR(64) NOT NULL,
   `order` int(2) NOT NULL,
   `permissionId` INT(11) NOT NULL,
   PRIMARY KEY (`id`),
