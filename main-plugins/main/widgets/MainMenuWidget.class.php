@@ -20,6 +20,12 @@ class MainMenuWidget extends Widget{
 			// Get the menus 
 			$menus = Menu::getAvailableMenus($user);
 
+			// Filter the menus that have no action and no item
+			$menus = array_filter($menus, function($menu){
+				return $menu->action || count($menu->visibleItems) > 0;
+			});
+
+
 			// Get the user menu
 			if(Session::isConnected()){
 				$menus[self::USER_MENU_ID]->label = $user->getUsername();

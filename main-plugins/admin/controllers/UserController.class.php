@@ -243,7 +243,7 @@ class UserController extends Controller{
 			));
 		}
 		else{
-			$form->treat();			
+			return $form->treat();			
 		}
 		
 	}	
