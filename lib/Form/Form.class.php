@@ -637,6 +637,9 @@ class Form{
 			if($this->check($exit)){
 				return $this->register($exit);		
 			}
+			else{
+				return false;
+			}
 		}
 	}	
 }

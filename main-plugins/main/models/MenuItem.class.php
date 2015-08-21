@@ -36,15 +36,20 @@ class MenuItem extends Model{
 		if($user == null){
 			$user = Session::getUser();
 		}
+
+		$items = self::getAll(null, array(), array('menuId' => 'ASC', 'order' => 'ASC'));
+		return array_filter($items, function($item) use($user){
+			return !$item->permissionId || $user->isAllowed($item->permissionId);
+		});
 		
-		$sql = 'SELECT I.*
-				FROM ' . self::$tablename . ' I
-					LEFT JOIN ' . RolePermission::getTable() . ' RP ON RP.permissionId = I.permissionId
-					LEFT JOIN ' . User::getTable() . ' U ON RP.roleId = U.roleId					
-				WHERE (U.id = :userId AND RP.value = 1) OR I.permissionId = 0
-				ORDER BY menuId ASC, `order` ASC';
+		// $sql = 'SELECT I.*
+		// 		FROM ' . self::$tablename . ' I
+		// 			LEFT JOIN ' . RolePermission::getTable() . ' RP ON RP.permissionId = I.permissionId
+		// 			LEFT JOIN ' . User::getTable() . ' U ON RP.roleId = U.roleId					
+		// 		WHERE (U.id = :userId AND RP.value = 1) OR I.permissionId = 0
+		// 		ORDER BY menuId ASC, `order` ASC';
 		
-		return DB::get(self::$dbname)->query($sql, array('userId' => $user->id), array('return' => __CLASS__));	
+		// return DB::get(self::$dbname)->query($sql, array('userId' => $user->id), array('return' => __CLASS__));	
 	}
 
 	public static function add($data){

@@ -5,7 +5,7 @@ class User extends Model{
 	protected static $tablename = "User";	
 	protected static $primaryColumn = "id";
 
-	private $profile;
+	private $profile, $permissions;
 
 	const GUEST_USER_ID = 0;
 	const ROOT_USER_ID = 1;
@@ -28,7 +28,7 @@ class User extends Model{
 	
 	private function getPermissions(){
 		if(!isset($this->permissions)){
-			$sql = 'SELECT P.plugin, P.key
+			$sql = 'SELECT P.plugin, P.key, P.id
 					FROM RolePermission RP 
 						INNER JOIN Permission P ON RP.permissionId = P.id						
 						INNER JOIN User U ON U.roleId = RP.roleId
@@ -36,6 +36,10 @@ class User extends Model{
 			$permissions = DB::get(self::$dbname)->query($sql, array('id' => $this->id), array('return' => DB::RETURN_OBJECT));
 			$this->permissions = array();			
 			foreach($permissions as $permission){
+				// Register the permission by it id
+				$this->permissions[$permission->id] = 1;
+
+				// Regoster the permission by it name
 				$this->permissions[$permission->plugin][$permission->key] = 1;
 			}
 		}		
@@ -68,19 +72,40 @@ class User extends Model{
 		}
 	}
 	
+
+	/**
+	 * 	Check if the user is allowed to perform an action
+	 * @param string|int $action This parameter can represent :
+	 *								- A specific action, formatted as "<plugin>.<key>"
+	 *								- A permission id, when an integer is given
+	 *								- A plugin name, so this method will check if at least one action of the plugin is avaialble for the user
+	 * @return boolean TRUE if the suer is allowed to perform the action, else FALSE
+	 */
 	public function isAllowed($action){
 		if($this->roleId == Role::ADMIN_ROLE_ID){
+			// The admins can perform any action
 			return true;
 		}
+		if($action !== Permission::ALL_PRIVILEGES_ID && $action !== Permission::ALL_PRIVILEGES_NAME){
+			if($this->isAllowed(Permission::ALL_PRIVILEGES_ID)){
+				// The user has all privileges
+				return true;
+			}
+		}
 		
+		// Get the user permissions
 		$this->getPermissions();
+
 		if(strpos($action, '.') !== false){
+			// Check a specific action
 			list($plugin, $command) = explode('.', $action);
 		}
 		else{
+			// Check a action by it id or a while plugin
 			$plugin = $action;
 		}
 		
+
 		if(empty($command)){
 			// Return if the user has at least one authorization in the plugin
 			return !empty($this->permissions[$plugin]);
@@ -90,10 +115,17 @@ class User extends Model{
 			return !empty($this->permissions[$plugin][$command]);
 		}
 	}	
-		
+	
+
+	/**
+	 * Get the user's username
+	 * @return string The user's username
+	 */	
 	public function getUsername(){
 		return $this->id ? $this->username : Lang::get('main.guest-username');
 	}
+	
+
 	
 	public function getDisplayName(){
 		return Option::get('user.display-realname') && $this->getProfileData('realname') ? $this->getProfileData('realname') : $this->getUsername();

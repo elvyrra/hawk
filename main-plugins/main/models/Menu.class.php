@@ -29,42 +29,55 @@ class Menu extends Model{
 	}
 		
 
+	/**
+	 * Get the list of menus that are aavailable for the given user
+	 * @param User $user The user to look for the available menus
+	 * @param string $index The column to use as key in the result array
+	 * @return array The list of available menus for the user
+	 */
 	public static function getAvailableMenus($user = null, $index = null){
 		if($user === null){
+			// Get the current user
 			$user = Session::getUser();
 		}
 		if($index === null){
+			// Defaulty get the primary column as index
 			$index = self::$primaryColumn;
 		}
 		
+		$menus = self::getAll($index, array(), array('order' => 'ASC'));
+		$menus = array_filter($menus, function($menu) use($user){
+			return ! $menu->permissionId || $user->isAllowed($menu->permissionId);
+		});
+
+		// Get the items to populate the found menus
 		$menuItems = MenuItem::getAvailableItems();
-
-		$menus = self::getAll(self::$primaryColumn, array(), array('order' => DB::SORT_ASC));
-
 		foreach($menuItems as $item){
-			$menus[$item->menuId]->visibleItems[] = $item;
-		}
-
-		if($index != self::$primaryColumn){
-			$id = self::$primaryColumn;
-			foreach($menus as $menu){
-
-				$menus[$menu->$index] = $menu;
-				unset($menus[$menu->$id]);
+			if(!empty($menus[$item->menuId])){
+				$menus[$item->menuId]->visibleItems[] = $item;
 			}
 		}
-		
-		$menus = array_filter($menus, function($menu){
-			return $menu->action || count($menu->visibleItems) > 0;
-		});
 
 		return $menus;
 	}
 
-	public static function getByName($plugin, $name){
-		return self::getByExample(new DBExample(array('plugin' => $plugin, 'name' => $name)));
+
+	/**
+	 * Get a menu by it name and it plugin	 
+	 * @param string $name The menu name
+	 * @return Menu The found menu
+	 */
+	public static function getByName($name){
+		list($plugin, $key) = explode('.', $name, 2);
+		return self::getByExample(new DBExample(array('plugin' => $plugin, 'name' => $key)));
 	}
 	
+
+	/**
+	 * Add a new menu in the database
+	 * @param array $data The menu data to insert
+	 * @return Menu The created menu
+	 */
 	public static function add($data){
 		if(empty($data['plugin']) || empty($data['name'])){
 			throw new Exception("To add a new menu, you must specify at least the plugin and the name of the menu");
@@ -90,9 +103,15 @@ class Menu extends Model{
 		return $menu;
 	}
 
+
+	/**
+	 * Add an item to the menu
+	 * @param array $data The item data to insert
+	 * @return MenuItem the added menu item
+	 */
 	public function addItem($data){
 		$data['menuId'] = $this->id;
 
-		MenuItem::add($data);
+		return MenuItem::add($data);
 	}
 }
