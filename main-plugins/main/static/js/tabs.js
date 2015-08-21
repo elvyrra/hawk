@@ -15,6 +15,7 @@ var Tab = function(id){
 	this.title = ko.observable("");
 	this.url = ko.observable("");
 	this.content = ko.observable("");
+	this.route = ko.observable("");
 
 	this.titleSelector = '#main-tab-title-' + this.id();
 	this.paneSelector = '#main-tab-' + this.id();
@@ -101,20 +102,21 @@ Tabset.prototype.activateTab = function(id){
 };
 
 Tabset.prototype.remove = function(id){
-	if (this.getActiveTab() == this.tabs()[id]){
-		var next = this.getNextTab(id);
-		if(next){
-			/* Activate the next tab */
-			next.activate();
+	if(this.tabs().length > 1){
+		if (this.getActiveTab() == this.tabs()[id]){
+			var next = this.getNextTab(id);
+			if(next){
+				/* Activate the next tab */
+				next.activate();
+			}
 		}
-	}
-	
-	/* Delete the tab nodes */
-	this.tabs.splice(id, 1);	
-
-	/* Register the new list of tabs */
-	this.registerTabs();
 		
+		/* Delete the tab nodes */
+		this.tabs.splice(id, 1);	
+
+		/* Register the new list of tabs */
+		this.registerTabs();
+	}		
 };
 
 Tabset.prototype.getActiveTab = function(){
