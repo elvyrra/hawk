@@ -180,31 +180,6 @@ class InstallController extends Controller{
 				$iv = Crypto::generateKey(16);
 				$configMode = 'dev';
 
-				/**
-				 * Create the config file
-				 */				
-				$param = array(
-					'{{ $salt }}' => addcslashes($salt, "'"),
-					'{{ $key }}' => addcslashes($key, "'"),
-					'{{ $iv }}' => addcslashes($iv, "'"),
-					'{{ $configMode }}' => $configMode,
-					'{{ $rooturl }}' => $form->getData('rooturl'),
-					'{{ $host }}' => $form->getData('db[host]'),
-					'{{ $username }}' => $form->getData('db[username]'),
-					'{{ $password }}' => $form->getData('db[password]'),
-					'{{ $dbname }}' => $form->getData('db[dbname]'),
-					'{{ $sessionEngine }}' => $form->getData('session'),
-					'{{ $version }}' => $form->getData('version')
-				);
-				$config = strtr(file_get_contents(Plugin::current()->getRootDir() . 'files/config.php.tpl'), $param);
-				file_put_contents(INCLUDES_DIR . 'config.php', $config);
-
-
-				/**
-				 * Create the envrionment config file
-				 */
-				touch(ROOT_DIR . 'etc/' . $configMode . '.php');
-
 
 				/**
 				 * Create the database and it tables
@@ -246,6 +221,31 @@ class InstallController extends Controller{
 					return $form->response(Form::STATUS_ERROR, Lang::get('install.install-error'));
 				}
 				else{
+					/**
+					 * Create the config file
+					 */				
+					$param = array(
+						'{{ $salt }}' => addcslashes($salt, "'"),
+						'{{ $key }}' => addcslashes($key, "'"),
+						'{{ $iv }}' => addcslashes($iv, "'"),
+						'{{ $configMode }}' => $configMode,
+						'{{ $rooturl }}' => $form->getData('rooturl'),
+						'{{ $host }}' => $form->getData('db[host]'),
+						'{{ $username }}' => $form->getData('db[username]'),
+						'{{ $password }}' => $form->getData('db[password]'),
+						'{{ $dbname }}' => $form->getData('db[dbname]'),
+						'{{ $sessionEngine }}' => $form->getData('session'),
+						'{{ $version }}' => $form->getData('version')
+					);
+					$config = strtr(file_get_contents(Plugin::current()->getRootDir() . 'files/config.php.tpl'), $param);
+					file_put_contents(INCLUDES_DIR . 'config.php', $config);
+
+
+					/**
+					 * Create the envrionment config file
+					 */
+					touch(ROOT_DIR . 'etc/' . $configMode . '.php');
+					
 					return $form->response(Form::STATUS_SUCCESS, Lang::get('install.install-success'));
 				}
 			}

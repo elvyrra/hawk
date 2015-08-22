@@ -3,10 +3,9 @@
 require INCLUDES_DIR . 'constants.php';
 require INCLUDES_DIR . 'custom-constants.php';
 require INCLUDES_DIR . 'autoload.php';
-if(!is_file(INCLUDES_DIR . 'config.php')){
-	touch(INCLUDES_DIR . 'config.php');
+if(is_file(INCLUDES_DIR . 'config.php')){
+	require INCLUDES_DIR . 'config.php';
 }
-require INCLUDES_DIR . 'config.php';
 require INCLUDES_DIR . 'error-handler.php';
 
 define("ROOT_URL", (string) Conf::get('rooturl') . '/');

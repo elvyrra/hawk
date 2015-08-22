@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `Language` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*!40000 ALTER TABLE `Language` DISABLE KEYS */;
-INSERT INTO `Language` (`tag`, `label`, `isDefault`, `active`) VALUES
+INSERT IGNORE INTO `Language` (`tag`, `label`, `isDefault`, `active`) VALUES
 	('en', 'English', 1, 1),
 	('fr', 'Français', 0, 1);
 /*!40000 ALTER TABLE `Language` ENABLE KEYS */;
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS `Menu` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*!40000 ALTER TABLE `Menu` DISABLE KEYS */;
-INSERT INTO `Menu` (`id`, `plugin`, `name`, `labelKey`, `action`, `actionParameters`, `target`, `order`, `permissionId`) VALUES
+INSERT IGNORE INTO `Menu` (`id`, `plugin`, `name`, `labelKey`, `action`, `actionParameters`, `target`, `order`, `permissionId`) VALUES
 (1, 'main', 'user', 'user.username', '', '', '', 1, 0),
 (2, 'admin', 'admin', 'main.menu-admin-title', '', '', '', 0, 0);
 /*!40000 ALTER TABLE `Menu` ENABLE KEYS */;
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS `MenuItem` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*!40000 ALTER TABLE `MenuItem` DISABLE KEYS */;
-INSERT INTO `MenuItem` (`id`, `menuId`, `name`, `labelKey`, `action`, `actionParameters`, `target`, `order`, `permissionId`) VALUES
+INSERT IGNORE INTO `MenuItem` (`id`, `menuId`, `name`, `labelKey`, `action`, `actionParameters`, `target`, `order`, `permissionId`) VALUES
 (1, 2, 'settings', 'main.menu-admin-settings-title', 'main-settings', '', '', 0, 1),
 (2, 2, 'users', 'main.menu-admin-users-title', 'manage-users', '', '', 1, 2),
 (3, 2, 'permissions', 'main.menu-admin-roles-title', 'permissions', '', '', 2, 2),
@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS `Option` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*!40000 ALTER TABLE `Option` DISABLE KEYS */;
-INSERT INTO `Option` (`plugin`, `key`, `value`) VALUES
+INSERT IGNORE INTO `Option` (`plugin`, `key`, `value`) VALUES
 	('main', 'allow-guest', '0'),
 	('main', 'language', '{{ $language }}'),
 	('main', 'selected-theme', 'hawk'),
@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS `Permission` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*!40000 ALTER TABLE `Permission` DISABLE KEYS */;
-INSERT INTO `Permission` (`id`, `plugin`, `key`, `availableForGuests`) VALUES
+INSERT IGNORE INTO `Permission` (`id`, `plugin`, `key`, `availableForGuests`) VALUES
 	(1, 'admin', 'all', 0),
 	(2, 'admin', 'users', 0),
 	(3, 'admin', 'themes', 0),
@@ -132,8 +132,8 @@ CREATE TABLE IF NOT EXISTS `ProfileQuestion` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*!40000 ALTER TABLE `ProfileQuestion` DISABLE KEYS */;
-INSERT INTO `ProfileQuestion` (`name`, `type`, `parameters`, `editable`, `displayInRegister`, `displayInProfile`, `order`) VALUES
-	('language', 'select', '{"options":[],"required":true}'),
+INSERT IGNORE INTO `ProfileQuestion` (`name`, `type`, `parameters`, `editable`, `displayInRegister`, `displayInProfile`, `order`) VALUES
+	('language', 'select', '{"options":[],"required":true}', 0, 0, 0, 0),
   ('avatar', 'file', '', 0, 1, 1, 2),
 	('realname', 'text', '{"required" : true}', 0, 1, 1, 1);
 /*!40000 ALTER TABLE `ProfileQuestion` ENABLE KEYS */;
@@ -161,7 +161,7 @@ CREATE TABLE IF NOT EXISTS `Role` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*!40000 ALTER TABLE `Role` DISABLE KEYS */;
-INSERT INTO `Role` (`id`, `name`, `removable`, `color`) VALUES
+INSERT IGNORE INTO `Role` (`id`, `name`, `removable`, `color`) VALUES
 	(0, 'guest', 0, '#000'),
 	(1, 'admin', 0, '#080');
 /*!40000 ALTER TABLE `Role` ENABLE KEYS */;
@@ -181,7 +181,7 @@ CREATE TABLE IF NOT EXISTS `RolePermission` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*!40000 ALTER TABLE `RolePermission` DISABLE KEYS */;
-INSERT INTO `RolePermission` (`roleId`, `permissionId`, `value`) VALUES
+INSERT IGNORE INTO `RolePermission` (`roleId`, `permissionId`, `value`) VALUES
 	(1, 1, 1),
 	(1, 2, 1),
 	(1, 3, 1),
@@ -212,7 +212,7 @@ CREATE TABLE IF NOT EXISTS `User` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*!40000 ALTER TABLE `User` DISABLE KEYS */;
-INSERT INTO `User` (`id`, `email`, `username`, `password`, `active`, `createTime`, `createIp`, `roleId`) VALUES
+INSERT IGNORE INTO `User` (`id`, `email`, `username`, `password`, `active`, `createTime`, `createIp`, `roleId`) VALUES
 	(0, '', 'guest', '', 0, 0, '', 0),
 	(1, {{ $email }}, {{ $login }}, {{ $password }}, 1, UNIX_TIMESTAMP(), {{ $ip }}, 1);	
 /*!40000 ALTER TABLE `User` ENABLE KEYS */;
