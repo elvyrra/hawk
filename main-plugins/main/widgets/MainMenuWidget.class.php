@@ -10,7 +10,7 @@ class MainMenuWidget extends Widget{
 	
 
 	/**
-	 * Display the main menu
+	 * Display the main menu. The menu is separated in two : The applications (plugins), and the user menu (containing the access to user data, and admin data if the user is administrator)
 	 * */
 	public function display(){
 		$user = Session::getUser();
@@ -39,16 +39,6 @@ class MainMenuWidget extends Widget{
 				$userMenus[self::ADMIN_MENU_ID] = $menus[self::ADMIN_MENU_ID];
 				unset($menus[self::ADMIN_MENU_ID]);
 			}
-
-			// Trigger an event to add or remove menus from plugins 
-			$event = new Event(self::EVENT_AFTER_GET_MENUS, array(
-				'menus' => $menus,
-				'userMenus' => $userMenus
-			));
-
-			EventManager::trigger($event);
-			$menus = $event->getData('menus');
-			$userMenus = $event->getData('userMenus');
 		}
 		
 		if(!Session::isConnected()){
@@ -62,12 +52,19 @@ class MainMenuWidget extends Widget{
 			);
 		}
 
+		// Trigger an event to add or remove menus from plugins 
+		$event = new Event(self::EVENT_AFTER_GET_MENUS, array(
+			'menus' => array(
+				'applications' => $menus,
+				'user' => $userMenus
+			)
+		));
+
+		EventManager::trigger($event);
+		$menus = $event->getData('menus');
 
 		return View::make(ThemeManager::getSelected()->getView('main-menu.tpl'), array(
-			'groups' => array(
-				'left' => $menus,
-				'right' => $userMenus
-			),
+			'menus' => $menus,
 			'logo' => Option::get('main.logo') ? USERFILES_PLUGINS_URL . 'main/' . Option::get('main.logo') : ''
 		));
 	}

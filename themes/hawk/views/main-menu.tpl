@@ -11,9 +11,9 @@
 		</div>
 
 		<div class="collapse navbar-collapse" id="main-menu-collapse">
-			{foreach($groups as $position => $menus)}
-				<ul class="nav navbar-nav navbar-{{ $position }}">
-					{foreach($menus as $menu)}	
+			{foreach($menus as $name => $groups)}
+				<ul class="nav navbar-nav {if($name=='user')} navbar-right {/if}">
+					{foreach($groups as $menu)}	
 						{if($menu->visibleItems)}
 							<li class="dropdown main-menu" id="main-menu-{{ $menu->id }}">
 								<div class="dropdown-toggle main-menu-title" type="button" id="main-menu-title-{{ $menu->id }}" data-toggle="dropdown">
