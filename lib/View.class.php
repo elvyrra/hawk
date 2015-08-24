@@ -208,7 +208,7 @@ class View{
 	 * @return string The HTML result of the string
 	 */
 	public static function makeFromString($content, $data = array()){
-		$file = tempnam('', '');
+		$file = tempnam(TMP_DIR, '');
 		file_put_contents($file, $content);
 
 		$result = self::make($file, $data);

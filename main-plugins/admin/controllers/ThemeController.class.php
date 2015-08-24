@@ -335,7 +335,7 @@ class ThemeController extends Controller{
 	 */
 	public function deleteMedia(){
 		$filename = urldecode($this->filename);
-		unlink(ThemeManager::getSelected()->getMediasDir() . $filename);
+		FileSystem::remove(ThemeManager::getSelected()->getMediasDir() . $filename);
 	}
 
 
@@ -397,7 +397,7 @@ class ThemeController extends Controller{
 		$theme = ThemeManager::get($this->name);
 		if($theme->isRemovable()){
 			$dir = $theme->getRootDirname();
-			shell_exec("rm -r $dir");
+			FileSystem::remove($dir);
 		}
 	}
 }

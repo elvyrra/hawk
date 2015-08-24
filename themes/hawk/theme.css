@@ -233,6 +233,10 @@ input[type="radio"]{
 	margin-right: 4px;
 }
 
+input[type="radio"] + label{
+    display: inline;
+}
+
 /** Disabled inputs **/
 input[disabled], textarea[disabled], input[readonly], textarea[readonly] {
 	color: rgb(177, 177, 177);

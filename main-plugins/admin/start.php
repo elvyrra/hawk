@@ -90,7 +90,7 @@ Router::auth(Request::isAjax() && Session::isConnected(), function(){
 
 	
 	/*** Manage the languages and languages keys ***/	
-	Router::auth(Session::isAllowed('admin.languages') || Session::isAllowed('admin.all'), function(){
+	Router::auth(Session::isAllowed('admin.languages'), function(){
 		// list all the supported languages
 		Router::any('manage-languages', '/admin/languages/', array('action' => 'LanguageController.index'));		
 		Router::get('language-keys-list', '/admin/languages/keys', array('action' => 'LanguageController.listKeys'));

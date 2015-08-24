@@ -225,9 +225,8 @@ class LanguageController extends Controller{
 		$files = array();
 		$dirs = array(MAIN_PLUGINS_DIR, PLUGINS_DIR, USERFILES_PLUGINS_DIR . Lang::TRANSLATIONS_DIR);
 		foreach($dirs as $dir){
-			$result = array();
-			exec('find ' . $dir . ' -name "*.*.lang"', $result);
-
+			$result = FileSystem::find($dir, '*.*.lang', FileSystem::FIND_FILE_ONLY);
+			
 			foreach($result as $file){
 				list($plugin, $language, $ext) = explode('.', basename($file));
 				
@@ -391,7 +390,7 @@ class LanguageController extends Controller{
 					)),
 				)
 			),
-			'onsuccess' => 'app.dialog("close"); app.load(app.getUri("LanguageController.index"));'
+			'onsuccess' => 'app.dialog("close"); app.load(app.getUri("manage-languages"));'
 		);
 		
 		$form = new Form($param);
@@ -486,7 +485,7 @@ class LanguageController extends Controller{
 							$plugin => $translations
 						));
 
-						unlink($tmpfile);						
+						unlink($tmpfile);
 					}
 					
 					Log::info('Language files were successfully imported');

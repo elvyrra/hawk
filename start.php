@@ -3,10 +3,9 @@
 require INCLUDES_DIR . 'constants.php';
 require INCLUDES_DIR . 'custom-constants.php';
 require INCLUDES_DIR . 'autoload.php';
-if(!is_file(INCLUDES_DIR . 'config.php')){
-	touch(INCLUDES_DIR . 'config.php');
+if(is_file(INCLUDES_DIR . 'config.php')){
+	require INCLUDES_DIR . 'config.php';
 }
-require INCLUDES_DIR . 'config.php';
 require INCLUDES_DIR . 'error-handler.php';
 
 define("ROOT_URL", (string) Conf::get('rooturl') . '/');
@@ -48,11 +47,13 @@ if(!empty($sessionInterface)){
 if(!empty($_COOKIE['language'])){
     define('LANGUAGE', $_COOKIE['language']);
 }
-elseif(Session::getUser()->getProfileData('language')){
-    define('LANGUAGE', Session::getUser()->getProfileData('language'));
-}
-elseif(Conf::has('db') && Option::get('main.language')){
-    define('LANGUAGE', Option::get('main.language'));
+elseif(Conf::has('db')){
+    if(Session::getUser()->getProfileData('language')){
+        define('LANGUAGE', Session::getUser()->getProfileData('language'));
+    }
+    elseif(Option::get('main.language')){
+        define('LANGUAGE', Option::get('main.language'));
+    }
 }
 else{
     define('LANGUAGE', Lang::DEFAULT_LANGUAGE);

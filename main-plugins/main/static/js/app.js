@@ -271,9 +271,11 @@ App.prototype.load = function(url, data){
 		
 	if(url){					            
 		/*** we first check that page does not already exist in a tab ***/
-		if(url != this.getUri('MainController.newTab')){				
+		var route = this.getRouteFromUri(url);
+		if(url != this.getUri('MainController.newTab')){
+
 			for(var i= 0; i < this.tabset.tabs().length; i++){
-				if (this.tabset.tabs()[i].url() == url) {
+				if (this.tabset.tabs()[i].url() == url || this.tabset.tabs()[i].route() == route) {
 					if (i !== this.tabset.getActiveTab().id) {
 						this.tabset.activateTab(i);
 					}
@@ -309,6 +311,7 @@ App.prototype.load = function(url, data){
 					// Register the tab url
 					var activeTab = this.tabset.getActiveTab();
 					activeTab.url(url);
+					activeTab.route(route);
 
 					activeTab.content(response);
 					
@@ -474,6 +477,20 @@ App.prototype.getUri = function(method, args){
 	}
 	else{
 		return App.INVALID_URI;
+	}
+};
+
+
+/**
+ * Get the route name corresponding to an URI
+ * @param {string} uri - The uri to look the corresponding route for
+ */
+App.prototype.getRouteFromUri = function(uri){
+	for(var i in this.routes){
+		var regex = new RegExp('^' + this.routes[i].pattern + '$');
+		if(uri.match(regex)){
+			return i;
+		}
 	}
 };
 

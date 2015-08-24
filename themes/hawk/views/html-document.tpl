@@ -42,7 +42,7 @@
 		<script type="text/javascript">
 			app.setLanguage("{{ LANGUAGE }}");
 			app.setRootUrl("{{ ROOT_URL }}");
-			app.setRoutes({{ json_encode(Router::getRoutes()) }});
+			app.setRoutes({{ json_encode($routes) }});
 				
 			app.ready(function(){		
 				Lang.langs = {{ $langLabels }};

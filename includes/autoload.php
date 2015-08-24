@@ -4,6 +4,8 @@
  * @author Elvyrra SAS
  */
 
+// Autoload class needs at least FileSystem class
+include LIB_DIR . 'FileSystem.class.php';
 
 /**
  * This class describes the autoload behavior of the application
@@ -48,8 +50,11 @@ class Autoload{
         $filename = "$classname.class.php";
 		
 		// Cross any search folder to find out the class file
-        foreach(self::$searchDirectories as $dir){	
-            if($file = self::findFileIndirectory($filename, $dir)){
+        foreach(self::$searchDirectories as $dir){
+            $files = FileSystem::find($dir, $filename, FileSystem::FIND_FILE_ONLY);
+            if(!empty($files)){
+                $file = $files[0];
+
                 // The class file has been found, include it
                 include $file;
 
@@ -58,27 +63,10 @@ class Autoload{
 
                 return true;
             }
-        }
+        }        
     }
 
     /**
-     * Find a file in a directory
-     * @param string $basename The basename of the file
-     * @param string $dir The directory to search in
-     */
-    private static function findFileIndirectory($basename, $dir){
-        if(is_file($dir . $basename)){
-            return $dir . $basename;
-        }
-        foreach(glob($dir . '*', GLOB_ONLYDIR | GLOB_MARK) as $subdir){
-            if($result = self::findFileIndirectory($basename, $subdir)){
-                return $result;
-            }
-        }
-        return null;
-    }
-        
-	/**
 	 * Save the autoload cache at the end of a script processing. It is not registered any times it is updated,
 	 * to improve the performances of the application.
 	 */

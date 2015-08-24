@@ -14,6 +14,13 @@ class MainController extends Controller{
 
 		$title = Conf::has('db') ? Option::get('main.title') : DEFAULT_HTML_TITLE;
 
+		$routes = array();
+		foreach(Router::getRoutes() as $name => $route){
+			$data = get_object_vars($route);
+			unset($data['action']);
+			$routes[$name] = $data;
+		}
+
 		return View::make(ThemeManager::getSelected()->getView('html-document.tpl'), array(
 			'title' => $title,
 			'themeBaseCss' => ThemeManager::getSelected()->getBaseCssUrl(),
@@ -22,7 +29,8 @@ class MainController extends Controller{
 			'mainCssUrl' => Plugin::current()->getCssUrl(),
 			'body' => $body,
 			'langLabels' => $labelsJSON,
-			'favicon' => $this->getFaviconUrl()
+			'favicon' => $this->getFaviconUrl(),
+			'routes' => $routes
 		));
 	}
 
@@ -41,7 +49,7 @@ class MainController extends Controller{
 		}
 
 		$body = View::make($this->theme->getView('body.tpl'), array(
-			'pages' => json_encode($pages),
+			'pages' => json_encode($pages),			
 			'canAccessApplication' => $canAccessApplication
 		));	
 

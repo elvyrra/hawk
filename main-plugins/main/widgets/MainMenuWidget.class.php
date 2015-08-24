@@ -50,7 +50,8 @@ class MainMenuWidget extends Widget{
 			$menus = $event->getData('menus');
 			$userMenus = $event->getData('userMenus');
 		}
-		else{
+		
+		if(!Session::isConnected()){
 			$userMenus = array(
 				new Menu(array(
 					'id' => uniqid(),

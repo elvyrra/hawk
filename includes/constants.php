@@ -22,6 +22,8 @@ define('USERFILES_THEMES_DIR', USERFILES_DIR . 'themes/');
 
 define('USERFILES_PLUGINS_DIR', USERFILES_DIR . 'plugins/');
 
+define('TMP_DIR', ROOT_DIR . 'tmp/');
+
 // The main db name
 define('MAINDB', 'main');
 

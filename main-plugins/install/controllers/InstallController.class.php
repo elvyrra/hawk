@@ -180,31 +180,6 @@ class InstallController extends Controller{
 				$iv = Crypto::generateKey(16);
 				$configMode = 'dev';
 
-				/**
-				 * Create the config file
-				 */				
-				$param = array(
-					'{{ $salt }}' => addcslashes($salt, "'"),
-					'{{ $key }}' => addcslashes($key, "'"),
-					'{{ $iv }}' => addcslashes($iv, "'"),
-					'{{ $configMode }}' => $configMode,
-					'{{ $rooturl }}' => $form->getData('rooturl'),
-					'{{ $host }}' => $form->getData('db[host]'),
-					'{{ $username }}' => $form->getData('db[username]'),
-					'{{ $password }}' => $form->getData('db[password]'),
-					'{{ $dbname }}' => $form->getData('db[dbname]'),
-					'{{ $sessionEngine }}' => $form->getData('session'),
-					'{{ $version }}' => $form->getData('version')
-				);
-				$config = strtr(file_get_contents(Plugin::current()->getRootDir() . 'files/config.php.tpl'), $param);
-				file_put_contents(INCLUDES_DIR . 'config.php', $config);
-
-
-				/**
-				 * Create the envrionment config file
-				 */
-				touch(ROOT_DIR . 'etc/' . $configMode . '.php');
-
 
 				/**
 				 * Create the database and it tables
@@ -226,28 +201,52 @@ class InstallController extends Controller{
 					return $form->response(Form::STATUS_ERROR, Lang::get('install.install-connection-error'));
 				}
 
-				$param = array(
-					'{{ $dbname }}' => $form->getData('db[dbname]'),
-					'{{ $language }}' => $this->language,
-					'{{ $timezone }}' => $form->getData('timezone'),
-					'{{ $title }}' => Db::get('tmp')->quote($form->getData('title')),
-					'{{ $email }}' => Db::get('tmp')->quote($form->getData('admin[email]')),
-					'{{ $login }}' => Db::get('tmp')->quote($form->getData('admin[login]')),
-					'{{ $password }}' => Db::get('tmp')->quote(Crypto::saltHash($form->getData('admin[password]'), $salt)),
-					'{{ $ip }}' => Db::get('tmp')->quote(Request::clientIp())
-				);
-				$sql = strtr(file_get_contents(Plugin::current()->getRootDir() . 'files/install.sql.tpl'), $param);
-				file_put_contents($tmpfile, $sql);
+				try{
+					$param = array(
+						'{{ $dbname }}' => $form->getData('db[dbname]'),
+						'{{ $language }}' => $this->language,
+						'{{ $timezone }}' => $form->getData('timezone'),
+						'{{ $title }}' => Db::get('tmp')->quote($form->getData('title')),
+						'{{ $email }}' => Db::get('tmp')->quote($form->getData('admin[email]')),
+						'{{ $login }}' => Db::get('tmp')->quote($form->getData('admin[login]')),
+						'{{ $password }}' => Db::get('tmp')->quote(Crypto::saltHash($form->getData('admin[password]'), $salt)),
+						'{{ $ip }}' => Db::get('tmp')->quote(Request::clientIp())
+					);
+					$sql = strtr(file_get_contents(Plugin::current()->getRootDir() . 'files/install.sql.tpl'), $param);
+					// file_put_contents($tmpfile, $sql);
 
-				list($host, $port) = explode(':', $form->getData('db[host]'), 2);
-				system('mysql --host=' . $host . ($port ? ' --port=' . $port : '') . ' --user=' . $form->getData('db[username]') . ' --pass=' . $form->getData('db[password]') . ' < ' . $tmpfile . ' 2>&1', $return);
+					Db::get('tmp')->query($sql);
 
-				if($return){
-					return $form->response(Form::STATUS_ERROR, Lang::get('install.install-error'));
-				}
-				else{
+					/**
+					 * Create the config file
+					 */				
+					$param = array(
+						'{{ $salt }}' => addcslashes($salt, "'"),
+						'{{ $key }}' => addcslashes($key, "'"),
+						'{{ $iv }}' => addcslashes($iv, "'"),
+						'{{ $configMode }}' => $configMode,
+						'{{ $rooturl }}' => $form->getData('rooturl'),
+						'{{ $host }}' => $form->getData('db[host]'),
+						'{{ $username }}' => $form->getData('db[username]'),
+						'{{ $password }}' => $form->getData('db[password]'),
+						'{{ $dbname }}' => $form->getData('db[dbname]'),
+						'{{ $sessionEngine }}' => $form->getData('session'),
+						'{{ $version }}' => $form->getData('version')
+					);
+					$config = strtr(file_get_contents(Plugin::current()->getRootDir() . 'files/config.php.tpl'), $param);
+					file_put_contents(INCLUDES_DIR . 'config.php', $config);
+
+
+					/**
+					 * Create the envrionment config file
+					 */
+					touch(ROOT_DIR . 'etc/' . $configMode . '.php');
+					
 					return $form->response(Form::STATUS_SUCCESS, Lang::get('install.install-success'));
 				}
+				catch(Exception $e){
+					return $form->response(Form::STATUS_ERROR, Lang::get('install.install-error'));
+				}				
 			}
 		}
 	}
