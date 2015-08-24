@@ -197,7 +197,7 @@ class Theme{
 				$css);
 			}
             
-            shell_exec("cp -r {$this->getRootDirname()}/* {$this->getBuildDirname()}");
+            FileSystem::copy($this->getRootDirname(), USERFILES_THEMES_DIR);
 
             file_put_contents($this->getBuildCssFile(), $css);
         }

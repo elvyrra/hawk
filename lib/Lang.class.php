@@ -91,18 +91,17 @@ class Lang{
 			return self::$originCache["$this->plugin.$this->lang"];
 		}
 
-		// The file is not present in the cache, search it
-		$cmd = 'find ' . MAIN_PLUGINS_DIR . ' ' . PLUGINS_DIR . ' -name "' . $this->plugin . '.' . $this->lang . '.lang"';
-		exec($cmd, $output);		
+		// The file is not present in the cache, search it. We use the method Autoload::find that already performs this action		
+		foreach(array(MAIN_PLUGINS_DIR, PLUGINS_DIR) as $dir){
+			$files = FileSystem::find($dir, $this->plugin . '.' . $this->lang . '.lang', FileSystem::FIND_FILE_ONLY);
+			if(!empty($files)){
+				$file = $files[0];
 
-		if(!empty($output)){
-			// a file was found
-			$file = $output[0];
-
-			// register it in the cache
-			self::$originCache["$this->plugin.$this->lang"] = $file;
-			
-			return $file;
+				// register it in the cache
+				self::$originCache["$this->plugin.$this->lang"] = $file;
+				
+				return $file;
+			}
 		}
 		return null;
 	}

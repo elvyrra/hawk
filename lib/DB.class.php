@@ -95,7 +95,9 @@ class DB{
 			}
 			
 			$this->connection = new PDO($dns, $this->username, $this->password);			
-            $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);			
+            $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);	
+            $this->connection->setAttribute(PDO::ATTR_EMULATE_PREPARES, 1);
+            
 			$this->connection->query('SET NAMES "'.$this->charset.'"');
         }
         catch(PDOException $e) {

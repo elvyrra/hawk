@@ -107,11 +107,13 @@ class Request{
                     $filename = $match[2];
                     $mime = $match[3];
                     $content = $match[4];
-                    $tmpname = uniqid('/tmp/');
+                    $tmpname = tempnam(TMP_DIR, '');
+                    
                     file_put_contents($tmpname, $content);
                     if(preg_match('/^(\w+)\[(.*)\]$/', $name, $m)){
-                        if(!isset($_FILES[$m[1]]))
+                        if(!isset($_FILES[$m[1]])){
                             $_FILES[$m[1]] = array();
+                        }
                         if(empty($m[2])){
                             $_FILES[$m[1]]['name'][] = $filename;
                             $_FILES[$m[1]]['type'][] = $mime;

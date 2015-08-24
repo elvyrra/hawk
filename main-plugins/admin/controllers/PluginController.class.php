@@ -228,7 +228,7 @@ class PluginController extends Controller{
     public function delete(){
         $directory = Plugin::get($this->plugin)->getRootDir();
 
-        shell_exec("rm -r $directory");
+        FileSystem::remove($directory);
 
         return $this->compute('availablePlugins');
     }
