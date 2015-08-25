@@ -3,10 +3,17 @@
 
 class LanguageFilterWidget extends Widget{
 	public function __construct($filters){
-		$languages = array();
+		$options = array();
+		// active languages
+		$languages = array(); 
 		foreach(Language::getAll() as $language){
-			$languages[$language->tag] = $language->label;
+			$options[$language->tag] = $language->label;
+			if($language->active){
+				$languages[$language->tag] = $language;
+			}
 		}	
+
+
 		
 		$param = array(
 			'id' => 'language-filter-form',
@@ -18,12 +25,12 @@ class LanguageFilterWidget extends Widget{
 
 					new SelectInput(array(
 						'name' => 'tag',
-						'options'  => $languages,
+						'options'  => $options,
 						'default' => $filters['tag'],
 						'style' => 'width: 80%; margin-right: 5px;',
 						'label' => Lang::get('language.filter-language-label'),
-						'after' => '<span class="fa fa-pencil text-primary edit-lang" title="'. Lang::get('language.filter-language-edit') . '"></span>
-									<span class="fa fa-close text-danger delete-lang" title="'. Lang::get('language.filter-language-delete') . '"></span>'									
+						'after' => '<span class="fa fa-pencil text-primary edit-lang" title="'. Lang::get('language.filter-language-edit') . '"></span>' . 
+									(count($languages) > 1 && Option::get('main.language') != $filters['tag'] && $filters['tag'] != Lang::DEFAULT_LANGUAGE ? '<span class="fa fa-close text-danger delete-lang" title="'. Lang::get('language.filter-language-delete') . '"></span>' : '')
 					)),
 					
 					new RadioInput(array(

@@ -348,16 +348,19 @@ class LanguageController extends Controller{
 	 * Edit a language
 	 */
 	public function editLanguage(){
+		$activeLanguages = Language::getAllActive();
+
+		$language = Language::getByTag($this->tag);
+
 		$param = array(
 			'id' => 'language-form',
-			'model' => 'Language',
-			'reference' => array(Language::getPrimaryColumn() => $this->tag),
+			'object' => $language,
 			'fieldsets' => array(
 				'form' => array(
 					'nofieldset' => true,
 					
 					new TextInput(array(
-						'field' => 'tag',
+						'name' => 'tag',
 						'label' => Lang::get('language.lang-form-tag-label'),
 						'maxlength' => 2,
 						'required' => true,
@@ -365,10 +368,16 @@ class LanguageController extends Controller{
 					)),
 					
 					new TextInput(array(
-						'field' => 'label',
+						'name' => 'label',
 						'label' => Lang::get('language.lang-form-label-label'),
 						'required' => true,
 					)),		
+
+					new CheckboxInput(array(
+						'name' => 'active',
+						'label' => Lang::get('language.lang-form-active-label'),
+						'noDisplayed' => (count($activeLanguages) <= 1 && $language->active) || $language->isDefault
+					))
 				),
 				
 				'_submits' => array(
@@ -377,12 +386,7 @@ class LanguageController extends Controller{
 						'value' => Lang::get('main.valid-button'),
 					)),
 					
-					new DeleteInput(array(
-						'name' => 'delete',
-						'value' => Lang::get('main.delete-button'),
-						'notDisplayed' => $this->tag == 'new'						
-					)),
-					
+					 
 					new ButtonInput(array(
 						'name' => 'cancel',
 						'value' => Lang::get('main.cancel-button'),
@@ -403,7 +407,7 @@ class LanguageController extends Controller{
 			));
 		}
 		else{
-			$form->treat();			
+			return $form->treat();			
 		}
 	}
 	
@@ -412,7 +416,14 @@ class LanguageController extends Controller{
 	 */
 	public function deleteLanguage(){
 		try{
-			Language::getByTag($this->tag)->delete();		
+			$language = Language::getByTag($this->tag);
+			if(Option::get('main.language') == $this->tag){
+				// Set a new default language
+				$newDefault = Language::getAllActive()[0];
+				Option::set('main.language', $newDefault->tag);
+			}
+			$language->delete();		
+
 			Log::info('The language ' . $this->tag . ' has been removed');
 		}
 		catch(Exception $e){

@@ -13,6 +13,8 @@ class MainController extends Controller{
 		$labelsJSON = json_encode($labels, JSON_HEX_APOS | JSON_HEX_QUOT);
 
 		$title = Conf::has('db') ? Option::get('main.title') : DEFAULT_HTML_TITLE;
+		$description = Conf::has('db') ? Option::get('main.description') : '';
+		$keywords = Conf::has('db') ? Option::get('main.keywords') : '';
 
 		$routes = array();
 		foreach(Router::getRoutes() as $name => $route){
@@ -23,6 +25,8 @@ class MainController extends Controller{
 
 		return View::make(ThemeManager::getSelected()->getView('html-document.tpl'), array(
 			'title' => $title,
+			'description' => $description,
+			'keywords' => $keywords,
 			'themeBaseCss' => ThemeManager::getSelected()->getBaseCssUrl(),
 			'themeCustomCss' => ThemeManager::getSelected()->getCustomCssUrl(),
 			'mainJsUrl' => Plugin::current()->getJsUrl(),

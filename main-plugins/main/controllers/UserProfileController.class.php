@@ -27,7 +27,6 @@ class UserProfileController extends Controller{
                         'name' => 'username',
                         'required' => true,
                         'label' => Lang::get('admin.user-form-username-label'),
-                        'value' => $user->username,
                         'disabled' => true,
                     )),
                     
@@ -35,7 +34,6 @@ class UserProfileController extends Controller{
                         'name' => 'email',
                         'required' => true,
                         'label' => Lang::get('admin.user-form-email-label'),
-                        'value' => $user->email,
                         'disabled' => true,
                     )),
                     
@@ -43,7 +41,6 @@ class UserProfileController extends Controller{
                         'name' => 'roleId',
                         'options' => $roles,
                         'label' => Lang::get('admin.user-form-roleId-label'),
-                        'value' => $user->roleId,
                         'disabled' => true,
                     ))
                 ),
@@ -95,7 +92,7 @@ class UserProfileController extends Controller{
             
             if($question->name == 'language'){
                 // Get language options
-                $languages = Language::getAll();
+                $languages = Language::getAllActive();
                 $options = array();
                 foreach($languages as $language){
                     $options[$language->tag] = $language->label;

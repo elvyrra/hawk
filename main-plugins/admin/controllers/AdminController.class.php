@@ -49,6 +49,18 @@ class AdminController extends Controller{
 						'default' => Option::get('main.title'),
 						'label' => Lang::get('admin.settings-title-label')
 					)),
+
+					new TextareaInput(array(
+						'name' => 'main.description',
+						'default' => Option::get('main.description'),
+						'label' => Lang::get('admin.settings-description-label')
+					)),
+
+					new TextInput(array(
+						'name' => 'main.keywords',
+						'default' => Option::get('main.keywords'),
+						'label' => Lang::get('admin.settings-keywords-label')
+					)),
 					
 					new SelectInput(array(
 						'name' => 'main.language',

@@ -5,7 +5,10 @@
 		<meta http-equiv="Content-Type" content="text/html; charset={{ ENCODING }}" />
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 
-		<title>{{ $title }}</title>
+		<title>{{ $title }}</title>		
+		<meta name="description" content="{{ $description }}" />
+		<meta name="keywords" content="{{$keywords}}" />
+		
 		{if($favicon)}
 			<link rel="shortcut icon" href="{{ $favicon }}" />
 			<link rel="icon" href="{{ $favicon }}" />

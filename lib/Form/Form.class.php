@@ -54,6 +54,11 @@ class Form{
 	$model = self::DEFAULT_MODEL,
 
 	/**
+	 * The object treated by the form
+	 */
+	$object,
+
+	/**
 	 * The width of the input labels (Default : 150px)
 	 */
 	$labelWidth = '150px',
@@ -166,14 +171,21 @@ class Form{
         	$this->columns = 1;
         }
 		
-		if(isset($this->model) && !empty($this->reference)){
-			$model = $this->model;				
-			$this->example = new DBExample($this->reference);
-			$this->object = $model::getByExample($this->example);				
+		if(!isset($this->object)){
+			if(isset($this->model) && !empty($this->reference)){
+				$model = $this->model;				
+				$this->example = new DBExample($this->reference);
+				$this->object = $model::getByExample($this->example);				
+			}
+			else{
+				$this->object = null;
+			}
 		}
 		else{
-			$this->object = null;
-		}		
+			$this->model = get_class($this->object);
+			$id = $this->object->getPrimaryColumn();
+			$this->reference = array($id => $this->object->$id);
+		}
 
 		$this->new = $this->object === null;
 		
