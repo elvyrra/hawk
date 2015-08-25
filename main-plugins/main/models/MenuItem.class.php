@@ -22,16 +22,6 @@ class MenuItem extends Model{
 		}
 	}
 	
-	public static function getByName($name, $menuName){
-		return DB::get(self::$dbname)->select(array(
-			'fields' => array('M.*'),
-			'from' => self::$tablename . ' MI INNER JOIN ' . Menu::getTable() . ' M ON MI.menuId = M.id',
-			'where' => new DBExample(array('M.name' => $menuName, 'MI.name' => $name)),
-			'return' => __CLASS__,
-			'one' => true,
-		));		
-	}
-
 	public static function getAvailableItems($user = null){
 		if($user == null){
 			$user = Session::getUser();
@@ -41,15 +31,6 @@ class MenuItem extends Model{
 		return array_filter($items, function($item) use($user){
 			return !$item->permissionId || $user->isAllowed($item->permissionId);
 		});
-		
-		// $sql = 'SELECT I.*
-		// 		FROM ' . self::$tablename . ' I
-		// 			LEFT JOIN ' . RolePermission::getTable() . ' RP ON RP.permissionId = I.permissionId
-		// 			LEFT JOIN ' . User::getTable() . ' U ON RP.roleId = U.roleId					
-		// 		WHERE (U.id = :userId AND RP.value = 1) OR I.permissionId = 0
-		// 		ORDER BY menuId ASC, `order` ASC';
-		
-		// return DB::get(self::$dbname)->query($sql, array('userId' => $user->id), array('return' => __CLASS__));	
 	}
 
 	public static function add($data){

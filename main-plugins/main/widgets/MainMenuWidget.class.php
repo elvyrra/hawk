@@ -5,8 +5,7 @@ class MainMenuWidget extends Widget{
 	const EVENT_AFTER_GET_MENUS = 'menu.after_get_items';
 	const EVENT_AFTER_GET_USER_MENU = 'menu.after_get_user_items';
 
-	const USER_MENU_ID = 1;
-	const ADMIN_MENU_ID = 2;
+	
 	
 
 	/**
@@ -28,16 +27,16 @@ class MainMenuWidget extends Widget{
 
 			// Get the user menu
 			if(Session::isConnected()){
-				$menus[self::USER_MENU_ID]->label = $user->getUsername();
-				$userMenus[self::USER_MENU_ID] = $menus[self::USER_MENU_ID];				
+				$menus[Menu::USER_MENU_ID]->label = $user->getUsername();
+				$userMenus[Menu::USER_MENU_ID] = $menus[Menu::USER_MENU_ID];				
 			}
 			// remove the user menu from applications menus
-			unset($menus[self::USER_MENU_ID]);
+			unset($menus[Menu::USER_MENU_ID]);
 
 			// put the admin menu in user menu
-			if(!empty($menus[self::ADMIN_MENU_ID])){
-				$userMenus[self::ADMIN_MENU_ID] = $menus[self::ADMIN_MENU_ID];
-				unset($menus[self::ADMIN_MENU_ID]);
+			if(!empty($menus[Menu::ADMIN_MENU_ID])){
+				$userMenus[Menu::ADMIN_MENU_ID] = $menus[Menu::ADMIN_MENU_ID];
+				unset($menus[Menu::ADMIN_MENU_ID]);
 			}
 		}
 		

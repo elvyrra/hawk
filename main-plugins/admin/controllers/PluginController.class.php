@@ -150,7 +150,13 @@ class PluginController extends Controller{
      * Install a plugin
      */
     public function install(){
-        Plugin::get($this->plugin)->install();
+        try{
+            Plugin::get($this->plugin)->install();
+        }
+        catch(Exception $e){
+            $message = Lang::get('admin.plugin-install-error', array('plugin' => $this->plugin)) . ( DEBUG_MODE ? preg_replace('/\s/', ' ', $e->getMessage()) : '');
+            $this->addJavaScriptInline("app.notify('danger', '" . addcslashes($message, "'") . "');");
+        }
 
         return $this->compute('availablePlugins');
     }
@@ -161,7 +167,13 @@ class PluginController extends Controller{
      * Uninstall a plugin
      */
     public function uninstall(){
-        Plugin::get($this->plugin)->uninstall();
+        try{
+            Plugin::get($this->plugin)->uninstall();
+        }
+        catch(Exception $e){
+            $message = Lang::get('admin.plugin-uninstall-error', array('plugin' => $this->plugin)) . ( DEBUG_MODE ? preg_replace('/\s/', ' ', $e->getMessage()) : '');
+            $this->addJavaScriptInline("app.notify('danger', '" . addcslashes($message, "'") . "');");
+        }
 
         return $this->compute('availablePlugins');
 
@@ -173,7 +185,13 @@ class PluginController extends Controller{
      * Activate a plugin
      */
     public function activate(){
-        Plugin::get($this->plugin)->activate();
+        try{
+            Plugin::get($this->plugin)->activate();
+        }
+        catch(Exception $e){
+            $message = Lang::get('admin.plugin-activate-error', array('plugin' => $this->plugin)) . ( DEBUG_MODE ? preg_replace('/\s/', ' ', $e->getMessage()) : '');
+            $this->addJavaScriptInline("app.notify('danger', '" . addcslashes($message, "'") . "');");
+        }
 
         return $this->compute('availablePlugins');
     }
@@ -184,7 +202,13 @@ class PluginController extends Controller{
      * Deactivate a plugin
      */
     public function deactivate(){
-        Plugin::get($this->plugin)->deactivate();
+        try{
+            Plugin::get($this->plugin)->deactivate();
+        }
+        catch(Exception $e){
+            $message = Lang::get('admin.plugin-deactivate-error', array('plugin' => $this->plugin)) . ( DEBUG_MODE ? preg_replace('/\s/', ' ', $e->getMessage()) : '');
+            $this->addJavaScriptInline("app.notify('danger', '" . addcslashes($message, "'") . "');");
+        }
 
         return $this->compute('availablePlugins');
     }
