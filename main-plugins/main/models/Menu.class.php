@@ -5,6 +5,9 @@ class Menu extends Model{
 	protected static $tablename = "Menu";
 	protected static $primaryColumn = "id";
 
+	const USER_MENU_ID = 1;
+	const ADMIN_MENU_ID = 2;
+
 	/**
 	 * Constructor
 	 * @param array $data the menu data	 
@@ -93,7 +96,7 @@ class Menu extends Model{
 		}
 		else{
 			// First update the menus which order is greater than the one you want to include
-			$sql = 'UPDATE ' . self::$tablename . ' SET `order` = `order` + 1  WHERE order >= :order';
+			$sql = 'UPDATE ' . self::$tablename . ' SET `order` = `order` + 1  WHERE `order`  >= :order';
 			DB::get(self::$dbname)->query($sql, array('order' => $data['order']));
 		}
 
@@ -113,5 +116,18 @@ class Menu extends Model{
 		$data['menuId'] = $this->id;
 
 		return MenuItem::add($data);
+	}
+
+
+	/**
+	 * Get an item by it name
+	 * @param string $name the menu item name
+	 * @return MenuItem
+	 */
+	public function getItemByName($name){
+		return MenuItem::getByExample(new DBExample(array(
+			'menuId' => $this->id,
+			'name' => $name
+		)));
 	}
 }

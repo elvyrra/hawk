@@ -88,12 +88,7 @@ class Log{
         else{
             // The log file does not exists yet, create it
             $this->resource = fopen($this->filename, 'w+');
-        }
-
-        // Add an event on the end of the script to close the resource
-        EventManager::on('process-end', function($event){            
-            fclose($this->resource);
-        });
+        }       
     }
 
     /**

@@ -23,9 +23,14 @@ class AdminController extends Controller{
 
 		$menuItems = array();
 		foreach($menus as $menu){
-			foreach($menu->visibleItems as $item){
-				if(!preg_match('/^(javascript\:|#)/', $item->action) && (!$item->target || $item->target == 'newtab')){
-					$menuItems[$item->action] = $menu->label . " &gt; " . $item->label;
+			if($menu->action && !preg_match('/^(javascript\:|#)/', $menu->action) && (!$menu->target || $menu->target == 'newtab')){
+				$menuItems[$menu->action] = $menu->label;
+			}
+			else{
+				foreach($menu->visibleItems as $item){
+					if(!preg_match('/^(javascript\:|#)/', $item->action) && (!$item->target || $item->target == 'newtab')){
+						$menuItems[$item->action] = $menu->label . " &gt; " . $item->label;
+					}
 				}
 			}
 		}
