@@ -155,15 +155,23 @@ App.prototype.init = function(){
 			event.preventDefault();
 			if(self.tabset.getActiveTab()){
 				var history = self.tabset.getActiveTab().history;
-				if(history.length > 1){
-					history.pop();
-					var url = history[history.length - 1];
-					self.load(url);
+				if(event.state){
+					// call back button					
+					if(history.length > 1){
+						history.pop();
+						var url = history[history.length - 1];
+						self.load(url);
+					}
+					else{
+						self.load(self.getUri("new-tab"));
+					}				
 				}
 				else{
-					self.load(self.getUri("new-tab"));
-				}				
-			}	
+					// Click on a link with an anchor as href
+					var url = history[history.length - 1];
+					window.history.replaceState({}, '', "#!" + url);
+				}
+			}
 		};
 
 		this.loading = {
@@ -322,7 +330,7 @@ App.prototype.load = function(url, data){
 					this.tabset.registerTabs();
 					
 					// register the url in the tab history
-					this.tabset.getActiveTab().history.push(url);
+					activeTab.history.push(url);
 					
 					history.pushState({}, '', "#!" + url);
 				}
