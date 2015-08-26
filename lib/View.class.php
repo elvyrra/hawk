@@ -44,8 +44,8 @@ class View{
 
 	const ASSIGN_REGEX = '#\{assign\s+name=(["\'])(\w+)\\1\s*\}(.*?)\{\/assign\}#ims';
 
-	const PLUGIN_REGEX = '#\{(\w+)((\s+\w+\=([\'"])((?:\\\"|\\\'|.)*?)\\4)*)\s*\}#';
-	const PLUGIN_ARGUMENTS_REGEX = '#(\w+)\=([\'"])(\{?)((?:\\\"|\\\'|.)*?)(\}?)\\2#';
+	const PLUGIN_REGEX = '#\{(\w+)((\s+\w+\=([\'"])((?:\\\\4|.)*?)\\4)*)\s*\}#';
+	const PLUGIN_ARGUMENTS_REGEX = '#(\w+)\=([\'"])(\{?)((?:\\\\2|.)*?)(\}?)\\2#';
 	
 	
 	/**
