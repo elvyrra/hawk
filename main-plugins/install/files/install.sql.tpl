@@ -208,7 +208,8 @@ CREATE TABLE IF NOT EXISTS `User` (
   `createIp` varchar(15) NOT NULL,
   `roleId` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `email` (`email`)
+  UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*!40000 ALTER TABLE `User` DISABLE KEYS */;

@@ -444,7 +444,7 @@ class Form{
 			Log::warning(Session::getUser()->username . ' has badly completed the form ' . $this->id);
 			if($exit){
 				/*** The form check failed ***/
-				return $this->response(self::STATUS_CHECK_ERROR, Lang::get('form.error-fill'));
+				Response::end($this->response(self::STATUS_CHECK_ERROR, Lang::get('form.error-fill')));
 			}
 			else{
 				$this->addReturn('message', Lang::get('form.error-fill'));
@@ -512,7 +512,7 @@ class Form{
 			Log::info(Session::getUser()->username . ' has updated the data on the form ' . $this->id);
 			if($exit){
 				// output the response
-				return $this->response(self::STATUS_SUCCESS, $success ? $success : Lang::get('form.success-register'));
+				Response::end($this->response(self::STATUS_SUCCESS, $success ? $success : Lang::get('form.success-register')));
 			}
 			return $this->object->$id;	
 		}
@@ -557,7 +557,7 @@ class Form{
 			
 			Log::info('The delete action on the form ' . $this->id . ' was successflully completed');
 			if($exit){
-				return $this->response(self::STATUS_SUCCESS, $success ? $success : Lang::get('form.success-delete'));
+				Response::end($this->response(self::STATUS_SUCCESS, $success ? $success : Lang::get('form.success-delete')));
 			}
 			return $this->object->$id;
 		}

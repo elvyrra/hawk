@@ -167,12 +167,14 @@ class UserController extends Controller{
 					new TextInput(array(
 						'name' => 'username',
 						'required' => true,
+						'unique' => true,
 						'label' => Lang::get('admin.user-form-username-label'),
 					)),
 					
 					new EmailInput(array(
 						'name' => 'email',
 						'required' => true,
+						'unique' => true,
 						'label' => Lang::get('admin.user-form-email-label'),
 					)),
 					

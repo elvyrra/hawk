@@ -12,9 +12,9 @@ class MainController extends Controller{
 		);			
 		$labelsJSON = json_encode($labels, JSON_HEX_APOS | JSON_HEX_QUOT);
 
-		$title = Conf::has('db') ? Option::get('main.title') : DEFAULT_HTML_TITLE;
-		$description = Conf::has('db') ? Option::get('main.description') : '';
-		$keywords = Conf::has('db') ? Option::get('main.keywords') : '';
+		$title = Conf::has('db') ? Option::get('main.page-title-' . LANGUAGE) : DEFAULT_HTML_TITLE;
+		$description = Conf::has('db') ? Option::get('main.page-description-' . LANGUAGE) : '';
+		$keywords = Conf::has('db') ? Option::get('main.page-keywords-' . LANGUAGE) : '';
 
 		$routes = array();
 		foreach(Router::getRoutes() as $name => $route){
