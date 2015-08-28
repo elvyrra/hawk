@@ -142,7 +142,8 @@ class AdminController extends Controller{
 						'name' => 'main.home-page-item',
 						'id' => 'home-page-item',
 						'label' => Lang::get('admin.settings-home-page-item-label'),
-						'options' => $menuItems
+						'options' => $menuItems,
+						'value' => Option::get('main.home-page-item')
 					)),
 					
 					new CheckboxInput(array(

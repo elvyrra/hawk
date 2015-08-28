@@ -83,6 +83,15 @@ class Request{
 
 
     /**
+     * Get the request body
+     * @return array the request body
+     */
+    public static function getBody(){
+        return $_POST;
+    }
+
+
+    /**
      * Populate $_POST and $_FILES from php://input
      */
     public static function parseScriptInput(){

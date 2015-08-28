@@ -26,7 +26,7 @@ class ViewPluginTabs extends ViewPlugin{
 	 * The tabs set
 	 * @var array
 	 */
-	$tabs;
+	$tabs = array();
 
 	/**
 	 * Display the tabs
@@ -37,12 +37,12 @@ class ViewPluginTabs extends ViewPlugin{
 			$this->id = uniqid();
 		}
 		foreach($this->tabs as &$tab){
-			if(!$tab['id']){
+			if(empty($tab['id'])){
 				$tab['id'] = uniqid();
 			}
 		}
 		if(!$this->selected){
-			$this->selected = 1;
+			$this->selected = array_keys($this->tabs)[0];
 		}
 
 		return View::make(ThemeManager::getSelected()->getView('tabs.tpl'), array(

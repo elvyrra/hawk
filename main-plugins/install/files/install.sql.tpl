@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS `Menu` (
   `target` VARCHAR(64) NOT NULL,
   `order` int(2) NOT NULL,
   `permissionId` INT(11) NOT NULL,
+  `active` TINYINT(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   UNIQUE INDEX `Index 2` (`plugin`, `name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -53,6 +54,7 @@ CREATE TABLE IF NOT EXISTS `MenuItem` (
   `target` varchar(32) NOT NULL,
   `order` int(2) NOT NULL,
   `permissionId` int(11) NOT NULL DEFAULT '0',
+  `active` TINYINT(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   UNIQUE KEY `menuId_2` (`menuId`,`name`),
   KEY `menuId` (`menuId`),

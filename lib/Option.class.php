@@ -18,7 +18,7 @@ class Option{
 	/**
 	 * The file containing the cache of options
 	 */
-	const CACHE_FILE = 'options.php';
+	// const CACHE_FILE = 'options.php';
 	
 	/**
 	 * Get the value of an option
@@ -26,9 +26,9 @@ class Option{
 	 * @return string the value og the option
 	 */
 	public static function get($name){
-		if(empty(self::$options) && is_file(CACHE_DIR . self::CACHE_FILE)){
-			self::$options = include CACHE_DIR . self::CACHE_FILE;
-		}
+		// if(empty(self::$options) && is_file(CACHE_DIR . self::CACHE_FILE)){
+		// 	self::$options = include CACHE_DIR . self::CACHE_FILE;
+		// }
 
 		list($plugin, $key) = explode('.', $name);
 		if(! isset(self::$options[$plugin][$key])){
@@ -97,6 +97,7 @@ class Option{
 	}
 }
 
-EventManager::on('process-end', function(){
-	file_put_contents(CACHE_DIR . Option::CACHE_FILE, '<?php return ' . var_export(Option::getAll(), true) . ';');
-});
+// EventManager::on('process-end', function(){
+// 	// Utils::debug(Option::getAll());
+// 	file_put_contents(CACHE_DIR . Option::CACHE_FILE, '<?php return ' . var_export(Option::getAll(), true) . ';');
+// });

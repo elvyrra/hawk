@@ -41,6 +41,13 @@ class Response{
     }
 
     /**
+     * Set response headers
+     */
+    public function header($name, $value){
+        header($name .': ' . $value);
+    }
+
+    /**
      * Set the content type of the HTTP response
      * @param string $type The type to set
      */

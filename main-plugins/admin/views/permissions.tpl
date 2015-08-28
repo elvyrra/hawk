@@ -5,7 +5,7 @@
 			{foreach($permissions as $group => $data)}
 				<!-- Plugin name -->
 				<tr>
-					<th class="bg-primary text-center" colspan="{{ count($roles) + 1 }}">{{ Lang::get($group . '.plugin-name') }}</th>
+					<th class="bg-primary text-center" colspan="{{ count($roles) + 1 }}">{{ Plugin::get($group)->getDefinition('title') }}</th>
 				</tr>
 
 				<!-- Role list -->

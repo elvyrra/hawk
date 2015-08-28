@@ -16,8 +16,8 @@ $parameters = array(
     ),
 
     'version' => array(
-        'question' => 'Version (default : 0.1) :',
-        'regex' => '/^.*$/'
+        'question' => 'Version (default : 1.0.0) :',
+        'regex' => '/^((\d+\.){2,3}\d+)?$/'
     ),
 
     'author' => array(
@@ -70,7 +70,7 @@ shell_exec('cp ' . THEMES_DIR . $data['extends'] . '/preview.png ' . THEMES_DIR 
 // Create the file 'manifest.json'
 $conf = array(
     'title' => $data['title'],
-    'version' => $data['version'] ? $data['version'] : '0.1',
+    'version' => $data['version'] ? $data['version'] : '1.0.0',
     'author' => $data['author'],
     'extends' => $data['extends']
 );

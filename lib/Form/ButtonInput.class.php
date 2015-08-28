@@ -61,6 +61,7 @@ class ButtonInput extends FormInput{
 		$param['type'] = static::TYPE;
 		
 		$param = array_intersect_key($param, array_flip(array('id', 'class', 'icon', 'label', 'type', 'name', 'onclick', 'style', 'href', 'target')));
+		$param = array_merge($param, $this->attributes);
 		
 		/*** Set the attributes of the button ***/	
 		if(!preg_match("!\bbtn-\w+\b!", $param['class'])){

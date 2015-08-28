@@ -5,16 +5,12 @@ class MainController extends Controller{
 	/**
 	 * Display the main page
 	 * */
-	public function index($body){			
+	public function index($body, $title = '', $description = '', $keywords = ''){			
 		$labels = array(
 			'main' => Lang::keys('javascript'),
 			'form' =>  Lang::keys('form')
 		);			
 		$labelsJSON = json_encode($labels, JSON_HEX_APOS | JSON_HEX_QUOT);
-
-		$title = Conf::has('db') ? Option::get('main.page-title-' . LANGUAGE) : DEFAULT_HTML_TITLE;
-		$description = Conf::has('db') ? Option::get('main.page-description-' . LANGUAGE) : '';
-		$keywords = Conf::has('db') ? Option::get('main.page-keywords-' . LANGUAGE) : '';
 
 		$routes = array();
 		foreach(Router::getRoutes() as $name => $route){
@@ -54,10 +50,14 @@ class MainController extends Controller{
 
 		$body = View::make($this->theme->getView('body.tpl'), array(
 			'pages' => json_encode($pages),			
-			'canAccessApplication' => $canAccessApplication
+			'canAccessApplication' => $canAccessApplication,
 		));	
 
-		return $this->index($body);
+		$title = Conf::has('db') ? Option::get('main.page-title-' . LANGUAGE) : DEFAULT_HTML_TITLE;
+		$description = Conf::has('db') ? Option::get('main.page-description-' . LANGUAGE) : '';
+		$keywords = Conf::has('db') ? Option::get('main.page-keywords-' . LANGUAGE) : '';
+
+		return $this->index($body, $title, $description, $keywords);
 	}
 
 
@@ -134,5 +134,13 @@ class MainController extends Controller{
 		$pdf = new PDF($content);
 
 		return $pdf->display('conditions.pdf');
+	}
+
+
+	/**
+	 * Refresh The main menu
+	 */
+	public function refreshMenu(){
+		return MainMenuWidget::getInstance()->display();
 	}
 }

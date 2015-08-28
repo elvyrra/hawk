@@ -20,8 +20,8 @@ $parameters = array(
     ),
 
     'version' => array(
-        'question' => 'Version (default : 0.1) :',
-        'regex' => '/^.*$/'
+        'question' => 'Version (default : 1.0.0) :',
+        'regex' => '/^((\d+\.){2,3}\d+)?$/'
     ),
 
     'author' => array(
@@ -64,7 +64,7 @@ $installerClass = str_replace(' ', '', ucwords(str_replace(array('-', '_'), ' ',
 $conf = array(
     'title' => $data['title'],
     'description' => $data['description'],
-    'version' => $data['version'] ? $data['version'] : '0.1',
+    'version' => $data['version'] ? $data['version'] : '1.0.0',
     'author' => $data['author'],
     'installer' => $installerClass,
     'dependencies' => array()
@@ -85,6 +85,7 @@ $installerContent =
  * This class describes the behavio of the installer for the plugin {$data['name']}
  */
 class {$installerClass} extends PluginInstaller{
+    const PLUGIN_NAME = '{$data['name']}';
     
     /**
      * Install the plugin. This method is called on plugin installation, after the plugin has been inserted in the database

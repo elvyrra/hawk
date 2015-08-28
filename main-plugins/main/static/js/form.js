@@ -11,7 +11,6 @@ var Form = function(id, fields){
 	this.upload = this.node.hasClass('upload-form');
 	this.action = this.node.attr('action');
 	this.method = this.node.attr('method');
-	this.youpi = ko.observable("coucou");
 	this.inputs = {};
 	for(var name in fields){
 		this.inputs[name] = new FormInput(fields[name], this);

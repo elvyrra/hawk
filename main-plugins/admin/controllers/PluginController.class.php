@@ -11,7 +11,6 @@ class PluginController extends Controller{
         $widgets = array(new NewPluginWidget(), new SearchPluginWidget());        
 
         $this->addCss(Plugin::current()->getCssUrl() . "plugins.css");
-        $this->addJavaScript(Plugin::current()->getJsUrl() . 'plugins.js');
 
         return LeftSidebarTab::make(array(
             'tabId' => self::TABID,

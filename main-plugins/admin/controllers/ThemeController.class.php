@@ -9,10 +9,26 @@ class ThemeController extends Controller{
 	public function index(){
 		
 		$tabs = array(
-			'select' => $this->compute('listThemes'),
-			'customize' => $this->compute('customize'),
-			'css' => $this->compute('css'),
-			'medias' => $this->compute('medias'),
+			'select' => array(
+				'title' => Lang::get('admin.theme-tab-select-title'),
+				'content' => $this->compute('listThemes'),
+			),
+			'customize' => array(
+				'title' => Lang::get('admin.theme-tab-basic-custom-title'),
+				'content' => $this->compute('customize'),
+			),			
+			'css' => array(
+				'title' => Lang::get('admin.theme-tab-advanced-custom-title'),
+				'content' => $this->compute('css'),
+			),
+			'medias' => array(
+				'title' => Lang::get('admin.theme-tab-medias-title'),
+				'content' => $this->compute('medias'),
+			),
+			'menu' => array(
+				'title' => Lang::get('admin.theme-tab-menu-title'),
+				'content' => $this->compute('menu')
+			)
 		);
 
 		$this->addJavaScript(Plugin::current()->getJsUrl() . "themes.js");
@@ -398,6 +414,37 @@ class ThemeController extends Controller{
 		if($theme->isRemovable()){
 			$dir = $theme->getRootDirname();
 			FileSystem::remove($dir);
+		}
+	}
+
+
+	/**
+	 * Customize the menu
+	 */
+	public function menu(){
+		$form = new Form(array(
+			'id' => 'set-menus-form',
+			'fields' => array(
+				new HiddenInput(array(
+					'name' => 'menus',					
+				)),
+
+				new SubmitForm(array(
+					'name' => 'valid',
+					'value' => Lang::get('main.valid-button'),
+				)),
+			)
+		));
+
+		if(!$form->submitted()){
+			$page = View::make(Plugin::current()->getView('sort-menus.tpl'), array(
+				'form' => $form,
+				'menus' => $menus,
+				'inactive' => $inactive,
+			));
+		}
+		else{
+
 		}
 	}
 }

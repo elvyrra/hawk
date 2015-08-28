@@ -64,6 +64,9 @@ App.prototype.require = function(scripts, callback){
  * @static @prop {array} required - Required scripts needed for app to work
  */
 App.required = [
+	"ext/jquery-sortable.js",
+	"jquery.addons.js",
+	"ko.bindings.js",
 	"extends.js",
 	"date.js",
 	"tabs.js",
@@ -175,7 +178,7 @@ App.prototype.init = function(){
 		};
 
 		this.loading = {
-			display : ko.observable(true),
+			display : ko.observable(false),
 			progressing : ko.observable(false),
 			purcentage : ko.observable(0),
 
@@ -527,6 +530,14 @@ App.prototype.setLanguage = function(language){
  */
 App.prototype.setRootUrl = function(url){
 	this.rootUrl = url;
+};
+
+
+App.prototype.refreshMenu = function(){
+    $.get(this.getUri('refresh-menu'), function(response){
+        $("#main-menu").replaceWith(response);
+		this.notify('warning', Lang.get('admin.plugins-advert-menu-changed'));        
+    }.bind(this));	
 };
 
 window.app = new App(); 

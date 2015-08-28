@@ -47,6 +47,8 @@ class View{
 	const PLUGIN_REGEX = '#\{(\w+)((\s+\w+\=([\'"])((?:\\\\4|.)*?)\\4)*)\s*\}#';
 	const PLUGIN_ARGUMENTS_REGEX = '#(\w+)\=([\'"])(\{?)((?:\\\\2|.)*?)(\}?)\\2#';
 	
+	const TRANSLATION_REGEX = '#{(?!if)([a-zA-Z]{2})}(.*?){/\\1}#ism';
+
 	
 	/**
 	 * Constructor
@@ -123,6 +125,7 @@ class View{
 			self::BLOCK_START_REGEX => "<?php $1 $2 : ?>", // structure starts
 			self::BLOCK_END_REGEX => "<?php end$1; ?>", // structures ends
 			self::ECHO_REGEX => "<?php echo $1; ?>", // echo
+			self::TRANSLATION_REGEX => "<?php if(LANGUAGE == '$1'): ?>$2<?php endif; ?>", // Support translations in views
 			self::ASSIGN_REGEX => "<?php ob_start(); ?>$3<?php \$$2 = ob_get_clean(); ?>" // assign template part in variable
 		);		
 		$this->content = preg_replace(array_keys($replaces), $replaces, $this->content);
