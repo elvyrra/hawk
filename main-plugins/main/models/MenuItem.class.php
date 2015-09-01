@@ -52,6 +52,10 @@ class MenuItem extends Model{
 	}
 
 	public static function add($data){
+		if(empty($data['parentId'])){
+			$data['parentId'] = 0;
+		}
+
 		$data['order'] = DB::get(self::$dbname)->select(array(
 			'fields' => array('COALESCE(MAX(`order`), 0) + 1' => 'newOrder'),
 			'from' => self::$tablename,
@@ -66,5 +70,32 @@ class MenuItem extends Model{
 		EventManager::trigger(new Event('menu-item.added', array('item' => $item)));
 
 		return $item;
+	}
+
+	/**
+	 * Find a menu item by it name, formatted as "<plugin>.<name>"
+	 */
+	public static function getByName($name){
+		list($plugin, $name) = explode('.', $name, 2);
+
+		return self::getByExample(new DBExample(
+			array(
+				'plugin' => $plugin,
+				'name' => $name
+			)
+		));
+	}
+
+	/**
+	 * Delete a menu item
+	 */
+	public function delete(){
+		DB::get(MAINDB)->update(
+			self::getTable(), 
+			new DBExample(array('parentId' => $this->id)), 
+			array('parentId' => 0)
+		);
+
+		parent::delete();
 	}
 }
