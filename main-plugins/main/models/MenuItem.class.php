@@ -5,8 +5,13 @@ class MenuItem extends Model{
 	public static $tablename = "MenuItem";
 	protected static $primaryColumn = "id";
 
+	const USER_ITEM_ID = 1;
+	const ADMIN_ITEM_ID = 2;
+
 	public function __construct($data = array()){
 		parent::__construct($data);
+
+		$this->visibleItems = array();
 
 		if(!empty($this->labelKey)){
 			$this->label = Lang::get($this->labelKey);
@@ -27,36 +32,38 @@ class MenuItem extends Model{
 			$user = Session::getUser();
 		}
 
-		$items = self::getAll(null, array(), array('menuId' => 'ASC', 'order' => 'ASC'));
-		return array_filter($items, function($item) use($user){
-			return !$item->permissionId || $user->isAllowed($item->permissionId);
+		// Get all items
+		$items = self::getAll(self::$primaryColumn, array(), array('parentId' => 'ASC', 'order' => 'ASC'));
+
+		// Filter unavailable items (that are not active or not accessible)
+		$items = array_filter($items, function($item) use($user){
+			return $item->active && (!$item->permissionId || $user->isAllowed($item->permissionId));
 		});
+
+		// Put the sub items under their parent item
+		foreach($items as $item){
+			if($item->parentId){
+				$items[$item->parentId]->visibleItems[$item->order] = $item;
+				unset($items[$item->id]);
+			}
+		}
+
+		return $items;
 	}
 
 	public static function add($data){
-		if(!isset($data['menuId'])){
-			throw new Exception("To add a new menu item, you must give the menuId in the item parameters");
-		}
-
-		if(!isset($data['order']) || $data['order'] === -1){
-			$data['order'] = DB::get(self::$dbname)->select(array(
-				'fields' => array('COALESCE(MAX(`order`), 0) + 1' => 'newOrder'),
-				'from' => self::$tablename,
-				'where' => new DBExample(array('menuId' => $data['menuId'])),				
-				'one' => true,
-				'return' => DB::RETURN_OBJECT
-			))->newOrder;
-		}
-		else{
-			// First update the items which order is greater than the one you want to include
-			$sql = 'UPDATE ' . self::$tablename . ' SET  `order` = `order` + 1  WHERE menuId = :menuId AND `order` >= :order';
-			DB::get(self::$dbname)->query($sql, array('order' => $data['order'], 'menuId' => $data['menuId']));
-		}
+		$data['order'] = DB::get(self::$dbname)->select(array(
+			'fields' => array('COALESCE(MAX(`order`), 0) + 1' => 'newOrder'),
+			'from' => self::$tablename,
+			'where' => new DBExample(array('parentId' => $data['parentId'])),
+			'one' => true,
+			'return' => DB::RETURN_OBJECT
+		))->newOrder;
 
 		// Insert the menu item
 		$item = parent::add($data);	
 
-		EventManager::trigger(new Event('menu.added', array('item' => $item)));
+		EventManager::trigger(new Event('menu-item.added', array('item' => $item)));
 
 		return $item;
 	}

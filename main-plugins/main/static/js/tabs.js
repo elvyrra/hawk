@@ -1,15 +1,3 @@
-/**********************************************************************
- *    						tabs.js
- *
- *
- * Author:   Julien Thaon & Sebastien Lecocq 
- * Date: 	 Jan. 01, 2014
- * Copyright: ELVYRRA SAS
- *
- * This file is part of Beaver's project.
- *
- *
- **********************************************************************/
 var Tab = function(id){
 	this.id = ko.observable(id);
 	this.title = ko.observable("");

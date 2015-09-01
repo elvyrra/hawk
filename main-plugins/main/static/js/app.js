@@ -4,7 +4,7 @@
 var App = function(){
 	this.language = '';
 	this.rootUrl = '';
-	this.jsBaseUrl = document.getElementById("main-js-script").src.split("/").slice(0, -1).join("/") + "/";
+	this.jsBaseUrl = document.getElementById("app-script").src.split("/").slice(0, -1).join("/") + "/";
 	this.isConnected = false;
 	this.routes = [];
 	this.forms = {};
@@ -15,11 +15,7 @@ var App = function(){
 	
 	this.isReady = false;
 
-	this.notification = {
-		display : ko.observable(false),
-		level : ko.observable(),
-		message : ko.observable()
-	}
+	
 
 	this.init();
 };
@@ -61,11 +57,19 @@ App.prototype.require = function(scripts, callback){
 
 
 /**
- * @static @prop {array} required - Required scripts needed for app to work
+ * @static @prop {array} dependencies - Required scripts needed for app to work
  */
-App.required = [
+App.dependencies = [
+	"ext/jquery-2.1.3.min.js",
+	"ext/jquery.cookie.js",
+	"ext/jquery.mask.min.js",
 	"ext/jquery-sortable.js",
 	"jquery.addons.js",
+	"ext/bootstrap.min.js",
+	"ext/bootstrap-colorpicker.min.js",
+	"ext/bootstrap-datepicker.min.js",
+	"ext/knockout-3.3.0.js",
+	"ext/ckeditor/ckeditor.js",
 	"ko.bindings.js",
 	"extends.js",
 	"date.js",
@@ -84,7 +88,13 @@ App.INVALID_URI = '/INVALID_URI';
  * Initialize the application 
  */
 App.prototype.init = function(){
-	this.require(App.required, function(){			
+	this.require(App.dependencies, function(){			
+		// Manage the notification area
+		this.notification = {
+			display : ko.observable(false),
+			level : ko.observable(),
+			message : ko.observable()
+		}
 
 		this.tabset = new Tabset();
 		var self = this;
@@ -312,7 +322,8 @@ App.prototype.load = function(url, data){
 				xhr : this.xhr,
 				url : url, 
 				type : options.post ? 'post' : 'get',
-				data : options.post
+				data : options.post,
+				dataType : 'text',
 			})
 			.done(function(response){					
 				this.loading.stop();
@@ -325,7 +336,7 @@ App.prototype.load = function(url, data){
 					activeTab.route(route);
 
 					activeTab.content(response);
-					
+
 					// Set the tab title
 					activeTab.title($(options.selector).find(".page-name").first().val());
 					

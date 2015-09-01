@@ -19,17 +19,17 @@ class AdminController extends Controller{
 			$roles[$role->id] = Lang::get("roles.role-$role->id-label");
 		}
 
-		$menus = Menu::getAvailableMenus();
+		$items = MenuItem::getAvailableItems();
 
 		$menuItems = array();
-		foreach($menus as $menu){
-			if($menu->action && !preg_match('/^(javascript\:|#)/', $menu->action) && (!$menu->target || $menu->target == 'newtab')){
-				$menuItems[$menu->action] = $menu->label;
+		foreach($items as $item){
+			if($item->action && !preg_match('/^(javascript\:|#)/', $item->action) && (!$item->target || $item->target == 'newtab')){
+				$menuItems[$item->action] = $item->label;
 			}
 			else{
-				foreach($menu->visibleItems as $item){
-					if(!preg_match('/^(javascript\:|#)/', $item->action) && (!$item->target || $item->target == 'newtab')){
-						$menuItems[$item->action] = $menu->label . " &gt; " . $item->label;
+				foreach($item->visibleItems as $subitem){
+					if(!preg_match('/^(javascript\:|#)/', $subitem->action) && (!$subitem->target || $subitem->target == 'newtab')){
+						$menuItems[$subitem->action] = $item->label . " &gt; " . $subitem->label;
 					}
 				}
 			}

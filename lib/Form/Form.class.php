@@ -221,7 +221,11 @@ class Form{
 		// get the data of the form to display or register
         $this->reload();
 
-        self::$instances[$this->id] = $this;		
+        self::$instances[$this->id] = $this;	
+
+        EventManager::trigger(new Event('form.' . $this->id . '.instanciated', array(
+        	'form' => $this
+        )));
 	}
 	
 

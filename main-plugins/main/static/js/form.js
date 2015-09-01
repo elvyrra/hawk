@@ -1,4 +1,3 @@
-
 /**
  * @class Form
  * @constructs
@@ -190,8 +189,13 @@ var FormInput= function(field, form){
 /**
  * Get the value of the field
  */
-FormInput.prototype.val = function(){
-	return this.node.val();
+FormInput.prototype.val = function(value){
+	if(value === undefined){
+		return this.node.val();		
+	}
+	else{
+		this.node.val(value);
+	}
 };
 
 

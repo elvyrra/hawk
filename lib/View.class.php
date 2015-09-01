@@ -178,15 +178,9 @@ class View{
 	public function display(){
 		extract($this->data);
 		ob_start();
-		try{
-			include $this->fileCache->getFile();
-		}
-		catch(Exception $e){
-			$exception = new ViewException(ViewException::TYPE_EVAL, $this->file, $e);
-
-			Response::set($exception->display());
-			Response::end();
-		}		
+		
+		include $this->fileCache->getFile();
+		
 		return ob_get_clean();
 	}	
 	
@@ -246,7 +240,6 @@ class ViewException extends Exception{
 			break;
 			
 			case self::TYPE_EVAL:
-				debug($previous);
 				$trace = array_map(function($t){
 					return $t['file'] . ':' . $t['line'];
 				}, $previous->getTrace());

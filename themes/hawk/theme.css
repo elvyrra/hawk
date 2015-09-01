@@ -892,3 +892,51 @@ p .fa{
     background: #d9edf7;
     color: #31708f;
 }
+
+
+/*------------------------------ Sortable lists -----------------------*/
+body.dragging, body.dragging * {
+  cursor: move !important;
+}
+
+.dragged {
+  position: absolute;
+  opacity: 0.5;
+  z-index: 2000;
+}
+
+.sortable{
+    list-style-type: none;
+}
+
+.sortable li{        
+    list-style-type: none;
+}
+
+.sortable li .sortable-item{
+    margin: 5px 0;    
+    border: 1px solid rgba(0,0,0,0.5);    
+    border-radius: 5px;
+}
+
+.sortable li .sortable-item .drag-handle{
+    cursor: move;
+    background: #eee;
+    padding: 10px;
+    border-radius: 5px 0 0 5px;
+    height: 100%;
+}
+
+.sortable li.placeholder {
+    position: relative;
+    background: @bgInfo;
+    border: 1px solid rgba(0,0,0,0.5);  
+    border-radius: 5px;
+    min-height: 25px;
+}
+
+.sortable li.placeholder:before {
+    position: absolute;
+    /** Define arrowhead **/
+}
+

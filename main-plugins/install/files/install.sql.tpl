@@ -22,57 +22,37 @@ INSERT IGNORE INTO `Language` (`tag`, `label`, `isDefault`, `active`) VALUES
 /*!40000 ALTER TABLE `Language` ENABLE KEYS */;
 
 
-CREATE TABLE IF NOT EXISTS `Menu` (
+CREATE TABLE IF NOT EXISTS `MenuItem` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `plugin` VARCHAR(32) NOT NULL DEFAULT '0',
   `name` varchar(64) NOT NULL,
+  `parentId` int(11) NOT NULL DEFAULT 0,
   `labelKey` varchar(128) NOT NULL,
   `action` VARCHAR(128) NOT NULL,
   `actionParameters` VARCHAR(1024) NOT NULL,
   `target` VARCHAR(64) NOT NULL,
-  `order` int(2) NOT NULL,
-  `permissionId` INT(11) NOT NULL,
+  `order` int(2) NOT NULL DEFAULT 0,
+  `permissionId` INT(11) NOT NULL DEFAULT 0,
   `active` TINYINT(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   UNIQUE INDEX `Index 2` (`plugin`, `name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*!40000 ALTER TABLE `Menu` DISABLE KEYS */;
-INSERT IGNORE INTO `Menu` (`id`, `plugin`, `name`, `labelKey`, `action`, `actionParameters`, `target`, `order`, `permissionId`) VALUES
-(1, 'main', 'user', 'user.username', '', '', '', 1, 0),
-(2, 'admin', 'admin', 'main.menu-admin-title', '', '', '', 0, 0);
-/*!40000 ALTER TABLE `Menu` ENABLE KEYS */;
-
-
-CREATE TABLE IF NOT EXISTS `MenuItem` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `menuId` int(11) NOT NULL,
-  `name` varchar(64) NOT NULL,
-  `labelKey` varchar(128) NOT NULL,
-  `action` varchar(128) NOT NULL,
-  `actionParameters` varchar(1024) NOT NULL DEFAULT '',
-  `target` varchar(32) NOT NULL,
-  `order` int(2) NOT NULL,
-  `permissionId` int(11) NOT NULL DEFAULT '0',
-  `active` TINYINT(1) NOT NULL DEFAULT '1',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `menuId_2` (`menuId`,`name`),
-  KEY `menuId` (`menuId`),
-  CONSTRAINT `MenuItem_ibfk_1` FOREIGN KEY (`menuId`) REFERENCES `Menu` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 /*!40000 ALTER TABLE `MenuItem` DISABLE KEYS */;
-INSERT IGNORE INTO `MenuItem` (`id`, `menuId`, `name`, `labelKey`, `action`, `actionParameters`, `target`, `order`, `permissionId`) VALUES
-(1, 2, 'settings', 'main.menu-admin-settings-title', 'main-settings', '', '', 0, 1),
-(2, 2, 'users', 'main.menu-admin-users-title', 'manage-users', '', '', 1, 2),
-(3, 2, 'permissions', 'main.menu-admin-roles-title', 'permissions', '', '', 2, 2),
-(4, 2, 'themes', 'main.menu-admin-display-title', 'manage-themes', '', '', 3, 3),
-(5, 2, 'plugins', 'main.menu-admin-plugins-title', 'manage-plugins', '', '', 4, 1),
-(6, 2, 'translations', 'main.menu-admin-language-title', 'manage-languages', '', '', 5, 5),
-(7, 1, 'profile', 'main.menu-my-profile', 'edit-profile', '', 'dialog', 0, 0),
-(8, 1, 'change-password', 'main.menu-change-password', 'change-password', '', 'dialog', 1, 0),
-(9, 1, 'logout', 'main.menu-logout', 'javascript: location = app.getUri(''logout'');', '', '', 2, 0);
+INSERT IGNORE INTO `MenuItem` (`id`, `plugin`, `name`, `parentId`, `labelKey`, `action`, `actionParameters`, `target`, `order`, `permissionId`, `active`) VALUES
+(1, 'main', 'user', 0, 'user.username', '', '', '', 0, 0, 1),
+(2, 'admin', 'admin', 0, 'main.menu-admin-title', '', '', '', 1, 0, 1),
+(3, 'admin', 'settings', 2, 'main.menu-admin-settings-title', 'main-settings', '', '', 0, 1, 1),
+(4, 'admin', 'users', 2, 'main.menu-admin-users-title', 'manage-users', '', '', 1, 2, 1),
+(5, 'admin', 'permissions', 2, 'main.menu-admin-roles-title', 'permissions', '', '', 2, 2, 1),
+(6, 'admin', 'themes', 2, 'main.menu-admin-display-title', 'manage-themes', '', '', 3, 3, 1),
+(7, 'admin', 'plugins', 2, 'main.menu-admin-plugins-title', 'manage-plugins', '', '', 4, 1, 1),
+(8, 'admin', 'translations', 2, 'main.menu-admin-language-title', 'manage-languages', '', '', 5, 5, 1),
+(9, 'user', 'profile', 1, 'main.menu-my-profile', 'edit-profile', '', 'dialog', 0, 6, 1),
+(10, 'user', 'change-password', 1, 'main.menu-change-password', 'change-password', '', 'dialog', 1, 6, 1),
+(11, 'user', 'logout', 1, 'main.menu-logout', 'javascript: location = app.getUri(''logout'');', '', '', 2, 6, 1);
 /*!40000 ALTER TABLE `MenuItem` ENABLE KEYS */;
+
 
 
 CREATE TABLE IF NOT EXISTS `Option` (
@@ -109,7 +89,8 @@ INSERT IGNORE INTO `Permission` (`id`, `plugin`, `key`, `availableForGuests`) VA
 	(2, 'admin', 'users', 0),
 	(3, 'admin', 'themes', 0),
 	(4, 'admin', 'plugins', 0),
-	(5, 'admin', 'languages', 0);
+	(5, 'admin', 'languages', 0),
+  (6, 'main', 'user-actions', 0);
 /*!40000 ALTER TABLE `Permission` ENABLE KEYS */;
 
 

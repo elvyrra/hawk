@@ -422,29 +422,55 @@ class ThemeController extends Controller{
 	 * Customize the menu
 	 */
 	public function menu(){
+		$items = MenuItem::getAll();
+
 		$form = new Form(array(
 			'id' => 'set-menus-form',
+			'action' => Router::getUri('set-menu'),
 			'fields' => array(
 				new HiddenInput(array(
-					'name' => 'menus',					
-				)),
+					'name' => 'data',
+					'default' => json_encode($items, JSON_NUMERIC_CHECK),
+					'attributes' => array('data-bind' => 'value: ko.toJSON(items)'),
+				)),				
 
-				new SubmitForm(array(
+				new SubmitInput(array(
 					'name' => 'valid',
 					'value' => Lang::get('main.valid-button'),
 				)),
-			)
+			),
+
+			'onsuccess' => 'app.refreshMenu()'
 		));
 
 		if(!$form->submitted()){
-			$page = View::make(Plugin::current()->getView('sort-menus.tpl'), array(
-				'form' => $form,
-				'menus' => $menus,
-				'inactive' => $inactive,
+			Lang::addKeysToJavaScript('admin.plugins-advert-menu-changed');
+			return View::make(Plugin::current()->getView('sort-main-menu.tpl'), array(
+				'form' => $form,				
 			));
 		}
 		else{
+			try {
+				$items = MenuItem::getAll('id');
 
+				$data = json_decode($form->getData('data'), true);
+
+				foreach($data as $line){
+					$item = $items[$line['id']];
+					$item->set(array(
+						'active' => $line['active'],
+						'parentId' => $line['parentId'],
+						'order' => $line['order']
+					));
+					$item->save();
+				}
+
+				return $form->response(Form::STATUS_SUCCESS, Lang::get('admin.sort-menu-success'));
+			} 
+			catch (Exception $e) {
+				return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get('admin.sort-menu-error'));
+			}
+			
 		}
 	}
 }

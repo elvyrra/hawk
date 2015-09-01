@@ -200,7 +200,11 @@ class ItemList{
 			if(!empty($this->sorts[$name])){
 				$field->sortValue = $this->sorts[$name];
 			}
-		}	
+		}
+
+		EventManager::trigger(new Event('list.' . $this->id . '.instanciated', array(
+			'list' => $this
+		)));
 	}
 	
 	/**

@@ -5,58 +5,52 @@ class MainMenuWidget extends Widget{
 	const EVENT_AFTER_GET_MENUS = 'menu.after_get_items';
 	const EVENT_AFTER_GET_USER_MENU = 'menu.after_get_user_items';
 
-	
-	
-
 	/**
 	 * Display the main menu. The menu is separated in two : The applications (plugins), and the user menu (containing the access to user data, and admin data if the user is administrator)
 	 * */
 	public function display(){
 		$user = Session::getUser();
-		$menus = $userMenus = array();
+		
+		$menus= array(
+			'applications' => array(),
+			'user' => array()
+		);
 
 		if($user->canAccessApplication()){			
 			// Get the menus 
-			$menus = Menu::getAvailableMenus($user);
+			$items = MenuItem::getAvailableItems($user);
 
 			// Filter the menus that have no action and no item
-			$menus = array_filter($menus, function($menu){
-				return $menu->action || count($menu->visibleItems) > 0;
+			$items = array_filter($items, function($item){
+				return $item->action || count($item->visibleItems) > 0;
 			});
 
+			foreach($items as $id => $item){
+				if($id == MenuItem::USER_ITEM_ID){
+					$item->label = $user->getUsername();
+				}
 
-			// Get the user menu
-			if(Session::isConnected()){
-				$menus[Menu::USER_MENU_ID]->label = $user->getUsername();
-				$userMenus[Menu::USER_MENU_ID] = $menus[Menu::USER_MENU_ID];				
-			}
-			// remove the user menu from applications menus
-			unset($menus[Menu::USER_MENU_ID]);
-
-			// put the admin menu in user menu
-			if(!empty($menus[Menu::ADMIN_MENU_ID])){
-				$userMenus[Menu::ADMIN_MENU_ID] = $menus[Menu::ADMIN_MENU_ID];
-				unset($menus[Menu::ADMIN_MENU_ID]);
-			}
+				if(in_array($id, array(MenuItem::USER_ITEM_ID, MenuItem::ADMIN_ITEM_ID))){
+					$menus['user'][$item->order] = $item;
+				}
+				else{
+					$menus['applications'][$item->order] = $item;
+				}
+			}			
 		}
 		
 		if(!Session::isConnected()){
-			$userMenus = array(
-				new Menu(array(
-					'id' => uniqid(),
-					'labelKey' => 'main.login',
-					'action' => 'login',
-					'target' => 'dialog',
-				))
-			);
+			$menus['user'][] = new MenuItem(array(
+				'id' => uniqid(),
+				'labelKey' => 'main.login',
+				'action' => 'login',
+				'target' => 'dialog',
+			));
 		}
 
 		// Trigger an event to add or remove menus from plugins 
 		$event = new Event(self::EVENT_AFTER_GET_MENUS, array(
-			'menus' => array(
-				'applications' => $menus,
-				'user' => $userMenus
-			)
+			'menus' => $menus
 		));
 
 		EventManager::trigger($event);
