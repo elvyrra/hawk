@@ -1,5 +1,5 @@
 <?php
-Router::auth(Request::isAjax() && Session::isConnected(), function(){
+Router::auth(Session::isConnected(), function(){
 	/*** Application settings ***/
 	Router::any('main-settings', '/admin/settings', array('auth' => Session::isAllowed('admin.all'), 'action' => 'AdminController.settings'));
 
@@ -109,7 +109,7 @@ Router::auth(Request::isAjax() && Session::isConnected(), function(){
 		Router::post('add-language-key', '/admin/languages/keys/add', array('action' => 'LanguageController.addKey'));
 
 		// Delete a translation
-		Router::any('delete-translation', '/admin/languages/keys/{plugin}/{key}/{tag}/clean', array('where' => array('plugin' => '\w+', 'key' => '[\w\-]+', 'tag' => '[a-z]{2}'), 'action' => 'LanguageController.deleteTranslation'));
+		Router::any('delete-translation', '/admin/languages/keys/{plugin}/{key}/{tag}/clean', array('where' => array('plugin' => '[\w\-]+', 'key' => '[\w\-]+', 'tag' => '[a-z]{2}'), 'action' => 'LanguageController.deleteTranslation'));
 		
 		// Import language file
 		Router::any('import-language-keys', '/admin/languages/import', array('action' => 'LanguageController.import'));

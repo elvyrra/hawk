@@ -35,13 +35,6 @@ class UserProfileController extends Controller{
                         'required' => true,
                         'label' => Lang::get('admin.user-form-email-label'),
                         'disabled' => true,
-                    )),
-                    
-                    new SelectInput(array(
-                        'name' => 'roleId',
-                        'options' => $roles,
-                        'label' => Lang::get('admin.user-form-roleId-label'),
-                        'disabled' => true,
                     ))
                 ),
                 
@@ -86,7 +79,7 @@ class UserProfileController extends Controller{
                     $field['after'] = "<img src='" . ( $user->getProfileData($question->name) ? $user->getProfileData($question->name) : "") . "' class='profile-image' />";
                 }
                 else{
-                    $field['value'] = $user->getProfileData($question->name);
+                    $field['default'] = $user->getProfileData($question->name);
                 }
             }
             
@@ -98,6 +91,9 @@ class UserProfileController extends Controller{
                     $options[$language->tag] = $language->label;
                 }
                 $field['options'] = $options;
+                if(!$field['default']){
+                    $field['default'] = Option::get('main.language');
+                }
             }
 
 

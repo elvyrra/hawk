@@ -75,7 +75,7 @@ class ThemeController extends Controller{
 	 */
 	public function customize(){
 		$theme = ThemeManager::getSelected();
-		$variables = $theme->getCssVariables(file_get_contents($theme->getBaseCssFile()));
+		$variables = $theme->getCssVariables();
 		
 		if(!empty($_GET['reset'])){
 			foreach($variables as $var){

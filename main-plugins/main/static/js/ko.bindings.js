@@ -1,3 +1,4 @@
+define('bindings', ['ko'], function(ko){
 /**
  * Autocomplete data 
  */
@@ -99,3 +100,32 @@ ko.bindingHandlers.autocomplete = (function(){
 
 	return new Autocomplete();
 })();
+
+
+/**
+ * KO binding for ace
+ */
+ko.bindingHandlers.ace = {
+    init : function(element, valueAccessor, allBindings, viewModel, bindingContext){
+        var value = valueAccessor();
+        param = ko.unwrap(value);
+
+        app.require(["ext/ace/ace.js"], function(){
+            ace.config.set("modePath", app.jsBaseUrl + "ext/ace/");
+            ace.config.set("workerPath", app.jsBaseUrl + "ext/ace/") ;
+            ace.config.set("themePath", app.jsBaseUrl + "ext/ace/"); 
+
+            var editor = ace.edit(element);
+            editor.setTheme("ace/theme/" + (param.theme || 'chrome'));
+            editor.getSession().setMode("ace/mode/" + (param.mode || "js"));
+            editor.setShowPrintMargin(false);
+
+            editor.getSession().on("change", function(event){
+                var value = editor.getValue();
+                param.change(event, value, editor);                
+            }); 
+        });
+    },
+}
+
+});

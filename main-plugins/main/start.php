@@ -25,3 +25,5 @@ Router::auth(!Session::isConnected(), function(){
 Router::get('terms', '/terms-of-application', array('action' => 'MainController.terms'));
 
 Router::get('refresh-menu', '/main-menu', array('action' => 'MainController.refreshMenu'));
+
+Router::get('js-conf', '/conf.js', array('action' => 'MainController.jsConf'));

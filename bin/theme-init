@@ -45,10 +45,7 @@ foreach($parameters as $param => $options){
         	if($data[$param] && !is_dir(THEMES_DIR . $data[$param])){
         		echo "\033[0;31mThe theme you've mentionned as parent theme does not exists, please type an existing theme (or no theme)\n\033[0m";
         		$data[$param] = ' ';
-        	}
-        	elseif(!$data[$param]){
-        		$data[$param] = DEFAULT_THEME_NAME;
-        	}
+        	}        	
         }
     }
     while(!preg_match($options['regex'], $data[$param]));
@@ -61,7 +58,7 @@ $dir = THEMES_DIR . $data['name'] ;
 `mkdir $dir/views`;
 
 // Copy the file theme.css from the parent theme
-shell_exec('cp ' . THEMES_DIR . $data['extends'] . '/theme.css ' . THEMES_DIR . $data['name']);
+touch(THEMES_DIR . $data['name'] . '/theme.css');
 
 // Copy the file preview.png from the parent theme
 shell_exec('cp ' . THEMES_DIR . $data['extends'] . '/preview.png ' . THEMES_DIR . $data['name']);

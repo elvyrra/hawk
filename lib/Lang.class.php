@@ -229,6 +229,11 @@ class Lang{
      * @return string The translation
      */
     public static function get($langKey, $param = array(), $number = 0, $language = LANGUAGE){
+		$tmp = explode('.', $langKey);
+		if(count($tmp) != 2){
+			return $langKey;
+		}
+		
 		list($plugin, $key) = explode('.', $langKey);
 
 		if(!isset(self::$langs[$plugin]) || $language != self::$usedLanguage){						

@@ -143,4 +143,48 @@ class MainController extends Controller{
 	public function refreshMenu(){
 		return MainMenuWidget::getInstance()->display();
 	}
+
+	/**
+	 * Generate the conf.js file
+	 */
+	public function jsConf(){
+		$canAccessApplication = Session::getUser()->canAccessApplication();	
+
+		// Get all routes
+		$routes = array();
+		foreach(Router::getRoutes() as $name => $route){
+			$routes[$name] = array(
+				'url' => $route->url,
+				'where' => $route->where,
+				'default' => $route->default,
+				'pattern' => $route->pattern
+			);
+		}
+
+		// Get all Lang labels
+		$keys = array(
+			'main' => Lang::keys('javascript'),
+			'form' =>  Lang::keys('form')
+		);			
+		$keys = json_encode($keys, JSON_HEX_APOS | JSON_HEX_QUOT);
+
+		// Get the pages to open
+		$pages = array();
+		if(Session::isConnected() && Option::get('main.open-last-tabs') && !empty($_COOKIE['open-tabs'])){
+			// Open the last tabs the users opened before logout
+			$pages = json_decode($_COOKIE['open-tabs'], true);
+		}
+		
+		if(empty($pages) && $canAccessApplication){
+			$pages[] = Router::getUri('new-tab');
+		}
+
+		return View::make(Plugin::current()->getView('conf.js.tpl'), array(
+			'keys' => $keys,
+			'routes' => json_encode($routes, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRETTY_PRINT),
+			'maxTabs' => Option::get('main.tabsNumber') ? Option::get('main.tabsNumber') : 10,
+			'lastTabs' => json_encode($pages, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRETTY_PRINT),
+			'accessible' => $canAccessApplication
+		));
+	}
 }

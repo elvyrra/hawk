@@ -60,25 +60,6 @@
 			<div role="tabpanel" class="tab-pane main-tab-pane" data-bind="attr : { id : 'main-tab-' + id(), 'data-tab' : $index}, html : content"></div>
 		</div>
 	</div>
-
-	<script type="text/javascript">
-		app.ready(function(){
-			{if(Option::get('main.tabsNumber'))}
-				Tabset.MAX_TABS_NUMBER = {{ Option::get('main.tabsNumber') }};
-			{/if}
-			{if(!$canAccessApplication)}
-				app.dialog(app.getUri('login'));
-			{else}
-				app.lastTabs = {{ $pages }};
-				if(app.lastTabs){
-					app.openLastTabs(app.lastTabs);
-				}
-				else{					
-					app.tabset.push();
-				}
-			{/if}
-		});
-	</script>
 {else}
 	{{ $content }}
 {/if}

@@ -28,17 +28,9 @@
 		<!-- Customized file of the theme -->
 		<link rel="stylesheet" id="theme-custom-stylesheet" href="{{ $themeCustomCss }}" />
 
-		<script type="text/javascript" id="app-script" src="{{ $mainJsUrl }}app.js"></script>
+		<script type="text/javascript" src="conf.js"></script>
+		<script type="text/javascript" src="{{ $mainJsUrl }}ext/require.js" data-main="{{ $mainJsUrl }}app.js"></script>
 
-		<script type="text/javascript">
-			app.setLanguage("{{ LANGUAGE }}");
-			app.setRootUrl("{{ ROOT_URL }}");
-			app.setRoutes({{ json_encode($routes) }});
-				
-			app.ready(function(){		
-				Lang.langs = {{ $langLabels }};
-			});
-		</script>
 	</head>
 	
 	<body>

@@ -19,17 +19,19 @@
 
 <script type="text/javascript">
 	app.ready(function(){
-		app.forms["{{ $form->id }}"] = new Form("{{ $form->id }}", {{ json_encode($form->fields, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_NUMERIC_CHECK) }});
+		var form = new Form("{{ $form->id }}", {{ json_encode($form->fields, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_NUMERIC_CHECK) }});
+		
 		
 		{if(!empty($form->onsuccess))}
-			$("#{{$form->id}}").on('success', function(event, data){		
+			form.onsuccess = function(data){
 				{{ $form->onsuccess }}
-			});	
+			};			
 		{/if}
 	
 		{if($form->status == Form::STATUS_ERROR)}		
-			app.forms["{{ $form->id }}"].displayErrors({{ json_encode($form->errors,JSON_HEX_APOS | JSON_HEX_QUOT | JSON_NUMERIC_CHECK) }});
+			form.displayErrors({{ json_encode($form->errors,JSON_HEX_APOS | JSON_HEX_QUOT | JSON_NUMERIC_CHECK) }});
 		{/if}
+		app.forms["{{ $form->id }}"] = form;
 	});
 </script>
 

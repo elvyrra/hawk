@@ -40,7 +40,6 @@ class LoginController extends Controller{
 						"field" => "remember",
 						"independant" => true,
 						"default" => $login || $password ? 1 : 0,
-						"beforeLabel" => true,
 						"label" => Lang::get('main.login-remember-label'),
 					)),		
 				),

@@ -321,5 +321,21 @@ class Router{
 		
 		return null;
     }
+
+
+    /**
+     * Find a route from an URI
+     * @param string URI The uri to search the associated route
+     * @return Route the found route
+     */
+    public static function getRouteByUri($uri){
+    	foreach(self::$routes as $route){
+    		if($route->match($uri)){
+    			return $route;
+    		}
+    	}
+
+    	return null;
+    }
 	
 }
