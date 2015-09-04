@@ -36,32 +36,37 @@ $("#manage-themes-page")
 /***
  * Ace editor for Css editing tab
  */
-require(['ace'], function(ace){    
-	ace.config.set("modePath", app.baseUrl + "ext/ace/");
-	ace.config.set("workerPath", app.baseUrl + "ext/ace/") ;
-	ace.config.set("themePath", app.baseUrl + "ext/ace/"); 
+(function(){
+    var model = {
+        css : ko.observable(app.forms['theme-css-form'].inputs['css'].value),
+    };
+    require(['ace'], function(ace){    
+    	ace.config.set("modePath", app.baseUrl + "ext/ace/");
+    	ace.config.set("workerPath", app.baseUrl + "ext/ace/") ;
+    	ace.config.set("themePath", app.baseUrl + "ext/ace/"); 
 
-	var editor = ace.edit("theme-css-edit");
-	editor.setTheme("ace/theme/chrome");
-	editor.getSession().setMode("ace/mode/css");
-	editor.setShowPrintMargin(false);
+    	var editor = ace.edit("theme-css-edit");
+    	editor.setTheme("ace/theme/chrome");
+    	editor.getSession().setMode("ace/mode/css");
+    	editor.setShowPrintMargin(false);
 
-	editor.getSession().on("change", function(event){
-		var value = editor.getValue();
-		$('#editing-css-computed').text(value);
-		$("#theme-css-form [name='css'").val(value);
-	});	
-});
+    	editor.getSession().on("change", function(event){
+    		var value = editor.getValue();
+    		model.css(value);
+    	});	
+    });
+    ko.applyBindings(model, $("#theme-css-form").get(0));
 
-$("#theme-css-form").on("success", function(event, data){
-	$("#theme-custom-stylesheet").attr('href', data.href);
-});
+    app.forms['theme-css-form'].onsuccess = function(event, data){
+    	$("#theme-custom-stylesheet").attr('href', data.href);
+    };
+})();
 
 
 /**
  * Treat the menu sort
  */
-// (function(){
+(function(){
     var activeNode = document.getElementById('sort-menu-active');
     var inactiveNode = document.getElementById('sort-menu-inactive');
 
@@ -186,4 +191,4 @@ $("#theme-css-form").on("success", function(event, data){
     model.refresh(); 
     ko.applyBindings(model, inactiveNode);
 
-// })();
+})();

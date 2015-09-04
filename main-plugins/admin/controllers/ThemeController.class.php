@@ -211,11 +211,15 @@ class ThemeController extends Controller{
 						'name' => 'css',
 						'hidden' => true,
 						'value' => $css,
+						'attributes' => array(
+							'data-bind' => 'value : css'
+						)
 					)),
 
 					new HtmlInput(array(	
 						'name' => 'ace',					
-						'value' => '<style id="editing-css-computed">' . $css . '</style><div id="theme-css-edit" contenteditable>' . $css . '</div>'
+						'value' => '<style id="editing-css-computed" data-binding="text: css">' . $css . '</style>
+									<div id="theme-css-edit" contenteditable >' . $css . '</div>'
 					)),
 				)
 			)
