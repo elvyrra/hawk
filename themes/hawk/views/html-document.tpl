@@ -28,7 +28,7 @@
 		<!-- Customized file of the theme -->
 		<link rel="stylesheet" id="theme-custom-stylesheet" href="{{ $themeCustomCss }}" />
 
-		<script type="text/javascript" src="conf.js"></script>
+		<script type="text/javascript" src="{{ Router::getUri('js-conf') }}"></script>
 		<script type="text/javascript" src="{{ $mainJsUrl }}ext/require.js" data-main="{{ $mainJsUrl }}app.js"></script>
 
 	</head>

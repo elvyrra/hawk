@@ -200,7 +200,6 @@ class Theme{
             foreach($this->sources as $source){
                 if(filemtime($source) > filemtime($this->getBuildCssFile())){
                     $build = true;
-                    Utils::debug('file updated');
                     break;
                 }
             }

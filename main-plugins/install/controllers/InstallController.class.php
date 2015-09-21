@@ -158,7 +158,7 @@ class InstallController extends Controller{
 					))
 				)
 			),
-			'onsuccess' => 'debugger; location.href = location.href.replace(location.pathname, "");'
+			'onsuccess' => 'location.href = data.rooturl;'
 		));
 
 		if(!$form->submitted()){
@@ -241,6 +241,8 @@ class InstallController extends Controller{
 					 * Create the envrionment config file
 					 */
 					touch(ROOT_DIR . 'etc/' . $configMode . '.php');
+
+					$form->addReturn('rooturl', $form->getData('rooturl'));
 					
 					return $form->response(Form::STATUS_SUCCESS, Lang::get('install.install-success'));
 				}

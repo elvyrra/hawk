@@ -179,6 +179,8 @@ class MainController extends Controller{
 			$pages[] = Router::getUri('new-tab');
 		}
 
+		Response::setScript();
+
 		return View::make(Plugin::current()->getView('conf.js.tpl'), array(
 			'keys' => $keys,
 			'routes' => json_encode($routes, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRETTY_PRINT),

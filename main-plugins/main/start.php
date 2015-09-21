@@ -1,5 +1,4 @@
 <?php
-
 Router::get('index', '/', array('action' => 'MainController.main'));
 Router::get('new-tab', '/newtab', array('auth' => Request::isAjax() && (Session::isConnected() || Option::get('main.allow-guest')), 'action' => 'MainController.newTab'));
 	
@@ -27,3 +26,4 @@ Router::get('terms', '/terms-of-application', array('action' => 'MainController.
 Router::get('refresh-menu', '/main-menu', array('action' => 'MainController.refreshMenu'));
 
 Router::get('js-conf', '/conf.js', array('action' => 'MainController.jsConf'));
+

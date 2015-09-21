@@ -26,10 +26,6 @@ class Option{
 	 * @return string the value og the option
 	 */
 	public static function get($name){
-		// if(empty(self::$options) && is_file(CACHE_DIR . self::CACHE_FILE)){
-		// 	self::$options = include CACHE_DIR . self::CACHE_FILE;
-		// }
-
 		list($plugin, $key) = explode('.', $name);
 		if(! isset(self::$options[$plugin][$key])){
 			self::getPluginOptions($plugin);

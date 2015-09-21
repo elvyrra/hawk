@@ -14,7 +14,7 @@ EventManager::trigger(new Event('process-start'));
 
 
 /*** Initialize the plugins ***/
-$plugins = Conf::has('db') ? array_merge(Plugin::getMainPlugins(), Plugin::getActivePlugins()) : array(Plugin::get('install'));
+$plugins = Conf::has('db') ? array_merge(Plugin::getMainPlugins(), Plugin::getActivePlugins()) : array(Plugin::get('main'), Plugin::get('install'));
 foreach($plugins as $plugin){	
 	if(is_file($plugin->getStartFile())){
 		include $plugin->getStartFile();

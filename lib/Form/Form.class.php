@@ -596,8 +596,9 @@ class Form{
 			foreach($name as $key => $value)
 				$this->addReturn($key, $value);
 		}
-		else
+		else{
 			$this->returns[$name] = $message;
+		}
 	}
 	
 

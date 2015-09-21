@@ -1,10 +1,10 @@
+"use strict";
 
 /**
  *  Start by configure requirejs paths and shim
  */
 require.config({
 	paths : {
-		'extends' : "extends",
 		jquery : "ext/jquery-2.1.3.min",
 		cookie : "ext/jquery.cookie",
 		mask : "ext/jquery.mask.min",
@@ -85,10 +85,8 @@ App.INVALID_URI = '/INVALID_URI';
  * Initialize the application 
  */
 App.prototype.start = function(){
-	var start = new Date().getTime();
 	define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 'sortable', 'addons', 'bootstrap', 'colorpicker' , 'datepicker',  'ckeditor', 'bindings', 'extends' , 'date' ], function($, ko, Tabset, Form, List, Lang) {
 		// export libraries to global context
-		console.log('require time : ' + (new Date().getTime() - start));
 		window.$ = $;
 		window.ko = ko;
 		window.Tabset = Tabset;
@@ -466,7 +464,7 @@ App.prototype.hideNotification = function(){
 App.prototype.dialog = function(action){
 	$("#dialogbox").empty().modal('hide');
 	
-	if(action == "close"){			
+	if(action == "close"){
 		return;
 	}
 	

@@ -37,7 +37,20 @@ trait Session{
 		if(empty($_SESSION['user']['id'])){
 			$_SESSION['user']['id'] = 0;
 		}
-		self::$user = User::getById($_SESSION['user']['id']);
+
+		if(Conf::has('db')){
+			// Get the user from the database
+			self::$user = User::getById($_SESSION['user']['id']);
+		}
+		else{
+			// The database does not exists yet. Create a 'fake' guest user
+			self::$user = new User(array(
+				'id' => User::GUEST_USER_ID,
+				'username' => 'guest',
+				'active' => 0,
+				'ip' => Request::clientIp()
+			));
+		}
 		return self::$user;
 	}
 	
@@ -54,7 +67,7 @@ trait Session{
 			self::$connected = false;
 		}
 		elseif(isset($_SESSION['user']['ip']) && $_SESSION['user']['ip'] != Request::clientIp()){
-			return false;
+			self::$connected = false;
 		}
 		else{		
 			/*** The session is not empty . Check the coherency between the user id and
