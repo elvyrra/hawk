@@ -4,7 +4,7 @@
  * @author Elvyrra SAS
  */
 
-
+namespace Hawk\Plugins\Admin;
 
 /**
  * This Widget is used to filter the users list by status or role
@@ -65,5 +65,4 @@ class UserFilterWidget extends Widget{
 			'icon' => 'filter',
 		));
 	}
-	
 }

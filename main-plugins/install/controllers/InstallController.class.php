@@ -1,8 +1,8 @@
 <?php
 
+namespace Hawk\Plugins\Install;
 
-class InstallController extends Controller{
-	
+class InstallController extends Controller{	
 	public function setLanguage(){
 		$form = new Form(array(
 			'id' => 'install-form',
@@ -35,7 +35,7 @@ class InstallController extends Controller{
 			'form' => $form
 		));
 
-		return MainController::getInstance()->index($body);
+		return \Hawk\Plugins\MainController::getInstance()->index($body);
 	}
 
 	public function settings(){
@@ -63,21 +63,9 @@ class InstallController extends Controller{
 					new SelectInput(array(
 						'name' => 'timezone',
 						'required' => true,
-						'options' => array_combine(DateTimeZone::listIdentifiers(), DateTimeZone::listIdentifiers()),
+						'options' => array_combine(\DateTimeZone::listIdentifiers(), \DateTimeZone::listIdentifiers()),
 						'default' => DEFAULT_TIMEZONE,
 						'label' => Lang::get('install.settings-timezone-label')
-					)),
-
-					new SelectInput(array(
-						'name' => 'session',
-						'required' => true,
-						'options' => array(
-							'file' => Lang::get('install.settings-session-file-value', null, null, $this->language),
-							'database' => Lang::get('install.settings-session-database-value', null, null, $this->language),
-							// 'memcache' => Lang::get('install.settings-session-memcache-value', null, null, $this->language)
-						),
-						'label' => Lang::get('install.settings-session-label', null, null, $this->language),
-						'default' => DEFAULT_SESSION_ENGINE
 					)),
 
 					new TextInput(array(
@@ -167,7 +155,7 @@ class InstallController extends Controller{
 				'form' => $form
 			));
 
-			return MainController::getInstance()->index($body);
+			return \Hawk\Plugins\Main\MainController::getInstance()->index($body);
 		}
 		else{
 			// Make the installation 
@@ -246,7 +234,7 @@ class InstallController extends Controller{
 					
 					return $form->response(Form::STATUS_SUCCESS, Lang::get('install.install-success'));
 				}
-				catch(Exception $e){
+				catch(\Exception $e){
 					return $form->response(Form::STATUS_ERROR, Lang::get('install.install-error'));
 				}				
 			}

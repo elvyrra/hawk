@@ -1,4 +1,6 @@
 <?php
+namespace Hawk;
+
 /** DEFINED BY THE INSTALL PROCESS **/
 define('CRYPTO_SALT', '{{ $salt }}');
 define('CRYPTO_KEY','{{ $key }}');

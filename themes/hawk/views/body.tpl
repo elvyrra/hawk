@@ -22,7 +22,7 @@
 	</div>
 </div>
 
-{widget class="MainMenuWidget"}
+{widget class="Hawk\Plugins\Main\MainMenuWidget"}
 
 {if(empty($content))}
 	<div id="main-content" role="tabpanel" data-bind="with: tabset">
@@ -47,7 +47,7 @@
 				</li>
 				<!-- /ko -->
 
-				<li class="add-tab-button corner-top-left corner-bottom-right" href="{uri action='MainController.newTab'}" target="newtab" data-bind="visible: tabs().length < Tabset.MAX_TABS_NUMBER">
+				<li class="add-tab-button corner-top-left corner-bottom-right" href="{uri action='new-tab'}" target="newtab" data-bind="visible: tabs().length < Tabset.MAX_TABS_NUMBER">
 					<span class="" id="main-tab-add">
 						<span class="fa fa-plus open-new-tab" title="{text key='main.open-new-tab'}" ></span>
 					</span>

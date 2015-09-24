@@ -4,8 +4,12 @@
  * @author Elvyrra SAS
  */
 
-// Autoload class needs at least FileSystem class
-include LIB_DIR . 'FileSystem.class.php';
+namespace Hawk;
+
+// Autoload class needs at least FileSystem class and Plugin Class
+require LIB_DIR . 'FileSystem.class.php';
+require LIB_DIR . 'Plugin.class.php';
+
 
 /**
  * This class describes the autoload behavior of the application
@@ -19,17 +23,8 @@ class Autoload{
 	// Autoload cache file
     const CACHE_FILE = CACHE_DIR . 'autoload-cache.php';
 
-	/**
-     * folders where to search classes declarations
-     */
-    private static $searchDirectories = array(
-        LIB_DIR,
-        PLUGINS_DIR, 
-        MAIN_PLUGINS_DIR,
-        CUSTOM_LIB_DIR
-    );
-	
-	/**
+
+    /**
 	 * Load a file containing the wanted class
 	 * @param string $classname The class to load
 	 */
@@ -38,19 +33,69 @@ class Autoload{
 		if(is_file(self::CACHE_FILE) && empty(self::$cache)){
             self::$cache = include self::CACHE_FILE;            
         }
-		
-		// Check the class file is registered in cache
+
+        // Check the class file is registered in cache
 		if(isset(self::$cache[$classname])){
 			// The file is registered in cache, include it, and exit the function
             include self::$cache[$classname];
             return true;
         }
 
+        $parts = explode('\\', $classname);
+        if(count($parts) > 1){
+            $namespace = implode('\\', array_slice($parts, 0, -1));
+        }
+        else{
+            $namespace = '';
+        }
+        $class = end($parts);
+        // $reflection = new \ReflectionClass($classname);
+        // $class = $reflection->getShortName();
+        // $namespace = $reflection->getNamespaceName();
+
+        $filename = "$class.class.php";
+
 		// The file is not registered in cache, let's find it. Any class file must be as <classname>.class.php
-        $filename = "$classname.class.php";
-		
+        $dirs = array();
+        $searchDirectories = array(
+            'Hawk' => array(LIB_DIR, CUSTOM_LIB_DIR),
+            'Hawk\View\Plugins' => array(LIB_DIR . 'view-plugins/'),
+            '' => array(LIB_DIR . 'ext', CUSTOM_LIB_DIR)
+        );
+
+        if(isset($searchDirectories[$namespace])){
+            $dirs = $searchDirectories[$namespace];
+        }
+        elseif(preg_match('/^Hawk\\\\Plugins\\\\([\w]+)$/', $namespace, $matches)){  
+            if(class_exists("\\Hawk\\$class")){
+                class_alias("\\Hawk\\$class", $classname);
+                return true;
+            }
+            else{
+                // The class is under a plugin
+                if(in_array(strtolower($matches[1]), Plugin::$mainPlugins)){
+                    // The class is under one of the main plugins
+                    $dirs = array(Plugin::get(strtolower($matches[1]))->getRootDir());
+                }
+                else{
+                    // Find the plugins associated to this namespace
+                    $plugins = Plugin::getAll(true);
+                    foreach($plugins as $plugin){
+                        if($plugin->getDefinition('namespace') === $matches[1]){
+                            $dirs = array($plugin->getRootDir());
+                            break;
+                        }
+                    }                
+                }
+            }
+        }
+        else{
+            // If the class exists, it is in custom-libs directory
+            $dirs = array(CUSTOM_LIB_DIR, LIB_DIR . 'ext/');
+        }
+
 		// Cross any search folder to find out the class file
-        foreach(self::$searchDirectories as $dir){
+        foreach($dirs as $dir){
             $files = FileSystem::find($dir, $filename, FileSystem::FIND_FILE_ONLY);
             if(!empty($files)){
                 $file = $files[0];
@@ -63,8 +108,14 @@ class Autoload{
 
                 return true;
             }
-        }        
+        }  
+
+        // if(! class_exists($classname) && class_exists("\\Hawk\\$class")){
+        //     // The class has still not been found.            
+        //     class_alias("\\Hawk\\$class", $classname);
+        // }
     }
+
 
     /**
 	 * Save the autoload cache at the end of a script processing. It is not registered any times it is updated,
@@ -77,7 +128,7 @@ class Autoload{
 
 
 // register autoload function 
-spl_autoload_register('Autoload::load', true, false);
+spl_autoload_register('\Hawk\Autoload::load', true, false);
 
 // Save the autoload cache 
 EventManager::on('process-end', function(Event $event){

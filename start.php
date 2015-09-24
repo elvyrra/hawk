@@ -1,4 +1,5 @@
 <?php
+namespace Hawk;
 
 require INCLUDES_DIR . 'constants.php';
 require INCLUDES_DIR . 'custom-constants.php';
@@ -30,18 +31,12 @@ if(Conf::has('db')){
     }
 }
 
-/*** Get the session system ***/
-define('SESSION_ENGINE', Conf::has('session.engine') ? Conf::get('session.engine') : DEFAULT_SESSION_ENGINE);
-
 /*** Open the session ***/
-$sessionInterface = ucfirst(SESSION_ENGINE) . 'Session';
-if(!empty($sessionInterface)){
-    $handler = new $sessionInterface();
-    session_set_save_handler($handler);
-
-    session_set_cookie_params((int) Conf::get('session.lifetime'), '/');
-    session_start();
+if(Conf::has('db')){
+    session_set_save_handler(new DatabaseSessionHandler()); 
 }
+session_set_cookie_params((int) Conf::get('session.lifetime'), '/');
+session_start();
 
 /*** Constants depending to the options ***/
 if(!empty($_COOKIE['language'])){

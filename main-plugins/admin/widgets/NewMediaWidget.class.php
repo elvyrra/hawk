@@ -1,5 +1,5 @@
 <?php
-
+namespace Hawk\Plugins\Admin;
 
 class NewMediaWidget extends Widget{
     public function __construct(){

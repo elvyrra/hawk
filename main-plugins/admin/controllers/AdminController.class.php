@@ -1,5 +1,6 @@
 <?php
 
+namespace Hawk\Plugins\Admin;
 
 class AdminController extends Controller{
 	const MAX_LOGO_SIZE = 200000; // 200 Ko
@@ -53,7 +54,7 @@ class AdminController extends Controller{
 					new SelectInput(array(
 						'name' => 'main.timezone',
 						'required' => true,
-						'options' => array_combine(DateTimeZone::listIdentifiers(), DateTimeZone::listIdentifiers()),
+						'options' => array_combine(\DateTimeZone::listIdentifiers(), \DateTimeZone::listIdentifiers()),
 						'default' => Option::get('main.timezone'),
 						'label' => Lang::get('admin.settings-timezone-label')
 					)),
@@ -323,7 +324,7 @@ class AdminController extends Controller{
 				if($form->check()){					
 					// register scalar values
 					foreach($form->fields as $name => $field){						
-						if(!$field instanceof FileInput && !$field instanceof ButtonInput){
+						if(!$field instanceof \Hawk\FileInput && !$field instanceof \Hawk\ButtonInput){
 							$value = $field->dbvalue();
 							if($value === null){
 								$value = '0';
@@ -331,7 +332,7 @@ class AdminController extends Controller{
 							$field->set($value);
 							Option::set($name, $value);					
 						}
-						elseif($field instanceof FileInput){			
+						elseif($field instanceof \Hawk\FileInput){			
 							$upload = Upload::getInstance($name);						
 							if($upload){							
 								try{									
@@ -346,7 +347,7 @@ class AdminController extends Controller{
 
 									if($name == 'favicon'){
 										$basename = uniqid() . '.ico';
-										$generator = new PHPICO($file->tmpFile, array(
+										$generator = new \PHPICO($file->tmpFile, array(
 											array(16, 16),
 											array(32, 32),
 											array(48, 48),

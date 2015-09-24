@@ -1,5 +1,6 @@
 <?php
 
+namespace Hawk\Plugins\Admin;
 
 class LanguageFilterWidget extends Widget{
 	public function __construct($filters){
@@ -18,7 +19,7 @@ class LanguageFilterWidget extends Widget{
 		$param = array(
 			'id' => 'language-filter-form',
 			'method' => 'get',
-			'action' => Router::getUri('LanguageController.listKeys'),
+			'action' => Router::getUri('language-keys-list'),
 			'fieldsets' => array(
 				'filters' => array(
 					'nofieldset' => true,

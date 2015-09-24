@@ -1,5 +1,6 @@
 <?php
 
+namespace Hawk\Plugins\Main;
 
 class UserProfileController extends Controller{
 
@@ -67,7 +68,7 @@ class UserProfileController extends Controller{
 
         // Generate the question fields
         foreach($questions as $question){
-            $classname = ucwords($question->type) . 'Input';
+            $classname = '\Hawk\\' . ucwords($question->type) . 'Input';
             $field = json_decode($question->parameters, true);
             $field['name'] = $question->name;
             $field['id'] = 'user-form-' . $question->name. '-input';

@@ -1,6 +1,6 @@
 <div class="row">
 	<div class="col-xs-12 col-sm-6 col-md-3 col-lg-2">
-		{widget class="UserFilterWidget"}
+		{widget class="Hawk\Plugins\Admin\UserFilterWidget"}
 	</div>
 	<div class="col-xs(12 col-sm-6 col-md-9 col-lg-10">		
 		{{ $list }}		

@@ -1,4 +1,5 @@
 <?php
+namespace Hawk;
 
 /*** Initialize the application ***/
 define('SCRIPT_START_TIME', microtime(true));

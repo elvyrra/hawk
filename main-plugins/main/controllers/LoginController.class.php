@@ -1,5 +1,6 @@
 <?php
 
+namespace Hawk\Plugins\Main;
 	
 class LoginController extends Controller{
 	
@@ -16,7 +17,6 @@ class LoginController extends Controller{
 			"id" => "login-form",
 			"method" => "post",
 			"autocomplete" => false,
-			"action" => Router::getUri('LoginController.login'),
 			"fieldsets" => array(
 				"form" => array(
 									
@@ -54,7 +54,7 @@ class LoginController extends Controller{
 						new ButtonInput(array(
 							'name' => 'register',
 							'value' => Lang::get('main.register-button'),
-							'href' => Router::getUri('LoginController.register'),
+							'href' => Router::getUri('register'),
 							'target' => 'dialog',
 							'class' => 'btn-primary'
 						)) : 

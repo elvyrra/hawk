@@ -1,5 +1,5 @@
 <?php
-
+namespace Hawk\Plugins\Admin;
 
 class RoleController extends Controller{
 	/**

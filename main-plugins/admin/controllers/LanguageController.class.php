@@ -3,7 +3,7 @@
  * LanguageController.class.php
  */
 
-
+namespace Hawk\Plugins\Admin;
 
 /**
  * This class is the controller for language key actions
@@ -283,7 +283,7 @@ class LanguageController extends Controller{
 
 		$param = array(
 			'id' => 'language-key-list',
-			'action' => Router::getUri('LanguageController.listKeys'),
+			'action' => Router::getUri('language-keys-list'),
 			'data' => $data,
 			'controls' => array(
 				array(
@@ -296,13 +296,13 @@ class LanguageController extends Controller{
 				array(
 					'icon' => 'plus',
 					'label' => Lang::get('language.new-lang'),
-					'href' => Router::getUri('LanguageController.editLanguage', array('tag' => 'new')),
+					'href' => Router::getUri('edit-language', array('tag' => 'new')),
 					'target' => 'dialog',
 					'class' => 'btn-success'
 				),
 				
 				array(
-					'href' => Router::getUri('LanguageController.import'),
+					'href' => Router::getUri('import-language-keys'),
 					'target' => 'dialog',
 					'icon' => 'download',
 					'label' => Lang::get('language.import-btn'),

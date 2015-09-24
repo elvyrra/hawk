@@ -1,5 +1,6 @@
 <?php
 
+namespace Hawk\Plugins\Admin;
 
 class NewLanguageKeyWidget extends Widget{
 

@@ -1,5 +1,5 @@
 <?php
-
+namespace Hawk\Plugins\Admin;
 
 class NewThemeWidget extends Widget{
     public function __construct(){

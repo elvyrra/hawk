@@ -1,6 +1,6 @@
 <div class="row">
 	<div class="col-md-2">
-		{widget class="NewThemeWidget"}
+		{widget class="Hawk\Plugins\Admin\NewThemeWidget"}
 	</div>
 
 	<div class="col-md-10">		

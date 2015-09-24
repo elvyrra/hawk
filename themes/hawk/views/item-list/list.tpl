@@ -3,7 +3,7 @@
 	<div class="list-navigation">
 		<div class="pull-left">
 			{foreach($list->controls as $control)}
-				{{ (new ViewPluginButton($control))->display() }}
+				{{ (new \Hawk\View\Plugins\Button($control))->display() }}
 			{/foreach}
 		</div>
 		{if($list->navigation !== false)}

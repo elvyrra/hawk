@@ -1,5 +1,6 @@
 <?php
 
+namespace Hawk\Plugins\Main;
 
 class MainMenuWidget extends Widget{
 	const EVENT_AFTER_GET_MENUS = 'menu.after_get_items';

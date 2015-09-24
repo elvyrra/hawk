@@ -1,6 +1,7 @@
 <?php
 
-	
+namespace Hawk\Plugins\Main;
+
 class MainController extends Controller{
 	/**
 	 * Display the main page

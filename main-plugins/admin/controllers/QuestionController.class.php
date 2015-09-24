@@ -1,12 +1,12 @@
 <?php
-
+namespace Hawk\Plugins\Admin;
 
 class QuestionController extends Controller{
 	public function listQuestions(){
 		$questions = ProfileQuestion::getAll();
 		$param = array(
 			'id' => 'display-questions-form',	
-			'action' => Router::getUri("QuestionController.listQuestions"),
+			'action' => Router::getUri('profile-questions'),
 			'fieldsets' => array(
 				'form' => array(),
 				
@@ -20,7 +20,7 @@ class QuestionController extends Controller{
 						'name' => 'new-question',
 						'value' => Lang::get('admin.new-question-btn'),
 						'class' => 'btn-success',
-						'href' => Router::getUri("QuestionController.edit", array('name' => '_new')),
+						'href' => Router::getUri('edit-profile-question', array('name' => '_new')),
 						'target' => 'dialog',
 						'icon' => 'plus'
 					))
@@ -62,7 +62,7 @@ class QuestionController extends Controller{
 				'actions' => array(
 					'independant' => true,
 					'display' => function($value, $field, $line){
-						return 	$line->editable ? "<i class='fa fa-pencil text-info' href='" . Router::getUri("QuestionController.edit", array('name' => $line->name)) . "' target='dialog' title='". Lang::get('admin.edit-profile-question')."' ></i>".
+						return 	$line->editable ? "<i class='fa fa-pencil text-info' href='" . Router::getUri('edit-profile-question', array('name' => $line->name)) . "' target='dialog' title='". Lang::get('admin.edit-profile-question')."' ></i>".
 												 "<i class='fa fa-times text-danger delete-question' data-question='$line->name' title='" . Lang::get('admin.delete-profile-question') . "'></i>" : "";
 					},
 					'sort' => false,

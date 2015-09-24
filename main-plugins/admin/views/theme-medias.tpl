@@ -1,6 +1,6 @@
 <div class="row">
 	<div class="col-md-2">
-		{widget class="NewMediaWidget"}
+		{widget class="Hawk\Plugins\Admin\NewMediaWidget"}
 	</div>
 
 	<div class="col-md-10">
