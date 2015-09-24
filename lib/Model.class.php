@@ -3,6 +3,8 @@
  * Model.class.php
  */
 
+namespace Hawk;
+
 /**
  * This class describes the data models behavior. each model defined in plugin must inherits this class
  * @package Core

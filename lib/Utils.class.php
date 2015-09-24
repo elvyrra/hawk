@@ -5,6 +5,8 @@
  * @license MIT
  */
 
+namespace Hawk;
+
 /**
  * This trait contains utilities method that cen be used anywhere in the core
  * @package Utils

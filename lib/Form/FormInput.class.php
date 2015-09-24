@@ -4,6 +4,7 @@
  * @author Elvyrra SAS
  */
 
+namespace Hawk;
 
 /**
  * This class describes the general behavior of inputs in forms. This class is associated to Form class
@@ -283,7 +284,7 @@ class FormInput{
     			'inputDisplay' => $inputDisplay
             ));
         }
-        catch(Exception $e){
+        catch(\Exception $e){
             ErrorHandler::exception($e);
         }
     }

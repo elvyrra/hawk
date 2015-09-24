@@ -5,7 +5,7 @@
  * @license MIT
  */
 
-
+namespace Hawk;
 
 /**
  * This class describes the button inputs in form (button, delete, dans submit)

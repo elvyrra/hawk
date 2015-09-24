@@ -4,6 +4,8 @@
  * @author Elvyrra SAS
  */ 
 
+namespace Hawk;
+
 /**
  * This class contains cryptography functions
  * @package Security

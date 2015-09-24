@@ -4,6 +4,8 @@
  *	@author Elvyrra SAS
  */
 
+namespace Hawk;
+
 /**
  * This class describes the behavior for inputs time
  * @package Form\Input

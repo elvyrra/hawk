@@ -4,6 +4,8 @@
  * @author Elvyrra SAS
  */
 
+namespace Hawk;
+
 /**
  * This class describes the routes behavior
  * @package Core\Router
@@ -29,6 +31,16 @@ class Route{
 	 * @var string
 	 */
 	public $url = '',
+
+	/**
+	 * The route URL prefix
+	 */
+	$prefix = '',
+
+	/**
+	 * The action namespace
+	 */
+	$namespace = '',
 
 	/**
 	 * The pattern rules
@@ -65,12 +77,16 @@ class Route{
 		$this->map($param);
 		
 		$this->args = array();
-		$this->url = $url;		
+		$this->url = $this->prefix . $url;				
 		$this->pattern = preg_replace_callback("/\{(\w+)\}/", function($match){			
 			$this->args[] = $match[1];
 			$where = $this->where[$match[1]] ? $this->where[$match[1]] : '.*?';
 			return "(" . $where . ")";
-		}, $url);
+		}, $this->url);
+
+		if($this->namespace){
+			$this->action = $this->namespace . '\\' . $this->action;
+		}
 	}
 	
 

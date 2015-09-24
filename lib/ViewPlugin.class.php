@@ -4,6 +4,8 @@
  * @author Elvyrra SAS
  */
 
+namespace Hawk;
+
 /**
  * This abstract class defines the view plugins. It must be inherited by any class that defines any view plugin. 
  * This class is called when, in a view, you write something like that :

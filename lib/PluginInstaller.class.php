@@ -5,6 +5,8 @@
  * @license MIT
  */
 
+namespace Hawk;
+
 /**
  * This abstract class defines the methods used to install, activate, deactivate, and uninstall plugins
  * @package Core\Plugin

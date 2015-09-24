@@ -4,6 +4,8 @@
  * @author Elvyrra SAS
  */
 
+namespace Hawk;
+
 /**
  * This class describes script events that can be triggers and listened with the EventManager class
  * @package Core\Event

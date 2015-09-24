@@ -4,6 +4,8 @@
  * @author Elvyrra SAS
  */
 
+namespace Hawk;
+
 /**
  * This class describes the file inputs behavior
  * @package Form\Input

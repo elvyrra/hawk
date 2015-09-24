@@ -4,7 +4,7 @@
  * @author Elvyrra SAS
  */
 
-
+namespace Hawk;
 
 /**
  * This class describes color inputs

@@ -3,6 +3,7 @@
  * ErrorHandler.class.php
  */
 
+namespace Hawk;
 
 /**
  * This class defines the errors and exceptions handlers

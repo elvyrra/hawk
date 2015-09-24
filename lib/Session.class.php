@@ -4,6 +4,7 @@
  * @author Elvyrra SAS
  */
 
+namespace Hawk;
 
 /**
  * This trait is used to manage the user's sessions. It's declared as trait 
@@ -11,7 +12,7 @@
  * the session management (manage licences, number of simultaneous connections, ...)
  * @package Core
  */
-trait Session{
+class Session{
 	/**
 	 * Static variable that registers the connected state of the current user
 	 * @static

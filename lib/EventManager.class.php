@@ -5,6 +5,8 @@
  * @license MIT
  */
 
+namespace Hawk;
+
 /**
  * This class manages scripts events
  * @package Core\Event

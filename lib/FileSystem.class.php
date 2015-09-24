@@ -6,6 +6,8 @@
  * @license MIT
  */
 
+namespace Hawk;
+
 /**
  * This class has utilities to manage the file system, for missing functions in PHP
  * @package Utils
@@ -110,4 +112,4 @@ class FileSystem{
 /**
  * This class describes exceptions throwed by FileSystem class
  */
-class FileSystemException extends Exception{}
+class FileSystemException extends \Exception{}

@@ -5,6 +5,8 @@
  * @license MIT
  */
 
+namespace Hawk;
+
 /**
  * This class describes the field displayed in a smart list.
  * All properties of an instance of this class can be scalar, or a function taking as arguments :
@@ -239,7 +241,7 @@ class ItemListField {
 		$line = $this->list->results[$lineIndex];
 		$name = $this->name;		
 
-		$cell = new StdClass;
+		$cell = new \StdClass;
 		foreach(self::$callableProperties as $prop){
 			if(! is_null($this->$prop) && is_callable($this->$prop)){
 				$func = $this->$prop;				

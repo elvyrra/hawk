@@ -4,6 +4,8 @@
  * @author Elvyrra SAS
  */
 
+namespace Hawk;
+
 /**
  * This class describes the behavior of the application plugins
  * @package Core\Plugin
@@ -13,6 +15,11 @@ class Plugin{
 	 * The table in the database where the plugins data are registered
 	 */
 	const TABLE = "Plugin";
+
+	/**
+	 * The basename of the file containing the plugin definition
+	 */
+	const MANIFEST_BASENAME = 'manifest.json';
 
 	/**
 	 * The plugin name
@@ -48,7 +55,7 @@ class Plugin{
 	/**
 	 * The application main plugins, not removable or editable, used for the application core
 	 */
-	private static $mainPlugins = array('main', 'install', 'admin');
+	public static $mainPlugins = array('main', 'install', 'admin');
 
 	/**
 	 * The plugin instances
@@ -63,13 +70,16 @@ class Plugin{
 	private function __construct($name){
 		$this->name = $name;		
 		$this->rootDir = ($this->isMainPlugin() ? MAIN_PLUGINS_DIR : PLUGINS_DIR) . $this->name . '/';
+
+		if(!is_dir($this->rootDir)){
+			throw new \Exception('The plugin does not exists');
+		}
 		
 		if(!$this->isMainPlugin()){
-			$this->definition = json_decode(file_get_contents($this->rootDir . 'manifest.json'), true);
-
-			if(!$this->definition['installer']){
-				throw new Exception("The plugin $this->name must have a installer filled in it manifest");
+			if(!is_file($this->rootDir . self::MANIFEST_BASENAME)){
+				throw new \Exception('The plugin must have a file manifest.json');
 			}
+			$this->definition = json_decode(file_get_contents($this->rootDir . self::MANIFEST_BASENAME), true);
 		}
 		else{
 			$this->active = 1;
@@ -93,7 +103,7 @@ class Plugin{
 
 			return self::$instances[$name];
 		}
-		catch(Exception $e){
+		catch(\Exception $e){
 			return null;
 		}
 	}
@@ -394,7 +404,7 @@ class Plugin{
 			return $this->manager;
 		}
 
-		$class = $this->getDefinition('installer');
+		$class = '\\Hawk\\Plugins\\' . $this->getDefinition('namespace') . '\\Installer';
 		if(!empty($class)){
 			$this->manager = new $class($this);
 			return $this->manager;
@@ -417,7 +427,7 @@ class Plugin{
 			$this->getInstallerInstance()->install();		
 			Log::notice('The plugin ' . $this->name . ' has been installed');
 		}
-		catch(Exception $e){
+		catch(\Exception $e){
 			DB::get(MAINDB)->delete(self::TABLE, new DBExample(array('name' => $this->name)));
 
 			Log::error('En error occured while installing plugin ' . $this->name . ' : ' . $e->getMessage());
@@ -436,7 +446,7 @@ class Plugin{
 			$this->getInstallerInstance()->uninstall();
 			Log::notice('The plugin ' . $this->name . ' has been uninstalled');
 		}
-		catch(Exception $e){
+		catch(\Exception $e){
 			DB::get(MAINDB)->insert(self::TABLE, array(
 				'name' => $this->name,			
 				'active' => 0
@@ -468,7 +478,7 @@ class Plugin{
 			$this->getInstallerInstance()->activate();
 			Log::notice('The plugin ' . $this->name . ' has been activated');
 		}
-		catch(Exception $e){
+		catch(\Exception $e){
 			DB::get(MAINDB)->update(self::TABLE, new DBExample(array('name' => $this->name)), array('active' => 0));
 			
 			Log::error('En error occured while activating plugin ' . $this->name . ' : ' . $e->getMessage());
@@ -489,7 +499,7 @@ class Plugin{
 			$this->getInstallerInstance()->deactivate();
 			Log::notice('The plugin ' . $this->name . ' has been deactivated');
 		}
-		catch(Exception $e){
+		catch(\Exception $e){
 			DB::get(MAINDB)->update(self::TABLE, new DBExample(array('name' => $this->name)), array('active' => 1));
 			
 			Log::error('En error occured while deactivating plugin ' . $this->name . ' : ' . $e->getMessage());

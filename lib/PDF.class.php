@@ -3,6 +3,7 @@
  * PDF.class.php
  */
 
+namespace Hawk;
 
 /**
  * This class uses dompdf to generate PDF from HTML templates
@@ -21,7 +22,7 @@ class PDF{
     public function __construct($html){
         require_once(LIB_DIR . "ext/dompdf/dompdf_config.inc.php");
         
-        $this->engine = new DOMPDF();
+        $this->engine = new \DOMPDF();
         $this->engine->load_html($html);
 
         $this->setPaper('A4', 'portrait');

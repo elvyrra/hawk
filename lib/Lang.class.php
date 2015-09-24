@@ -5,6 +5,8 @@
  * @license MIT
  */
 
+namespace Hawk;
+
 /**
  * This class is used to manage translations
  * @package Core

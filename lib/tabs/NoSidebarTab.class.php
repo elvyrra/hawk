@@ -4,6 +4,8 @@
  * @author Elvyrra SAS
  */
 
+namespace Hawk;
+
 /**
  * This class is used to display a whole tab without sidebar
  * @package TabLayout

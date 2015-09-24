@@ -5,6 +5,8 @@
  * @license MIT
  */
 
+namespace Hawk;
+
 /**
  * This class describes the themes behavior
  * @package Core\Theme
@@ -231,7 +233,7 @@ class Theme{
                 $css = preg_replace('/@' . $varname . '\s*\:\s*(' . $variable['default'] . ')/', '@' . $varname . ': ' . $value, $css);
             }
 
-            $less = new lessc;
+            $less = new \lessc;
 			if(!(DEV_MODE || DEBUG_MODE)){
                 $less->setFormatter("compressed");
                 $less->setPreserveComments(true);

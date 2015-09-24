@@ -3,7 +3,7 @@
  * Widget.class.php
  */
 
-
+namespace Hawk;
 
 /**
  * This abstract class describes the bahavior of widgets. 
@@ -17,14 +17,4 @@ abstract class Widget extends Controller{
 	 * @return string The HTML result of the widget displaying
 	 */
 	abstract public function display();
-	
-	/**
-	 * Add the widget on controller action
-	 * @param string $controllerAction The controller that calls the widget
-	 * @param string $order (before | after) to define if the widget will be called before or after controller action execution
-	 * @param string $widgetAction The action to perform to display the widget
-	 */
-	public static function add($controllerAction, $order, $widgetAction){
-		EventManager::on("$controllerAction.$order", $widgetAction);
-	}
 }

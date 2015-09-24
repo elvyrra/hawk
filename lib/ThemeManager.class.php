@@ -3,7 +3,7 @@
  * ThemeManager.class.php
  */
 
-
+namespace Hawk;
 
 /**
  * This class manage the installed themes

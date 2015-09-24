@@ -3,6 +3,8 @@
  * Form.class.php
  */
 
+namespace Hawk;
+
 /**
  * This class is used to generate, display and treat forms.
  * @package Form
@@ -156,7 +158,7 @@ class Form{
 		/*
 		 * Default values
 		 */
-		$this->action = $_SERVER['REQUEST_URI'];		
+		$this->action = Request::uri();
 				
 		// Get the parameters of the instance
 		$data = $param;
@@ -170,6 +172,13 @@ class Form{
         if(!in_array($this->columns, array(1,2,3,4,6,12))){
         	$this->columns = 1;
         }
+
+        if(!class_exists($this->model)){
+			$trace = debug_backtrace();
+			$class = $trace[0]['class'];
+			$reflection = new \ReflectionClass($trace[0]['class']);
+			$this->model = $reflection->getNamespaceName() . '\\' . $this->model;
+		}
 		
 		if(!isset($this->object)){
 			if(isset($this->model) && !empty($this->reference)){
@@ -424,7 +433,7 @@ class Form{
 			// Wrap the content with the form tag
 			return $this->wrap($content);
 		}
-		catch(Exception $e){
+		catch(\Exception $e){
 			ErrorHandler::exception($e);
 		}
 	}
@@ -473,7 +482,7 @@ class Form{
 			
 			
 			if($this->model == self::DEFAULT_MODEL || !$this->reference){
-				throw new Exception("The method register of the class Form can be called only if model and reference properties are set");
+				throw new \Exception("The method register of the class Form can be called only if model and reference properties are set");
 			}
 			if(!$this->object){
 				$model = $this->model; 
@@ -520,7 +529,7 @@ class Form{
 			}
 			return $this->object->$id;	
 		}
-		catch(DatabaseException $e){				
+		catch(DBException $e){				
 			$this->status = self::STATUS_ERROR;			
 			Log::error('An error occured while registering data on the form ' . $this->id . ' : ' . $e->getMessage());
 			if($exit){
@@ -543,11 +552,11 @@ class Form{
 			$this->dbaction = self::ACTION_DELETE;
 
 			if($this->model == self::DEFAULT_MODEL || !$this->reference){
-				throw new Exception("The method delete of the class Form can be called only if model and reference properties are set");
+				throw new \Exception("The method delete of the class Form can be called only if model and reference properties are set");
 			}
 			
 			if(!$this->object){
-				throw new Exception("This object instance cannot be removed : No such object");
+				throw new \Exception("This object instance cannot be removed : No such object");
 			}
 			
 			$id = $this->object->getPrimaryColumn();
@@ -565,7 +574,7 @@ class Form{
 			}
 			return $this->object->$id;
 		}
-		catch(DatabaseException $e){		
+		catch(DBException $e){		
 			$this->status = self::STATUS_ERROR;
 			Log::error('An error occured while deleting the element of the form ' . $this->id . ' : ' . $e->getMessage());
 			

@@ -4,6 +4,7 @@
  * @author Elvyrra SAS
  */
 
+namespace Hawk;
 
 /**
  * This class describes the behavior of a form fieldset

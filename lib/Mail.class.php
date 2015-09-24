@@ -3,7 +3,7 @@
  * Mail.class.php
  */
 
-
+namespace Hawk;
 
 /**
  * This class use PHPMailer library to send mails from Hawk applications
@@ -27,7 +27,7 @@ class Mail{
 	 * @param array $param The parameters to pass to PHPMailer
 	 */
 	public function __construct($param = array()){
-		$this->mailer = new PHPMailer;
+		$this->mailer = new \PHPMailer;
 
 		$param['Mailer'] = Option::get('main.mailer-type') ? Option::get('main.mailer-type') : self::DEFAULT_MAILER;
 		if($param['Mailer'] == 'smtp' || $param['Mailer'] == 'pop3'){
@@ -201,6 +201,6 @@ class Mail{
 /**
  * MailException
  */
-class MailException extends Exception{
+class MailException extends \Exception{
 
 }

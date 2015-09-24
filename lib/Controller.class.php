@@ -4,6 +4,7 @@
  * @author Elvyrra SAS
  */
 	
+namespace Hawk;
 
 /**
  * This class describes the behavior of a controller. All controllers defined in application plugins 
@@ -59,7 +60,7 @@ class Controller{
 		$result = $this->$method();
 		if(Response::getType() == 'html'){
 			// Create a phpQuery object to be modified by event listeners (widgets)
-			$result = phpQuery::newDocument($result);
+			$result = \phpQuery::newDocument($result);
 		}
 				
 		/*** Load the widgets after calling the controller method ***/		
@@ -67,7 +68,7 @@ class Controller{
 		EventManager::trigger($event);
 		
 		$result = $event->getData('result');
-		if( $result instanceof phpQuery){			
+		if( $result instanceof \phpQuery){			
 			return $result->htmlOuter();
 		}
 		else{
@@ -81,7 +82,7 @@ class Controller{
 	 * @param string $content The content to add
 	 */
 	private function addContentAtEnd($content){	
-		Widget::add(Router::getCurrentAction(), Controller::AFTER_ACTION, function($event) use($content){			
+		EventManager::on(Router::getCurrentAction() . '.' . self::AFTER_ACTION, function($event) use($content){			
 			if(Response::getType() === 'html'){	
 				$dom = $event->getData('result');
 				if($dom->find('body')->length){

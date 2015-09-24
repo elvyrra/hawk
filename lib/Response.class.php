@@ -5,6 +5,8 @@
  * @license MIT
  */
 
+namespace Hawk;
+
 /**
  * This class defines static methods to prepare and send the HTTP response to the client 
  * @package Core
