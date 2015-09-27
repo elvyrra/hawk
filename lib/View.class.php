@@ -44,9 +44,11 @@ class View{
 
 	const ASSIGN_REGEX = '#\{assign\s+name=(["\'])(\w+)\\1\s*\}(.*?)\{\/assign\}#ims';
 
-	const PLUGIN_REGEX = '#\{(\w+)((\s+\w+\=([\'"])((?:\\\"|\\\'|.)*?)\\4)*)\s*\}#';
-	const PLUGIN_ARGUMENTS_REGEX = '#(\w+)\=([\'"])(\{?)((?:\\\"|\\\'|.)*?)(\}?)\\2#';
+	const PLUGIN_REGEX = '#\{(\w+)((\s+\w+\=([\'"])((?:\\\\4|.)*?)\\4)*)\s*\}#';
+	const PLUGIN_ARGUMENTS_REGEX = '#(\w+)\=([\'"])(\{?)((?:\\\\2|.)*?)(\}?)\\2#';
 	
+	const TRANSLATION_REGEX = '#{(?!if)([a-zA-Z]{2})}(.*?){/\\1}#ism';
+
 	
 	/**
 	 * Constructor
@@ -123,6 +125,7 @@ class View{
 			self::BLOCK_START_REGEX => "<?php $1 $2 : ?>", // structure starts
 			self::BLOCK_END_REGEX => "<?php end$1; ?>", // structures ends
 			self::ECHO_REGEX => "<?php echo $1; ?>", // echo
+			self::TRANSLATION_REGEX => "<?php if(LANGUAGE == '$1'): ?>$2<?php endif; ?>", // Support translations in views
 			self::ASSIGN_REGEX => "<?php ob_start(); ?>$3<?php \$$2 = ob_get_clean(); ?>" // assign template part in variable
 		);		
 		$this->content = preg_replace(array_keys($replaces), $replaces, $this->content);
@@ -175,15 +178,9 @@ class View{
 	public function display(){
 		extract($this->data);
 		ob_start();
-		try{
-			include $this->fileCache->getFile();
-		}
-		catch(Exception $e){
-			$exception = new ViewException(ViewException::TYPE_EVAL, $this->file, $e);
-
-			Response::set($exception->display());
-			Response::end();
-		}		
+		
+		include $this->fileCache->getFile();
+		
 		return ob_get_clean();
 	}	
 	
@@ -243,7 +240,6 @@ class ViewException extends Exception{
 			break;
 			
 			case self::TYPE_EVAL:
-				debug($previous);
 				$trace = array_map(function($t){
 					return $t['file'] . ':' . $t['line'];
 				}, $previous->getTrace());

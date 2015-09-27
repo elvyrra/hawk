@@ -11,7 +11,7 @@
 		{/foreach}
 
 		{foreach($input->attributes as $key => $value)}
-			{if($value !== null)} {{ $key }}="{{ $value }}" {/if}
+			{if($value !== null)} {{ $key }}="{{ htmlentities($value, ENT_COMPAT) }}" {/if}
 		{/foreach} />
 {if($input->mask)}
 	<script>$('#{{$input->id}}').mask('{{$input->mask}}');</script>

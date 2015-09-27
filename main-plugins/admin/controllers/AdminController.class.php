@@ -19,21 +19,22 @@ class AdminController extends Controller{
 			$roles[$role->id] = Lang::get("roles.role-$role->id-label");
 		}
 
-		$menus = Menu::getAvailableMenus();
+		$items = MenuItem::getAvailableItems();
 
 		$menuItems = array();
-		foreach($menus as $menu){
-			if($menu->action && !preg_match('/^(javascript\:|#)/', $menu->action) && (!$menu->target || $menu->target == 'newtab')){
-				$menuItems[$menu->action] = $menu->label;
+		foreach($items as $item){
+			if($item->action && !preg_match('/^(javascript\:|#)/', $item->action) && (!$item->target || $item->target == 'newtab')){
+				$menuItems[$item->action] = $item->label;
 			}
 			else{
-				foreach($menu->visibleItems as $item){
-					if(!preg_match('/^(javascript\:|#)/', $item->action) && (!$item->target || $item->target == 'newtab')){
-						$menuItems[$item->action] = $menu->label . " &gt; " . $item->label;
+				foreach($item->visibleItems as $subitem){
+					if(!preg_match('/^(javascript\:|#)/', $subitem->action) && (!$subitem->target || $subitem->target == 'newtab')){
+						$menuItems[$subitem->action] = $item->label . " &gt; " . $subitem->label;
 					}
 				}
 			}
 		}
+
 
 		$param = array(
 			'id' => 'settings-form',
@@ -41,15 +42,6 @@ class AdminController extends Controller{
 			'labelWidth' => '250px',
 			'fieldsets' => array(
 				'main' => array(
-					'nofieldset' => true,
-					
-					new TextInput(array(
-						'name' => 'main.title',
-						'required' => true,
-						'default' => Option::get('main.title'),
-						'label' => Lang::get('admin.settings-title-label')
-					)),
-					
 					new SelectInput(array(
 						'name' => 'main.language',
 						'required' => true,
@@ -101,10 +93,29 @@ class AdminController extends Controller{
 						'extensions' => array('gif', 'png', 'jpg', 'jpeg', 'ico')
 					))
 				),
+
+				'referencing' => call_user_func(function() use($languages){
+					$inputs = array();
+					foreach($languages as $tag => $language){	
+						$inputs[] = new TextInput(array(
+							'name' => 'main.page-title-' . $tag,
+							'default' => Option::get('main.page-title-' . $tag),
+						));
+
+						$inputs[] = new TextareaInput(array(
+							'name' => 'main.page-description-' . $tag,
+							'default' =>  Option::get('main.page-description-' . $tag),
+						));
+
+						$inputs[] = new TextInput(array(
+							'name' => 'main.page-keywords-' . $tag,
+							'default' => Option::get('main.page-keywords-' . $tag),
+						));
+					}
+					return $inputs;
+				}),
 				
 				'home' => array(
-					'nofieldset' => true,
-					
 					new RadioInput(array(
 						'name' => 'main.home-page-type',
 						'options' => array(
@@ -131,7 +142,8 @@ class AdminController extends Controller{
 						'name' => 'main.home-page-item',
 						'id' => 'home-page-item',
 						'label' => Lang::get('admin.settings-home-page-item-label'),
-						'options' => $menuItems
+						'options' => $menuItems,
+						'value' => Option::get('main.home-page-item')
 					)),
 					
 					new CheckboxInput(array(
@@ -143,8 +155,6 @@ class AdminController extends Controller{
 				),
 				
 				'users' => array(
-					'nofieldset' => true,
-					
 					new RadioInput(array(
 						'name' => 'main.allow-guest',
 						'options' => array(
@@ -210,21 +220,9 @@ class AdminController extends Controller{
 						'options' => $roles,
 						'default' => Option::get('roles.default-role')
 					)),
-
-					// new IntegerInput(array(
-					// 	'name' => 'main.session-lifetime',
-					// 	'label' => Lang::get('admin.settings-session-lifetime-label'),
-					// 	'default' => Option::get('main.session-lifetime') ? Option::get('main.session-lifetime') : 0,
-					// 	'minimum' => 0,
-					// 	'after' => Lang::get('admin.settings-session-lifetime-description')
-					// ))
-
-
 				),
 				
 				'email' => array(
-					'nofieldset' => true,
-
 					new EmailInput(array(
 						'name' => 'main.mailer-from',
 						'default' => Option::get('main.mailer-from') ? Option::get('main.mailer-from') : Session::getUser()->email,
@@ -303,10 +301,12 @@ class AdminController extends Controller{
 		
 		$form = new Form($param);
 		if(!$form->submitted()){
+			// Display the form
 			$this->addCss(Plugin::current()->getCssUrl() . 'settings.css');
 
 			$page = View::make(Plugin::current()->getViewsDir() . 'settings.tpl', array(
 				'form' => $form,	
+				'languages' => $languages
 			));
 			
 			$this->addJavaScript(Plugin::current()->getJsUrl() . 'settings.js');
@@ -317,11 +317,12 @@ class AdminController extends Controller{
 				'page' => $page				
 			));
 		}
-		else{			
-			try{				
+		else{	
+			// treat the form		
+			try{			
 				if($form->check()){					
 					// register scalar values
-					foreach($form->fields as $name => $field){
+					foreach($form->fields as $name => $field){						
 						if(!$field instanceof FileInput && !$field instanceof ButtonInput){
 							$value = $field->dbvalue();
 							if($value === null){

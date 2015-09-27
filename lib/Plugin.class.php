@@ -74,6 +74,9 @@ class Plugin{
 		else{
 			$this->active = 1;
 			$this->removable = false;
+			$this->definition = array(
+				'title' => Lang::get($this->name . '.plugin-name'),
+			);
 		}
 	}
 	

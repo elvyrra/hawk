@@ -9,10 +9,26 @@ class ThemeController extends Controller{
 	public function index(){
 		
 		$tabs = array(
-			'select' => $this->compute('listThemes'),
-			'customize' => $this->compute('customize'),
-			'css' => $this->compute('css'),
-			'medias' => $this->compute('medias'),
+			'select' => array(
+				'title' => Lang::get('admin.theme-tab-select-title'),
+				'content' => $this->compute('listThemes'),
+			),
+			'customize' => array(
+				'title' => Lang::get('admin.theme-tab-basic-custom-title'),
+				'content' => $this->compute('customize'),
+			),			
+			'css' => array(
+				'title' => Lang::get('admin.theme-tab-advanced-custom-title'),
+				'content' => $this->compute('css'),
+			),
+			'medias' => array(
+				'title' => Lang::get('admin.theme-tab-medias-title'),
+				'content' => $this->compute('medias'),
+			),
+			'menu' => array(
+				'title' => Lang::get('admin.theme-tab-menu-title'),
+				'content' => $this->compute('menu')
+			)
 		);
 
 		$this->addJavaScript(Plugin::current()->getJsUrl() . "themes.js");
@@ -59,7 +75,7 @@ class ThemeController extends Controller{
 	 */
 	public function customize(){
 		$theme = ThemeManager::getSelected();
-		$variables = $theme->getCssVariables(file_get_contents($theme->getBaseCssFile()));
+		$variables = $theme->getCssVariables();
 		
 		if(!empty($_GET['reset'])){
 			foreach($variables as $var){
@@ -195,11 +211,15 @@ class ThemeController extends Controller{
 						'name' => 'css',
 						'hidden' => true,
 						'value' => $css,
+						'attributes' => array(
+							'data-bind' => 'value : css'
+						)
 					)),
 
 					new HtmlInput(array(	
 						'name' => 'ace',					
-						'value' => '<style id="editing-css-computed">' . $css . '</style><div id="theme-css-edit" contenteditable>' . $css . '</div>'
+						'value' => '<style id="editing-css-computed" data-binding="text: css">' . $css . '</style>
+									<div id="theme-css-edit" contenteditable >' . $css . '</div>'
 					)),
 				)
 			)
@@ -398,6 +418,63 @@ class ThemeController extends Controller{
 		if($theme->isRemovable()){
 			$dir = $theme->getRootDirname();
 			FileSystem::remove($dir);
+		}
+	}
+
+
+	/**
+	 * Customize the menu
+	 */
+	public function menu(){
+		$items = MenuItem::getAll();
+
+		$form = new Form(array(
+			'id' => 'set-menus-form',
+			'action' => Router::getUri('set-menu'),
+			'fields' => array(
+				new HiddenInput(array(
+					'name' => 'data',
+					'default' => json_encode($items, JSON_NUMERIC_CHECK),
+					'attributes' => array('data-bind' => 'value: ko.toJSON(items)'),
+				)),				
+
+				new SubmitInput(array(
+					'name' => 'valid',
+					'value' => Lang::get('main.valid-button'),
+				)),
+			),
+
+			'onsuccess' => 'app.refreshMenu()'
+		));
+
+		if(!$form->submitted()){
+			Lang::addKeysToJavaScript('admin.plugins-advert-menu-changed');
+			return View::make(Plugin::current()->getView('sort-main-menu.tpl'), array(
+				'form' => $form,				
+			));
+		}
+		else{
+			try {
+				$items = MenuItem::getAll('id');
+
+				$data = json_decode($form->getData('data'), true);
+
+				foreach($data as $line){
+					$item = $items[$line['id']];
+					$item->set(array(
+						'active' => $line['active'],
+						'parentId' => $line['parentId'],
+						'order' => $line['order']
+					));
+					$item->save();
+				}
+
+				return $form->response(Form::STATUS_SUCCESS, Lang::get('admin.sort-menu-success'));
+			} 
+			catch (Exception $e) {
+				return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get('admin.sort-menu-error'));
+			}
+			
 		}
 	}
 }

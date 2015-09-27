@@ -1,10 +1,68 @@
+"use strict";
+
+/**
+ *  Start by configure requirejs paths and shim
+ */
+require.config({
+	paths : {
+		jquery : "ext/jquery-2.1.3.min",
+		cookie : "ext/jquery.cookie",
+		mask : "ext/jquery.mask.min",
+		sortable : "ext/jquery-sortable",
+		addons : "jquery.addons",
+		bootstrap : "ext/bootstrap.min",
+		colorpicker : "ext/bootstrap-colorpicker.min",
+		datepicker : "ext/bootstrap-datepicker.min",
+		ko : "ext/knockout-3.3.0",
+		ckeditor : "ext/ckeditor/ckeditor",
+		bindings : "ko.bindings",
+		ace : "ext/ace/ace"		
+	},
+
+	shim : {
+		jquery : {
+			exports : '$'
+		},
+		ko : {
+			exports : 'ko'
+		},
+		
+		cookie : {
+			deps : ['jquery'],
+		},
+		mask : {
+			deps : ['jquery']
+		},
+		sortable : {
+			deps : ['jquery']
+		},
+		addons : {
+			deps : ['jquery'],
+		},
+		bootstrap : {
+			deps : ['jquery']
+		},
+		datepicker : {
+			deps : ['bootstrap']
+		},
+		colorpicker: {
+			deps : ['bootstrap']
+		},		
+		bindings : {
+			deps : ['ko']
+		},
+		ace : {
+			exports : 'ace'
+		}
+	}
+});
+
 /**
  * @class App - This class describes the behavior of the application 
  */
 var App = function(){
 	this.language = '';
 	this.rootUrl = '';
-	this.jsBaseUrl = document.getElementById("main-js-script").src.split("/").slice(0, -1).join("/") + "/";
 	this.isConnected = false;
 	this.routes = [];
 	this.forms = {};
@@ -15,62 +73,8 @@ var App = function(){
 	
 	this.isReady = false;
 
-	this.notification = {
-		display : ko.observable(false),
-		level : ko.observable(),
-		message : ko.observable()
-	}
-
-	this.init();
 };
 
-
-/**
- * Load a JavaScript file into the DOM
- * @param {Array} scripts - the list of the scripts to load
- * @param {Function} callback - The code to execute when all scripts are loaded
- */
-App.prototype.require = function(scripts, callback){
-	var remaining = scripts.length;
-	if(typeof scripts === "string"){
-		throw new Error("app.require expects the first argument to be array, string given");
-	}
-	if(! scripts.length){
-		return callback();
-	}
-	
-	var src = scripts.shift();
-	if(! /^https?\:\/\//.test(src) && ! /^\//.test(src) ){
-		src = this.jsBaseUrl + src;
-	}
-
-	if(! this.scripts[src]){
-		var s = document.createElement("script");
-		s.type = "text/javascript";
-		s.src = src;		
-		s.onload = function(){ 
-			this.scripts[src] = 1;
-			this.require(scripts, callback);
-		}.bind(this);
-		document.getElementsByTagName("head")[0].appendChild(s);
-	}
-	else{		
-		this.require(scripts, callback);
-	}
-};
-
-
-/**
- * @static @prop {array} required - Required scripts needed for app to work
- */
-App.required = [
-	"extends.js",
-	"date.js",
-	"tabs.js",
-	"form.js",
-	"list.js",
-	"lang.js",
-];
 
 /**
  * @const {string} INVALID_URI - The URI to return for non existing route
@@ -80,8 +84,31 @@ App.INVALID_URI = '/INVALID_URI';
 /**
  * Initialize the application 
  */
-App.prototype.init = function(){
-	this.require(App.required, function(){			
+App.prototype.start = function(){
+	define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 'sortable', 'addons', 'bootstrap', 'colorpicker' , 'datepicker',  'ckeditor', 'bindings', 'extends' , 'date' ], function($, ko, Tabset, Form, List, Lang) {
+		// export libraries to global context
+		window.$ = $;
+		window.ko = ko;
+		window.Tabset = Tabset;
+		window.Form = Form;
+		window.List = List;
+		window.Lang = Lang;
+
+		// Set the configuration data 
+		this.setLanguage(appConf.Lang.language);
+		this.setRoutes(appConf.routes);
+		this.setRootUrl(appConf.rooturl);
+		Lang.init(appConf.Lang.keys);
+		Tabset.MAX_TABS_NUMBER = appConf.tabs.max;
+		this.baseUrl = require.toUrl('');
+
+
+		// Manage the notification area
+		this.notification = {
+			display : ko.observable(false),
+			level : ko.observable(),
+			message : ko.observable()
+		}
 
 		this.tabset = new Tabset();
 		var self = this;
@@ -155,19 +182,27 @@ App.prototype.init = function(){
 			event.preventDefault();
 			if(self.tabset.getActiveTab()){
 				var history = self.tabset.getActiveTab().history;
-				if(history.length > 1){
-					history.pop();
-					var url = history[history.length - 1];
-					self.load(url);
+				if(event.state){
+					// call back button					
+					if(history.length > 1){
+						history.pop();
+						var url = history[history.length - 1];
+						self.load(url);
+					}
+					else{
+						self.load(self.getUri("new-tab"));
+					}				
 				}
 				else{
-					self.load(self.getUri("new-tab"));
-				}				
-			}	
+					// Click on a link with an anchor as href
+					var url = history[history.length - 1];
+					window.history.replaceState({}, '', "#!" + url);
+				}
+			}
 		};
 
 		this.loading = {
-			display : ko.observable(true),
+			display : ko.observable(false),
 			progressing : ko.observable(false),
 			purcentage : ko.observable(0),
 
@@ -199,35 +234,40 @@ App.prototype.init = function(){
 		evt.initEvent("app-ready", true, false);
 		dispatchEvent(evt);
 		
-	}.bind(this));
+		if(appConf.user.canAccessApplication){
+			this.openLastTabs(appConf.tabs.open);
+		}
+		else{
+			this.dialog(this.getUri('login'));
+		}
 
-
-	/**
-	 * Customize app HttpRequestObject
-	 */
-	this.xhr = function(){
-		var xhr = new window.XMLHttpRequest();
-        
-        this.computeProgession = function(evt){
-        	if (evt.lengthComputable) {
-                var percentComplete = parseInt(evt.loaded / evt.total * 100);
-                //Do something with upload progress here
-                window.app.loading.progress(percentComplete);
-            }
-        }
-
-        /**
-         * Compute progression on upload AJAX requests
-         */
-        xhr.upload.addEventListener("progress", this.computeProgession);
-
-        /**
-         * Compute progression on AJAX requests
-         */
-        xhr.addEventListener("progress", this.computeProgession);
+		/**
+		 * Customize app HttpRequestObject
+		 */
+		this.xhr = function(){
+			var xhr = new window.XMLHttpRequest();
 	        
-        return xhr;
-	}.bind(this);
+	        this.computeProgession = function(evt){
+	        	if (evt.lengthComputable) {
+	                var percentComplete = parseInt(evt.loaded / evt.total * 100);
+	                //Do something with upload progress here
+	                window.app.loading.progress(percentComplete);
+	            }
+	        }
+
+	        /**
+	         * Compute progression on upload AJAX requests
+	         */
+	        xhr.upload.addEventListener("progress", this.computeProgession);
+
+	        /**
+	         * Compute progression on AJAX requests
+	         */
+	        xhr.addEventListener("progress", this.computeProgession);
+		        
+	        return xhr;
+		}.bind(this);
+	}.bind(this));
 };
 
 
@@ -301,7 +341,8 @@ App.prototype.load = function(url, data){
 				xhr : this.xhr,
 				url : url, 
 				type : options.post ? 'post' : 'get',
-				data : options.post
+				data : options.post,
+				dataType : 'text',
 			})
 			.done(function(response){					
 				this.loading.stop();
@@ -314,7 +355,7 @@ App.prototype.load = function(url, data){
 					activeTab.route(route);
 
 					activeTab.content(response);
-					
+
 					// Set the tab title
 					activeTab.title($(options.selector).find(".page-name").first().val());
 					
@@ -322,7 +363,7 @@ App.prototype.load = function(url, data){
 					this.tabset.registerTabs();
 					
 					// register the url in the tab history
-					this.tabset.getActiveTab().history.push(url);
+					activeTab.history.push(url);
 					
 					history.pushState({}, '', "#!" + url);
 				}
@@ -365,7 +406,7 @@ App.prototype.openLastTabs = function(uris){
 	}
 
 	var uri = uris.shift();
-	app.load(uri, {
+	this.load(uri, {
 		newtab : true,
 		onload : this.openLastTabs.bind(this, uris)
 	});	
@@ -423,7 +464,7 @@ App.prototype.hideNotification = function(){
 App.prototype.dialog = function(action){
 	$("#dialogbox").empty().modal('hide');
 	
-	if(action == "close"){			
+	if(action == "close"){
 		return;
 	}
 	
@@ -521,8 +562,18 @@ App.prototype.setRootUrl = function(url){
 	this.rootUrl = url;
 };
 
+
+App.prototype.refreshMenu = function(){
+    $.get(this.getUri('refresh-menu'), function(response){
+        $("#main-menu").replaceWith(response);
+		this.notify('warning', Lang.get('admin.plugins-advert-menu-changed'));        
+    }.bind(this));	
+};
+
 window.app = new App(); 
 
 app.ready(function(){
-	ko.applyBindings(app);   
+	ko.applyBindings(app);   	
 });
+
+app.start();

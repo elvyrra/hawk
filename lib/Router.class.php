@@ -140,6 +140,19 @@ class Router{
 	
 
 	/**
+	 * Add a route acessible by PATCH HTTP requests
+	 * @param string $name The route name. This name must be unique for each route
+	 * @param string $uri The route URI, defined like : /path/{param1}/to/{param2}
+	 * @param array $param The route parameters. This array can have the following data :
+	 *						- 'action' string (required) : The controller method to call when the route is matched. formatted like this : 'ControllerClass.method'
+	 *						- 'where' array (optionnal) : An array defining each parameter pattern, where keys are the names of the route parameters, and values are the regular expression to match (without delimiters)
+	 *						- 'default' array (optionnal) : An array defining the default values of parameters. This is useful to generate a URI from a route name (method getUri), without giving all parameters values
+	 */
+	public static function patch($name, $url, $param){
+		self::add('delete', $name, $url, $param);
+	}
+
+	/**
 	 * Add a route acessible by GET, POST OR DELETE HTTP requests
 	 * @param string $name The route name. This name must be unique for each route
 	 * @param string $uri The route URI, defined like : /path/{param1}/to/{param2}
@@ -307,6 +320,22 @@ class Router{
 		}
 		
 		return null;
+    }
+
+
+    /**
+     * Find a route from an URI
+     * @param string URI The uri to search the associated route
+     * @return Route the found route
+     */
+    public static function getRouteByUri($uri){
+    	foreach(self::$routes as $route){
+    		if($route->match($uri)){
+    			return $route;
+    		}
+    	}
+
+    	return null;
     }
 	
 }

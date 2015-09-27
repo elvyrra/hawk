@@ -26,13 +26,23 @@ class Theme{
      * The parent theme name
      * @var Theme
      */
-    $parent = null;
+    $parent = null,
+
+    /**
+     * The CSS sources, inherited from parent theme
+     */
+    $sources = array();
 
     
     /**
      * The theme css file basename
      */
-    const CSS_BASENAME = 'theme.css';
+    const LESS_BASENAME = 'theme.less';
+
+    /**
+     * The filename of the compiled Css file
+     */
+    const COMPILED_CSS_BASENAME = 'theme.css';
 
     /**
      * The theme css custom file basename
@@ -59,6 +69,8 @@ class Theme{
         elseif($this->name != ThemeManager::DEFAULT_THEME){
             $this->parent = ThemeManager::get(ThemeManager::DEFAULT_THEME);
         }
+
+        $this->sources = $this->getCssSources();
     }
 
 
@@ -126,11 +138,39 @@ class Theme{
      * @return string
      */
     public function getBaseCssFile(){
-        $file = $this->getRootDirname() . self::CSS_BASENAME;
-        if(!is_file($file) && $this->parent){
-            $file = $this->parent->getBaseCssFile();
-        }
+        $file = $this->getRootDirname() . self::LESS_BASENAME;
         return $file;
+    }
+
+
+    /**
+     * Get the base CSS content (concatenate recursively parent css contents)
+     * @return string The compiler Css content
+     */
+    public function getBaseCssContent(){
+        return implode(PHP_EOL, array_map(function($file){
+            if(is_file($file)){
+                return file_get_contents($file);
+            }
+            else{
+                return '';
+            }
+        }, $this->sources));
+    }
+
+
+    /**
+     * Get the base CSS sources, getting all the parents CSS filenames
+     * @return array An array containing all the sources used to build this theme CSS file
+     */
+    public function getCssSources(){
+        $sources = array();
+        if($this->parent){
+            $sources = array_merge($sources, $this->parent->getCssSources());
+        }
+        $sources[] = $this->getBaseCssFile();        
+
+        return $sources;
     }
     
 
@@ -139,7 +179,7 @@ class Theme{
      * @return string
      */
     public function getBuildCssFile(){
-        return $this->getBuildDirname() . self::CSS_BASENAME;
+        return $this->getBuildDirname() . self::COMPILED_CSS_BASENAME;
     }
     
 
@@ -151,10 +191,23 @@ class Theme{
         if(!file_exists($this->getBuildDirname())){
             mkdir($this->getBuildDirname(), 0755, true);
         }
-        
-        if($force || !is_file($this->getBuildCssFile()) || filemtime($this->getBaseCssFile()) > filemtime($this->getBuildCssFile())){
+
+        $build = false;
+        if($force || !is_file($this->getBuildCssFile())){
+            $build = true;
+        }
+        else{
+            foreach($this->sources as $source){
+                if(filemtime($source) > filemtime($this->getBuildCssFile())){
+                    $build = true;
+                    break;
+                }
+            }
+        }
+
+        if($build){              
             // Build the css
-			$css = file_get_contents($this->getBaseCssFile());
+			$css = $this->getBaseCssContent();
             
 			// Get the theme options
             if(Conf::has('db')){
@@ -175,31 +228,19 @@ class Theme{
 				if(isset($options[$varname])){
 					$value = $options[$varname];
 				}
-                $css = str_replace("@$varname", $value, $css);
+                $css = preg_replace('/@' . $varname . '\s*\:\s*(' . $variable['default'] . ')/', '@' . $varname . ': ' . $value, $css);
             }
-			
+
+            $less = new lessc;
 			if(!(DEV_MODE || DEBUG_MODE)){
-				// Minify the css result
-				$css = preg_replace(array(
-                    '!/\*(.*?)\*/!m', // remove comments
-                    '!\s+([\:\{\};,])!', // remove whitespaces before colons, semi-colons, and parenthesis                    
-                    '!([\:\{\};,])\s+!', // remove whitespaces after colons, semi-colons, and parenthesis
-                    '!^\s+!', // remove whitespaces starting line
-                    '![\t\r\n]+!', // remove line returns and tabs
-                ),
-                array(
-                    '',
-                    '$1',
-                    '$1',                    
-                    '',
-                    ''
-                ),
-				$css);
-			}
-            
+                $less->setFormatter("compressed");
+                $less->setPreserveComments(true);
+            }
+            $compiled = $less->compile($css);
+				
             FileSystem::copy($this->getRootDirname(), USERFILES_THEMES_DIR);
 
-            file_put_contents($this->getBuildCssFile(), $css);
+            file_put_contents($this->getBuildCssFile(), $compiled);
         }
     }
 
@@ -210,15 +251,16 @@ class Theme{
      * @param string $css The CSS code to parse
      * @return array The variables, where each element contains the 'name' of the variabme, it 'type', it 'description', and it 'default' value
      */
-    public function getCssVariables($css){
-        preg_match_all('#^/\*\s+define\s*\(\s*(\w+)\s*,\s*(color|dimension|file)\s*,\s*"(.+?)"\s*,\s*(.+?)\)\s*\*/#m', $css, $matches, PREG_SET_ORDER);                     
+    public function getCssVariables(){
+        $css = $this->getBaseCssContent();
+        preg_match_all('#^\s*@([\w\-]+)\s*\:\s*(.*?)\s*\;\s*//\s*"(.+?)"\s*,\s*(color|dimension|file)#m', $css, $matches, PREG_SET_ORDER);                     
         $variables = array();
         foreach($matches as $match){
             $variables[] = array(
                 'name' => $match[1],
-                'type' => $match[2],
+                'default' => $match[2],
                 'description' => $match[3],
-                'default' => $match[4]
+                'type' => $match[4]
             );
         }
         return $variables;
@@ -230,8 +272,8 @@ class Theme{
      * @return string The URL of the built CSS file
      */
     public function getBaseCssUrl(){
-        $this->buildCssFile(DEV_MODE || NO_CACHE);
-        return $this->getRootUrl() . self::CSS_BASENAME;
+        $this->buildCssFile();
+        return $this->getRootUrl() . self::COMPILED_CSS_BASENAME;
     }
     
     /**
@@ -289,12 +331,15 @@ class Theme{
      */
     public function getView($filename){
         $file = $this->getViewsDir() . $filename;
-        
-        if(!is_file($file) && $this->parent){
-            // The view does not exists in the theme, and the theme is not the default one, Try to get the view file in the default theme
-            $file = $this->parent->getView($filename);
+        if(!is_file($file) && $this->name != ThemeManager::DEFAULT_THEME){
+            if($this->parent){
+                // The view does not exists in the theme, and the theme is not the default one, Try to get the view file in the default theme
+                $file = $this->parent->getView($filename);
+            }
+            else{
+                $file = ThemeManager::get(ThemeManager::DEFAULT_THEME)->getView($filename);
+            }
         }
-        
         return $file;
     }
 

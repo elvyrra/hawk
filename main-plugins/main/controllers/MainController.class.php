@@ -5,14 +5,12 @@ class MainController extends Controller{
 	/**
 	 * Display the main page
 	 * */
-	public function index($body){			
+	public function index($body, $title = '', $description = '', $keywords = ''){			
 		$labels = array(
 			'main' => Lang::keys('javascript'),
 			'form' =>  Lang::keys('form')
 		);			
 		$labelsJSON = json_encode($labels, JSON_HEX_APOS | JSON_HEX_QUOT);
-
-		$title = Conf::has('db') ? Option::get('main.title') : DEFAULT_HTML_TITLE;
 
 		$routes = array();
 		foreach(Router::getRoutes() as $name => $route){
@@ -23,6 +21,8 @@ class MainController extends Controller{
 
 		return View::make(ThemeManager::getSelected()->getView('html-document.tpl'), array(
 			'title' => $title,
+			'description' => $description,
+			'keywords' => $keywords,
 			'themeBaseCss' => ThemeManager::getSelected()->getBaseCssUrl(),
 			'themeCustomCss' => ThemeManager::getSelected()->getCustomCssUrl(),
 			'mainJsUrl' => Plugin::current()->getJsUrl(),
@@ -50,10 +50,14 @@ class MainController extends Controller{
 
 		$body = View::make($this->theme->getView('body.tpl'), array(
 			'pages' => json_encode($pages),			
-			'canAccessApplication' => $canAccessApplication
+			'canAccessApplication' => $canAccessApplication,
 		));	
 
-		return $this->index($body);
+		$title = Conf::has('db') ? Option::get('main.page-title-' . LANGUAGE) : DEFAULT_HTML_TITLE;
+		$description = Conf::has('db') ? Option::get('main.page-description-' . LANGUAGE) : '';
+		$keywords = Conf::has('db') ? Option::get('main.page-keywords-' . LANGUAGE) : '';
+
+		return $this->index($body, $title, $description, $keywords);
 	}
 
 
@@ -130,5 +134,59 @@ class MainController extends Controller{
 		$pdf = new PDF($content);
 
 		return $pdf->display('conditions.pdf');
+	}
+
+
+	/**
+	 * Refresh The main menu
+	 */
+	public function refreshMenu(){
+		return MainMenuWidget::getInstance()->display();
+	}
+
+	/**
+	 * Generate the conf.js file
+	 */
+	public function jsConf(){
+		$canAccessApplication = Session::getUser()->canAccessApplication();	
+
+		// Get all routes
+		$routes = array();
+		foreach(Router::getRoutes() as $name => $route){
+			$routes[$name] = array(
+				'url' => $route->url,
+				'where' => $route->where,
+				'default' => $route->default,
+				'pattern' => $route->pattern
+			);
+		}
+
+		// Get all Lang labels
+		$keys = array(
+			'main' => Lang::keys('javascript'),
+			'form' =>  Lang::keys('form')
+		);			
+		$keys = json_encode($keys, JSON_HEX_APOS | JSON_HEX_QUOT);
+
+		// Get the pages to open
+		$pages = array();
+		if(Session::isConnected() && Option::get('main.open-last-tabs') && !empty($_COOKIE['open-tabs'])){
+			// Open the last tabs the users opened before logout
+			$pages = json_decode($_COOKIE['open-tabs'], true);
+		}
+		
+		if(empty($pages) && $canAccessApplication){
+			$pages[] = Router::getUri('new-tab');
+		}
+
+		Response::setScript();
+
+		return View::make(Plugin::current()->getView('conf.js.tpl'), array(
+			'keys' => $keys,
+			'routes' => json_encode($routes, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRETTY_PRINT),
+			'maxTabs' => Option::get('main.tabsNumber') ? Option::get('main.tabsNumber') : 10,
+			'lastTabs' => json_encode($pages, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRETTY_PRINT),
+			'accessible' => $canAccessApplication
+		));
 	}
 }

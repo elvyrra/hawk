@@ -27,7 +27,6 @@ class UserProfileController extends Controller{
                         'name' => 'username',
                         'required' => true,
                         'label' => Lang::get('admin.user-form-username-label'),
-                        'value' => $user->username,
                         'disabled' => true,
                     )),
                     
@@ -35,15 +34,6 @@ class UserProfileController extends Controller{
                         'name' => 'email',
                         'required' => true,
                         'label' => Lang::get('admin.user-form-email-label'),
-                        'value' => $user->email,
-                        'disabled' => true,
-                    )),
-                    
-                    new SelectInput(array(
-                        'name' => 'roleId',
-                        'options' => $roles,
-                        'label' => Lang::get('admin.user-form-roleId-label'),
-                        'value' => $user->roleId,
                         'disabled' => true,
                     ))
                 ),
@@ -89,18 +79,21 @@ class UserProfileController extends Controller{
                     $field['after'] = "<img src='" . ( $user->getProfileData($question->name) ? $user->getProfileData($question->name) : "") . "' class='profile-image' />";
                 }
                 else{
-                    $field['value'] = $user->getProfileData($question->name);
+                    $field['default'] = $user->getProfileData($question->name);
                 }
             }
             
             if($question->name == 'language'){
                 // Get language options
-                $languages = Language::getAll();
+                $languages = Language::getAllActive();
                 $options = array();
                 foreach($languages as $language){
                     $options[$language->tag] = $language->label;
                 }
                 $field['options'] = $options;
+                if(!$field['default']){
+                    $field['default'] = Option::get('main.language');
+                }
             }
 
 

@@ -200,7 +200,11 @@ class ItemList{
 			if(!empty($this->sorts[$name])){
 				$field->sortValue = $this->sorts[$name];
 			}
-		}	
+		}
+
+		EventManager::trigger(new Event('list.' . $this->id . '.instanciated', array(
+			'list' => $this
+		)));
 	}
 	
 	/**
@@ -237,7 +241,7 @@ class ItemList{
 				$where[] = $this->filter;
 			}
 		} 		
-			
+		
 		/* insert the reference if not present in the fields **/
 		if(!isset($this->fields[$this->refAlias])){
 			$this->fields[$this->refAlias] = new ItemListField($this->refAlias, array(
@@ -253,7 +257,7 @@ class ItemList{
 				$fields[$this->dbo->formatField($field->field)] = $this->dbo->formatField($name);
 				
 				/*** Get the pattern condition ***/			
-				$sql = $field->getSearchCondition($this->binds);
+				$sql = $field->getSearchCondition($this->binds);				
 				if($sql){
 					$where[] = $sql;
 				}
@@ -393,5 +397,14 @@ class ItemList{
 		catch(Exception $e){
 			ErrorHandler::exception($e);
 		}
-	}	
+	}
+
+	/**
+	 * display the list (alias)
+	 * @return string The HTML result of displaying
+	 */	
+	public function display(){
+		return $this->__toString();
+	}
+
 }

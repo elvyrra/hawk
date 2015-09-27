@@ -1,15 +1,3 @@
-/**********************************************************************
- *    						date.js
- *
- *
- * Author:   Julien Thaon & Sebastien Lecocq 
- * Date: 	 Jan. 01, 2014
- * Copyright: ELVYRRA SAS
- *
- * This file is part of Beaver's project.
- *
- *
- **********************************************************************/
 Date.prototype.DAYS = [
 	{fr : "Dimanche", en : "Sunday"},
 	{fr : "Lundi", en : "Monday"},
@@ -210,4 +198,3 @@ Date.prototype.diff = function(todate){
 	
 	return output;	
 }
-/******************* (C) COPYRIGHT 2014 ELVYRRA SAS *********************/

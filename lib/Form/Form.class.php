@@ -54,6 +54,11 @@ class Form{
 	$model = self::DEFAULT_MODEL,
 
 	/**
+	 * The object treated by the form
+	 */
+	$object,
+
+	/**
 	 * The width of the input labels (Default : 150px)
 	 */
 	$labelWidth = '150px',
@@ -166,14 +171,21 @@ class Form{
         	$this->columns = 1;
         }
 		
-		if(isset($this->model) && !empty($this->reference)){
-			$model = $this->model;				
-			$this->example = new DBExample($this->reference);
-			$this->object = $model::getByExample($this->example);				
+		if(!isset($this->object)){
+			if(isset($this->model) && !empty($this->reference)){
+				$model = $this->model;				
+				$this->example = new DBExample($this->reference);
+				$this->object = $model::getByExample($this->example);				
+			}
+			else{
+				$this->object = null;
+			}
 		}
 		else{
-			$this->object = null;
-		}		
+			$this->model = get_class($this->object);
+			$id = $this->object->getPrimaryColumn();
+			$this->reference = array($id => $this->object->$id);
+		}
 
 		$this->new = $this->object === null;
 		
@@ -209,7 +221,11 @@ class Form{
 		// get the data of the form to display or register
         $this->reload();
 
-        self::$instances[$this->id] = $this;		
+        self::$instances[$this->id] = $this;	
+
+        EventManager::trigger(new Event('form.' . $this->id . '.instanciated', array(
+        	'form' => $this
+        )));
 	}
 	
 
@@ -432,7 +448,7 @@ class Form{
 			Log::warning(Session::getUser()->username . ' has badly completed the form ' . $this->id);
 			if($exit){
 				/*** The form check failed ***/
-				return $this->response(self::STATUS_CHECK_ERROR, Lang::get('form.error-fill'));
+				Response::end($this->response(self::STATUS_CHECK_ERROR, Lang::get('form.error-fill')));
 			}
 			else{
 				$this->addReturn('message', Lang::get('form.error-fill'));
@@ -500,7 +516,7 @@ class Form{
 			Log::info(Session::getUser()->username . ' has updated the data on the form ' . $this->id);
 			if($exit){
 				// output the response
-				return $this->response(self::STATUS_SUCCESS, $success ? $success : Lang::get('form.success-register'));
+				Response::end($this->response(self::STATUS_SUCCESS, $success ? $success : Lang::get('form.success-register')));
 			}
 			return $this->object->$id;	
 		}
@@ -545,7 +561,7 @@ class Form{
 			
 			Log::info('The delete action on the form ' . $this->id . ' was successflully completed');
 			if($exit){
-				return $this->response(self::STATUS_SUCCESS, $success ? $success : Lang::get('form.success-delete'));
+				Response::end($this->response(self::STATUS_SUCCESS, $success ? $success : Lang::get('form.success-delete')));
 			}
 			return $this->object->$id;
 		}
@@ -580,8 +596,9 @@ class Form{
 			foreach($name as $key => $value)
 				$this->addReturn($key, $value);
 		}
-		else
+		else{
 			$this->returns[$name] = $message;
+		}
 	}
 	
 

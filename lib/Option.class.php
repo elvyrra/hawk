@@ -14,6 +14,11 @@ class Option{
 	 * The options loaded from database and saved in memory
 	 */
 	private static $options = array();
+
+	/**
+	 * The file containing the cache of options
+	 */
+	// const CACHE_FILE = 'options.php';
 	
 	/**
 	 * Get the value of an option
@@ -78,4 +83,17 @@ class Option{
 			'key' => $key
 		)));
 	}
+
+	/**
+	 * Get All options
+	 * @return array The array containing all options
+	 */
+	public static function getAll(){
+		return self::$options;
+	}
 }
+
+// EventManager::on('process-end', function(){
+// 	// Utils::debug(Option::getAll());
+// 	file_put_contents(CACHE_DIR . Option::CACHE_FILE, '<?php return ' . var_export(Option::getAll(), true) . ';');
+// });

@@ -41,6 +41,13 @@ class Response{
     }
 
     /**
+     * Set response headers
+     */
+    public function header($name, $value){
+        header($name .': ' . $value);
+    }
+
+    /**
      * Set the content type of the HTTP response
      * @param string $type The type to set
      */
@@ -85,7 +92,11 @@ class Response{
     /**
      * Return the HTTP response to the client, ad exit the script
      */
-	public static function end(){        		
+	public static function end($content = ''){
+        if($content){
+            self::set($content);
+        }
+        
         switch(self::$type){
             case 'json' :
                 echo json_encode(self::$content, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_NUMERIC_CHECK);

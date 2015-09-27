@@ -52,18 +52,20 @@
 	</table>
 </div>
 <script type="text/javascript">
-	app.ready(function(){
-		app.lists["{{ $list->id }}"] = new List({
-			id : "{{ $list->id }}",
-			action : "{{ $list->action }}",
-			target : "{{ $list->target }}",
-			fields : {{ json_encode(array_keys($list->fields)) }}			
-		});
-		
-		app.lists["{{ $list->id }}"].selected = {{ $list->selected !== false ? "'$list->selected'" : "null" }};
-		app.lists["{{ $list->id }}"].maxPages({{ $pages }});	
-		
+	require(['app'], function(){
+		app.ready(function(){
+			app.lists["{{ $list->id }}"] = new List({
+				id : "{{ $list->id }}",
+				action : "{{ $list->action }}",
+				target : "{{ $list->target }}",
+				fields : {{ json_encode(array_keys($list->fields)) }}			
+			});
+			
+			app.lists["{{ $list->id }}"].selected = {{ $list->selected !== false ? "'$list->selected'" : "null" }};
+			app.lists["{{ $list->id }}"].maxPages({{ $pages }});	
+			
 
-		ko.applyBindings(app.lists["{{ $list->id }}"], document.getElementById("{{ $list->id }}"));				
+			ko.applyBindings(app.lists["{{ $list->id }}"], document.getElementById("{{ $list->id }}"));				
+		});
 	});
 </script>

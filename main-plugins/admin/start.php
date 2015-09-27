@@ -1,5 +1,5 @@
 <?php
-Router::auth(Request::isAjax() && Session::isConnected(), function(){
+Router::auth(Session::isConnected(), function(){
 	/*** Application settings ***/
 	Router::any('main-settings', '/admin/settings', array('auth' => Session::isAllowed('admin.all'), 'action' => 'AdminController.settings'));
 
@@ -45,7 +45,9 @@ Router::auth(Request::isAjax() && Session::isConnected(), function(){
 		// Add a media
 		Router::any('add-theme-media', '/admin/current-theme/medias/add', array('action' => 'ThemeController.addMedia'));
 		// Remove a media
-		Router::get('delete-theme-media', '/admin/current-theme/medias/{filename}/delete', array('where' => array('filename' => '[^\/]+'), 'action' => 'ThemeController.deleteMedia'));
+		Router::get('delete-theme-media', '/admin/current-theme/medias/{filename}/delete', array('where' => array('filename' => '[^\/]+'), 'action' => 'ThemeController.deleteMedia'));		
+		// Set the menu items and order
+		Router::post('set-menu', '/admin/menu/set-order', array('action' => 'ThemeController.menu'));
 		
 		// Display the list of available themes
 		Router::any('available-themes', '/admin/themes/available', array('action' => 'ThemeController.listThemes'));
@@ -83,7 +85,7 @@ Router::auth(Request::isAjax() && Session::isConnected(), function(){
 		Router::get('delete-plugin', '/admin/plugins/{plugin}/remove', array('where' => array('plugin' => '[a-zA-Z0-9\-_.]+'), 'action' => 'PluginController.delete'));
 
 		EventManager::on('menuitem.added menu.added menu.deleted menuitem.deleted', function($event){
-            Router::getCurrentController()->addJavaScriptInline('advertMenuChanged()');
+            Router::getCurrentController()->addJavaScriptInline('app.refreshMenu()');
         });
 
 	});
@@ -107,7 +109,7 @@ Router::auth(Request::isAjax() && Session::isConnected(), function(){
 		Router::post('add-language-key', '/admin/languages/keys/add', array('action' => 'LanguageController.addKey'));
 
 		// Delete a translation
-		Router::any('delete-translation', '/admin/languages/keys/{plugin}/{key}/{tag}/clean', array('where' => array('plugin' => '\w+', 'key' => '[\w\-]+', 'tag' => '[a-z]{2}'), 'action' => 'LanguageController.deleteTranslation'));
+		Router::any('delete-translation', '/admin/languages/keys/{plugin}/{key}/{tag}/clean', array('where' => array('plugin' => '[\w\-]+', 'key' => '[\w\-]+', 'tag' => '[a-z]{2}'), 'action' => 'LanguageController.deleteTranslation'));
 		
 		// Import language file
 		Router::any('import-language-keys', '/admin/languages/import', array('action' => 'LanguageController.import'));

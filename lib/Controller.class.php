@@ -84,7 +84,12 @@ class Controller{
 		Widget::add(Router::getCurrentAction(), Controller::AFTER_ACTION, function($event) use($content){			
 			if(Response::getType() === 'html'){	
 				$dom = $event->getData('result');
-				$dom->find("*:last")->after($content);
+				if($dom->find('body')->length){
+					$dom->find('body')->append($content);
+				}
+				else{
+					$dom->find("*:first")->parent()->children()->slice(-1)->after($content);					
+				}
 			}
 		});
 	}

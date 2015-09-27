@@ -84,3 +84,4 @@ register-email-content = "<p>You have just registered on {sitename}, and we than
 <a href=\"{uri}\">{uri}</a>\
 <p> We hope to see you soon on {sitename} </p>\
 <p> The {sitename} team. </p>"
+permission-name-user-actions = "Action on his own account"

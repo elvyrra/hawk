@@ -9,7 +9,7 @@
 			entities : false,		
 			on : {				
 				change : function(event){ 
-					document.getElementById(id).value = event.editor.getData(); 
+					$("#" + id).val(event.editor.getData()).trigger('change');
 				}
 			}
 		});			

@@ -18,12 +18,14 @@ class ObjectInput extends FormInput{
      * @return string The HTML result to display
      */
     public function __toString(){
-		if(empty($this->value))
+		if(empty($this->value)){
 			$this->value = "{}";
-		elseif(is_array($this->value))
+		}
+		elseif(is_array($this->value)){
 			$this->value = json_encode($this->value, JSON_NUMERIC_CHECK | JSON_HEX_APOS | JSON_HEX_QUOT);
+		}
 		
         return parent::__toString();
-    }   
+    }
 	
 }

@@ -37,7 +37,7 @@ class PermissionController extends Controller{
 						$param['fieldsets']['form'][] = new CheckboxInput(array(
 							'name' => "permission-{$permission->id}-{$role->id}",
 							'disabled' => $role->id == Role::ADMIN_ROLE_ID,
-							'default' => $role->id == Role::ADMIN_ROLE_ID ? 1 : $values[$permission->id][$role->id],
+							'default' => $role->id == Role::ADMIN_ROLE_ID ? 1 : (isset($values[$permission->id][$role->id]) ? $values[$permission->id][$role->id] : 0),
 							'class' => $permission->id == Permission::ALL_PRIVILEGES_ID ? 'select-all' : '',
 						));
 					}

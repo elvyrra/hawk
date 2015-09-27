@@ -87,3 +87,4 @@ user-profile-update-error = "Une erreur est survenue pendant la mise à jour de 
 list-results-number[0] = "Aucun résultat"
 list-results-number[1] = "1 résultat"
 list-results-number[p] = "{number} résultats"
+permission-name-user-actions = "Action sur son compte"
