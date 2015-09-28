@@ -346,9 +346,6 @@ class PluginController extends Controller{
 
                 // The plugin can be created
                 $dir = PLUGINS_DIR . $form->getData('name') . '/';
-                $namespace = preg_replace_callback('/(^|\-)(\w?)/', function($m){
-                    return strtoupper($m[2]);                    
-                }, $form->getData('name'));                
 
                 try{
                     // Create the directories structure
@@ -368,28 +365,30 @@ class PluginController extends Controller{
                         'description' => $form->getData('description'),
                         'version' => $form->getData('version'),
                         'author' => $form->getData('author'),
-                        'namespace' => $namespace,
                         'dependencies' => array()
                     );
                     if(file_put_contents($dir . Plugin::MANIFEST_BASENAME, json_encode($conf, JSON_PRETTY_PRINT)) === false){
                         throw new \Exception('Impossible to create the file ' . Plugin::MANIFEST_BASENAME);
                     }
 
+                    $plugin = Plugin::get($form->getData('name'));
+                    $namespace = $plugin->getNamespace();
+
                     // Create the file start.php
-                    $start = str_replace(array('{{ $namespace }}', '{{ $name }}'), array($namespace, $form->getData('name')), file_get_contents(Plugin::current()->getRootDir() . 'templates/start.tpl'));
+                    $start = str_replace(array('{{ $namespace }}', '{{ $name }}'), array($namespace, $plugin->getName()), file_get_contents(Plugin::current()->getRootDir() . 'templates/start.tpl'));
                     if(file_put_contents($dir . 'start.php', $start) === false){
                         throw new \Exceptio('Impossible to create the file start.php');
                     }
 
                     // Create the file Installer.class.php
-                    $installer = str_replace(array('{{ $namespace }}', '{{ $name }}'), array($namespace, $form->getData('name')), file_get_contents(Plugin::current()->getRootDir() . 'templates/installer.tpl'));
+                    $installer = str_replace(array('{{ $namespace }}', '{{ $name }}'), array($namespace, $plugin->getName()), file_get_contents(Plugin::current()->getRootDir() . 'templates/installer.tpl'));
                     if(file_put_contents($dir . 'classes/Installer.class.php', $installer) === false){
                         throw new \Exception('Impossible to create the file classes/Installer.class.php');
                     }
 
                     // Create the language file
-                    if(!touch($dir . 'lang/' . $form->getData('name') . '.en.lang')){
-                        throw new \Exception('Impossible to create the file lang/' . $form->getData('name') . '.en.lang');
+                    if(!touch($dir . 'lang/' . $plugin->getName() . '.en.lang')){
+                        throw new \Exception('Impossible to create the file lang/' . $plugin->getName() . '.en.lang');
                     }
 
                     return $form->response(Form::STATUS_SUCCESS, Lang::get('admin.new-plugin-success'));

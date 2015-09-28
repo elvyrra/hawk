@@ -396,6 +396,18 @@ class Plugin{
 	
 
 	/**
+	 * Get the namespace used for all files in the plugin. The namespace is generated from the plugin name
+	 * @return string The plugin namespace
+	 */
+	public function getNamespace(){
+		$namespace = preg_replace_callback('/(^|\-)(\w?)/', function($m){
+            return strtoupper($m[2]);                    
+		}, $this->name);  
+
+		return 'Hawk\\Plugins\\' . $namespace;
+	}
+
+	/**
 	 * Instance the plugin installer
 	 * @return PluginInstaller The instance of the plugin installer
 	 */
@@ -404,7 +416,7 @@ class Plugin{
 			return $this->manager;
 		}
 
-		$class = '\\Hawk\\Plugins\\' . $this->getDefinition('namespace') . '\\Installer';
+		$class = $this->getNamespace() . '\\Installer';
 		if(!empty($class)){
 			$this->manager = new $class($this);
 			return $this->manager;
