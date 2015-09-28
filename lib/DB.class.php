@@ -4,7 +4,7 @@
  * @author Elvyrra SAS
  */
 
-
+namespace Hawk;
 
 /**
  * This class is a manager for MySQL connection and queries
@@ -94,13 +94,13 @@ class DB{
 				$dns .= ";port=$this->port";
 			}
 			
-			$this->connection = new PDO($dns, $this->username, $this->password);			
-            $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);	
-            $this->connection->setAttribute(PDO::ATTR_EMULATE_PREPARES, 1);
+			$this->connection = new \PDO($dns, $this->username, $this->password);			
+            $this->connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);	
+            $this->connection->setAttribute(\PDO::ATTR_EMULATE_PREPARES, 1);
             
 			$this->connection->query('SET NAMES "'.$this->charset.'"');
         }
-        catch(PDOException $e) {
+        catch(\PDOException $e) {
             throw new DBException($e->getMessage(), DBException::CONNECTION_ERROR, $this->host);
         }
     }
@@ -212,12 +212,12 @@ class DB{
 					case self::RETURN_ARRAY:
 						if($options['onerow']){
 							// Return the first row as associative array
-							$result = $stmt->fetch(PDO::FETCH_ASSOC);
+							$result = $stmt->fetch(\PDO::FETCH_ASSOC);
 						}
 						else{
 							// Return an array of associative arrays
 							$data = array();
-							while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+							while($row = $stmt->fetch(\PDO::FETCH_ASSOC)){
 								if($options['index']){
 									$data[$row[$options['index']]] = $row;
 								}
@@ -232,12 +232,12 @@ class DB{
 					case self::RETURN_OBJECT :
 						if($options['onerow']){
 							// Return the first row as an StdClass instance
-							$result = $stmt->fetch(PDO::FETCH_OBJ);
+							$result = $stmt->fetch(\PDO::FETCH_OBJ);
 						}
 						else{
 							// Return an array of StdClass instances
 							$data = array();							
-							while($row = $stmt->fetch(PDO::FETCH_OBJ)){
+							while($row = $stmt->fetch(\PDO::FETCH_OBJ)){
 								if($options['index']){
 									$index = $options['index'];
 									$data[$row->$index]= $row;
@@ -293,7 +293,7 @@ class DB{
 
 			return $result;
         }
-        catch(PDOException $e) {
+        catch(\PDOException $e) {
         	$this->addLog($log, 'query failed', $start, microtime(true));        	
             throw new DBException($e->getMessage(), DBException::QUERY_ERROR, $sql);
         }  	
@@ -385,7 +385,7 @@ class DB{
 		}
 		   
 		if(empty($query->return)){
-			$query->return = DB::RETURN_ARRAY;
+			$query->return = self::RETURN_ARRAY;
 		}
 		
 		return $this->query($sql, $query->binds, array(
@@ -421,7 +421,7 @@ class DB{
 				
 		$sql="INSERT $flag INTO ".$table." (".$keys.") VALUES (".$values.") " . ($onduplicatekey ? "ON DUPLICATE KEY UPDATE $onduplicatekey" : "");
 		
-		return $this->query($sql, $binds, array('return' => DB::RETURN_LAST_INSERT_ID));
+		return $this->query($sql, $binds, array('return' => self::RETURN_LAST_INSERT_ID));
 	}
 	
 	/**
@@ -446,7 +446,7 @@ class DB{
 		$values = implode(' , ',$values);
 						
 		$sql="REPLACE INTO ".$table." (".$keys.") VALUES (".$values.")";
-		return $this->query($sql, $binds, array('return' => DB::RETURN_LAST_INSERT_ID));
+		return $this->query($sql, $binds, array('return' => self::RETURN_LAST_INSERT_ID));
 	}
 	
 	/**
@@ -474,7 +474,7 @@ class DB{
         
 		$sql = "UPDATE $table SET ". implode(',',$updates) . $where;
         
-		return $this->query($sql, $binds, array('return' => DB::RETURN_AFFECTED_ROWS));
+		return $this->query($sql, $binds, array('return' => self::RETURN_AFFECTED_ROWS));
 	}
 	
 	/**
@@ -494,7 +494,7 @@ class DB{
 		
         $sql = "DELETE FROM $table $where";
         
-		return $this->query($sql, $binds, array('return' => DB::RETURN_AFFECTED_ROWS));
+		return $this->query($sql, $binds, array('return' => self::RETURN_AFFECTED_ROWS));
     }
 	
 	/**
@@ -526,7 +526,7 @@ class DB{
 			
         $sql = "SELECT COUNT($field) as counter FROM $table $condition";
 		
-		return $this->query($sql, $binds, array('return' => DB::RETURN_OBJECT, 'onerow' => true))->counter;
+		return $this->query($sql, $binds, array('return' => self::RETURN_OBJECT, 'onerow' => true))->counter;
     }
 	
 
@@ -584,7 +584,7 @@ class DB{
 /**
  * This class manages the exceptions throwed by DB class
  */
-class DBException extends Exception{
+class DBException extends \Exception{
 	const CONNECTION_ERROR = 1;
 	const QUERY_ERROR = 2;	
 

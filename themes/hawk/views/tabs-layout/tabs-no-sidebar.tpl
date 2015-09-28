@@ -1,5 +1,5 @@
 <div id="{{ !empty($tabId) ? $tabId  : ''}}">
-	<input type="hidden" class="page-name" value="<i class='fa fa-{{$icon}}'></i> {{ isset($tabTitle) ? $tabTitle : $title }}"/>
+	<input type="hidden" class="page-name" value="<i class='icon icon-{{$icon}}'></i> {{ isset($tabTitle) ? $tabTitle : $title }}"/>
 	<div class="whole-page">	
 		{if(!empty($title))}
 			<h2 class="page-title">{{ $title }}</h2>	

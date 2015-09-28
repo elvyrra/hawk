@@ -4,6 +4,8 @@
  * @author Elvyrra SAS
  */
 
+namespace Hawk;
+
 /**
  * This class is used to display a whole tab with a sidebar on right
  * @package TabLayout
@@ -22,6 +24,6 @@ class RightSidebarTab extends View{
 			$data['page']['class'] = 'col-md-9 col-lg-10';
 		}
 		
-		return parent::make(ThemeManager::getSelected()->getView('tabs-layout/tabs-sidebar-right.tpl'), $data);
+		return parent::make(Theme::getSelected()->getView('tabs-layout/tabs-sidebar-right.tpl'), $data);
 	}
 }

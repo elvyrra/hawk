@@ -5,6 +5,8 @@
  * @license MIT
  */
 
+namespace Hawk;
+
 /**
  * This class describes the field displayed in a smart list.
  * All properties of an instance of this class can be scalar, or a function taking as arguments :
@@ -203,7 +205,7 @@ class ItemListField {
 				case 'text' :
 				default :
 					$input = new TextInput(array(
-						'after' => '<i class="fa fa-times-circle clean-search" data-bind="click: function(data){ data.search(null); }, visible: search()"></i>',
+						'after' => '<i class="icon icon-times-circle clean-search" data-bind="click: function(data){ data.search(null); }, visible: search()"></i>',
 						'attributes' => array(
 							'data-bind' => "textInput: search, css : search() ? 'alert-info not-empty' : 'empty'",
 						)
@@ -225,7 +227,7 @@ class ItemListField {
 	 * @return string The HTML result to display	 
 	 */
 	public function displayHeader(){
-		return View::make(ThemeManager::getSelected()->getView('item-list/field-header.tpl'), array(
+		return View::make(Theme::getSelected()->getView('item-list/field-header.tpl'), array(
 			'field' => $this,
 		));
 	}
@@ -239,7 +241,7 @@ class ItemListField {
 		$line = $this->list->results[$lineIndex];
 		$name = $this->name;		
 
-		$cell = new StdClass;
+		$cell = new \StdClass;
 		foreach(self::$callableProperties as $prop){
 			if(! is_null($this->$prop) && is_callable($this->$prop)){
 				$func = $this->$prop;				
@@ -263,7 +265,7 @@ class ItemListField {
 			$cell->content .= ' ' . $cell->unit;
 		}
 
-		return View::make(ThemeManager::getSelected()->getView('item-list/result-cell.tpl'), array(
+		return View::make(Theme::getSelected()->getView('item-list/result-cell.tpl'), array(
 			'cell' => $cell,
 			'field' => $this
 		));

@@ -3,7 +3,7 @@
  * LanguageController.class.php
  */
 
-
+namespace Hawk\Plugins\Admin;
 
 /**
  * This class is the controller for language key actions
@@ -283,7 +283,7 @@ class LanguageController extends Controller{
 
 		$param = array(
 			'id' => 'language-key-list',
-			'action' => Router::getUri('LanguageController.listKeys'),
+			'action' => Router::getUri('language-keys-list'),
 			'data' => $data,
 			'controls' => array(
 				array(
@@ -296,13 +296,13 @@ class LanguageController extends Controller{
 				array(
 					'icon' => 'plus',
 					'label' => Lang::get('language.new-lang'),
-					'href' => Router::getUri('LanguageController.editLanguage', array('tag' => 'new')),
+					'href' => Router::getUri('edit-language', array('tag' => 'new')),
 					'target' => 'dialog',
 					'class' => 'btn-success'
 				),
 				
 				array(
-					'href' => Router::getUri('LanguageController.import'),
+					'href' => Router::getUri('import-language-keys'),
 					'target' => 'dialog',
 					'icon' => 'download',
 					'label' => Lang::get('language.import-btn'),
@@ -332,7 +332,7 @@ class LanguageController extends Controller{
 					'search' => false,
 					'sort' => false,
 					'display' => function($value, $field, $line) {
-						return "<span class='fa fa-undo text-danger delete-translation' title='" . Lang::get('language.delete-translation-btn') . "' data-key='$line->langKey'></span>";						
+						return "<span class='icon icon-undo text-danger delete-translation' title='" . Lang::get('language.delete-translation-btn') . "' data-key='$line->langKey'></span>";						
 					}
 				),			
 			)
@@ -400,7 +400,7 @@ class LanguageController extends Controller{
 		$form = new Form($param);
 		
 		if(!$form->submitted()){
-			return View::make($this->theme->getView('dialogbox.tpl'), array(
+			return View::make(Theme::getSelected()->getView('dialogbox.tpl'), array(
 				'icon' => 'flag',
 				'title' => $form->new ? Lang::get('language.add-lang-form-title') : Lang::get('language.edit-lang-form-title'),
 				'page' => $form
@@ -469,7 +469,7 @@ class LanguageController extends Controller{
 		$form = new Form($param);
 		
 		if(!$form->submitted()){
-			return View::make($this->theme->getView('dialogbox.tpl'), array(
+			return View::make(Theme::getSelected()->getView('dialogbox.tpl'), array(
 				'icon' => 'flag',
 				'title' => Lang::get('language.import-form-title'),
 				'page' => $form

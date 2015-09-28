@@ -1,5 +1,6 @@
 <?php
 
+namespace Hawk\Plugins\Admin;
 
 class LanguageFilterWidget extends Widget{
 	public function __construct($filters){
@@ -18,7 +19,7 @@ class LanguageFilterWidget extends Widget{
 		$param = array(
 			'id' => 'language-filter-form',
 			'method' => 'get',
-			'action' => Router::getUri('LanguageController.listKeys'),
+			'action' => Router::getUri('language-keys-list'),
 			'fieldsets' => array(
 				'filters' => array(
 					'nofieldset' => true,
@@ -29,8 +30,8 @@ class LanguageFilterWidget extends Widget{
 						'default' => $filters['tag'],
 						'style' => 'width: 80%; margin-right: 5px;',
 						'label' => Lang::get('language.filter-language-label'),
-						'after' => '<span class="fa fa-pencil text-primary edit-lang" title="'. Lang::get('language.filter-language-edit') . '"></span>' . 
-									(count($languages) > 1 && Option::get('main.language') != $filters['tag'] && $filters['tag'] != Lang::DEFAULT_LANGUAGE ? '<span class="fa fa-close text-danger delete-lang" title="'. Lang::get('language.filter-language-delete') . '"></span>' : '')
+						'after' => '<span class="icon icon-pencil text-primary edit-lang" title="'. Lang::get('language.filter-language-edit') . '"></span>' . 
+									(count($languages) > 1 && Option::get('main.language') != $filters['tag'] && $filters['tag'] != Lang::DEFAULT_LANGUAGE ? '<span class="icon icon-close text-danger delete-lang" title="'. Lang::get('language.filter-language-delete') . '"></span>' : '')
 					)),
 					
 					new RadioInput(array(
@@ -50,7 +51,7 @@ class LanguageFilterWidget extends Widget{
 	
 	
 	public function display(){
-		return View::make(ThemeManager::getSelected()->getView("box.tpl"), array(
+		return View::make(Theme::getSelected()->getView("box.tpl"), array(
 			'title' => Lang::get('language.filter-filters-legend'),
 			'icon' => 'filter',
 			'content' => $this->form

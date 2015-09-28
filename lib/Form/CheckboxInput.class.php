@@ -5,6 +5,7 @@
  * @license MIT
  */
 
+namespace Hawk;
 
 /**
  * This class describes checkboxes

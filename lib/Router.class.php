@@ -5,6 +5,8 @@
  * @license MIT
  */
 
+namespace Hawk;
+
 /**
  * This class describes the application router. It is used in any plugin to route URIs to controllers methods
  * @package Core\Router
@@ -27,11 +29,6 @@ class Router{
 	private static $activeRoutes = array();	
 
 	/**
-	 * The actions associated to each route
-	 */
-	private static $actions = array();
-
-	/**
 	 * The current route, associated to the current URI
 	 */
 	private static $currentRoute;
@@ -40,7 +37,12 @@ class Router{
 	 * The authentications required to match the URIs
 	 */
     private static $auth = array();
-    
+
+
+    /**
+     * The predefined data for the routes
+     */
+    private static $predefinedData = array();
     
 	/**
 	 * Add a new accessible route to the router
@@ -61,6 +63,12 @@ class Router{
 		else{
 			$param['auth'] = self::$auth;
 		}
+
+		foreach(self::$predefinedData as $key => $value){
+			$param[$key] = $value;
+		}
+		
+
 		if(isset(self::$routes[$name])){
 			trigger_error("The route named '$name' already exists", E_USER_WARNING);
 		}
@@ -68,7 +76,6 @@ class Router{
 			$route = new Route($uri, $param);
 					
 			self::$routes[$name] = &$route;
-			self::$actions[$route->action] = &$route;
 			
 			if(Request::method() == $method || $method == 'any'){
 				self::$activeRoutes[$name] = &$route;
@@ -78,7 +85,7 @@ class Router{
 
 	/**
 	 * Add an authentication condition to match the routes defined inside $action callback. For example, you can write something like :
-	 * Router::auth(Session::getUser()->isAuthorizedFor('admin.all'), function(){
+	 * Router::auth(Session::getUser()->isAllowed('admin.all'), function(){
 	 *		Router::get('test-route', '/test', array('action' => 'TestController.testMethod'));
 	 * });
 	 * If the user tries to access to /test without the necessary privileges, then a HTTP code 403 (Forbidden) will be returned
@@ -94,6 +101,24 @@ class Router{
 		
 		// Remove the authentication for the rest of the scripts
 		array_pop(self::$auth);
+	}
+
+
+	/**
+	 * Set properties for all the routes that are defined in the $action callback. 
+	 * It can be used to set a prefix to a set of routes, a namespace for all routes actions, ...
+	 * @param array $data The properties to set
+	 * @param callable $action The function that defines the routes with these properties
+	 */
+	public static function setProperties($data, $action){
+		$currentData = self::$predefinedData;
+		foreach($data as $key => $value){
+			self::$predefinedData[$key] = $value;
+		}
+		
+		$action();
+
+		self::$predefinedData = $currentData;
 	}
 	
 
@@ -171,7 +196,7 @@ class Router{
 	 */
 	public static function route(){
 		$uri = preg_replace("/\?.*$/", "", self::getUri());
-		
+
 		// Scan each row
 		foreach(self::$activeRoutes as $route){
             if($route->match($uri)){                  	      	
@@ -188,7 +213,7 @@ class Router{
 
 					// Emit an event, saying the routing action is finished
 					$event = new Event('after-routing', array('controller' => $controller, 'method' => $method, 'args' => $route->getData()));
-					EventManager::trigger($event);
+					$event->trigger();
 	                
 	                // Set the controller result to the HTTP response
 					Response::set($controller->compute($method));
@@ -197,7 +222,7 @@ class Router{
 
 					// The route is not accessible
 					Log::warning('A user with the IP address ' . Request::clientIp() . ' tried to access ' . self::getUri() . ' without the necessary privileges');
-					http_response_code(403);					
+					Response::setHttpCode(403);
 					Response::set(Lang::get('main.403-message'));
 				}
 				return;
@@ -206,7 +231,7 @@ class Router{
 		
 		// The route was not found 
 		Log::warning('The URI ' . self::getUri() . ' has not been routed');
-		http_response_code(404);
+		Response::setHttpCode(404);
         Response::set(Lang::get('main.404-message', array('uri' => $uri)));
 	}
 	
@@ -254,13 +279,13 @@ class Router{
 	}
 	
 	/**
-	 * Generate an URI from a given controller method (or route name) and its arguments. if $method is not set, then returns the current URI
-	 * @param string $method The route name of the controller method, formatted like this : 'ControllerClass.method'
+	 * Generate an URI from a given controller method (or route name) and its arguments. if $method is not set, then returns the current URI, relative to the site root URL
+	 * @param string $name The route name of the controller method, formatted like this : 'ControllerClass.method'
 	 * @param array $args The route arguments, where keys define the parameters names and values, the values to affect.
 	 * @return string The generated URI, or the current URI (if $method is not set)
 	 */
-	public static function getUri($method = '', $args= array()){
-		if(!$method){
+	public static function getUri($name = '', $args= array()){
+		if(!$name){
 			$fullUrl = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
 			
 			$rooturl = Conf::has('rooturl') ? Conf::get('rooturl') : $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'];
@@ -268,7 +293,7 @@ class Router{
 			return str_replace($rooturl, '', $fullUrl);
 		}
 
-		$route = self::getRouteByAction($method);
+		$route = self::getRouteByAction($name);
 				
 		if(empty($route)){
 			return self::INVALID_URL;
@@ -283,7 +308,7 @@ class Router{
 				$replace = $route->default[$arg];
 			}
 			else{
-				throw new Exception("The URI built from '$method' needs the argument : $arg", E_USER_WARNING);
+				throw new \Exception("The URI built from '$method' needs the argument : $arg");
 			}
 			$url = str_replace("{{$arg}}", $replace, $url);
 		}
@@ -294,29 +319,26 @@ class Router{
 
     /**
 	 * Generate a full URL from a given controller method (or route name) and its arguments. if $method is not set, then returns the current URL
-	 * @param string $method The route name of the controller method, formatted like this : 'ControllerClass.method'
+	 * @param string $name The route name of the controller method, formatted like this : 'ControllerClass.method'
 	 * @param array $args The route arguments, where keys define the parameters names and values, the values to affect.
 	 * @return string The generated URI, or the current URI (if $method is not set)
 	 * @see Router::getUri	 
 	 */
-    public static function getUrl($method = '', $args = array()){
-        return preg_replace('#/$#', '',Conf::get('rooturl')) . self::getUri($method, $args);
+    public static function getUrl($name = '', $args = array()){
+        return preg_replace('#/$#', '',Conf::get('rooturl')) . self::getUri($name, $args);
     }
 
 
     /**
      * Get a route by action
-     * @param string $method The route name of the controller method, formatted like this : 'ControllerClass.method'
+     * @param string $name The route name of the controller method, formatted like this : 'ControllerClass.method'
 	 * @param array $args The route arguments, where keys define the parameters names and values, the values to affect.
 	 * @return Route The route corresponding to research
      */
-    public static function getRouteByAction($method){
+    public static function getRouteByAction($name){
     	$route = null;
-		if(isset(self::$routes[$method])){
-			return self::$routes[$method];
-		}
-		elseif(isset(self::$actions[$method])){
-			return self::$actions[$method];
+		if(isset(self::$routes[$name])){
+			return self::$routes[$name];
 		}
 		
 		return null;

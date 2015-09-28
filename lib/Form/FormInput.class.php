@@ -4,6 +4,7 @@
  * @author Elvyrra SAS
  */
 
+namespace Hawk;
 
 /**
  * This class describes the general behavior of inputs in forms. This class is associated to Form class
@@ -223,10 +224,10 @@ class FormInput{
 		
 		$this->type = static::TYPE;
               
-		$theme = ThemeManager::getSelected();
+		$theme = Theme::getSelected();
 		
-        $file = ThemeManager::getSelected()->getView(Form::VIEWS_DIR . 'form-input-' . static::TYPE . '.tpl');
-        $this->tpl = is_file($file) ? $file : ThemeManager::getSelected()->getView(Form::VIEWS_DIR . 'form-input.tpl');
+        $file = Theme::getSelected()->getView(Form::VIEWS_DIR . 'form-input-' . static::TYPE . '.tpl');
+        $this->tpl = is_file($file) ? $file : Theme::getSelected()->getView(Form::VIEWS_DIR . 'form-input.tpl');
     }
 
 
@@ -263,13 +264,13 @@ class FormInput{
      */
     public function __toString(){
         try{
-    		$theme = ThemeManager::getSelected();
+    		$theme = Theme::getSelected();
     		
     		if($this->name == $this->errorAt){
     			unset($this->errorAt);
     		}
 
-    		$inputLabel = $this->label ? View::make(ThemeManager::getSelected()->getView(Form::VIEWS_DIR . 'form-input-label.tpl'), array(
+    		$inputLabel = $this->label ? View::make(Theme::getSelected()->getView(Form::VIEWS_DIR . 'form-input-label.tpl'), array(
     			'input' => $this
     		)) : '';
     		
@@ -277,13 +278,13 @@ class FormInput{
     			'input' => $this
     		));
                 
-            return View::make(ThemeManager::getSelected()->getView(Form::VIEWS_DIR . 'form-input-block.tpl'), array(
+            return View::make(Theme::getSelected()->getView(Form::VIEWS_DIR . 'form-input-block.tpl'), array(
                 'input' => $this, 
     			'inputLabel' => $inputLabel,
     			'inputDisplay' => $inputDisplay
             ));
         }
-        catch(Exception $e){
+        catch(\Exception $e){
             ErrorHandler::exception($e);
         }
     }

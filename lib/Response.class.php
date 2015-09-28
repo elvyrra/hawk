@@ -5,6 +5,8 @@
  * @license MIT
  */
 
+namespace Hawk;
+
 /**
  * This class defines static methods to prepare and send the HTTP response to the client 
  * @package Core
@@ -105,7 +107,7 @@ class Response{
                 echo self::$content;
             break;
         }
-        exit;
+        exit();
     }
 	
 
@@ -116,7 +118,7 @@ class Response{
 	public static function redirect($url){
         Log::debug('redirect to ' . $url);
         header("Location: $url");
-		exit;
+		exit();
 	}
 	
     /**

@@ -4,6 +4,8 @@
  * @author Elvyrra SAS
  */
 
+namespace Hawk;
+
 /**
  * This class describes date and datetime inputs
  * @package Form\Input
@@ -104,7 +106,7 @@ class DatetimeInput extends TextInput{
 	 * @return string The formatted value
 	 */
 	public function dbvalue(){
-		$date = DateTime::createFromFormat($this->format, $this->value);
+		$date = \DateTime::createFromFormat($this->format, $this->value);
 		if($this->dataType == 'int'){
 			return $date->getTimestamp();
 		}

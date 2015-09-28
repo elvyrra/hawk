@@ -1,8 +1,8 @@
 <?php
 
+namespace Hawk\Plugins\Install;
 
-class InstallController extends Controller{
-	
+class InstallController extends Controller{	
 	public function setLanguage(){
 		$form = new Form(array(
 			'id' => 'install-form',
@@ -35,7 +35,7 @@ class InstallController extends Controller{
 			'form' => $form
 		));
 
-		return MainController::getInstance()->index($body);
+		return \Hawk\Plugins\MainController::getInstance()->index($body);
 	}
 
 	public function settings(){
@@ -63,21 +63,9 @@ class InstallController extends Controller{
 					new SelectInput(array(
 						'name' => 'timezone',
 						'required' => true,
-						'options' => array_combine(DateTimeZone::listIdentifiers(), DateTimeZone::listIdentifiers()),
+						'options' => array_combine(\DateTimeZone::listIdentifiers(), \DateTimeZone::listIdentifiers()),
 						'default' => DEFAULT_TIMEZONE,
 						'label' => Lang::get('install.settings-timezone-label')
-					)),
-
-					new SelectInput(array(
-						'name' => 'session',
-						'required' => true,
-						'options' => array(
-							'file' => Lang::get('install.settings-session-file-value', null, null, $this->language),
-							'database' => Lang::get('install.settings-session-database-value', null, null, $this->language),
-							// 'memcache' => Lang::get('install.settings-session-memcache-value', null, null, $this->language)
-						),
-						'label' => Lang::get('install.settings-session-label', null, null, $this->language),
-						'default' => DEFAULT_SESSION_ENGINE
 					)),
 
 					new TextInput(array(
@@ -154,7 +142,7 @@ class InstallController extends Controller{
 					new SubmitInput(array(
 						'name' => 'valid',
 						'value' => Lang::get('install.install-button', null, null, $this->language),
-						'icon' => 'cog fa-spin',
+						'icon' => 'cog',
 					))
 				)
 			),
@@ -167,7 +155,7 @@ class InstallController extends Controller{
 				'form' => $form
 			));
 
-			return MainController::getInstance()->index($body);
+			return \Hawk\Plugins\Main\MainController::getInstance()->index($body);
 		}
 		else{
 			// Make the installation 
@@ -178,7 +166,7 @@ class InstallController extends Controller{
 				$salt = Crypto::generateKey(24);
 				$key = Crypto::generateKey(32);
 				$iv = Crypto::generateKey(16);
-				$configMode = 'dev';
+				$configMode = 'prod';
 
 
 				/**
@@ -212,7 +200,7 @@ class InstallController extends Controller{
 						'{{ $password }}' => Db::get('tmp')->quote(Crypto::saltHash($form->getData('admin[password]'), $salt)),
 						'{{ $ip }}' => Db::get('tmp')->quote(Request::clientIp())
 					);
-					$sql = strtr(file_get_contents(Plugin::current()->getRootDir() . 'files/install.sql.tpl'), $param);
+					$sql = strtr(file_get_contents(Plugin::current()->getRootDir() . 'templates/install.sql.tpl'), $param);
 					// file_put_contents($tmpfile, $sql);
 
 					Db::get('tmp')->query($sql);
@@ -233,7 +221,7 @@ class InstallController extends Controller{
 						'{{ $sessionEngine }}' => $form->getData('session'),
 						'{{ $version }}' => $form->getData('version')
 					);
-					$config = strtr(file_get_contents(Plugin::current()->getRootDir() . 'files/config.php.tpl'), $param);
+					$config = strtr(file_get_contents(Plugin::current()->getRootDir() . 'templates/config.php.tpl'), $param);
 					file_put_contents(INCLUDES_DIR . 'config.php', $config);
 
 
@@ -246,7 +234,7 @@ class InstallController extends Controller{
 					
 					return $form->response(Form::STATUS_SUCCESS, Lang::get('install.install-success'));
 				}
-				catch(Exception $e){
+				catch(\Exception $e){
 					return $form->response(Form::STATUS_ERROR, Lang::get('install.install-error'));
 				}				
 			}

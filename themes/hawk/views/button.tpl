@@ -3,7 +3,7 @@
 		{{$key}}="{{ addcslashes($value, '"') }}" 
 	{/foreach} >
 	{if($icon)}
-		<span class="fa fa-{{ $icon }}"></span>
+		<span class="icon icon-{{ $icon }}"></span>
 	{/if}
 	{{ $label }}
 </button>

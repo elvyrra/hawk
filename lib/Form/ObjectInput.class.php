@@ -4,6 +4,8 @@
  * @author Elvyrra SAS
  */
 
+namespace Hawk;
+
 /**
  * This class describe the behavior of an input representing an object.
  * To be treated, an object must be an array. 

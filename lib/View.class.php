@@ -4,6 +4,7 @@
  * @author Elvyrra SAS
  */
  
+namespace Hawk;
 
 /**
  * This class describes the behavior of views
@@ -134,7 +135,7 @@ class View{
 		// Parse plugins nodes		
 		$this->content = preg_replace_callback(self::PLUGIN_REGEX, function($matches){			
 			list($l, $component, $arguments) = $matches;
-			$componentClass = 'ViewPlugin' . ucfirst($component);
+			$componentClass = '\\Hawk\\View\\Plugins\\' . ucfirst($component);
 			
 			if(!class_exists($componentClass)){
 				return $matches[0];
@@ -162,10 +163,12 @@ class View{
 				
 				return '<?php $instance = new ' . $componentClass . '( array(' . implode(',',$parameters) . ') ); echo $instance->display(); ?>';
 			}
-			catch(Exception $e){
+			catch(\Exception $e){
 				return $matches[0];
 			}
 		}, $this->content);
+
+		$this->content = '<?php namespace ' . __NAMESPACE__ . '; ?>' . $this->content;
 		
 		return $this;
 	}
@@ -222,7 +225,7 @@ class View{
 /**
  * This class describes the View exceptions
  */
-class ViewException extends Exception{
+class ViewException extends \Exception{
 	const TYPE_FILE_NOT_FOUND = 1;
 	const TYPE_EVAL = 2;
 	

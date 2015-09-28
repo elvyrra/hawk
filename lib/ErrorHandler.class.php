@@ -3,6 +3,7 @@
  * ErrorHandler.class.php
  */
 
+namespace Hawk;
 
 /**
  * This class defines the errors and exceptions handlers
@@ -74,7 +75,7 @@ class ErrorHandler {
 			Response::end();
 		}
 		else{
-			echo View::make(ThemeManager::getSelected()->getView('error.tpl'), $param);
+			echo View::make(Theme::getSelected()->getView('error.tpl'), $param);
 		}
 	}
 
@@ -96,7 +97,7 @@ class ErrorHandler {
 			Response::set(json_encode($param));
 		}
 		else{				
-			Response::set(View::make(ThemeManager::getSelected()->getView('error.tpl'), $param));
+			Response::set(View::make(Theme::getSelected()->getView('error.tpl'), $param));
 		}
 		Response::end();
 	}

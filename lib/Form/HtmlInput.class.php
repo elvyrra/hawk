@@ -4,6 +4,8 @@
  * @author Elvyrra SAS
  */
 
+namespace Hawk;
+
 /**
  * This class describes html inputs. These objects are not really inputs, but can be used in forms to display HTML content betweeen other inputs, 
  * for instance short description of a set of inputs.

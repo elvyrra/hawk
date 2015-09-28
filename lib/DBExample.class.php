@@ -5,6 +5,8 @@
  * @license MIT
  */
 
+namespace Hawk;
+
 /**
  * This class is used to construct SQL WHERE expressions from arrays. 
  * This can be useful to build simple conditions without writing SQL query and manage binding values
@@ -183,5 +185,5 @@ class DBExample{
 /**
  * This class describes the behavior of the exceptions throwed by DBExample class
  */
-class DBExampleException extends Exception{	
+class DBExampleException extends \Exception{	
 }

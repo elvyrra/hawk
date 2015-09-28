@@ -1,8 +1,9 @@
 <?php
-
 /**
  * Log.class.php
  */
+
+namespace Hawk;
 
 /**
  * This class is used to log data in /logs directory. You can use it to log the action of the users on the application, for example to make stats.
@@ -73,8 +74,8 @@ class Log{
                 }
 
                 // Create the new archive
-                $zip = new ZipArchive;
-                $zip->open($this->filename . '.0.zip', ZipArchive::CREATE);
+                $zip = new \ZipArchive;
+                $zip->open($this->filename . '.0.zip', \ZipArchive::CREATE);
                 $zip->addFile($this->filename);
                 $zip->close();
 
@@ -95,7 +96,7 @@ class Log{
      * Get the available levels of log
      */
     private static function getLevels() {
-        $object = new ReflectionClass(__CLASS__);
+        $object = new \ReflectionClass(__CLASS__);
 
         $levels = $object->getConstants();
         unset($levels['MAX_FILE_SIZE']);

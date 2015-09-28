@@ -3,7 +3,7 @@
  * Image.class.php
  */
 
-
+namespace Hawk;
 
 /**
  * This class is used to treat images. This class can resize images, or compress them
@@ -285,4 +285,4 @@ class GifImage extends Image{
 /**
  * This class describes the execptions throwed by Image class
  */
-class ImageException extends Exception{}
+class ImageException extends \Exception{}

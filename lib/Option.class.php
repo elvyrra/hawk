@@ -3,7 +3,7 @@
  * Option.class.php
  */
 
-
+namespace Hawk;
 
 /**
  * This class is used to access and set application options
@@ -18,7 +18,6 @@ class Option{
 	/**
 	 * The file containing the cache of options
 	 */
-	// const CACHE_FILE = 'options.php';
 	
 	/**
 	 * Get the value of an option
@@ -51,7 +50,7 @@ class Option{
 		foreach($options as $option){
 			self::$options[$plugin][$option['key']] = $option['value'];
 		}
-		return isset(self::$options[$plugin]) ? self::$options[$plugin] : false;
+		return isset(self::$options[$plugin]) ? self::$options[$plugin] : array();
 	}
 	
 
@@ -93,7 +92,3 @@ class Option{
 	}
 }
 
-// EventManager::on('process-end', function(){
-// 	// Utils::debug(Option::getAll());
-// 	file_put_contents(CACHE_DIR . Option::CACHE_FILE, '<?php return ' . var_export(Option::getAll(), true) . ';');
-// });

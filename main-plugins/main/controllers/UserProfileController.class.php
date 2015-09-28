@@ -1,5 +1,6 @@
 <?php
 
+namespace Hawk\Plugins\Main;
 
 class UserProfileController extends Controller{
 
@@ -67,7 +68,7 @@ class UserProfileController extends Controller{
 
         // Generate the question fields
         foreach($questions as $question){
-            $classname = ucwords($question->type) . 'Input';
+            $classname = '\Hawk\\' . ucwords($question->type) . 'Input';
             $field = json_decode($question->parameters, true);
             $field['name'] = $question->name;
             $field['id'] = 'user-form-' . $question->name. '-input';
@@ -103,7 +104,7 @@ class UserProfileController extends Controller{
         
         $form = new Form($param);
         if(!$form->submitted()){
-            return View::make($this->theme->getView("dialogbox.tpl"), array(
+            return View::make(Theme::getSelected()->getView("dialogbox.tpl"), array(
                 'page' => $form,
                 'title' => Lang::get('admin.user-form-title'),
                 'icon' => 'user',
@@ -190,7 +191,7 @@ class UserProfileController extends Controller{
         $form = new Form($params);
 
         if(!$form->submitted()){
-            return View::make($this->theme->getView("dialogbox.tpl"), array(
+            return View::make(Theme::getSelected()->getView("dialogbox.tpl"), array(
                 'title' => Lang::get('main.update-password-title'),
                 'icon' => 'lock',
                 'page' => $form

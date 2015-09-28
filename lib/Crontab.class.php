@@ -4,6 +4,8 @@
  * @author Elvyrra SAS
  */
 
+namespace Hawk;
+
 /**
  * This class is used to add, and remove cron jobs. To use this class, you must have rights to execute shell commands on the server
  * @package Utils

@@ -1,13 +1,15 @@
 <?php
 /**
- * HTTP.class.php
+ * HTTPRequest.class.php
  */
  
+namespace Hawk;
+
 /**
  * This class is used to send HTTP request and get the result
  * @package Utils
  */
-class HTTPrequest{
+class HTTPRequest{
 	use Utils;
 
 	const METHOD_POST = 'POST';

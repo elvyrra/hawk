@@ -4,6 +4,7 @@
  * @author Elyrra SAS
  */
 
+namespace Hawk;
 
 /**
  * This class describes email inputs behavior

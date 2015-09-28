@@ -6,7 +6,7 @@
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-menu-collapse" >
 		        <span class="sr-only">Toggle navigation</span>
-		        <span class="fa fa-bars"></span>
+		        <span class="icon icon-bars"></span>
 	      	</button>
 		</div>
 
@@ -18,7 +18,7 @@
 							<li class="dropdown main-menu" id="main-menu-{{ $menu->id }}">
 								<div class="dropdown-toggle main-menu-title" type="button" id="main-menu-title-{{ $menu->id }}" data-toggle="dropdown">
 									{{ $menu->label }}
-									<i class="fa fa-caret-down"></i>
+									<i class="icon icon-caret-down"></i>
 								</div>
 								<ul class="dropdown-menu" role="menu" aria-labelledby="main-menu-title-{{ $menu->id }}" id="main-menu-items-{{ $menu->id }}">
 									{foreach($menu->visibleItems as $item)}

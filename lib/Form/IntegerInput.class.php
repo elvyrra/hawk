@@ -4,6 +4,8 @@
  * @author Elvyrra SAS
  */
 
+namespace Hawk;
+
 /**
  * This class describes the behavior of inputs that value must be an integer
  * @package Form\Input

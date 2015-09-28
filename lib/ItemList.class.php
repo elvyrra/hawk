@@ -4,7 +4,7 @@
  * @author Elvyrra SAS
  */
 
-
+namespace Hawk;
 
 /**
  * This class is used to generate and display smart lists, getting data from the database or a given array
@@ -144,8 +144,16 @@ class ItemList{
 		
 		/*** Get the values from the parameters array **/
 		$this->map($params);
+
+		if(!class_exists($this->model)){
+			$trace = debug_backtrace();
+			$class = $trace[0]['class'];
+			$reflection = new \ReflectionClass($trace[0]['class']);
+			$this->model = $reflection->getNamespaceName() . '\\' . $this->model;
+		}
+
 		
-		$model = $this->model;
+		$model = $this->model;		
 		
 		if(!isset($this->reference)){
 			$this->reference = $model::getPrimaryColumn();			
@@ -202,9 +210,10 @@ class ItemList{
 			}
 		}
 
-		EventManager::trigger(new Event('list.' . $this->id . '.instanciated', array(
+		$event = new Event('list.' . $this->id . '.instanciated', array(
 			'list' => $this
-		)));
+		));
+		$event->trigger();
 	}
 	
 	/**
@@ -297,7 +306,7 @@ class ItemList{
 			
 			return true;
 		}
-		catch(DatabaseException $e){
+		catch(DBException $e){
 			exit(DEBUG_MODE ? $e->getMessage() : Lang::get('main.list-error'));
 		}  
 	}
@@ -387,14 +396,14 @@ class ItemList{
 			}
 			
 			$tplFile = $this->refresh ? 'result.tpl' : 'list.tpl';
-			return View::make(ThemeManager::getSelected()->getView('item-list/' . $tplFile), array(			
+			return View::make(Theme::getSelected()->getView('item-list/' . $tplFile), array(			
 				'list' => $this,
 				'data' => $data,
 				'linesParameters' => $param,
 				'pages' => $pages
 			));
 		}
-		catch(Exception $e){
+		catch(\Exception $e){
 			ErrorHandler::exception($e);
 		}
 	}

@@ -3,7 +3,7 @@
  * RadioInput.class.php
  */
 
-
+namespace Hawk;
 
 /**
  * This class describes the input[type='radio']
@@ -18,5 +18,3 @@ class RadioInput extends FormInput{
 	public 	$layout = 'horizontal';
 
 }
-
-/******************* (C) COPYRIGHT 2014 ELVYRRA SAS *********************/

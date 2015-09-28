@@ -1,5 +1,5 @@
 <?php
-
+namespace Hawk\Plugins\Admin;
 
 class ThemeController extends Controller{
 
@@ -10,22 +10,27 @@ class ThemeController extends Controller{
 		
 		$tabs = array(
 			'select' => array(
+				'id' => 'admin-themes-select-tab',
 				'title' => Lang::get('admin.theme-tab-select-title'),
 				'content' => $this->compute('listThemes'),
 			),
 			'customize' => array(
+				'id' => 'admin-themes-customize-tab',
 				'title' => Lang::get('admin.theme-tab-basic-custom-title'),
 				'content' => $this->compute('customize'),
 			),			
 			'css' => array(
+				'id' => 'admin-themes-css-tab',
 				'title' => Lang::get('admin.theme-tab-advanced-custom-title'),
 				'content' => $this->compute('css'),
 			),
 			'medias' => array(
+				'id' => 'admin-themes-medias-tab',
 				'title' => Lang::get('admin.theme-tab-medias-title'),
 				'content' => $this->compute('medias'),
 			),
 			'menu' => array(
+				'id' => 'admin-themes-menu-tab',
 				'title' => Lang::get('admin.theme-tab-menu-title'),
 				'content' => $this->compute('menu')
 			)
@@ -47,14 +52,14 @@ class ThemeController extends Controller{
 	 * Display the list of available themes to choose one
 	 */
 	public function listThemes(){
-		$themes = ThemeManager::getAll();
-		$selectedTheme = ThemeManager::getSelected();	
+		$themes = Theme::getAll();
+		$selectedTheme = Theme::getSelected();	
 
 		Lang::addKeysToJavaScript("admin.theme-update-reload-page-confirm");
 
 		return View::make(Plugin::current()->getView("themes-list.tpl"), array(
-			'themes' => ThemeManager::getAll(),
-			'selectedTheme' => ThemeManager::getSelected(),
+			'themes' => Theme::getAll(),
+			'selectedTheme' => Theme::getSelected(),
 		));
 	}
 
@@ -64,7 +69,7 @@ class ThemeController extends Controller{
 	 * Select a theme to be active
 	 */
 	public function select(){
-		ThemeManager::setSelected($this->name);
+		Theme::setSelected($this->name);
 	}
 
 
@@ -74,14 +79,14 @@ class ThemeController extends Controller{
 	 * Customize the current selected theme
 	 */
 	public function customize(){
-		$theme = ThemeManager::getSelected();
-		$variables = $theme->getCssVariables();
+		$theme = Theme::getSelected();
+		$variables = $theme->getEditableVariables();
 		
 		if(!empty($_GET['reset'])){
 			foreach($variables as $var){
 				Option::delete('theme-' . $theme->getName() . '.' . $var['name']);
 			}
-			$theme->buildCssFile(true);
+			$theme->build(true);
 		}
 		
 		$options = $options = Option::getPluginOptions('theme-' . $theme->getName());
@@ -105,7 +110,7 @@ class ThemeController extends Controller{
 						'onclick' => 'app.load(app.getUri("customize-theme") + "?reset=1", {
 										selector : "#admin-themes-customize-tab",
 										onload : function(){
-											app.forms["custom-theme-form"].node.trigger("success" , {href : "' . $theme->getBaseCssUrl() . '?' . time() .'"})
+											app.forms["custom-theme-form"].onsuccess({href : "' . $theme->getBaseCssUrl() . '?" + new Date().getTime() });
 										}
 									})'
 					))
@@ -172,7 +177,7 @@ class ThemeController extends Controller{
 					}
 				}
 
-				$theme->buildCssFile(true);
+				$theme->build(true);
 				$form->addReturn('href', $theme->getBaseCssUrl() . '?' . time());
 				return $form->response(Form::STATUS_SUCCESS);
 			}
@@ -187,7 +192,7 @@ class ThemeController extends Controller{
 	 * Customize the css of the current selected theme
 	 */
 	public function css(){
-		$file = ThemeManager::getSelected()->getCustomCssFile();
+		$file = Theme::getSelected()->getCustomCssFile();
 		$css = is_file($file) ? file_get_contents($file) : '';
 		$param = array(
 			'id' => 'theme-css-form',
@@ -233,7 +238,7 @@ class ThemeController extends Controller{
 		else{
 			file_put_contents($file, $form->getData('css'));
 
-			$form->addReturn('href', ThemeManager::getSelected()->getCustomCssUrl() . '?' . time());
+			$form->addReturn('href', Theme::getSelected()->getCustomCssUrl() . '?' . time());
 
 			return $form->response(Form::STATUS_SUCCESS);
 		}
@@ -244,7 +249,7 @@ class ThemeController extends Controller{
 	 * Media gallery
 	 */
 	public function medias(){
-		$theme = ThemeManager::getSelected();
+		$theme = Theme::getSelected();
 
 		$rootDir = $theme->getMediasDir();
 		$rootUrl = $theme->getMediasUrl();
@@ -286,7 +291,7 @@ class ThemeController extends Controller{
 					default :
 						$medias[$category]['files'][] = array(
 							'url' => $url,
-							'display' => "<i class='fa fa-{$medias[$category]['icon']}'></i>" . basename($file)
+							'display' => "<i class='icon icon-{$medias[$category]['icon']}'></i>" . basename($file)
 						);
 						break;
 				}				
@@ -337,12 +342,12 @@ class ThemeController extends Controller{
 		if($form->check()){
 			$uploader = Upload::getInstance('medias');
 
-			$dir = ThemeManager::getSelected()->getMediasDir();
+			$dir = Theme::getSelected()->getMediasDir();
 			if(!is_dir($dir)){
 				mkdir($dir, 0755, true);
 			}
 			foreach($uploader->getFiles() as $file){
-				$uploader->move($file, ThemeManager::getSelected()->getMediasDir());
+				$uploader->move($file, Theme::getSelected()->getMediasDir());
 			}
 
 			return $form->response(Form::STATUS_SUCCESS);
@@ -355,16 +360,19 @@ class ThemeController extends Controller{
 	 */
 	public function deleteMedia(){
 		$filename = urldecode($this->filename);
-		FileSystem::remove(ThemeManager::getSelected()->getMediasDir() . $filename);
+		FileSystem::remove(Theme::getSelected()->getMediasDir() . $filename);
 	}
 
 
 
-	public function addThemeForm(){
+	/**
+	 * The form to import a new theme
+	 */
+	public function importThemeForm(){
 		$param = array(
-			'id' => 'add-theme-form',
+			'id' => 'import-theme-form',
 			'upload' => true,
-			'action' => Router::getUri('add-theme'),
+			'action' => Router::getUri('import-theme'),
 			'fieldsets' => array(
 				'form' => array(
 					new FileInput(array(
@@ -377,7 +385,7 @@ class ThemeController extends Controller{
 					new SubmitInput(array(
 						'name' => 'valid',
 						'icon' => 'upload',
-						'value' => Lang::get('admin.theme-add-submit-value'),						
+						'value' => Lang::get('admin.theme-import-submit-value'),						
 					)),
 				)
 			),
@@ -390,15 +398,15 @@ class ThemeController extends Controller{
 
 
 	/**
-	 * Add a new theme
+	 * Import a new theme
 	 */
-	public function add(){
-		$form = $this->addThemeForm();
+	public function import(){
+		$form = $this->importThemeForm();
 		if($form->check()){
 			$uploader = Upload::getInstance('theme');
 
 			if($uploader){
-				$zip = new ZipArchive;
+				$zip = new \ZipArchive;
 				$file = $uploader->getFile();
 				$zip->open($file->tmpFile);
 				$zip->extractTo(THEMES_DIR);
@@ -411,10 +419,153 @@ class ThemeController extends Controller{
 
 
 	/**
+	 * Create a custom theme
+	 */
+	public function create(){
+		$form = new Form(array(
+			'id' => 'create-theme-form',
+			'labelWidth' => '20em',
+			'fieldsets' => array(
+				'form' => array(
+					new TextInput(array(
+						'name' => 'name',
+						'required' => true,
+						'pattern' => '/^[\w\-]+$/',
+						'label' => Lang::get('admin.theme-create-name-label')
+					)),
+
+					new TextInput(array(
+						'name' => 'title',
+						'required' => true,
+						'label' => Lang::get('admin.theme-create-title-label')
+					)),
+
+					new SelectInput(array(
+						'name' => 'extends',
+						'invitation' => '-',
+						'options' => array_map(function($theme){
+							return $theme->getTitle();
+						}, Theme::getAll()),
+						'label' => Lang::get('admin.theme-create-extends-label')
+					)),
+
+					new TextInput(array(
+                        'name' => 'version',
+                        'required' => true,
+                        'pattern' => '/^(\d+\.){2,3}\d+$/',
+                        'label' => Lang::get('admin.theme-create-version-label'),
+                        'default' => '0.0.1'
+                    )),
+
+                    new TextInput(array(
+                        'name' => 'author',
+                        'label' => Lang::get('admin.theme-create-author-label'),                    
+                    )),
+				),
+				
+				'submits' => array(
+					new SubmitInput(array(
+						'name' => 'valid',
+						'value' => Lang::get('main.valid-button')
+					)),
+
+					new ButtonInput(array(
+                        'name' => 'cancel',
+                        'value' => Lang::get('main.cancel-button'),
+                        'onclick' => 'app.dialog("close")'
+                    ))
+				)
+			),
+			'onsuccess' => 'app.dialog("close"); app.load(app.getUri("available-themes"), { selector : $("#admin-themes-select-tab")} );'
+		));
+
+		if(!$form->submitted()){
+            // Display the form
+            return View::make(Theme::getSelected()->getView('dialogbox.tpl'), array(
+                'title' => Lang::get('admin.theme-create-title'),
+                'icon' => 'picture-o',
+                'page' => $form
+            ));
+        }
+        else{ 
+        	if($form->check()){
+        		$dir = THEMES_DIR . $form->getData('name') . '/';
+        		if(is_dir($dir)){
+        			$form->error('name', Lang::get('admin.theme-create-name-already-exists-error'));
+        			return $form->response(Form::STATUS_CHECK_ERROR, Lang::get('admin.theme-create-name-already-exists-error'));
+        		}
+
+        		// The theme can be created
+        		try{
+        			// Create the main directory
+        			if(!mkdir($dir)){
+        				throw new \Exception('Impossible to create the directory ' . $dir);
+        			}
+
+        			// Create the directory views
+        			if(!mkdir($dir . 'views' )){
+        				throw new \Exception('Impossible to create the directory ' . $dir . 'views');
+        			}
+
+        			// Get the parent theme
+        			$parent = null;
+        			if($form->getData('extends')){
+        				$parent = Theme::get($form->getData('extends'));
+        			}
+
+        			// Create the file manifest.json
+        			$conf = array(
+        				'title' => $form->getData('title'),        				
+        				'version' => $form->getData('version'),
+        				'author' => $form->getData('author')
+        			);
+        			if($parent){
+        				$conf['extends'] = $parent->getName();
+        			}
+        			if(file_put_contents($dir . Theme::MANIFEST_BASENAME, json_encode($conf, JSON_PRETTY_PRINT)) === false){
+        				throw new \Exception('Impossible to create the file ' . $dir . Theme::MANIFEST_BASENAME);
+        			}
+
+        			$theme = Theme::get($form->getData('name'));
+        			if($parent){
+        				// The theme extends another one, make a copy of the parent theme except manifest.json and views
+        				foreach(glob($parent->getRootDirname() . '*') as $element) {
+        					if(! in_array(basename($element), array(Theme::MANIFEST_BASENAME, 'views'))){
+        						FileSystem::copy($element, $theme->getRootDirname());
+        					}
+        				}
+        			}
+        			else{
+        				// Create the directory less
+	        			if(!mkdir($dir . 'less' )){
+	        				throw new \Exception('Impossible to create the directory ' . $dir . 'less');
+	        			}
+
+	        			// Create the file theme.less
+	        			if(!touch($theme->getBaseLessFile())){
+	        				throw new \Exception('Impossible to create the file ' . $theme->getBaseLessFile());
+	        			}
+        			}
+					
+        			return $form->response(Form::STATUS_SUCCESS, Lang::get('admin.theme-create-success'));
+        		}
+        		catch(\Exception $e){
+        			if(is_dir($dir)){
+        				FileSystem::remove($dir);
+        			}
+        			return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get('admin.theme-create-error'));
+        		}
+        	}
+        }
+	}
+
+
+
+	/**
 	 * Delete a theme 
 	 */
 	public function delete(){
-		$theme = ThemeManager::get($this->name);
+		$theme = Theme::get($this->name);
 		if($theme->isRemovable()){
 			$dir = $theme->getRootDirname();
 			FileSystem::remove($dir);

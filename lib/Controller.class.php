@@ -4,6 +4,7 @@
  * @author Elvyrra SAS
  */
 	
+namespace Hawk;
 
 /**
  * This class describes the behavior of a controller. All controllers defined in application plugins 
@@ -29,7 +30,6 @@ class Controller{
 	public function __construct($param = array()){		
 		$this->map($param);
 			
-		$this->theme = ThemeManager::getSelected();
 		self::$currentController = $this;
 	}
 	
@@ -53,21 +53,21 @@ class Controller{
 	 */
 	public function compute($method){
 		/*** Load widgets before calling the controller method ***/
-		EventManager::trigger(new Event(get_called_class() . '.' . $method . '.' . self::BEFORE_ACTION, array('controller' => $this)));
+		(new Event(get_called_class() . '.' . $method . '.' . self::BEFORE_ACTION, array('controller' => $this)))->trigger();
 		
 		/*** Call the controller method ***/
 		$result = $this->$method();
 		if(Response::getType() == 'html'){
 			// Create a phpQuery object to be modified by event listeners (widgets)
-			$result = phpQuery::newDocument($result);
+			$result = \phpQuery::newDocument($result);
 		}
 				
 		/*** Load the widgets after calling the controller method ***/		
 		$event = new Event(get_called_class() . '.' . $method . '.' . self::AFTER_ACTION, array('controller' => $this, 'result' => $result));
-		EventManager::trigger($event);
+		$event->trigger();
 		
 		$result = $event->getData('result');
-		if( $result instanceof phpQuery){			
+		if( $result instanceof \phpQuery){			
 			return $result->htmlOuter();
 		}
 		else{
@@ -81,7 +81,7 @@ class Controller{
 	 * @param string $content The content to add
 	 */
 	private function addContentAtEnd($content){	
-		Widget::add(Router::getCurrentAction(), Controller::AFTER_ACTION, function($event) use($content){			
+		Event::on(Router::getCurrentAction() . '.' . self::AFTER_ACTION, function($event) use($content){			
 			if(Response::getType() === 'html'){	
 				$dom = $event->getData('result');
 				if($dom->find('body')->length){

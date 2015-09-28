@@ -1,4 +1,5 @@
 <?php
+namespace Hawk;
 
 /** DEVELOPER ZONE **/
 define('DEBUG_MODE', false); // Display or not the errors

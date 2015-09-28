@@ -4,7 +4,7 @@
  * @author Elvyrra SAS
  */
 
-
+namespace Hawk;
 
 /**
  * This class permits to treat AJAX uploads 
@@ -102,4 +102,4 @@ class Upload{
 /**
  * This class describes the exceptions throwed by Upload class
  */
-class UploadException extends Exception{}
+class UploadException extends \Exception{}

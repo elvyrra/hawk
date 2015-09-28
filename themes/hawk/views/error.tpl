@@ -1,6 +1,6 @@
 <div class="alert alert-{{ $level }}">
 	<div class="error-title">
-		<i class="fa fa-{{ $icon }}"></i>
+		<i class="icon icon-{{ $icon }}"></i>
 		{{ $title }}
 	</div>
 	<div class="error-content">
