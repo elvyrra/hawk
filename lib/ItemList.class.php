@@ -172,8 +172,6 @@ class ItemList{
 		$this->dbo= DB::get($model::getDbName());
 		$this->table = $model::getTable();
 		
-		
-
 		/*** initialize controls ***/
 		foreach($this->controls as &$button){
 			if(!empty($button['template'])){

@@ -16,6 +16,7 @@ settings-db-host-label = "Nom de l'hôte"
 settings-db-username-label = "Login de connexion"
 settings-db-password-label = "Mot de passe"
 settings-db-dbname-label = "Le nom de la base (sera créée si elle n'existe pas déjà)"
+settings-db-prefix-label = "Préfixe des tables"
 
 settings-admin-legend = "Administrateur"
 settings-admin-login-label = "Login"

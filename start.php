@@ -22,7 +22,7 @@ define('USERFILES_THEMES_URL', USERFILES_ROOT_URL . 'themes/');
 if(Conf::has('db')){
     /*** Access to the OS database (MySQL) ***/   
     try{
-        DB::add(MAINDB, Conf::get('db'));
+        DB::add(MAINDB, Conf::get('db.maindb'));
         DB::get(MAINDB);
     }
     catch(DBException $e){

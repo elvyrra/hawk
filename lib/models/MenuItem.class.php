@@ -58,7 +58,7 @@ class MenuItem extends Model{
 
 		$data['order'] = DB::get(self::$dbname)->select(array(
 			'fields' => array('COALESCE(MAX(`order`), 0) + 1' => 'newOrder'),
-			'from' => self::$tablename,
+			'from' => self::getTable(),
 			'where' => new DBExample(array('parentId' => $data['parentId'])),
 			'one' => true,
 			'return' => DB::RETURN_OBJECT
