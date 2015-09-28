@@ -13,7 +13,7 @@
 	{text key='main.hawk-powered'}
 	{if(DEV_MODE)}
 		<a href="{uri action='clear-cache'}" class="real-link pull-right" title="{text key="main.clear-cache"}"> 
-			<i class="icon icon-calendar-times-o"></i>
+			<i class="icon icon-calendar-times-o icon-lg clear-cache-btn"></i>
 		</a>
 	{/if}
 </div>
