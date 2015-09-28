@@ -71,7 +71,7 @@ class ButtonInput extends FormInput{
 		/*** Set the attribute and text to the span inside the button ***/
 		$param = array_map(function($v){return htmlentities($v, ENT_QUOTES); }, $param);
 		
-		return View::make(ThemeManager::getSelected()->getView('button.tpl') ,array(
+		return View::make(Theme::getSelected()->getView('button.tpl') ,array(
 			'class' => isset($param['class']) ? $param['class'] : '',
 			'param' => $param,
 			'icon' => isset($param['icon']) ? $param['icon'] : '',

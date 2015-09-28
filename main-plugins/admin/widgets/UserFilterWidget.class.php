@@ -59,7 +59,7 @@ class UserFilterWidget extends Widget{
 
 		));
 
-		return View::make(ThemeManager::getSelected()->getView("box.tpl"), array(
+		return View::make(Theme::getSelected()->getView("box.tpl"), array(
 			'content' => $form,
 			'title' => Lang::get('admin.user-filter-legend'),
 			'icon' => 'filter',

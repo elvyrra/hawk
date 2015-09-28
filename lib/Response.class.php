@@ -107,7 +107,7 @@ class Response{
                 echo self::$content;
             break;
         }
-        exit;
+        exit();
     }
 	
 
@@ -118,7 +118,7 @@ class Response{
 	public static function redirect($url){
         Log::debug('redirect to ' . $url);
         header("Location: $url");
-		exit;
+		exit();
 	}
 	
     /**

@@ -62,8 +62,8 @@ class QuestionController extends Controller{
 				'actions' => array(
 					'independant' => true,
 					'display' => function($value, $field, $line){
-						return 	$line->editable ? "<i class='fa fa-pencil text-info' href='" . Router::getUri('edit-profile-question', array('name' => $line->name)) . "' target='dialog' title='". Lang::get('admin.edit-profile-question')."' ></i>".
-												 "<i class='fa fa-times text-danger delete-question' data-question='$line->name' title='" . Lang::get('admin.delete-profile-question') . "'></i>" : "";
+						return 	$line->editable ? "<i class='icon icon-pencil text-info' href='" . Router::getUri('edit-profile-question', array('name' => $line->name)) . "' target='dialog' title='". Lang::get('admin.edit-profile-question')."' ></i>".
+												 "<i class='icon icon-times text-danger delete-question' data-question='$line->name' title='" . Lang::get('admin.delete-profile-question') . "'></i>" : "";
 					},
 					'sort' => false,
 					'search' => false,
@@ -226,7 +226,7 @@ class QuestionController extends Controller{
 
 						new HtmlInput(array(
 							'name' => 'parameters-description',
-							'value' => "<p class='alert alert-info'><i class='fa fa-exclamation-circle'></i>" . Lang::get('admin.profile-question-form-translation-description') . "</p>"
+							'value' => "<p class='alert alert-info'><i class='icon icon-exclamation-circle'></i>" . Lang::get('admin.profile-question-form-translation-description') . "</p>"
 						)),
 
 						new TextInput(array(
@@ -281,7 +281,7 @@ class QuestionController extends Controller{
 					'form' => $form
 				));
 
-				return View::make($this->theme->getView("dialogbox.tpl"), array(
+				return View::make(Theme::getSelected()->getView("dialogbox.tpl"), array(
 					'title' => Lang::get("admin.users-questions-title"),
 					'icon' => 'file-word-o',
 					'page' => $content

@@ -25,27 +25,34 @@ class FileSystem{
 	 * @param string $dest The destination file or directory
 	 */
 	public static function copy($source, $dest){
-		if(! file_exists($source)){
-			throw new FileSystemException('Cannot copy ' . $source . ' : No such file or directory');
-		}
-
-		if(is_file($source)){
-			// Copy a file
-			if(is_dir($dest)){
-				$dest = $dest . self::DP . basename($source);
+		if(basename($source) == '*'){
+			foreach(glob($source) as $element){
+				self::copy($element, $dest);
 			}
-			copy($source, $dest);
 		}
 		else{
-			// Copy a directory
-			$base = basename($source);
-			if(!is_dir($dest . self::DP . $base)){
-				mkdir($dest . self::DP . $base, fileperms($source), true);
+			if(! file_exists($source)){
+				throw new FileSystemException('Cannot copy ' . $source . ' : No such file or directory');
 			}
 
-			// Copy all files and folder under this directory
-			foreach(glob($source . self::DP . '*') as $element){				
-				self::copy($element, $dest . self::DP . $base);
+			if(is_file($source)){
+				// Copy a file
+				if(is_dir($dest)){
+					$dest = $dest . self::DP . basename($source);
+				}
+				copy($source, $dest);
+			}
+			else{
+				// Copy a directory
+				$base = basename($source);
+				if(!is_dir($dest . self::DP . $base)){
+					mkdir($dest . self::DP . $base, fileperms($source), true);
+				}
+
+				// Copy all files and folder under this directory
+				foreach(glob($source . self::DP . '*') as $element){				
+					self::copy($element, $dest . self::DP . $base);
+				}
 			}
 		}
 	}
@@ -89,22 +96,29 @@ class FileSystem{
 	 * @param string $source The file or directory name to remove
 	 * @return boolean, TRUE if the source was removed, else FALSE
 	 */
-	public static function remove($source){		
-		if(! file_exists($source)){
-			throw new FileSystemException('Cannot remove ' . $source . ' : No such file or directory');
-		}
-
-		if(is_file($source)){
-			// remove a file
-			return unlink($source);
-		}
-		else{
-			// remove a directory 
-			foreach(glob($source . self::DP . '*') as $element){
-				self::remove($element);				
+	public static function remove($source){	
+		if(basename($source) == '*'){
+			foreach(glob($source) as $element){
+				self::remove($element);
 			}
-			return rmdir($source);
-		}		
+		}
+		else{	
+			if(! file_exists($source)){
+				throw new FileSystemException('Cannot remove ' . $source . ' : No such file or directory');
+			}
+
+			if(is_file($source)){
+				// remove a file
+				return unlink($source);
+			}
+			else{
+				// remove a directory 
+				foreach(glob($source . self::DP . '*') as $element){
+					self::remove($element);				
+				}
+				return rmdir($source);
+			}
+		}
 	}
 }
 

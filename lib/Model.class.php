@@ -251,7 +251,7 @@ class Model{
         $instance = new $class($data);
         $instance->save();
 
-        EventManager::trigger(new Event(strtolower($class).'.added', array('data' => $data)));
+        (new Event(strtolower($class).'.added', array('data' => $data)))->trigger();
 
         return $instance;
     }
@@ -290,7 +290,7 @@ class Model{
 		$id = static::$primaryColumn;
 		$deleted = self::getDbInstance()->delete(static::$tablename, new DBExample(array($id => $this->$id)));
 
-        EventManager::trigger(new Event(strtolower($class).'.deleted', array('object' => $this)));
+        (new Event(strtolower($class).'.deleted', array('object' => $this)))->trigger();
 
         return (bool) $deleted;
 	}

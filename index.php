@@ -11,7 +11,7 @@ require ROOT_DIR . 'start.php';
 
 Log::debug('script has been Initialized');
 
-EventManager::trigger(new Event('process-start'));
+(new Event('process-start'))->trigger();
 
 
 /*** Initialize the plugins ***/
@@ -28,7 +28,7 @@ if(!Conf::has('db') && (Router::getUri() === '/' || Router::getUri() === 'index.
     return;
 }
 
-EventManager::trigger(new Event('before-routing'));
+(new Event('before-routing'))->trigger();
 
 /*** Compute the routage ***/
 Router::route();
@@ -38,7 +38,7 @@ $event = new Event('process-end', array(
 	'output' => Response::get(), 
 	'execTime' => microtime(true) - SCRIPT_START_TIME
 ));
-EventManager::trigger($event);
+$event->trigger();
 
 Response::set($event->getData('output'));
 

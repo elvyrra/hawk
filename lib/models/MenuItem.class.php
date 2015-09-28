@@ -67,8 +67,9 @@ class MenuItem extends Model{
 		// Insert the menu item
 		$item = parent::add($data);	
 
-		EventManager::trigger(new Event('menu-item.added', array('item' => $item)));
-
+		$event = new Event('menu-item.added', array('item' => $item));
+		$event->trigger();
+		
 		return $item;
 	}
 

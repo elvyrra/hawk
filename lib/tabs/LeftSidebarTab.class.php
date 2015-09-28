@@ -25,6 +25,6 @@ class LeftSidebarTab extends View{
 			$data['page']['class'] = 'col-md-9 col-lg-10';
 		}
 		
-		return parent::make(ThemeManager::getSelected()->getView('tabs-layout/tabs-sidebar-left.tpl'), $data);
+		return parent::make(Theme::getSelected()->getView('tabs-layout/tabs-sidebar-left.tpl'), $data);
 	}
 }

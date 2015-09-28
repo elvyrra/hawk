@@ -13,29 +13,10 @@ namespace Hawk;
  */
 class Theme{ 
     /**
-     * The theme name
-     * @var string
+     * The default theme name
      */
-    private $name, 
+    const DEFAULT_THEME = 'hawk';
 
-    /**
-     * The theme manifest data
-     * @var array
-     */
-    $data,
-
-    /**
-     * The parent theme name
-     * @var Theme
-     */
-    $parent = null,
-
-    /**
-     * The CSS sources, inherited from parent theme
-     */
-    $sources = array();
-
-    
     /**
      * The theme css file basename
      */
@@ -52,10 +33,85 @@ class Theme{
     const CSS_CUSTOM_BASENAME = 'theme-custom.css';
 
     /**
+     * The filename of the definition file
+     */
+    const MANIFEST_BASENAME = 'manifest.json';
+
+    /**
+     * The filename of the preview image
+     */
+    const PREVIEW_BASENAME = 'preview.png';
+
+    /**
+     * The theme name
+     * @var string
+     */
+    private $name, 
+
+    /**
+     * The theme manifest data
+     * @var array
+     */
+    $data,
+
+    /**
+     * The parent theme name
+     * @var Theme
+     */
+    $parent = null;
+
+    /**
      * The themes embedded with Hawk, that are not removable
      */
-    private static $nativeThemes = array("hawk");
+    private static $nativeThemes = array('hawk');
+
+    /**
+     * The instanciated themes
+     */
+    private static $themes;
+
+
+    /**
+     * Instanciate a new theme by it name
+     * @param string $name The name of the theme, corresponding to it directory name under /themes
+     * @return Theme The found theme
+     */
+    public static function get($name = self::DEFAULT_THEME){
+        if(!isset($themes[$name])){
+            self::$themes[$name] = new self($name);
+        }
+        return self::$themes[$name];
+    }
     
+
+    /**
+     * Get the theme configured for the application
+     * @return Theme The selected theme
+     */
+    public static function getSelected(){
+        return self::get(Conf::has('db') ? Option::get('main.selected-theme') : self::DEFAULT_THEME);
+    }
+    
+    /**
+     * Set a theme as the selected one for the application
+     * @param string $name The name of the theme
+     */
+    public static function setSelected($name){
+        Option::set('main.selected-theme', $name);        
+    }  
+
+    /**
+     * Get all the available themes
+     * @return array All the themes
+     */
+    public static function getAll(){        
+        foreach(glob(THEMES_DIR . '*') as $theme){
+            self::get(basename($theme));
+        }
+
+        return self::$themes;
+    } 
+
     /**
      * Constructor
      * @param string $name The theme name     
@@ -63,16 +119,14 @@ class Theme{
     public function __construct($name){
         $this->name = $name;
 
-        $this->getData();
+        $this->getDefinition();
 
         if(isset($this->data['extends'])){
-            $this->parent = ThemeManager::get($this->data['extends']);
+            $this->parent = self::get($this->data['extends']);
         }
-        elseif($this->name != ThemeManager::DEFAULT_THEME){
-            $this->parent = ThemeManager::get(ThemeManager::DEFAULT_THEME);
+        elseif($this->name != self::DEFAULT_THEME){
+            $this->parent = self::get(self::DEFAULT_THEME);
         }
-
-        $this->sources = $this->getCssSources();
     }
 
 
@@ -82,9 +136,9 @@ class Theme{
      * @param string $prop The property in data to get
      * @return mixed The value of the property $prop if it is set, else, all the theme data
      */
-    public function getData($prop = ""){    
+    public function getDefinition($prop = ""){    
         if(!isset($this->data)){            
-            $this->data = json_decode(file_get_contents($this->getRootDirname() . 'manifest.json'), true);
+            $this->data = json_decode(file_get_contents($this->getRootDirname() . self::MANIFEST_BASENAME), true);
         }
         return $prop ? $this->data[$prop] : $this->data;
     }
@@ -122,7 +176,7 @@ class Theme{
      * @return string
      */
     public function getPreviewFilename(){
-        return $this->getRootDirname() . 'preview.png';        
+        return $this->getRootDirname() . self::PREVIEW_BASENAME;
     }
 
 
@@ -131,51 +185,28 @@ class Theme{
      * @return string
      */
     public function getPreviewUrl(){
-        return THEMES_ROOT_URL . $this->name . '/preview.png';
+        return THEMES_ROOT_URL . $this->name . '/' . self::PREVIEW_BASENAME;
     }
     
+
+    /**
+     * Get the dirname containing the less files
+     */
+    public function getLessDirname(){
+        return $this->getRootDirname() . 'less/';
+    }
 
     /**
      * Get the base CSS file path
      * @return string
      */
-    public function getBaseCssFile(){
-        $file = $this->getRootDirname() . self::LESS_BASENAME;
+    public function getBaseLessFile(){
+        $file = $this->getLessDirname() . self::LESS_BASENAME;
         return $file;
     }
 
 
-    /**
-     * Get the base CSS content (concatenate recursively parent css contents)
-     * @return string The compiler Css content
-     */
-    public function getBaseCssContent(){
-        return implode(PHP_EOL, array_map(function($file){
-            if(is_file($file)){
-                return file_get_contents($file);
-            }
-            else{
-                return '';
-            }
-        }, $this->sources));
-    }
-
-
-    /**
-     * Get the base CSS sources, getting all the parents CSS filenames
-     * @return array An array containing all the sources used to build this theme CSS file
-     */
-    public function getCssSources(){
-        $sources = array();
-        if($this->parent){
-            $sources = array_merge($sources, $this->parent->getCssSources());
-        }
-        $sources[] = $this->getBaseCssFile();        
-
-        return $sources;
-    }
-    
-
+   
     /**
      * Get the base CSS file URL, after been built
      * @return string
@@ -186,76 +217,100 @@ class Theme{
     
 
     /**
-     * Build the base CSS file into build directory (replace variables by default or configured values)
-     * @param boolean $force If set to true, the built CSS file will be overriden, whereas it has not been modified since the last build. Else, if the file has not been modified since the last build, nothing will be done
+     * Get the path of the file contaning the data of the last theme compilation
+     * @return string the path of the file
      */
-    public function buildCssFile($force = false){
+    private function getLastCompilationInfoFilename(){
+        return $this->getBuildDirname() . 'compilation-info.php';
+    }
+
+    /**
+     * Build the theme : build the Less file theme.less into theme.css and copy every resource files in userfiles/themes/{themename}
+     * @param boolean $force If set to true, the theme will be rebuilt without condition
+     */
+    public function build($force = false){
         if(!file_exists($this->getBuildDirname())){
             mkdir($this->getBuildDirname(), 0755, true);
         }
 
-        $build = false;
-        if($force || !is_file($this->getBuildCssFile())){
-            $build = true;
+
+        $tmpdir = TMP_DIR . uniqid() . '/';
+
+        FileSystem::copy(dirname($this->getBaseLessFile()) . '/*', $tmpdir);
+        // Get the theme options
+        if(Conf::has('db')){
+            $options = Option::getPluginOptions('theme-' . $this->name);
         }
         else{
-            foreach($this->sources as $source){
-                if(filemtime($source) > filemtime($this->getBuildCssFile())){
-                    $build = true;
-                    break;
+            $options = array();
+        }
+        $less = file_get_contents($this->getBaseLessFile());
+        $variables = $this->getEditableVariables($less);
+        foreach($options as $variable => $value){
+            $less = preg_replace('/@(' . $variable . ')\s*:\s*(.*?);/', '@$1 : ' . $value . ';', $less);                 
+        }
+        file_put_contents($tmpdir . self::LESS_BASENAME, $less);
+
+        $lastCompilationFile = $this->getLastCompilationInfoFilename();
+        if(is_file($lastCompilationFile)){
+            $cache = include $lastCompilationFile;
+        }
+        else{
+            $cache = $tmpdir . self::LESS_BASENAME;
+        }
+
+
+        $less = new \lessc;
+        
+		// Get the theme options
+        $editableVariables = $this->getEditableVariables();        
+        if(Conf::has('db')){
+            $options = Option::getPluginOptions('theme-' . $this->name);
+        }
+        else{
+            $options = array();
+        }
+
+        $variables = array();
+        foreach($editableVariables as $variable){
+            $variables[$variable['name']] = isset($options[$variable['name']]) ? $options[$variable['name']] : $variable['default'];
+        }
+        $less->setVariables($variables);
+
+
+        $less->setFormatter('compressed');
+        $less->setPreserveComments(false);
+        $compilation = $less->cachedCompile($cache, $force);
+
+        if(!is_array($cache) || $compilation['updated'] > $cache['updated']){
+            foreach(glob($this->getRootDirname() . '*') as $elt){
+                if(! in_array(basename($elt), array('less', 'views'))) {
+                    FileSystem::copy($elt, $this->getBuildDirname());
                 }
             }
+
+            file_put_contents($this->getBuildCssFile(), '/*** ' . date('Y-m-d H:i:s') . ' ***/' . PHP_EOL . $compilation['compiled']);
+
+            // Save the compilation information
+            $compilation['root'] = $this->getBaseLessFile();
+            file_put_contents($this->getLastCompilationInfoFilename(), '<?php return ' . var_export($compilation, true) . ';');
         }
 
-        if($build){              
-            // Build the css
-			$css = $this->getBaseCssContent();
-            
-			// Get the theme options
-            if(Conf::has('db')){
-                $options = Option::getPluginOptions('theme-' . $this->name);
-            }
-            else{
-                $options = array();
-            }
-
-
-			// Replace the variables
-            $variables = $this->getCssVariables($css);
-            foreach($variables as $variable){
-                $varname = $variable['name'];
-                $value = $variable['default'];
-				
-				// Get the configured value in the options table
-				if(isset($options[$varname])){
-					$value = $options[$varname];
-				}
-                $css = preg_replace('/@' . $varname . '\s*\:\s*(' . $variable['default'] . ')/', '@' . $varname . ': ' . $value, $css);
-            }
-
-            $less = new \lessc;
-			if(!(DEV_MODE || DEBUG_MODE)){
-                $less->setFormatter("compressed");
-                $less->setPreserveComments(true);
-            }
-            $compiled = $less->compile($css);
-				
-            FileSystem::copy($this->getRootDirname(), USERFILES_THEMES_DIR);
-
-            file_put_contents($this->getBuildCssFile(), $compiled);
-        }
+        FileSystem::remove($tmpdir);
     }
 
 
     /**
      * Get the variables in a CSS file content. In CSS files, variables are defined with the folowing format :
      * /* define("variableName", color|dimension|file, "variable description that will appear in the customization page of the theme", defaultValue) *\/
-     * @param string $css The CSS code to parse
+     * @param string $less The Less code to parse
      * @return array The variables, where each element contains the 'name' of the variabme, it 'type', it 'description', and it 'default' value
      */
-    public function getCssVariables(){
-        $css = $this->getBaseCssContent();
-        preg_match_all('#^\s*@([\w\-]+)\s*\:\s*(.*?)\s*\;\s*//\s*"(.+?)"\s*,\s*(color|dimension|file)#m', $css, $matches, PREG_SET_ORDER);                     
+    public function getEditableVariables($less = null){
+        if(!$less){
+            $less = file_get_contents($this->getBaseLessFile());
+        }
+        preg_match_all('#^\s*//\s*@([\w\-]+)\s*\:\s*(.*?)\s*\;\s*"(.+?)"\s*,\s*(color|dimension|file)#m', $less, $matches, PREG_SET_ORDER);                     
         $variables = array();
         foreach($matches as $match){
             $variables[] = array(
@@ -274,7 +329,7 @@ class Theme{
      * @return string The URL of the built CSS file
      */
     public function getBaseCssUrl(){
-        $this->buildCssFile();
+        $this->build();
         return $this->getRootUrl() . self::COMPILED_CSS_BASENAME;
     }
     
@@ -333,13 +388,13 @@ class Theme{
      */
     public function getView($filename){
         $file = $this->getViewsDir() . $filename;
-        if(!is_file($file) && $this->name != ThemeManager::DEFAULT_THEME){
+        if(!is_file($file) && $this->name != self::DEFAULT_THEME){
             if($this->parent){
                 // The view does not exists in the theme, and the theme is not the default one, Try to get the view file in the default theme
                 $file = $this->parent->getView($filename);
             }
             else{
-                $file = ThemeManager::get(ThemeManager::DEFAULT_THEME)->getView($filename);
+                $file = self::get(self::DEFAULT_THEME)->getView($filename);
             }
         }
         return $file;
@@ -367,7 +422,7 @@ class Theme{
      * @return string the theme title
      */
     public function getTitle(){
-        return $this->getData('title');
+        return $this->getDefinition('title');
     }
 
     /**
@@ -383,6 +438,6 @@ class Theme{
      * @return boolean true if the theme is removable, else false.
      */
     public function isRemovable(){
-        return !in_array($this->name, self::$nativeThemes) && ThemeManager::getSelected() != $this;
+        return !in_array($this->name, self::$nativeThemes) && self::getSelected() != $this;
     }
 }

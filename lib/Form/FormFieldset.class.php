@@ -72,7 +72,7 @@ class FormFieldset{
 	 * @return string The HTML result to display
 	 */
 	public function __toString(){
-		return View::make(ThemeManager::getSelected()->getView(Form::VIEWS_DIR . 'form-fieldset.tpl'), array(
+		return View::make(Theme::getSelected()->getView(Form::VIEWS_DIR . 'form-fieldset.tpl'), array(
 			'fieldset' => $this,
 		));
 	}

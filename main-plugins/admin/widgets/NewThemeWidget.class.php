@@ -7,7 +7,7 @@ class NewThemeWidget extends Widget{
     }
 
     public function display(){
-        return View::make(ThemeManager::getSelected()->getView("box.tpl"), array(
+        return View::make(Theme::getSelected()->getView("box.tpl"), array(
             'title' => Lang::get('admin.theme-add-title'),
             'icon' => 'plus',
             'content' => $this->form

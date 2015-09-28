@@ -61,9 +61,11 @@ Router::setProperties(
 				// Display the list of available themes
 				Router::any('available-themes', 'themes/available', array('action' => 'ThemeController.listThemes'));
 				// Select a theme 
-				Router::get('select-theme', 'themes/{name}/select', array('where' => array('name' => '[a-zA-Z0-9\-_.]+'), 'action' => 'ThemeController.select'));
-				// Add a new theme
-				Router::any('add-theme', 'themes/add', array('action' => 'ThemeController.add'));
+				Router::get('select-theme', 'themes/{name}/select', array('where' => array('name' => '[a-zA-Z0-9\-_.]+'), 'action' => 'ThemeController.select'));					
+				// Create a theme
+				Router::any('create-theme', 'themes/create', array('action' => 'ThemeController.create'));
+				// Import new theme
+				Router::any('import-theme', 'themes/import', array('action' => 'ThemeController.import'));
 				// Remove a theme
 				Router::get('delete-theme', 'themes/{name}/remove', array('where' => array('name' => '[a-zA-Z0-9\-_.]+'), 'action' => 'ThemeController.delete'));
 
@@ -96,7 +98,7 @@ Router::setProperties(
 				// Create a new plugin structure
 				Router::any('create-plugin', 'plugins/_new', array('action' => 'PluginController.create'));
 
-				EventManager::on('menuitem.added menu.added menu.deleted menuitem.deleted', function($event){
+				Event::on('menuitem.added menu.added menu.deleted menuitem.deleted', function($event){
 		            Router::getCurrentController()->addJavaScriptInline('app.refreshMenu()');
 		        });
 

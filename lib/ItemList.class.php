@@ -210,9 +210,10 @@ class ItemList{
 			}
 		}
 
-		EventManager::trigger(new Event('list.' . $this->id . '.instanciated', array(
+		$event = new Event('list.' . $this->id . '.instanciated', array(
 			'list' => $this
-		)));
+		));
+		$event->trigger();
 	}
 	
 	/**
@@ -395,7 +396,7 @@ class ItemList{
 			}
 			
 			$tplFile = $this->refresh ? 'result.tpl' : 'list.tpl';
-			return View::make(ThemeManager::getSelected()->getView('item-list/' . $tplFile), array(			
+			return View::make(Theme::getSelected()->getView('item-list/' . $tplFile), array(			
 				'list' => $this,
 				'data' => $data,
 				'linesParameters' => $param,

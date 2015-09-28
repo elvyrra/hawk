@@ -45,7 +45,7 @@ class Panel extends \Hawk\ViewPlugin{
 			$this->id = uniqid();
 		}
 
-		return \Hawk\View::make(\Hawk\ThemeManager::getSelected()->getView('panel.tpl'), array(
+		return \Hawk\View::make(\Hawk\Theme::getSelected()->getView('panel.tpl'), array(
 			'id' => $this->id,
 			'title' => $this->title,
 			'icon' => $this->icon,

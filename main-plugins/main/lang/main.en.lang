@@ -25,7 +25,7 @@ list-results-number[1] = "1 result"
 list-results-number[p] = "{number} results"
 list-sort-asc = "A > Z"
 list-sort-desc = "Z > A"
-login = "<i class=\"fa fa-sign-in\"></i> Connect"
+login = "<i class=\"icon icon-sign-in\"></i> Connect"
 login-error-authentication = "The login or the password is not correct"
 login-error-inactive-user = "This account is not active on this application"
 login-form-title = "Connection"
@@ -85,3 +85,4 @@ register-email-content = "<p>You have just registered on {sitename}, and we than
 <p> We hope to see you soon on {sitename} </p>\
 <p> The {sitename} team. </p>"
 permission-name-user-actions = "Action on his own account"
+clear-cache = "Clear cache"

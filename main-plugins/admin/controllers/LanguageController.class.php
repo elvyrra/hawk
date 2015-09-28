@@ -332,7 +332,7 @@ class LanguageController extends Controller{
 					'search' => false,
 					'sort' => false,
 					'display' => function($value, $field, $line) {
-						return "<span class='fa fa-undo text-danger delete-translation' title='" . Lang::get('language.delete-translation-btn') . "' data-key='$line->langKey'></span>";						
+						return "<span class='icon icon-undo text-danger delete-translation' title='" . Lang::get('language.delete-translation-btn') . "' data-key='$line->langKey'></span>";						
 					}
 				),			
 			)
@@ -400,7 +400,7 @@ class LanguageController extends Controller{
 		$form = new Form($param);
 		
 		if(!$form->submitted()){
-			return View::make($this->theme->getView('dialogbox.tpl'), array(
+			return View::make(Theme::getSelected()->getView('dialogbox.tpl'), array(
 				'icon' => 'flag',
 				'title' => $form->new ? Lang::get('language.add-lang-form-title') : Lang::get('language.edit-lang-form-title'),
 				'page' => $form
@@ -469,7 +469,7 @@ class LanguageController extends Controller{
 		$form = new Form($param);
 		
 		if(!$form->submitted()){
-			return View::make($this->theme->getView('dialogbox.tpl'), array(
+			return View::make(Theme::getSelected()->getView('dialogbox.tpl'), array(
 				'icon' => 'flag',
 				'title' => Lang::get('language.import-form-title'),
 				'page' => $form

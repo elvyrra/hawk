@@ -104,7 +104,7 @@ class UserProfileController extends Controller{
         
         $form = new Form($param);
         if(!$form->submitted()){
-            return View::make($this->theme->getView("dialogbox.tpl"), array(
+            return View::make(Theme::getSelected()->getView("dialogbox.tpl"), array(
                 'page' => $form,
                 'title' => Lang::get('admin.user-form-title'),
                 'icon' => 'user',
@@ -191,7 +191,7 @@ class UserProfileController extends Controller{
         $form = new Form($params);
 
         if(!$form->submitted()){
-            return View::make($this->theme->getView("dialogbox.tpl"), array(
+            return View::make(Theme::getSelected()->getView("dialogbox.tpl"), array(
                 'title' => Lang::get('main.update-password-title'),
                 'icon' => 'lock',
                 'page' => $form

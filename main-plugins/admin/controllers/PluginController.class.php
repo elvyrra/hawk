@@ -329,7 +329,7 @@ class PluginController extends Controller{
 
         if(!$form->submitted()){
             // Display the form
-            return View::make(ThemeManager::getSelected()->getView('dialogbox.tpl'), array(
+            return View::make(Theme::getSelected()->getView('dialogbox.tpl'), array(
                 'title' => Lang::get('admin.new-plugin-title'),
                 'icon' => 'plug',
                 'page' => $form
@@ -341,7 +341,7 @@ class PluginController extends Controller{
                 if(Plugin::get($form->getData('name'))){
                     // A plugin with the same name already exists
                     $form->error('name', Lang::get('admin.new-plugin-already-exists-error'));
-                    return $form->response(Form::STATUS_ERROR, Lang::get('admin.new-plugin-already-exists-error'));
+                    return $form->response(Form::STATUS_CHECK_ERROR, Lang::get('admin.new-plugin-already-exists-error'));
                 }
 
                 // The plugin can be created

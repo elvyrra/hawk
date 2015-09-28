@@ -47,7 +47,7 @@ define('form', ['jquery', 'ko'], function($, ko){
 	};
 
 	Form.prototype.displayErrorMessage = function(text){
-		this.node.find(".form-result-message").addClass("alert alert-danger").html("<i class='fa fa-exclamation-circle'></i>  " + text);
+		this.node.find(".form-result-message").addClass("alert alert-danger").html("<i class='icon icon-exclamation-circle'></i>  " + text);
 	};
 
 	Form.prototype.displayErrors = function(errors){

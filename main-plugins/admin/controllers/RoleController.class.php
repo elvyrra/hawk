@@ -48,9 +48,9 @@ class RoleController extends Controller{
 				'actions' => array(
 					'independant' => true,
 					'display' => function($value, $field, $line){
-						return 	"<span class='fa fa-pencil text-info' href='" . Router::getUri('edit-role', array('roleId' => $line->id)) . "' target='dialog'></span>" .
-								"<span class='fa fa-unlock-alt text-success' href='" . Router::getUri('role-permissions', array('roleId' => $line->id)). "' target='newtab'></span>" .
-								($line->isRemovable() ? "<i class='fa fa-close text-danger delete-role' data-role='{$line->id}'></i>" : "");
+						return 	"<span class='icon icon-pencil text-info' href='" . Router::getUri('edit-role', array('roleId' => $line->id)) . "' target='dialog'></span>" .
+								"<span class='icon icon-unlock-alt text-success' href='" . Router::getUri('role-permissions', array('roleId' => $line->id)). "' target='newtab'></span>" .
+								($line->isRemovable() ? "<i class='icon icon-close text-danger delete-role' data-role='{$line->id}'></i>" : "");
 					},
 					'search' => false,
 					'sort' => false,
@@ -156,7 +156,7 @@ class RoleController extends Controller{
 		
 		$form = new Form($param);		
 		if(!$form->submitted()){
-			return View::make($this->theme->getView("dialogbox.tpl"), array(
+			return View::make(Theme::getSelected()->getView("dialogbox.tpl"), array(
 				'icon' => 'user',
 				'title' => Lang::get('roles.form-title'),
 				'page' => $form

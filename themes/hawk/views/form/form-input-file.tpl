@@ -1,7 +1,7 @@
 {import "form-input.tpl"}
 <label for="{{$input->id}}" class="input-file-invitation" >
 	{text key="main.input-file-invitation"}
-	<span class="fa fa-check file-chosen-icon" ></span>
+	<span class="icon icon-check file-chosen-icon" ></span>
 </label>
 <script type="text/javascript">
     (function(){

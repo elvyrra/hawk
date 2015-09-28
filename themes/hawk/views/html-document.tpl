@@ -14,8 +14,6 @@
 			<link rel="icon" href="{{ $favicon }}" />
 		{/if}
 		
-		<!-- FontAwesome -->
-		<link href="{{ $mainCssUrl }}font-awesome.min.css" rel="stylesheet" />        
 		<!-- Bootstrap CSS-->
 		<link rel="stylesheet" href="{{ $mainCssUrl }}bootstrap.min.css" />
 		<!-- Bootstrap Colorpicker -->

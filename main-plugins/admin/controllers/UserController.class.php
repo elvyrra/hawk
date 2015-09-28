@@ -70,13 +70,13 @@ class UserController extends Controller{
 				'actions' => array(
 					'independant' => true,
 					'display' => function($value, $field, $user){
-						$return = "<i class='fa fa-pencil text-primary' href='". Router::getUri('edit-user', array('username' => $user->username)) . "' target='dialog'></i>";
+						$return = "<i class='icon icon-pencil text-primary' href='". Router::getUri('edit-user', array('username' => $user->username)) . "' target='dialog'></i>";
 						if($user->isRemovable()){
-							$return .= "<i class='fa fa-close text-danger delete-user' data-user='{$user->username}'></i>";
+							$return .= "<i class='icon icon-close text-danger delete-user' data-user='{$user->username}'></i>";
 
 							$return .= $user->active ? 
-									"<i class='fa fa-lock text-warning lock-user' data-user='{$user->username}'></i>":
-									"<i class='fa fa-unlock text-success unlock-user' data-user='{$user->username}'></i>";
+									"<i class='icon icon-lock text-warning lock-user' data-user='{$user->username}'></i>":
+									"<i class='icon icon-unlock text-success unlock-user' data-user='{$user->username}'></i>";
 						}
 
 						return $return;
@@ -238,7 +238,7 @@ class UserController extends Controller{
 		$form = new Form($param);
 		
 		if(!$form->submitted()){
-			return View::make($this->theme->getView("dialogbox.tpl"), array(
+			return View::make(Theme::getSelected()->getView("dialogbox.tpl"), array(
 				'page' => $form,
 				'title' => Lang::get('admin.user-form-title'),
 				'icon' => 'user',

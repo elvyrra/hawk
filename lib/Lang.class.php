@@ -137,14 +137,31 @@ class Lang{
 
 
 	/**
-	 * Make the cache file
+	 * Build the language file as a PHP file contaning an array
 	 */
-	private function build(){				
-		if(!is_file($this->cacheFile) || (is_file($this->originFile) && filemtime($this->cacheFile) < filemtime($this->originFile)) || (is_file($this->translatedFile) && filemtime($this->cacheFile) < filemtime($this->translatedFile))){
+	private function build(){			
+		$build = false;
+		if(!is_file($this->cacheFile)){
+			// The cache file does not exist
+			$build = true;
+		}
+		elseif(is_file($this->originFile) && filemtime($this->cacheFile) < filemtime($this->originFile)){
+			// the origin file is newer than the cache file
+			$build = true;
+		}
+		elseif(is_file($this->translatedFile) && filemtime($this->cacheFile) < filemtime($this->translatedFile)){
+			// The translated file is newer than the cache file
+			$build = true;
+		}
+		
+		if($build){
+			// Build the cache file
 			$data = array_merge($this->parse($this->originFile), $this->parse($this->translatedFile));
-			if(!is_dir(CACHE_DIR . self::CACHE_DIR)){
-				mkdir(CACHE_DIR . self::CACHE_DIR, 0755);
+			
+			if(!is_dir(dirname($this->cacheFile))) {
+				mkdir(dirname($this->cacheFile), 0755);
 			}
+
 			file_put_contents($this->cacheFile, '<?php return ' . var_export($data, true) . ';' );
 		}
 	}
@@ -341,6 +358,6 @@ class Lang{
 }
 
 /*** Save the language cache ***/
-EventManager::on('process-end', function(Event $event){
+Event::on('process-end', function(Event $event){
 	Lang::saveOriginCache();
 });

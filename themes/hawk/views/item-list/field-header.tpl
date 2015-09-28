@@ -5,12 +5,12 @@
             <div class='list-sort-block' style='display:inline-block'>
                 <!-- Sort ascending -->
                 <span class="list-sort-column list-sort-asc" data-bind="css : {'list-sort-active' : sort() == 'ASC'}, click : function(data, event){ data.sort(data.sort() == 'ASC' ? '' : 'ASC'); }">
-                    <span class='fa fa-sort-alpha-asc' title='{text key="main.list-sort-asc"}'></span>
+                    <span class='icon icon-sort-alpha-asc' title='{text key="main.list-sort-asc"}'></span>
                 </span>
 
                 <!-- sort descending -->
                 <span class="list-sort-column list-sort-desc" data-bind="css : {'list-sort-active' : sort() == 'DESC'}, click : function(data, event){ data.sort(data.sort() == 'DESC' ? '' : 'DESC'); }">
-                    <span class='fa fa-sort-alpha-desc' title='{text key="main.list-sort-desc"}'></span>
+                    <span class='icon icon-sort-alpha-desc' title='{text key="main.list-sort-desc"}'></span>
                 </span>         
             </div>
         {/if}

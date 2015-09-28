@@ -49,7 +49,7 @@ class Accordion extends \Hawk\ViewPlugin{
 			}
 		}
 
-		return \Hawk\View::make(\Hawk\ThemeManager::getSelected()->getView('accordion.tpl'), array(
+		return \Hawk\View::make(\Hawk\Theme::getSelected()->getView('accordion.tpl'), array(
 			'id' => $this->id,
 			'panels' => $this->panels
 		));

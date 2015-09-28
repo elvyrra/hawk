@@ -30,7 +30,6 @@ class Controller{
 	public function __construct($param = array()){		
 		$this->map($param);
 			
-		$this->theme = ThemeManager::getSelected();
 		self::$currentController = $this;
 	}
 	
@@ -54,7 +53,7 @@ class Controller{
 	 */
 	public function compute($method){
 		/*** Load widgets before calling the controller method ***/
-		EventManager::trigger(new Event(get_called_class() . '.' . $method . '.' . self::BEFORE_ACTION, array('controller' => $this)));
+		(new Event(get_called_class() . '.' . $method . '.' . self::BEFORE_ACTION, array('controller' => $this)))->trigger();
 		
 		/*** Call the controller method ***/
 		$result = $this->$method();
@@ -65,7 +64,7 @@ class Controller{
 				
 		/*** Load the widgets after calling the controller method ***/		
 		$event = new Event(get_called_class() . '.' . $method . '.' . self::AFTER_ACTION, array('controller' => $this, 'result' => $result));
-		EventManager::trigger($event);
+		$event->trigger();
 		
 		$result = $event->getData('result');
 		if( $result instanceof \phpQuery){			
@@ -82,7 +81,7 @@ class Controller{
 	 * @param string $content The content to add
 	 */
 	private function addContentAtEnd($content){	
-		EventManager::on(Router::getCurrentAction() . '.' . self::AFTER_ACTION, function($event) use($content){			
+		Event::on(Router::getCurrentAction() . '.' . self::AFTER_ACTION, function($event) use($content){			
 			if(Response::getType() === 'html'){	
 				$dom = $event->getData('result');
 				if($dom->find('body')->length){

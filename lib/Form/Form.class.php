@@ -232,9 +232,11 @@ class Form{
 
         self::$instances[$this->id] = $this;	
 
-        EventManager::trigger(new Event('form.' . $this->id . '.instanciated', array(
+        
+        $event = new Event('form.' . $this->id . '.instanciated', array(
         	'form' => $this
-        )));
+        ));
+        $event->trigger();
 	}
 	
 
@@ -396,7 +398,7 @@ class Form{
 	 */
 	public function wrap($content){
 		Log::info('display form ' . $this->id);
-		return View::make(ThemeManager::getSelected()->getView(Form::VIEWS_DIR . 'form.tpl'), array(
+		return View::make(Theme::getSelected()->getView(Form::VIEWS_DIR . 'form.tpl'), array(
 			'form' => $this,
 			'content' => $content
 		));
@@ -425,7 +427,7 @@ class Form{
 			}
 
 			// Generate the form content 
-			$content = View::make(ThemeManager::getSelected()->getView(Form::VIEWS_DIR . 'form-content.tpl') , array(
+			$content = View::make(Theme::getSelected()->getView(Form::VIEWS_DIR . 'form-content.tpl') , array(
 				'form' => $this,
 				'column' => 0		
 			));

@@ -50,7 +50,7 @@ class Option{
 		foreach($options as $option){
 			self::$options[$plugin][$option['key']] = $option['value'];
 		}
-		return isset(self::$options[$plugin]) ? self::$options[$plugin] : false;
+		return isset(self::$options[$plugin]) ? self::$options[$plugin] : array();
 	}
 	
 

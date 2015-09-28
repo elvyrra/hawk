@@ -294,7 +294,7 @@ class Plugin{
 	 */
 	public function getView($view){
 		// Check if the view is overriden in the current theme
-		$file= ThemeManager::getSelected()->getView('plugins/' . $this->name . '/' . $view);
+		$file= Theme::getSelected()->getView('plugins/' . $this->name . '/' . $view);
 		if(is_file($file)){
 			// The view is overriden in the theme
 			return $file;

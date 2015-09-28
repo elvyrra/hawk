@@ -32,5 +32,10 @@ Router::setProperties(
 		Router::get('refresh-menu', '/main-menu', array('action' => 'MainController.refreshMenu'));
 
 		Router::get('js-conf', '/conf.js', array('action' => 'MainController.jsConf'));
+
+		// Clear the cache
+		Router::auth(DEV_MODE, function(){
+			Router::get('clear-cache', '/clear-cache', array('action' => 'MainController.clearCache'));
+		});
 	}
 );

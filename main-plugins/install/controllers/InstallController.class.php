@@ -142,7 +142,7 @@ class InstallController extends Controller{
 					new SubmitInput(array(
 						'name' => 'valid',
 						'value' => Lang::get('install.install-button', null, null, $this->language),
-						'icon' => 'cog fa-spin',
+						'icon' => 'cog',
 					))
 				)
 			),
@@ -166,7 +166,7 @@ class InstallController extends Controller{
 				$salt = Crypto::generateKey(24);
 				$key = Crypto::generateKey(32);
 				$iv = Crypto::generateKey(16);
-				$configMode = 'dev';
+				$configMode = 'prod';
 
 
 				/**
@@ -200,7 +200,7 @@ class InstallController extends Controller{
 						'{{ $password }}' => Db::get('tmp')->quote(Crypto::saltHash($form->getData('admin[password]'), $salt)),
 						'{{ $ip }}' => Db::get('tmp')->quote(Request::clientIp())
 					);
-					$sql = strtr(file_get_contents(Plugin::current()->getRootDir() . 'files/install.sql.tpl'), $param);
+					$sql = strtr(file_get_contents(Plugin::current()->getRootDir() . 'templates/install.sql.tpl'), $param);
 					// file_put_contents($tmpfile, $sql);
 
 					Db::get('tmp')->query($sql);
@@ -221,7 +221,7 @@ class InstallController extends Controller{
 						'{{ $sessionEngine }}' => $form->getData('session'),
 						'{{ $version }}' => $form->getData('version')
 					);
-					$config = strtr(file_get_contents(Plugin::current()->getRootDir() . 'files/config.php.tpl'), $param);
+					$config = strtr(file_get_contents(Plugin::current()->getRootDir() . 'templates/config.php.tpl'), $param);
 					file_put_contents(INCLUDES_DIR . 'config.php', $config);
 
 

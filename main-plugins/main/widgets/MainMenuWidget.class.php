@@ -43,7 +43,7 @@ class MainMenuWidget extends Widget{
 		if(!Session::isConnected()){
 			$menus['user'][] = new MenuItem(array(
 				'id' => uniqid(),
-				'labelKey' => 'main.login',
+				'labelKey' => 'main.login-menu-title',
 				'action' => 'login',
 				'target' => 'dialog',
 			));
@@ -54,10 +54,10 @@ class MainMenuWidget extends Widget{
 			'menus' => $menus
 		));
 
-		EventManager::trigger($event);
+		$event->trigger();
 		$menus = $event->getData('menus');
 
-		return View::make(ThemeManager::getSelected()->getView('main-menu.tpl'), array(
+		return View::make(Theme::getSelected()->getView('main-menu.tpl'), array(
 			'menus' => $menus,
 			'logo' => Option::get('main.logo') ? USERFILES_PLUGINS_URL . 'main/' . Option::get('main.logo') : ''
 		));

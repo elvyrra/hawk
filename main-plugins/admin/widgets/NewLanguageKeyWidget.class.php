@@ -9,7 +9,7 @@ class NewLanguageKeyWidget extends Widget{
 	public function display(){
         $form = LanguageController::getInstance()->keyForm();
         
-		return View::make(ThemeManager::getSelected()->getView("box.tpl"), array(
+		return View::make(Theme::getSelected()->getView("box.tpl"), array(
             'title' => Lang::get('language.key-form-add-title'),
             'icon' => 'font',
             'content' => $form

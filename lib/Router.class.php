@@ -213,7 +213,7 @@ class Router{
 
 					// Emit an event, saying the routing action is finished
 					$event = new Event('after-routing', array('controller' => $controller, 'method' => $method, 'args' => $route->getData()));
-					EventManager::trigger($event);
+					$event->trigger();
 	                
 	                // Set the controller result to the HTTP response
 					Response::set($controller->compute($method));

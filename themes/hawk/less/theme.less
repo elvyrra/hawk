@@ -1,30 +1,35 @@
-@textColor: #777777; // "Body text color", color
-@bodyBackground: #fff; // "Body background", color
-@fontSize: 12px; // "Global font size", dimension
-@titleColor: #337ab7; // "Color of title", color
+/** Editable variables **/
 
-@headerBackground: #333; // "Header and footer background", color
-@headerColor: #d6d6d6; // "Header and footer font color", color
+// @main-font-color: #777777; "Body text color", color
+// @main-bg-color: #fff; "Body background", color
+// @main-font-size: 12px; "Global font size", dimension
+// @title-color: #337ab7; "Color of title", color
 
-@colorMuted: #777; // "Text color muted", color
+// @header-bg: #333; "Header and footer background", color
+// @header-color: #d6d6d6; "Header and footer font color", color
 
-@colorDefault: #fff; // "Text color for default elements", color
-@bgDefault: #333; // "Background color for default elements", color
+// @muted-color: #777; "Text color muted", color
 
-@colorPrimary: #337ab7; // "Text color primary", color
-@bgPrimary: #337ab7; // "background color primary", color
+// @default-color: #fff; "Text color for default elements", color
+// @default-bg: #333; "Background color for default elements", color
 
-@colorSuccess: #3c763d; // "Text color success", color
-@bgSuccess: #dff0d8; // "background color success", color
+// @primary-color: #337ab7; "Text color primary", color
+// @primary-bg: #337ab7; "background color primary", color
 
-@colorInfo: #31708f; // "Text color info", color
-@bgInfo: #d9edf7; // "background color info", color
+// @success-color: #3c763d; "Text color success", color
+// @success-bg: #dff0d8; "background color success", color
 
-@colorWarning: #8a6d3b; //"Text color warning", color
-@bgWarning: #fcf8e3; // "background color warning", color
+// @info-color: #31708f; "Text color info", color
+// @info-bg: #d9edf7; "background color info", color
 
-@colorDanger: #a94442; //"Text color danger", color
-@bgDanger: #f2dede; //"background color danger", color
+// @warning-color: #8a6d3b; "Text color warning", color
+// @warning-bg: #fcf8e3; "background color warning", color
+
+// @danger-color: #a94442; "Text color danger", color
+// @danger-bg: #f2dede; "background color danger", color
+
+
+@import "font-awesome/font-awesome.less";
 
 body{
     margin: 0;
@@ -33,8 +38,8 @@ body{
     position: absolute;
     width: 100%;	
 	font-size: 12px;
-	color : @textColor;
-    background: @bodyBackground;
+	color : @main-font-color;
+    background: @main-bg-color;
 	font-family: "Open Sans", Arial;
 }
 
@@ -44,55 +49,55 @@ h1,h2,h3,h4,h5,h6{
 }
 
 .text-muted{ 
-    color: @colorMuted;
+    color: @muted-color;
 }
 .text-primary{ 
-    color: @colorPrimary;
+    color: @primary-color;
 }
 .text-success{ 
-    color: @colorSuccess;
+    color: @success-color;
 }
 .text-info{ 
-    color: @colorInfo;
+    color: @info-color;
 }
 .text-warning{
-    color: @colorWarning;
+    color: @warning-color;
 }
 .text-danger{ 
-    color: @colorDanger;
+    color: @danger-color;
 }
 
 .bg-primary{ 
-    background: @bgPrimary;
+    background: @primary-bg;
 }
 .bg-success{ 
-    background: @bgSuccess;
+    background: @success-bg;
 }
 .bg-info{ 
-    background: @bgInfo;
+    background: @info-bg;
 }
 .bg-warning{ 
-    background: @bgWarning;
+    background: @warning-bg;
 }
 .bg-danger{ 
-    background: @bgDanger;
+    background: @danger-bg;
 }
 
 .alert-success{ 
-    background: @bgSuccess; 
-    color: @colorSuccess;
+    background: @success-bg; 
+    color: @success-color;
 }
 .alert-info{
-    background: @bgInfo; 
-    color: @colorInfo;
+    background: @info-bg; 
+    color: @info-color;
 }
 .alert-warning{ 
-    background: @bgWarning;
-    color: @colorWarning;
+    background: @warning-bg;
+    color: @warning-color;
 }
 .alert-danger{ 
-    background: @bgDanger; 
-    color: @colorDanger;
+    background: @danger-bg; 
+    color: @danger-color;
 }
 
 .btn{
@@ -101,14 +106,14 @@ h1,h2,h3,h4,h5,h6{
 }
 
 .btn-default{
-	background: @bgDefault;
+	background: @default-bg;
 	border-color: #777;
-	color: @colorDefault;
+	color: @default-color;
 }
 
 .btn-default:hover{
 	background: #555;
-	color: @colorDefault;
+	color: @default-color;
 }
 
 /* labels */
@@ -213,7 +218,7 @@ form .clearfix{
 input, button, select, textarea {
     font-family: "Open Sans", Arial;
     outline-style: none;
-    color: @textColor;
+    color: @main-font-color;
 }
 
 input[type="text"],
@@ -265,9 +270,10 @@ input[type="file"] {
         border-radius: 0;
         overflow: hidden;
         height: 30px;    
-        background: @bgDefault;
-        color: @colorDefault;
+        background: @default-bg;
+        color: @default-color;
         border-color: #777;
+        margin-left: 0;
 
         & > .file-chosen-icon{
             visibility: hidden;
@@ -321,7 +327,7 @@ input[type="radio"]{
 
     &:checked:before{
         content: "\f111";
-        color: @colorPrimary;
+        color: @primary-color;
     }
 
     & + label{
@@ -347,17 +353,17 @@ input[type="checkbox"]{
 
     &:checked:before{
         content: "\f046";
-        color: @colorPrimary;
+        color: @primary-color;
     }
 }
 
 
 fieldset{
-	border : 1px solid @colorPrimary;
+	border : 1px solid @primary-color;
 	box-shadow: none;
 
     legend{
-        color: @colorPrimary;
+        color: @primary-color;
         border: none;
         background: none;
         margin-left: 15px;
@@ -380,7 +386,7 @@ label{
 
     &.required:after{
         content: "*";
-        color: @colorInfo;
+        color: @info-color;
     }
 }
 
@@ -423,8 +429,8 @@ label{
 /*-------------------------------- Navbars ----------------------------------------*/
 .navbar-inverse {
 	margin-bottom: 0px;
-    background: @headerBackground;
-    color: @headerColor;
+    background: @header-bg;
+    color: @header-color;
 
     .btn-navbar {
         float: left;
@@ -450,16 +456,16 @@ label{
 
     & > li > a{
         &:hover, &:focus{
-            background: @bgInfo;
-            color: @colorInfo;
+            background: @info-bg;
+            color: @info-color;
         }
     }
 }
 
 .dropdown-submenu:hover,.dropdown-submenu:focus {
     a {
-    	background: @bgInfo;
-    	color: @colorInfo;
+    	background: @info-bg;
+    	color: @info-color;
     }
 }
 
@@ -530,8 +536,8 @@ table {
 #main-menu, #footer{        
     width: 100%;
     border: none;
-    background: @headerBackground;
-    color: @headerColor;
+    background: @header-bg;
+    color: @header-color;
 }
 
 #main-menu{
@@ -561,7 +567,7 @@ table {
         }
     }
 
-    .dropdown-menu li i.fa{
+    .dropdown-menu li i.icon{
         width: 20px;    
     }
 }
@@ -612,7 +618,7 @@ table {
             height: 100%;
             white-space: nowrap; 
 
-            & > .fa {
+            & > .icon {
                 margin-right: 5px;
             }
         }
@@ -649,7 +655,7 @@ table {
 
 /*--------------------- Tabs content --------------------*/
 .main-tab-pane .page-title{
-	color: @colorPrimary;
+	color: @primary-color;
 	text-align: center;
 	margin: 5px 0;
 }
@@ -694,7 +700,7 @@ a, a:active, a:hover, a:visited, a:focus{
         padding: 3px 5px 2px 5px;
         height: 4em;
 
-        .fa{
+        .icon{
             margin: 3px;    
             cursor: pointer;
             padding: 0.2em 0.25em;
@@ -723,7 +729,7 @@ a, a:active, a:hover, a:visited, a:focus{
     }
 
     &.list-sort-active{
-        color: @colorPrimary;
+        color: @primary-color;
         opacity: 1;
     }
 }
@@ -738,8 +744,8 @@ a, a:active, a:hover, a:visited, a:focus{
     padding-right: 15px;
 
     &.not-empty {
-        background-color: @bgInfo;
-        color: @colorInfo;
+        background-color: @info-bg;
+        color: @info-color;
         padding-right: 16px;
     }   
 }
@@ -754,18 +760,18 @@ a, a:active, a:hover, a:visited, a:focus{
     height: 30px;
 
     & > td{
-        color: @textColor;    
+        color: @main-font-color;    
     }
 
     &.selected{
-        background: @colorInfo;
+        background: @info-color;
 
         &> td{
             color: white;    
         }
 
         &:hover > td{
-            color: @textColor;
+            color: @main-font-color;
         }
     }
 }
@@ -836,7 +842,7 @@ a, a:active, a:hover, a:visited, a:focus{
 	background: rgba(128,128,128,0.5);
 	color: white;
 
-    & > .fa {
+    & > .icon {
         margin-left: -0.5em;
         margin-bottom: 15px;
     }
@@ -866,7 +872,7 @@ a, a:active, a:hover, a:visited, a:focus{
 
 
 /*----------------------- Icons -----------------------------*/
-p .fa{
+p .icon{
 	margin-right: 7px;
 }
 
@@ -875,12 +881,12 @@ p .fa{
 .box{
     border-radius: 4px;
     border: 1px solid #777;    
-    margin: 5px;
+    margin-top: 5px;
     height: 100%;    
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
 
     .box-header{
-        background: @bgPrimary;        
+        background: @primary-bg;        
         font-size: 1.2em;
         color: white;    
         padding-left: 5px;
@@ -904,12 +910,12 @@ p .fa{
 /*----------------------- Error tooltips -------------------*/
 .tooltip.input-error{
 	.tooltip-inner{
-        background: @bgDanger;
-        color: @colorDanger;
+        background: @danger-bg;
+        color: @danger-color;
     }
 
     .tooltip-arrow{
-        border-right-color: @bgDanger;
+        border-right-color: @danger-bg;
     }
 }
 
@@ -996,7 +1002,7 @@ body.dragging, body.dragging * {
 
         &.placeholder {
             position: relative;
-            background: @bgInfo;
+            background: @info-bg;
             border: 1px solid rgba(0,0,0,0.5);  
             border-radius: 5px;
             min-height: 25px;

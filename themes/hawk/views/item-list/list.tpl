@@ -20,12 +20,12 @@
 						<span class="line-by-page-label">{text key="main.list-line-per-page"}</span>
 					</td>
 					<td class='list-page-choice'>
-						<span class='list-previous-page fa fa-chevron-circle-left' data-bind="click: function(data){ data.page(data.page() - 1); }, visible: page() > 1" title="{text key='main.list-previous-page'}" ></span>
+						<span class='list-previous-page icon icon-chevron-circle-left' data-bind="click: function(data){ data.page(data.page() - 1); }, visible: page() > 1" title="{text key='main.list-previous-page'}" ></span>
 
 						
 						<input type='text' class='list-page-number' data-bind="value: page"/> / <span data-bind="text: maxPages"></span>
 						
-						<span class="list-next-page fa fa-chevron-circle-right" data-bind="click: function(data){ data.page(data.page() + 1); }, visible: maxPages() > 1 && page() < maxPages()" title="{text key="main.list-next-page"}"></span>
+						<span class="list-next-page icon icon-chevron-circle-right" data-bind="click: function(data){ data.page(data.page() + 1); }, visible: maxPages() > 1 && page() < maxPages()" title="{text key="main.list-next-page"}"></span>
 					</td>
 				</tr>
 			</table>

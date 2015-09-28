@@ -20,6 +20,6 @@ class NoSidebarTab extends View{
 		if(is_array($data['page']) && isset($data['page']['content']))
 			$data['page'] = $data['page']['content'];
 			
-		return parent::make(ThemeManager::getSelected()->getView('tabs-layout/tabs-no-sidebar.tpl'), $data);
+		return parent::make(Theme::getSelected()->getView('tabs-layout/tabs-no-sidebar.tpl'), $data);
 	}
 }

@@ -47,7 +47,7 @@ class Button extends \Hawk\ViewPlugin{
 	 * @return string The html result describing the button
 	 */
 	public function display(){
-		return \Hawk\View::make(\Hawk\ThemeManager::getSelected()->getView('button.tpl'), array(
+		return \Hawk\View::make(\Hawk\Theme::getSelected()->getView('button.tpl'), array(
 			'class' => $this->class,
 			'icon' => $this->icon,
 			'label' => $this->label,

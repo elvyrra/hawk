@@ -75,7 +75,7 @@ class LoginController extends Controller{
 		$form = $this->form();
 		if(!$form->submitted()){	
 			// Display the login page in a dialog box
-			return View::make($this->theme->getView('dialogbox.tpl'), array(
+			return View::make(Theme::getSelected()->getView('dialogbox.tpl'), array(
 				'page' => $form->__toString(),
 				'icon' => 'sign-in',
 				'title' => Lang::get('main.login-form-title'),
@@ -216,7 +216,7 @@ class LoginController extends Controller{
 		
 		$form = new Form($param);
 		if(!$form->submitted()){
-			return View::make($this->theme->getView('dialogbox.tpl'), array(
+			return View::make(Theme::getSelected()->getView('dialogbox.tpl'), array(
 				'page' => $form->__toString(),
 				'icon' => 'sign-in',
 				'title' => Lang::get('main.login-form-title'),
@@ -274,8 +274,8 @@ class LoginController extends Controller{
 
 
 						$data = array(
-							'themeBaseCss' => ThemeManager::getSelected()->getBaseCssUrl(),
-							'themeCustomCss' => ThemeManager::getSelected()->getCustomCssUrl(),
+							'themeBaseCss' => Theme::getSelected()->getBaseCssUrl(),
+							'themeCustomCss' => Theme::getSelected()->getCustomCssUrl(),
 							'mainCssUrl' => Plugin::current()->getCssUrl(),
 							'logoUrl' =>  Option::get('main.logo') ? USERFILES_PLUGINS_URL . 'main/' . Option::get('main.logo') : Plugin::current()->getStaticUrl() . 'img/hawk-logo.png',
 							'sitename' => Option::get('main.title'),

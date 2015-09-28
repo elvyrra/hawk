@@ -20,12 +20,12 @@ class MainController extends Controller{
 			$routes[$name] = $data;
 		}
 
-		return View::make(ThemeManager::getSelected()->getView('html-document.tpl'), array(
+		return View::make(Theme::getSelected()->getView('html-document.tpl'), array(
 			'title' => $title,
 			'description' => $description,
 			'keywords' => $keywords,
-			'themeBaseCss' => ThemeManager::getSelected()->getBaseCssUrl(),
-			'themeCustomCss' => ThemeManager::getSelected()->getCustomCssUrl(),
+			'themeBaseCss' => Theme::getSelected()->getBaseCssUrl(),
+			'themeCustomCss' => Theme::getSelected()->getCustomCssUrl(),
 			'mainJsUrl' => Plugin::current()->getJsUrl(),
 			'mainCssUrl' => Plugin::current()->getCssUrl(),
 			'body' => $body,
@@ -49,7 +49,7 @@ class MainController extends Controller{
 			$pages[] = Router::getUri('new-tab');
 		}
 
-		$body = View::make($this->theme->getView('body.tpl'), array(
+		$body = View::make(Theme::getSelected()->getView('body.tpl'), array(
 			'pages' => json_encode($pages),			
 			'canAccessApplication' => $canAccessApplication,
 		));	
@@ -92,7 +92,7 @@ class MainController extends Controller{
 			$page = '';
 		}
 
-		return View::make(ThemeManager::getSelected()->getView('new-tab.tpl'), array(
+		return View::make(Theme::getSelected()->getView('new-tab.tpl'), array(
 			'custom' => $page
 		));
 	}
@@ -189,5 +189,22 @@ class MainController extends Controller{
 			'lastTabs' => json_encode($pages, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRETTY_PRINT),
 			'accessible' => $canAccessApplication
 		));
+	}
+
+	/**
+	 * Clear the cache and reload the whole page
+	 */
+	public function clearCache(){
+		Event::unbind('process-end');
+		
+		// Clear the directoty cache
+		foreach(glob(CACHE_DIR . '*') as $elt){
+			FileSystem::remove($elt);
+		}
+
+		// Clear the directory of the theme
+		FileSystem::remove(Theme::getSelected()->getBuildDirname());
+		
+		Response::redirectToAction('index');
 	}
 }

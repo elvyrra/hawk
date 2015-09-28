@@ -23,6 +23,11 @@ class Autoload{
 	// Autoload cache file
     const CACHE_FILE = CACHE_DIR . 'autoload-cache.php';
 
+    /**
+     * Variable that indicates if the cache changed
+     */
+    private static $cacheUpdated = false;
+
 
     /**
 	 * Load a file containing the wanted class
@@ -105,15 +110,11 @@ class Autoload{
 
                 // Register this file, associated to the class name, in cache
                 self::$cache[$classname] = $file;
+                self::$cacheUpdated = true;
 
                 return true;
             }
         }  
-
-        // if(! class_exists($classname) && class_exists("\\Hawk\\$class")){
-        //     // The class has still not been found.            
-        //     class_alias("\\Hawk\\$class", $classname);
-        // }
     }
 
 
@@ -121,16 +122,17 @@ class Autoload{
 	 * Save the autoload cache at the end of a script processing. It is not registered any times it is updated,
 	 * to improve the performances of the application.
 	 */
-    public static function saveCache(){
-        file_put_contents(self::CACHE_FILE, "<?php return ". var_export(self::$cache, true) . ";");        
+    public static function saveCache(){        
+        if(self::$cacheUpdated){
+            file_put_contents(self::CACHE_FILE, "<?php return ". var_export(self::$cache, true) . ";");
+        }
     }
 }
-
 
 // register autoload function 
 spl_autoload_register('\Hawk\Autoload::load', true, false);
 
 // Save the autoload cache 
-EventManager::on('process-end', function(Event $event){
-	Autoload::saveCache();
+Event::on('process-end', function(Event $event){     
+    Autoload::saveCache();
 });

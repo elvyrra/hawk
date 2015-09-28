@@ -11,12 +11,17 @@
 
 <div id="footer">
 	{text key='main.hawk-powered'}
+	{if(DEV_MODE)}
+		<a href="{uri action='clear-cache'}" class="real-link pull-right" title="{text key="main.clear-cache"}"> 
+			<i class="icon icon-calendar-times-o"></i>
+		</a>
+	{/if}
 </div>
 
 <div class="modal fade" id="dialogbox"></div>
 
 <div id='loading' data-bind="visible: loading.display">
-	<span class='fa fa-spinner fa-spin fa-5x'></span>
+	<span class='icon icon-spinner icon-spin icon-5x'></span>
 	<div id="loading-bar" data-bind="css: { progressing: loading.progressing}">
 		<span id='loading-purcentage' data-bind="style: { width: loading.purcentage() + '%'}"></span>
 	</div>
@@ -42,14 +47,14 @@
 					<a role="tab" data-toggle="tab" data-bind="attr: { href: '#main-tab-' + id() }, html : title" ></a>
 
 					<span class="main-tab-close pull-right" data-bind="attr: { 'data-tab' : $index }, visible: $parent.tabs().length > 1, click : function(){ $parent.remove($index()) }">
-						<span class="fa fa-times-circle"></span>
+						<span class="icon icon-times-circle"></span>
 					</span>
 				</li>
 				<!-- /ko -->
 
 				<li class="add-tab-button corner-top-left corner-bottom-right" href="{uri action='new-tab'}" target="newtab" data-bind="visible: tabs().length < Tabset.MAX_TABS_NUMBER">
 					<span class="" id="main-tab-add">
-						<span class="fa fa-plus open-new-tab" title="{text key='main.open-new-tab'}" ></span>
+						<span class="icon icon-plus open-new-tab" title="{text key='main.open-new-tab'}" ></span>
 					</span>
 				</li>
 			</ul>
