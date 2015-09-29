@@ -18,11 +18,11 @@ class TextareaInput extends FormInput{
 	 * The attribute 'rows'
 	 * @var int
 	 */
-	public 	$rows, 
+	public 	$rows = 15, 
 
 	/**
 	 * The attribute 'cols'
 	 * @var int
 	 */
-	$cols;
+	$cols = 50;
 }

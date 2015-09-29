@@ -34,10 +34,11 @@ class User extends Model{
 	private function getPermissions(){
 		if(!isset($this->permissions)){
 			$sql = 'SELECT P.plugin, P.key, P.id
-					FROM RolePermission RP 
-						INNER JOIN Permission P ON RP.permissionId = P.id						
-						INNER JOIN User U ON U.roleId = RP.roleId
+					FROM ' . RolePermission::getTable() . ' RP 
+						INNER JOIN ' . Permission::getTable() . ' P ON RP.permissionId = P.id						
+						INNER JOIN ' . self::getTable() . ' U ON U.roleId = RP.roleId
 					WHERE U.id = :id AND RP.value=1';
+
 			$permissions = DB::get(self::$dbname)->query($sql, array('id' => $this->id), array('return' => DB::RETURN_OBJECT));
 			$this->permissions = array();			
 			foreach($permissions as $permission){

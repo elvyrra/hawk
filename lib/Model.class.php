@@ -84,7 +84,7 @@ class Model{
 	public static function getByExample(DBExample $example = null, $fields = array()){
         return self::getDbInstance()->select(array(
             'fields' => $fields,
-            'from' => static::$tablename,
+            'from' => static::getTable(),
             'where' => $example,
             'return' => get_called_class(),
             'one' => true,
@@ -103,7 +103,7 @@ class Model{
     public static function getListByExample(DBExample $example = null, $index = null, $fields = array(), $order = array()){
 		return self::getDbInstance()->select(array(
             'fields' => $fields,
-			'from' => static::$tablename,
+			'from' => static::getTable(),
 			'where' => $example,
             'index' => $index,
 			'return' => get_called_class(),
@@ -122,7 +122,7 @@ class Model{
 	public static function getBySQL($where = null, $binds = array(), $fields = array()){
 		return self::getDbInstance()->select(array(
             'fields' => $fields,
-            'from' => static::$tablename,
+            'from' => static::getTable(),
             'where' => $where,
 			'binds' => $binds,
             'return' => get_called_class(),
@@ -143,7 +143,7 @@ class Model{
     public static function getListBySQL($where = null, $binds = array(), $index = null, $fields = array(), $order = array()){
 		return self::getDbInstance()->select(array(
             'fields' => $fields,
-			'from' => static::$tablename,
+			'from' => static::getTable(),
 			'where' => $where,
 			'binds' => $binds,
             'index' => $index,
@@ -160,7 +160,7 @@ class Model{
      * @return int the number of deleted elements in the database
 	 */
 	public static function deleteByExample(DBExample $example = null){
-		return self::getDbInstance()->delete(static::$tablename, $example);
+		return self::getDbInstance()->delete(static::getTable(), $example);
 	}
 	
 	/**
@@ -170,7 +170,7 @@ class Model{
      * @return int The number of deleted elements in the database
 	 */
 	public static function deleteBySQL($where = null, $binds = array()){
-		return self::getDbInstance()->delete(static::$tablename, $where, $binds);
+		return self::getDbInstance()->delete(static::getTable(), $where, $binds);
 	}
 	
 	
@@ -181,9 +181,8 @@ class Model{
      * @return int The number of found elements in the database
 	 */
     public static function countElementsByExample(DBExample $example = null, $group = array()){
-		return self::getDbInstance()->count(static::$tablename, $example, array(), self::$primaryColumn, $group);
-	}
-    
+		return self::getDbInstance()->count(static::getTable(), $example, array(), self::$primaryColumn, $group);
+	}    
 	
 	
     /**
@@ -194,7 +193,7 @@ class Model{
      * @return int The number of found elements in the database
 	 */
     public static function countElementsBySQL($where = null, $binds = array(),  $group = array()){
-		return self::getDbInstance()->count(static::$tablename, $where, $binds, self::$primaryColumn, $group);
+		return self::getDbInstance()->count(static::getTable(), $where, $binds, self::$primaryColumn, $group);
 	}
 
 
@@ -233,7 +232,7 @@ class Model{
 		}
         $onduplicate = implode(', ', $duplicateUpdates);
         
-        $lastid = self::getDbInstance()->insert(static::$tablename, $insert, '', $onduplicate);
+        $lastid = self::getDbInstance()->insert(static::getTable(), $insert, '', $onduplicate);
         if($lastid){
             $id = static::$primaryColumn;
             $this->$id = $lastid;
@@ -264,7 +263,7 @@ class Model{
         $id = static::$primaryColumn;
 		$insert = $this->prepareDatabaseData();
         
-        $lastid = self::getDbInstance()->insert(static::$tablename, $insert, 'IGNORE');
+        $lastid = self::getDbInstance()->insert(static::getTable(), $insert, 'IGNORE');
         if($lastid){
             $this->$id = $lastid;
         }
@@ -277,7 +276,7 @@ class Model{
     public function update(){
         $update = $this->prepareDatabaseData();
         $id = static::$primaryColumn;
-        self::getDbInstance()->update(static::$tablename, new DBExample(array($id => $this->$id)), $update);
+        self::getDbInstance()->update(static::getTable(), new DBExample(array($id => $this->$id)), $update);
     }
 	
 
@@ -288,7 +287,7 @@ class Model{
 	public function delete(){
 		$class = get_called_class();
 		$id = static::$primaryColumn;
-		$deleted = self::getDbInstance()->delete(static::$tablename, new DBExample(array($id => $this->$id)));
+		$deleted = self::getDbInstance()->delete(static::getTable(), new DBExample(array($id => $this->$id)));
 
         (new Event(strtolower($class).'.deleted', array('object' => $this)))->trigger();
 
@@ -336,7 +335,7 @@ class Model{
      * @return string the table name of the model
      */
     public static function getTable(){
-        return static::$tablename;
+        return DB::getFullTablename(static::$tablename);
     }
     
 

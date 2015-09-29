@@ -35,7 +35,7 @@ class InstallController extends Controller{
 			'form' => $form
 		));
 
-		return \Hawk\Plugins\MainController::getInstance()->index($body);
+		return \Hawk\Plugins\Main\MainController::getInstance()->index($body);
 	}
 
 	public function settings(){
@@ -105,6 +105,13 @@ class InstallController extends Controller{
 						'pattern' => '/^\w+$/',
 						'label' => Lang::get('install.settings-db-dbname-label', null, null, $this->language)
 					)),
+
+					new TextInput(array(
+						'name' => 'db[prefix]',
+						'default' => 'Hawk',
+						'pattern' => '/^\w+$/',
+						'label' => Lang::get('install.settings-db-prefix-label', null, null, $this->language)
+					))
 
 				),
 
@@ -192,6 +199,7 @@ class InstallController extends Controller{
 				try{
 					$param = array(
 						'{{ $dbname }}' => $form->getData('db[dbname]'),
+						'{{ $prefix }}' => $form->getData('db[prefix]'),
 						'{{ $language }}' => $this->language,
 						'{{ $timezone }}' => $form->getData('timezone'),
 						'{{ $title }}' => Db::get('tmp')->quote($form->getData('title')),
@@ -218,6 +226,7 @@ class InstallController extends Controller{
 						'{{ $username }}' => $form->getData('db[username]'),
 						'{{ $password }}' => $form->getData('db[password]'),
 						'{{ $dbname }}' => $form->getData('db[dbname]'),
+						'{{ $prefix }}' => $form->getData('db[prefix]'),
 						'{{ $sessionEngine }}' => $form->getData('session'),
 						'{{ $version }}' => $form->getData('version')
 					);
