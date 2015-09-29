@@ -13,6 +13,11 @@ Log::debug('script has been Initialized');
 
 (new Event('process-start'))->trigger();
 
+if(!Conf::has('db') && (Router::getUri() === '/' || Router::getUri() === 'index.php')) {
+    Log::debug('Hawk is not installed yet, redirect to install process page');
+    Response::redirect(Router::getUri('install'));
+    return;
+}
 
 /*** Initialize the plugins ***/
 $plugins = Conf::has('db') ? array_merge(Plugin::getMainPlugins(), Plugin::getActivePlugins()) : array(Plugin::get('main'), Plugin::get('install'));
@@ -20,12 +25,6 @@ foreach($plugins as $plugin){
 	if(is_file($plugin->getStartFile())){
 		include $plugin->getStartFile();
 	}
-}
-
-if(!Conf::has('db') && (Router::getUri() === '/' || Router::getUri() === 'index.php')) {
-    Log::debug('Hawk is not installed yet, redirect to install process page');
-    Response::redirect(Router::getUri('install'));
-    return;
 }
 
 (new Event('before-routing'))->trigger();
