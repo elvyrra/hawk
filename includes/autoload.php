@@ -69,7 +69,7 @@ class Autoload{
             $dirs = $searchDirectories[$namespace];
         }
         elseif(strpos($namespace, 'Hawk\\Plugins\\') === 0){
-            if(class_exists("\\Hawk\\$class")){
+            if(class_exists("\\Hawk\\$class") || trait_exists("\\Hawk\\$class")){
                 class_alias("\\Hawk\\$class", $classname);
                 return true;
             }

@@ -98,7 +98,7 @@ Router::setProperties(
 				// Create a new plugin structure
 				Router::any('create-plugin', 'plugins/_new', array('action' => 'PluginController.create'));
 
-				Event::on('menuitem.added menu.added menu.deleted menuitem.deleted', function($event){
+				Event::on('menuitem.added menuitem.deleted', function($event){
 		            Router::getCurrentController()->addJavaScriptInline('app.refreshMenu()');
 		        });
 

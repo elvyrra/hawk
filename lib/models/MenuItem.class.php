@@ -67,7 +67,7 @@ class MenuItem extends Model{
 		// Insert the menu item
 		$item = parent::add($data);	
 
-		$event = new Event('menu-item.added', array('item' => $item));
+		$event = new Event('menuitem.added', array('item' => $item));
 		$event->trigger();
 		
 		return $item;
@@ -98,5 +98,8 @@ class MenuItem extends Model{
 		);
 
 		parent::delete();
+
+		$event = new Event('menuitem.deleted', array('item' => $this));
+		$event->trigger();
 	}
 }
