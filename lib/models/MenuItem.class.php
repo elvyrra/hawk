@@ -58,7 +58,7 @@ class MenuItem extends Model{
 
 		$data['order'] = DB::get(self::$dbname)->select(array(
 			'fields' => array('COALESCE(MAX(`order`), 0) + 1' => 'newOrder'),
-			'from' => self::$tablename,
+			'from' => self::getTable(),
 			'where' => new DBExample(array('parentId' => $data['parentId'])),
 			'one' => true,
 			'return' => DB::RETURN_OBJECT
@@ -67,7 +67,7 @@ class MenuItem extends Model{
 		// Insert the menu item
 		$item = parent::add($data);	
 
-		$event = new Event('menu-item.added', array('item' => $item));
+		$event = new Event('menuitem.added', array('item' => $item));
 		$event->trigger();
 		
 		return $item;
@@ -98,5 +98,8 @@ class MenuItem extends Model{
 		);
 
 		parent::delete();
+
+		$event = new Event('menuitem.deleted', array('item' => $this));
+		$event->trigger();
 	}
 }

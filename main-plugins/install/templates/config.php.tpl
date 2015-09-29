@@ -13,12 +13,15 @@ define('CONFIG_MODE', '{{ $configMode }}');
 Conf::set(array(
     'rooturl' => '{{ $rooturl }}',
     'db' => array(
-        array(
-            'host' => '{{ $host }}',
-            'username' => '{{ $username }}',
-            'password' => '{{ $password }}',
-            'dbname' => '{{ $dbname }}',
-        ),  
+        'maindb' => array(
+            array(
+                'host' => '{{ $host }}',
+                'username' => '{{ $username }}',
+                'password' => '{{ $password }}',
+                'dbname' => '{{ $dbname }}',
+            )
+        ),
+        'prefix' => '{{ $prefix }}',
     ),
     'session' => array(
         'engine' => '{{ $sessionEngine }}',

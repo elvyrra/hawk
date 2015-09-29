@@ -15,12 +15,12 @@ class DatabaseSessionHandler implements \SessionHandlerInterface{
      * The DB instance used to get and set data
      * @var DB
      */
-    private $db;
+    private $db,
 
     /**
      * The name of the table containing the sessions
      */
-	const TABLE = 'Session';
+	$table;
 	
     /**
      * Close the session
@@ -34,7 +34,7 @@ class DatabaseSessionHandler implements \SessionHandlerInterface{
      * @param string $sessionId The session id, corresponding to the session cookie
      */
     public function destroy($sessionId){
-        return $this->db->delete(self::TABLE, 'id = :id', array('id' => $sessionId)) ? true : false;
+        return $this->db->delete($this->table, 'id = :id', array('id' => $sessionId)) ? true : false;
 
         // Clean expired sessions
         $this->gc(0);
@@ -45,7 +45,7 @@ class DatabaseSessionHandler implements \SessionHandlerInterface{
      * @param int $maxlifetime The session lifetime (not used)
      */
     public function gc($maxlifetime){
-        return $this->db->delete(self::TABLE, ':lifetime AND mtime + :lifetime < UNIX_TIMESTAMP()', array('lifetime' => Conf::get('session.lifetime'))) ? true : false;
+        return $this->db->delete($this->table, ':lifetime AND mtime + :lifetime < UNIX_TIMESTAMP()', array('lifetime' => Conf::get('session.lifetime'))) ? true : false;
     }
     
 
@@ -55,7 +55,8 @@ class DatabaseSessionHandler implements \SessionHandlerInterface{
      * @param string $name Not used
      */
     public function open($savePath, $name){
-        $this->db = DB::get(MAINDB);        
+        $this->db = DB::get(MAINDB);   
+        $this->table = DB::getFullTablename('Session');
 
         // Clean expired sessions
         $this->gc(0);
@@ -69,7 +70,7 @@ class DatabaseSessionHandler implements \SessionHandlerInterface{
      */
     public function read($sessionId){
         $line = $this->db->select(array(
-            'from' => self::TABLE,
+            'from' => $this->table,
             'where' => 'id = :id',
             'binds' => array('id' => $sessionId),
             'one' => true
@@ -85,7 +86,7 @@ class DatabaseSessionHandler implements \SessionHandlerInterface{
      * @param string $data The data session to write, serialized    
      */
     public function write($sessionId, $data){	
-        $sql = 'REPLACE INTO ' . self::TABLE . ' (id, data, mtime) VALUES (:id, :data, UNIX_TIMESTAMP())';
+        $sql = 'REPLACE INTO ' . $this->table . ' (id, data, mtime) VALUES (:id, :data, UNIX_TIMESTAMP())';
         return $this->db->query($sql, array(
             'id' => $sessionId,
             'data' => $data,

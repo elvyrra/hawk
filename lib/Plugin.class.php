@@ -14,7 +14,7 @@ class Plugin{
 	/**
 	 * The table in the database where the plugins data are registered
 	 */
-	const TABLE = "Plugin";
+	const TABLE = 'Plugin';
 
 	/**
 	 * The basename of the file containing the plugin definition
@@ -139,11 +139,16 @@ class Plugin{
 		$plugins = array();
 		$dirs = $noMain ? array(PLUGINS_DIR) : array(MAIN_PLUGINS_DIR, PLUGINS_DIR);
 
-		$configs = DB::get(MAINDB)->select(array(
-			'from' => self::TABLE,
-			'index' => 'name',			
-			'return' => DB::RETURN_OBJECT
-		));
+		if(Conf::has('db')){
+			$configs = DB::get(MAINDB)->select(array(
+				'from' => DB::getFullTablename(self::TABLE),
+				'index' => 'name',			
+				'return' => DB::RETURN_OBJECT
+			));
+		}
+		else{
+			$configs = array();
+		}
 
 		foreach($dirs as $dir){
 			foreach(glob($dir . '*', GLOB_ONLYDIR) as $dir){
@@ -167,7 +172,7 @@ class Plugin{
 	 */
 	public static function getActivePlugins(){
 		$configs = DB::get(MAINDB)->select(array(
-			'from' => self::TABLE,
+			'from' => DB::getFullTablename(self::TABLE),
 			'where' => 'active = 1',						
 		));
 
@@ -391,9 +396,21 @@ class Plugin{
 	 * @return boolean True if the plugin is installed, False else
 	 */
 	public function isInstalled(){
-		return (bool) DB::get(MAINDB)->count(self::TABLE, 'name = :name', array('name' => $this->name));
+		return (bool) DB::get(MAINDB)->count(DB::getFullTablename(self::TABLE), 'name = :name', array('name' => $this->name));
 	}
 	
+
+	/**
+	 * Get the namespace used for all files in the plugin. The namespace is generated from the plugin name
+	 * @return string The plugin namespace
+	 */
+	public function getNamespace(){
+		$namespace = preg_replace_callback('/(^|\-)(\w?)/', function($m){
+            return strtoupper($m[2]);                    
+		}, $this->name);  
+
+		return 'Hawk\\Plugins\\' . $namespace;
+	}
 
 	/**
 	 * Instance the plugin installer
@@ -404,7 +421,7 @@ class Plugin{
 			return $this->manager;
 		}
 
-		$class = '\\Hawk\\Plugins\\' . $this->getDefinition('namespace') . '\\Installer';
+		$class = $this->getNamespace() . '\\Installer';
 		if(!empty($class)){
 			$this->manager = new $class($this);
 			return $this->manager;
@@ -418,7 +435,7 @@ class Plugin{
 	 * Install the plugin
 	 */
 	public function install(){
-		DB::get(MAINDB)->insert(self::TABLE, array(
+		DB::get(MAINDB)->insert(DB::getFullTablename(self::TABLE), array(
 			'name' => $this->name,			
 			'active' => 0
 		), 'IGNORE');
@@ -428,7 +445,7 @@ class Plugin{
 			Log::notice('The plugin ' . $this->name . ' has been installed');
 		}
 		catch(\Exception $e){
-			DB::get(MAINDB)->delete(self::TABLE, new DBExample(array('name' => $this->name)));
+			DB::get(MAINDB)->delete(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)));
 
 			Log::error('En error occured while installing plugin ' . $this->name . ' : ' . $e->getMessage());
 			throw $e;
@@ -440,14 +457,14 @@ class Plugin{
 	 * Uninstall the plugin
 	 */
 	public function uninstall(){
-		Db::get(MAINDB)->delete(self::TABLE, new DBExample(array('name' => $this->name)));
+		Db::get(MAINDB)->delete(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)));
 
 		try{
 			$this->getInstallerInstance()->uninstall();
 			Log::notice('The plugin ' . $this->name . ' has been uninstalled');
 		}
 		catch(\Exception $e){
-			DB::get(MAINDB)->insert(self::TABLE, array(
+			DB::get(MAINDB)->insert(DB::getFullTablename(self::TABLE), array(
 				'name' => $this->name,			
 				'active' => 0
 			), 'IGNORE');
@@ -472,14 +489,14 @@ class Plugin{
 	public function activate(){
 		// Activate the plugin
 		$this->active = 1;
-		DB::get(MAINDB)->update(self::TABLE, new DBExample(array('name' => $this->name)), array('active' => 1));	
+		DB::get(MAINDB)->update(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)), array('active' => 1));	
 
 		try{
 			$this->getInstallerInstance()->activate();
 			Log::notice('The plugin ' . $this->name . ' has been activated');
 		}
 		catch(\Exception $e){
-			DB::get(MAINDB)->update(self::TABLE, new DBExample(array('name' => $this->name)), array('active' => 0));
+			DB::get(MAINDB)->update(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)), array('active' => 0));
 			
 			Log::error('En error occured while activating plugin ' . $this->name . ' : ' . $e->getMessage());
 			throw $e;
@@ -493,14 +510,14 @@ class Plugin{
 	public function deactivate(){
 		// Deactivate the plugin
 		$this->active = 0;
-		DB::get(MAINDB)->update(self::TABLE, new DBExample(array('name' => $this->name)), array('active' => 0));	
+		DB::get(MAINDB)->update(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)), array('active' => 0));	
 
 		try{
 			$this->getInstallerInstance()->deactivate();
 			Log::notice('The plugin ' . $this->name . ' has been deactivated');
 		}
 		catch(\Exception $e){
-			DB::get(MAINDB)->update(self::TABLE, new DBExample(array('name' => $this->name)), array('active' => 1));
+			DB::get(MAINDB)->update(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)), array('active' => 1));
 			
 			Log::error('En error occured while deactivating plugin ' . $this->name . ' : ' . $e->getMessage());
 			throw $e;

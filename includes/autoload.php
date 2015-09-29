@@ -54,9 +54,6 @@ class Autoload{
             $namespace = '';
         }
         $class = end($parts);
-        // $reflection = new \ReflectionClass($classname);
-        // $class = $reflection->getShortName();
-        // $namespace = $reflection->getNamespaceName();
 
         $filename = "$class.class.php";
 
@@ -71,27 +68,20 @@ class Autoload{
         if(isset($searchDirectories[$namespace])){
             $dirs = $searchDirectories[$namespace];
         }
-        elseif(preg_match('/^Hawk\\\\Plugins\\\\([\w]+)$/', $namespace, $matches)){  
-            if(class_exists("\\Hawk\\$class")){
+        elseif(strpos($namespace, 'Hawk\\Plugins\\') === 0){
+            if(class_exists("\\Hawk\\$class") || trait_exists("\\Hawk\\$class")){
                 class_alias("\\Hawk\\$class", $classname);
                 return true;
             }
             else{
-                // The class is under a plugin
-                if(in_array(strtolower($matches[1]), Plugin::$mainPlugins)){
-                    // The class is under one of the main plugins
-                    $dirs = array(Plugin::get(strtolower($matches[1]))->getRootDir());
-                }
-                else{
-                    // Find the plugins associated to this namespace
-                    $plugins = Plugin::getAll(true);
-                    foreach($plugins as $plugin){
-                        if($plugin->getDefinition('namespace') === $matches[1]){
-                            $dirs = array($plugin->getRootDir());
-                            break;
-                        }
-                    }                
-                }
+                // Find the plugins associated to this namespace
+                $plugins = Plugin::getAll();
+                foreach($plugins as $plugin){
+                    if($plugin->getNamespace() === $namespace){
+                        $dirs = array($plugin->getRootDir());
+                        break;
+                    }
+                }                
             }
         }
         else{

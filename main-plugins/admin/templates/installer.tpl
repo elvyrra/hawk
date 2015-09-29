@@ -3,7 +3,7 @@
  * Installer.class.php
  */
 
-namespace Hawk\Plugins\{{ $namespace }};
+namespace {{ $namespace }};
 
 /**
  * This class describes the behavio of the installer for the plugin {$data['name']}

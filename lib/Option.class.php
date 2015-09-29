@@ -44,7 +44,7 @@ class Option{
 		}
 		
 		$options = DB::get(MAINDB)->select(array(
-			'from' => 'Option',
+			'from' => DB::getFullTablename('Option'),
 			'where' => new DBExample(array('plugin' => $plugin))			
 		));
 		foreach($options as $option){
@@ -63,7 +63,7 @@ class Option{
 		list($plugin, $key) = explode('.', $name);
 		self::$options[$plugin][$key] = $value;
 		
-		DB::get(MAINDB)->replace('Option', array(
+		DB::get(MAINDB)->replace(DB::getFullTablename('Option'), array(
 			'plugin' => $plugin,
 			'key' => $key,
 			'value' => $value
@@ -77,7 +77,7 @@ class Option{
 	 */
 	public static function delete($name){
 		list($plugin, $key) = explode('.', $name);
-		DB::get(MAINDB)->delete('Option', new DBExample(array(
+		DB::get(MAINDB)->delete(DB::getFullTablename('Option'), new DBExample(array(
 			'plugin' => $plugin, 
 			'key' => $key
 		)));

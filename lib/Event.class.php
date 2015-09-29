@@ -134,7 +134,7 @@ class Event{
 
         $trace = debug_backtrace()[0];
         Log::debug('The event ' . $name . 'has been triggered from ' . $trace['file'] . ':' . $trace['line']);
-        
+
         if(isset(self::$events[$name])){
             ksort(self::$events[$name]);
             foreach(self::$events[$name] as $action){               

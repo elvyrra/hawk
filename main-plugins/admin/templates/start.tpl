@@ -1,6 +1,6 @@
 <?php
 
-namespace Hawk\Plugins\{{ $namespace }};
+namespace {{ $namespace }};
 
 Router::setProperties(
     array(

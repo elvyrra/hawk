@@ -575,9 +575,25 @@ class DB{
 	 * @param int $type The data type
 	 * @return string The quoted string
 	 */
-	public function quote($str, $type = PDO::PARAM_STR){
+	public function quote($str, $type = \PDO::PARAM_STR){
 		return $this->connection->quote($str, $type);
 	}
+
+
+	/**
+	 * Get the real name of a table, with the configured prefix
+	 * @param string $table The base table name
+	 * @param string $prefix If set, this prefix will replace the one configured for the application
+	 * @return string The complete name of the table
+	 */
+	public static function getFullTablename($table, $prefix = null){
+		if($prefix === null){
+			$prefix = Conf::get('db.prefix');			
+		}
+
+		return $prefix . $table;
+	}
+
 }
 
 
