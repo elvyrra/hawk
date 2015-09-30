@@ -124,8 +124,9 @@ class UserProfileController extends Controller{
                                 mkdir($dir, 0755, true);
                             }
                             
-                            $upload->move($file, $dir);
-                            $user->setProfileData($question->name, $url . $file->basename);
+                            $basename = uniqid() . $file->extension;
+                            $upload->move($file, $dir, $basename);
+                            $user->setProfileData($question->name, $url . $basename);
                         }
                     }
                     else{

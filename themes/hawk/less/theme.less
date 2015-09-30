@@ -277,6 +277,9 @@ input[type="file"] {
 
         & > .file-chosen-icon{
             visibility: hidden;
+            width: 15px;
+            display: inline-block;
+            float: right;
         }
     }
 
@@ -284,6 +287,14 @@ input[type="file"] {
         background: #5cb85c;
         color: #fff;
         border-color: #4cae4c;
+
+        & > .input-file-invitation-text{
+            width: calc(~"100% - 16px");
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            display: inline-block;
+        }
 
         & > .file-chosen-icon {
             visibility: visible;
