@@ -1,23 +1,48 @@
-#manage-themes-page .theme-item .icons{
-	float: right;	
-	display: none;
-}
-
-#manage-themes-page .theme-item:hover .icons{
-	display: block;
-}
-
-
 #manage-themes-page .theme-item{
 	position: relative;
 	width: 220px;
 	height: 220px;
+    margin-right: 5px;
+}
+
+#manage-themes-page .theme-item .theme-item-header{
+    width: 100%;
+    display: block;    
+    height: 30px;
+    margin-bottom : 5px;
+}
+
+#manage-themes-page .theme-item .theme-item-header h4{
+    width: calc(100% - 46px);
+    height: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#manage-themes-page .theme-item .icons{
+    display: none;
+    width: 46px;
+}
+
+#manage-themes-page .theme-item:hover .icons{
+    display: block;
+
 }
 
 #manage-themes-page .theme-item .theme-preview{
-    height: auto;
+    text-align: center;
+}
+
+#manage-themes-page .theme-item .theme-preview > img{
+    height: auto;    
     width: 200px;
+    max-height: 200px;
     margin: auto;
+}
+
+#manage-themes-page .theme-item .theme-preview > .icon{
+    font-size: 150px;
 }
 
 #manage-themes-page .theme-media-item{

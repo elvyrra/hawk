@@ -10,16 +10,20 @@
 			{foreach($themes as $name => $theme)}
 				<div class="theme-item box pull-left {{ $name === $selectedTheme->getName() ? 'bg-success' : '' }}">
 					<div class="box-content">
-						<h4>{{ $theme->getTitle() }}</h4>
-						<span class="icons">
-							{if($name != $selectedTheme->getName())}<i class="icon icon-check text-success select-theme icon-2x" data-theme="{{ $name }}" title="{text key='admin.theme-select-theme'}"></i>{/if}
-							{if($theme->isRemovable())}<i class="icon icon-close text-danger delete-theme icon-2x" data-theme="{{ $name }}" title="{text key='admin.theme-delete-theme'}"></i>{/if}
-						</span>		
-						{if(is_file($theme->getPreviewFilename()))}
-							<img src="{{ $theme->getPreviewUrl() }}" class="theme-preview" alt="Theme preview : {{ $theme->getTitle() }}"/>
-						{else}
-							<span class="icon icon-picture-o icon-5x"></span>
-						{/if}
+						<div class="theme-item-header">
+							<h4>{{ $theme->getTitle() }}</h4>
+							<span class="icons">
+								{if($name != $selectedTheme->getName())}<i class="icon icon-check text-success select-theme icon-2x" data-theme="{{ $name }}" title="{text key='admin.theme-select-theme'}"></i>{/if}
+								{if($theme->isRemovable())}<i class="icon icon-close text-danger delete-theme icon-2x" data-theme="{{ $name }}" title="{text key='admin.theme-delete-theme'}"></i>{/if}
+							</span>
+						</div>
+						<div class="theme-preview">		
+							{if(is_file($theme->getPreviewFilename()))}
+								<img src="{{ $theme->getPreviewUrl() }}" alt="Theme preview : {{ $theme->getTitle() }}"/>
+							{else}
+								<span class="icon icon-picture-o icon-5x"></span>
+							{/if}
+						</div>
 					</div>
 				</div>
 			{/foreach}
