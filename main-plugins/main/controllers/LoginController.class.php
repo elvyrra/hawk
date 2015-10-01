@@ -277,7 +277,7 @@ class LoginController extends Controller{
 							'themeBaseCss' => Theme::getSelected()->getBaseCssUrl(),
 							'themeCustomCss' => Theme::getSelected()->getCustomCssUrl(),
 							'mainCssUrl' => Plugin::current()->getCssUrl(),
-							'logoUrl' =>  Option::get('main.logo') ? USERFILES_PLUGINS_URL . 'main/' . Option::get('main.logo') : Plugin::current()->getStaticUrl() . 'img/hawk-logo.png',
+							'logoUrl' =>  Option::get('main.logo') ? Plugin::current()->getUserfilesUrl(Option::get('main.logo')) : Plugin::current()->getStaticUrl('img/hawk-logo.png'),
 							'sitename' => Option::get('main.title'),
 							'url' => $url
 						);

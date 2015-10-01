@@ -36,8 +36,8 @@ class ThemeController extends Controller{
 			)
 		);
 
-		$this->addJavaScript(Plugin::current()->getJsUrl() . "themes.js");
-		$this->addCss(Plugin::current()->getCssUrl() . "themes.css");
+		$this->addJavaScript(Plugin::current()->getJsUrl('themes.js'));
+		$this->addCss(Plugin::current()->getCssUrl('themes.css'));
 
 		Lang::addKeysToJavaScript("admin.theme-delete-confirm");
 		return View::make(Plugin::current()->getView("themes.tpl"), array(

@@ -15,11 +15,11 @@
 		{/if}
 		
 		<!-- Bootstrap CSS-->
-		<link rel="stylesheet" href="{{ $mainCssUrl }}bootstrap.min.css" />
+		<link rel="stylesheet" href="{{ Plugin::get('main')->getCssUrl('bootstrap.min.css') }}" />
 		<!-- Bootstrap Colorpicker -->
-		<link rel="stylesheet" href="{{ $mainCssUrl }}bootstrap-colorpicker.min.css" />
+		<link rel="stylesheet" href="{{ Plugin::get('main')->getCssUrl('bootstrap-colorpicker.min.css') }}" />
 		<!-- Bootstrap Datepicker -->
-		<link rel="stylesheet" href="{{ $mainCssUrl }}bootstrap-datepicker.min.css" />
+		<link rel="stylesheet" href="{{ Plugin::get('main')->getCssUrl('bootstrap-datepicker.min.css') }}" />
 		
 		<!-- Base CSS file of the theme -->
 		<link rel="stylesheet" id="theme-base-stylesheet" href="{{ $themeBaseCss }}" />
@@ -27,8 +27,8 @@
 		<link rel="stylesheet" id="theme-custom-stylesheet" href="{{ $themeCustomCss }}" />
 
 		<script type="text/javascript" src="{{ Router::getUri('js-conf') }}"></script>
-		<script type="text/javascript" src="{{ $mainJsUrl }}ext/require.js" data-main="{{ $mainJsUrl }}app.js"></script>
 
+		<script type="text/javascript" src="{{ Plugin::get('main')->getJsUrl('ext/require.js') }}" data-main="{{ Plugin::get('main')->getJsUrl('app.js') }}"></script>
 	</head>
 	
 	<body>

@@ -11,13 +11,11 @@ require INCLUDES_DIR . 'error-handler.php';
 
 define("ROOT_URL", (string) Conf::get('rooturl') . '/');
 
-/*** Define the main paths ***/
-define('THEMES_ROOT_URL', ROOT_URL . 'themes/');
-define('PLUGINS_ROOT_URL', ROOT_URL . 'plugins/');
 
-define('USERFILES_ROOT_URL', ROOT_URL . 'userfiles/');
-define('USERFILES_PLUGINS_URL', USERFILES_ROOT_URL . 'plugins/');
-define('USERFILES_THEMES_URL', USERFILES_ROOT_URL . 'themes/');
+/*** Define the main paths ***/
+define('STATIC_URL', ROOT_URL . 'static/');
+define('THEMES_ROOT_URL', STATIC_URL . 'themes/');
+define('PLUGINS_ROOT_URL', STATIC_URL . 'plugins/');
 
 if(Conf::has('db')){
     /*** Access to the OS database (MySQL) ***/   

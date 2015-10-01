@@ -14,8 +14,8 @@ class UserController extends Controller{
 			'questions' => QuestionController::getInstance()->compute('listQuestions')
 		);
 
-		$this->addCss(Plugin::current()->getCssUrl(). "users.css");
-		$this->addJavaScript(Plugin::current()->getJsUrl() . 'users.js');
+		$this->addCss(Plugin::current()->getCssUrl('users.css') );
+		$this->addJavaScript(Plugin::current()->getJsUrl('users.js'));
 		
 		$page = View::make(Plugin::current()->getViewsDir() . 'users.tpl', array(
 			'tabs' => $tabs,

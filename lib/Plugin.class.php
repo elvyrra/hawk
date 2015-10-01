@@ -261,16 +261,24 @@ class Plugin{
 	 * @return string The directory containing controllers classes of the plugin
 	 */
 	public function getControllersDir(){
-		return $this->rootDir . 'controllers/';
+		return $this->getRootDir() . 'controllers/';
 	}
 	
+
+	/**
+	 * Return the directory containing the plugin language files
+	 * @return string The directory contaning the plugin language files
+	 */
+	public function getLangDir(){
+		return $this->getRootDir() . 'lang/';
+	}
 
 	/**
 	 * Return the directory containing the plugin models
 	 * @return string The directory containing models classes of the plugin
 	 */
 	public function getModelsDir(){
-		return $this->rootDir . 'models/';
+		return $this->getRootDir() . 'models/';
 	}
 
 
@@ -279,7 +287,7 @@ class Plugin{
 	 * @return string The directory containing the widgets classes of the plugin
 	 */
 	public function getWidgetsDir(){
-		return $this->rootDir . 'widgets/';
+		return $this->getRootDir() . 'widgets/';
 	}
 	
 
@@ -288,7 +296,7 @@ class Plugin{
 	 * @return string The directory contaning the plugin views
 	 */
 	public function getViewsDir(){
-		return $this->rootDir . 'views/';	
+		return $this->getRootDir() . 'views/';	
 	}
 	
 
@@ -312,65 +320,139 @@ class Plugin{
 
 	/**
 	 * Return the directory containing the plugin static files (js, css, images)
-	 * @return string The directory contanining the plugin static files
+	 * @return string The directory path
 	 */
 	public function getStaticDir(){
-		return $this->rootDir . 'static/';
+		return $this->getRootDir() . 'static/';
 	}
-	
+
+	/**
+	 * Return the directory containing the plugin public static files (acessible by HTTP requests)
+	 * @return string The directory path
+	 */
+	public function getPublicStaticDir(){
+		return STATIC_PLUGINS_DIR . $this->name . '/';
+	}
+
 
 	/**
 	 * Return the url where to find out the plugin static files
-	 * @return string The URL to get the plugin static files
+	 * @return string The URL
 	 */
-	public function getStaticUrl(){
-		return ROOT_URL . str_replace(ROOT_DIR, '', $this->rootDir) . 'static/';
-	}
-	
+	public function getStaticUrl($basename = ''){
+		$baseUrl = PLUGINS_ROOT_URL . $this->name . '/';
+		if(empty($basename)){
+			return $baseUrl;
+		}
+		else{
+			$privateFilename = $this->getStaticDir() . $basename;
+			$publicFilename = $this->getPublicStaticDir() . $basename;
+
+			if(is_file($privateFilename) && (!is_file($publicFilename) || filemtime($privateFilename) > filemtime($publicFilename))){
+				if(!is_dir(dirname($publicFilename))){
+					mkdir(dirname($publicFilename), 0755, true);
+				}
+				
+				copy($privateFilename, $publicFilename);				
+			}
+		}
+		return $baseUrl . $basename;
+	}	
+
+
+
+
 
 	/**
 	 * Return the directory containing the plugin JavaScript files
-	 * @return string The directory contaning the plugin JavaScript files
+	 * @return string The directory path
 	 */
 	public function getJsDir(){
 		return $this->getStaticDir() . 'js/';
 	}
-	
+
 
 	/**
-	 * Return the url where to find out the plugin JavaScript files
-	 * @return string The URL of the plugin JavaScript files directory
+	 * Return the directory containing the plugin public JavaScript files (accessible by HTTP requests)
+	 * @return string The directory path
 	 */
-	public function getJsUrl(){
-		return $this->getStaticUrl() . 'js/';
+	public function getPublicJsDir(){
+		return $this->getPublicStaticDir() . 'js/';
 	}
-	
+
+	/**
+	 * Return the URL of a public javascript file, or the URL of the directory containing public javascript files if $basename is empty
+	 * @param string $basename The Javascript file basename
+	 * @return string The URL
+	 */
+	public function getJsUrl($basename = ''){
+		if(empty($basename)){
+			return $this->getStaticUrl() . 'js/';
+		}
+		else{
+			return $this->getStaticUrl('js/' . $basename);
+		}
+	}
+
+
+
+
+
 
 	/**
 	 * Return the directory containing the plugin CSS files
 	 * @return string The directory contaning the plugin CSS files
 	 */
-	public function getCssDir(){
-		return $this->getStaticDir() . 'css/';
+	public function getLessDir(){
+		return $this->getStaticDir() . 'less/';
 	}
 	
 
 	/**
-	 * Return the url where to find out the plugin css files
-	 * @return string The URL of the plugin CSS files directory
+	 * Return the directory containing the plugin public CSS files (accessible by HTTP requests)
+	 * @return string The directory path
 	 */
-	public function getCssUrl(){
-		return $this->getStaticUrl() . 'css/';
+	public function getPublicCssDir(){
+		return $this->getPublicStaticDir() . 'css/';
 	}
-	
+
 
 	/**
-	 * Return the directory containing the plugin language files
-	 * @return string The directory contaning the plugin language files
+	 * Return the URL of a public CSS file, or the URL of the directory containing public CSS files if $basename is empty
+	 * @param string $basename The Less file basename
+	 * @return string The URL
 	 */
-	public function getLangDir(){
-		return $this->rootDir . 'lang/';
+	public function getCssUrl($basename = ""){
+		$cssUrl = $this->getStaticUrl() . 'css/';
+		if(empty($basename)){
+			return $cssUrl;
+		}
+		else{
+			$privateFilename = $this->getLessDir() . $basename;
+			$cssBasename = preg_replace('/\.less$/', '.css', $basename);						
+			
+			if(is_file($privateFilename)){
+				$publicFilename = $this->getPublicCssDir() . $cssBasename;
+
+				Event::on('built-less', function(Event $event) use($privateFilename){
+					if($event->getData('source') === $privateFilename){
+						// Copy all static files except less and JS
+						foreach(glob($this->getStaticDir() . '*' ) as $elt){
+			                if(! in_array(basename($elt), array('less', 'js'))) {
+			                    FileSystem::copy($elt, $this->getPublicStaticDir());
+			                }
+			            }
+					}
+				});
+
+				Less::compile($privateFilename, $publicFilename);
+			}
+
+			return $cssUrl . $cssBasename;
+		}
 	}
+
+
 
 
 	/**
@@ -383,11 +465,27 @@ class Plugin{
 
 
 	/**
-	 * Return the directory containing the url to request user files
-	 * @return string The URL of the directory containing the user files of the plugin
+	 * Return the directory containing the public (accessible by HTTP requests) plugin files due to user actions
+	 * @return string The directory contaning the user files of the plugin
 	 */
-	public function getUserfilesUrl(){
-		return USERFILES_PLUGINS_URL . $this->name . '/';
+	public function getPublicUserfilesDir(){
+		return $this->getPublicStaticDir() . 'userfiles/';
+	}
+
+	
+	/**
+	 * Return the URL of a static userfile, or the URL of the directory contaning the userfiles, if $basename is empty
+	 * @param string $basename The basename of the file to get the access URL
+	 * @return string The URL
+	 */
+	public function getUserfilesUrl($basename = ''){
+		$baseUrl = $this->getStaticUrl() . 'userfiles/';
+		if(empty($basename)){
+			return $baseUrl;
+		}
+		else{
+			return $baseUrl . $basename;
+		}
 	}
 	
 

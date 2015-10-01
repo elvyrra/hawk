@@ -22,6 +22,12 @@ define('USERFILES_THEMES_DIR', USERFILES_DIR . 'themes/');
 
 define('USERFILES_PLUGINS_DIR', USERFILES_DIR . 'plugins/');
 
+define('STATIC_DIR', ROOT_DIR . 'static/');
+
+define('STATIC_THEMES_DIR', STATIC_DIR . 'themes/');
+
+define('STATIC_PLUGINS_DIR', STATIC_DIR . 'plugins/');
+
 define('TMP_DIR', ROOT_DIR . 'tmp/');
 
 // The main db name

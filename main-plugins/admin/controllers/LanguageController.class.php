@@ -40,7 +40,7 @@ class LanguageController extends Controller{
 		
 		Lang::addKeysToJavaScript("language.confirm-delete-lang", "language.confirm-delete-key");
 		
-		$this->addJavaScript( Plugin::current()->getJsUrl() . 'languages.js');
+		$this->addJavaScript( Plugin::current()->getJsUrl('languages.js'));
 
 		return LeftSidebarTab::make(array(
 			'icon' => 'flag',

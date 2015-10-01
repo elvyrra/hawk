@@ -10,7 +10,7 @@ class PluginController extends Controller{
         $list = $this->compute('availablePlugins');
         $widgets = array(new SearchPluginWidget());        
 
-        $this->addCss(Plugin::current()->getCssUrl() . "plugins.css");
+        $this->addCss(Plugin::current()->getCssUrl('plugins.css'));
 
         return LeftSidebarTab::make(array(
             'tabId' => self::TABID,
@@ -149,7 +149,7 @@ class PluginController extends Controller{
         
         $list = new ItemList($param);
         Lang::addKeysToJavaScript('admin.plugins-advert-menu-changed', 'admin.confirm-delete-plugin', 'admin.confirm-uninstall-plugin');
-        $this->addJavaScript(Plugin::current()->getJsUrl() . 'plugins.js');
+        $this->addJavaScript(Plugin::current()->getJsUrl('plugins.js'));
         return $list;        
     }
 

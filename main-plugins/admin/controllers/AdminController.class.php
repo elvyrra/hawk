@@ -81,7 +81,7 @@ class AdminController extends Controller{
 					new FileInput(array(
 						'name' => 'logo',
 						'label' => Lang::get('admin.settings-logo-label'),
-						'after' => Option::get('main.logo') ? '<img src="/userfiles/plugins/main/'.Option::get('main.logo').'" class="settings-logo-preview" />' : '',
+						'after' => Option::get('main.logo') ? '<img src="' . Plugin::get('main')->getUserfilesUrl(Option::get('main.logo')) . '" class="settings-logo-preview" />' : '',
 						'maxSize' => 200000,
 						'extensions' => array('gif', 'png', 'jpg', 'jpeg')
 					)),
@@ -89,7 +89,7 @@ class AdminController extends Controller{
 					new FileInput(array(
 						'name' => 'favicon',
 						'label' => Lang::get('admin.settings-favicon-label'),
-						'after' => Option::get('main.favicon') ? '<img src="/userfiles/plugins/main/'.Option::get('main.favicon').'" class="settings-favicon-preview" />' : '',
+						'after' => Option::get('main.favicon') ? '<img src="'. Plugin::get('main')->getUserfilesUrl(Option::get('main.favicon')).'" class="settings-favicon-preview" />' : '',
 						'maxSize' => 20000,
 						'extensions' => array('gif', 'png', 'jpg', 'jpeg', 'ico')
 					))
@@ -303,14 +303,14 @@ class AdminController extends Controller{
 		$form = new Form($param);
 		if(!$form->submitted()){
 			// Display the form
-			$this->addCss(Plugin::current()->getCssUrl() . 'settings.css');
+			$this->addCss(Plugin::current()->getCssUrl('settings.css'));
 
-			$page = View::make(Plugin::current()->getViewsDir() . 'settings.tpl', array(
+			$page = View::make(Plugin::current()->getView('settings.tpl'), array(
 				'form' => $form,	
 				'languages' => $languages
 			));
 			
-			$this->addJavaScript(Plugin::current()->getJsUrl() . 'settings.js');
+			$this->addJavaScript(Plugin::current()->getJsUrl('settings.js'));
 			return NoSidebarTab::make(array(
 				'icon' => 'cogs',
 				'title' => Lang::get('admin.settings-page-name'),
@@ -339,7 +339,7 @@ class AdminController extends Controller{
 									$file = $upload->getFile();
 
 									
-									$dir = Plugin::get('main')->getUserfilesDir();
+									$dir = Plugin::get('main')->getPublicUserfilesDir();
 									
 									if(!is_dir($dir)){
 										mkdir($dir, 0755);

@@ -158,7 +158,7 @@ class Theme{
      * @return string
      */
     public function getBuildDirname(){
-        return USERFILES_THEMES_DIR . $this->name . '/';
+        return STATIC_THEMES_DIR . $this->name . '/';
     }
     
 
@@ -167,7 +167,7 @@ class Theme{
      * @return string
      */
     public function getRootUrl(){
-        return USERFILES_THEMES_URL . $this->name . '/';
+        return THEMES_ROOT_URL . $this->name . '/';
     }
 
 
@@ -185,7 +185,13 @@ class Theme{
      * @return string
      */
     public function getPreviewUrl(){
-        return THEMES_ROOT_URL . $this->name . '/' . self::PREVIEW_BASENAME;
+        $privateFilename = $this->getPreviewFilename();
+        $publicFilename = $this->getBuildDirname() . self::PREVIEW_BASENAME;
+
+        if(is_file($privateFilename) && (!is_file($publicFilename) || filemtime($privateFilename) > filemtime($publicFilename))){
+            copy($privateFilename, $publicFilename);
+        }
+        return $this->getRootUrl() . self::PREVIEW_BASENAME;
     }
     
 
@@ -201,8 +207,7 @@ class Theme{
      * @return string
      */
     public function getBaseLessFile(){
-        $file = $this->getLessDirname() . self::LESS_BASENAME;
-        return $file;
+        return $this->getLessDirname() . self::LESS_BASENAME;        
     }
 
 
@@ -221,7 +226,7 @@ class Theme{
      * @return string the path of the file
      */
     private function getLastCompilationInfoFilename(){
-        return $this->getBuildDirname() . 'compilation-info.php';
+        return CACHE_DIR . 'theme-' . $this->name . '-compilation-info.php';
     }
 
     /**
@@ -233,36 +238,18 @@ class Theme{
             mkdir($this->getBuildDirname(), 0755, true);
         }
 
+        // Listen for compilation success
+        Event::on('built-less', function(Event $event){
+            if($event->getData('source') === $this->getBaseLessFile()){
+                foreach(glob($this->getRootDirname() . '*', GLOB_ONLYDIR ) as $elt){
+                    if(! in_array(basename($elt), array('less', 'views'))) {
+                        FileSystem::copy($elt, $this->getBuildDirname());
+                    }
+                }
+            }
+        });
 
-        $tmpdir = TMP_DIR . uniqid() . '/';
-
-        FileSystem::copy(dirname($this->getBaseLessFile()) . '/*', $tmpdir);
         // Get the theme options
-        if(Conf::has('db')){
-            $options = Option::getPluginOptions('theme-' . $this->name);
-        }
-        else{
-            $options = array();
-        }
-        $less = file_get_contents($this->getBaseLessFile());
-        $variables = $this->getEditableVariables($less);
-        foreach($options as $variable => $value){
-            $less = preg_replace('/@(' . $variable . ')\s*:\s*(.*?);/', '@$1 : ' . $value . ';', $less);                 
-        }
-        file_put_contents($tmpdir . self::LESS_BASENAME, $less);
-
-        $lastCompilationFile = $this->getLastCompilationInfoFilename();
-        if(is_file($lastCompilationFile)){
-            $cache = include $lastCompilationFile;
-        }
-        else{
-            $cache = $tmpdir . self::LESS_BASENAME;
-        }
-
-
-        $less = new \lessc;
-        
-		// Get the theme options
         $editableVariables = $this->getEditableVariables();        
         if(Conf::has('db')){
             $options = Option::getPluginOptions('theme-' . $this->name);
@@ -275,28 +262,10 @@ class Theme{
         foreach($editableVariables as $variable){
             $variables[$variable['name']] = isset($options[$variable['name']]) ? $options[$variable['name']] : $variable['default'];
         }
-        $less->setVariables($variables);
 
 
-        $less->setFormatter('compressed');
-        $less->setPreserveComments(false);
-        $compilation = $less->cachedCompile($cache, $force);
-
-        if(!is_array($cache) || $compilation['updated'] > $cache['updated']){
-            foreach(glob($this->getRootDirname() . '*') as $elt){
-                if(! in_array(basename($elt), array('less', 'views'))) {
-                    FileSystem::copy($elt, $this->getBuildDirname());
-                }
-            }
-
-            file_put_contents($this->getBuildCssFile(), '/*** ' . date('Y-m-d H:i:s') . ' ***/' . PHP_EOL . $compilation['compiled']);
-
-            // Save the compilation information
-            $compilation['root'] = $this->getBaseLessFile();
-            file_put_contents($this->getLastCompilationInfoFilename(), '<?php return ' . var_export($compilation, true) . ';');
-        }
-
-        FileSystem::remove($tmpdir);
+        Less::compile($this->getBaseLessFile(), $this->getBuildCssFile(), $force, $variables);       
+        
     }
 
 

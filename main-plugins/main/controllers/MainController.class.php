@@ -20,14 +20,15 @@ class MainController extends Controller{
 			$routes[$name] = $data;
 		}
 
+		
+		FileSystem::copy(Plugin::current()->getJsDir() . '/*', Plugin::current()->getPublicJsDir());
+
 		return View::make(Theme::getSelected()->getView('html-document.tpl'), array(
 			'title' => $title,
 			'description' => $description,
 			'keywords' => $keywords,
 			'themeBaseCss' => Theme::getSelected()->getBaseCssUrl(),
-			'themeCustomCss' => Theme::getSelected()->getCustomCssUrl(),
-			'mainJsUrl' => Plugin::current()->getJsUrl(),
-			'mainCssUrl' => Plugin::current()->getCssUrl(),
+			'themeCustomCss' => Theme::getSelected()->getCustomCssUrl(),			
 			'body' => $body,
 			'langLabels' => $labelsJSON,
 			'favicon' => $this->getFaviconUrl(),
@@ -122,7 +123,7 @@ class MainController extends Controller{
 			return Plugin::current()->getStaticUrl() . 'img/hawk-favicon.ico';
 		}
 		else{
-			return USERFILES_PLUGINS_URL . 'main/' . $favicon;
+			return Plugin::current()->getUserfilesUrl($favicon);
 		}
 	}
 

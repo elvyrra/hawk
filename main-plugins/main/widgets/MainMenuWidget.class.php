@@ -59,7 +59,7 @@ class MainMenuWidget extends Widget{
 
 		return View::make(Theme::getSelected()->getView('main-menu.tpl'), array(
 			'menus' => $menus,
-			'logo' => Option::get('main.logo') ? USERFILES_PLUGINS_URL . 'main/' . Option::get('main.logo') : ''
+			'logo' => Option::get('main.logo') ? Plugin::current()->getUserfilesUrl(Option::get('main.logo')) : ''
 		));
 	}
 	
