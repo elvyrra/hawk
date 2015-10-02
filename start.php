@@ -4,6 +4,7 @@ namespace Hawk;
 require INCLUDES_DIR . 'constants.php';
 require INCLUDES_DIR . 'custom-constants.php';
 require INCLUDES_DIR . 'autoload.php';
+
 if(is_file(INCLUDES_DIR . 'config.php')){
 	require INCLUDES_DIR . 'config.php';
 }

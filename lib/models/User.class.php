@@ -24,7 +24,7 @@ class User extends Model{
 
 	public static function getAll($index = null, $fields = array(), $order = array()){
 		$example = array('id' => array('$ne' => self::GUEST_USER_ID));
-		return self::getListByExample(new DBExample($example), $index, $fields, $orders);
+		return self::getListByExample(new DBExample($example), $index, $fields, $order);
 	}
 	
 	public static function getByUsername($username){

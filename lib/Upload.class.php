@@ -95,7 +95,7 @@ class Upload{
 			$filename = $i++ . '_' . $basename;
 		}
 
-		return rename($file->tmpFile, $directory . '/' . $filename);
+		return rename($file->tmpFile, $directory . $filename); //. '/'
 	}
 }
 
