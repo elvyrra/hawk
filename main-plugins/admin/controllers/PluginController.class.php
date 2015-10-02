@@ -10,7 +10,7 @@ class PluginController extends Controller{
         $list = $this->compute('availablePlugins');
         $widgets = array(new SearchPluginWidget());        
 
-        $this->addCss(Plugin::current()->getCssUrl('plugins.css'));
+        $this->addCss(Plugin::current()->getCssUrl('plugins.less'));
 
         return LeftSidebarTab::make(array(
             'tabId' => self::TABID,

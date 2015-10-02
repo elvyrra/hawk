@@ -18,7 +18,6 @@
 	{/if}
 </div>
 
-<div class="modal fade" id="dialogbox"></div>
 
 <div id='loading' data-bind="visible: loading.display">
 	<span class='icon icon-spinner icon-spin icon-5x'></span>
@@ -32,7 +31,7 @@
 {if(empty($content))}
 	<div id="main-content" role="tabpanel" data-bind="with: tabset">
 		<!-- Nav tabs -->
-		{if($canAccessApplication)}
+		<!-- {if($canAccessApplication)} -->
 			<ul class="nav nav-tabs" role="tablist" id="main-nav-tabs">
 				<!-- ko foreach: tabs -->
 				<li role="presentation" class="main-tab-title corner-top" data-toggle="tooltip" data-placement="bottom" data-bind="attr: { 
@@ -58,7 +57,7 @@
 					</span>
 				</li>
 			</ul>
-		{/if}
+		<!-- {/if} -->
 		
 		<!-- Tab panes -->
 		<div class="tab-content" id="main-tab-content" data-bind="foreach: tabs">
@@ -68,3 +67,5 @@
 {else}
 	{{ $content }}
 {/if}
+
+<div class="modal" id="dialogbox"></div>

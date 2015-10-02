@@ -56,7 +56,8 @@ class Controller{
 		(new Event(get_called_class() . '.' . $method . '.' . self::BEFORE_ACTION, array('controller' => $this)))->trigger();
 		
 		/*** Call the controller method ***/
-		$result = $this->$method();
+		$args = array_splice(func_get_args(), 1);
+		$result = call_user_func_array(array($this, $method), $args);
 		if(Response::getType() == 'html'){
 			// Create a phpQuery object to be modified by event listeners (widgets)
 			$result = \phpQuery::newDocument($result);

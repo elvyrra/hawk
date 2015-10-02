@@ -192,6 +192,7 @@ class AdminController extends Controller{
 
 					new WysiwygInput(array(
 						'name' => 'main.confirm-email-content',
+						'id' => 'settings-confirm-email-content-input',
 						'default' => Option::get('main.confirm-email-content'),
 						'label' => Lang::get('admin.settings-confirm-email-content-label'),
 						'labelWidth' => 'auto',
@@ -210,6 +211,7 @@ class AdminController extends Controller{
 
 					new WysiwygInput(array(
 						'name' => 'main.terms',
+						'id' => 'settings-terms-input',
 						'label' => Lang::get('admin.settings-terms-label'),
 						'labelWidth' => 'auto',
 						'default' => Option::get('main.terms'),
@@ -303,7 +305,7 @@ class AdminController extends Controller{
 		$form = new Form($param);
 		if(!$form->submitted()){
 			// Display the form
-			$this->addCss(Plugin::current()->getCssUrl('settings.css'));
+			$this->addCss(Plugin::current()->getCssUrl('settings.less'));
 
 			$page = View::make(Plugin::current()->getView('settings.tpl'), array(
 				'form' => $form,	

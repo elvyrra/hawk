@@ -61,6 +61,7 @@ class FileSystem{
 	/**
 	 * Find files by a pattern
 	 * @param string $source The directory to search in	 
+	 * @param string $pattern The pattern to find the files
 	 * @param string $type The type of source to find : 'file', 'dir', 'any'	 
 	 * @return array The list of files or directories found
 	 */

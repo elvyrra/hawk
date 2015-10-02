@@ -1,13 +1,30 @@
 <?php
+/**
+ * Language.class.php
+ */
 namespace Hawk;
 
+
+/**
+ * This class the language model
+ */
 class Language extends Model{
+	/**
+	 * The associated table 
+	 */
 	protected static $tablename = "Language";
+
+	/**
+	 * The primary key in the table
+	 */
 	protected static $primaryColumn = 'tag';
 	
+
+	/**
+	 * The class instances
+	 */
 	private static $instances = array();
 	
-
 	
 	/**
 	 * Find a language by it tag

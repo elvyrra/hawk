@@ -44,6 +44,8 @@ class Response{
 
     /**
      * Set response headers
+     * @param string $name The header name
+     * @param string $value The header value
      */
     public function header($name, $value){
         header($name .': ' . $value);

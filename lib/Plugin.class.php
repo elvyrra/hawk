@@ -336,7 +336,8 @@ class Plugin{
 
 
 	/**
-	 * Return the url where to find out the plugin static files
+	 * Return the url of a static file in the plugin, or the directory containing static files if $basename is empty
+	 * @param string $basename The file to get the URL of
 	 * @return string The URL
 	 */
 	public function getStaticUrl($basename = ''){

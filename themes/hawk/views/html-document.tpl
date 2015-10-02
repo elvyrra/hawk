@@ -14,17 +14,15 @@
 			<link rel="icon" href="{{ $favicon }}" />
 		{/if}
 		
-		<!-- Bootstrap CSS-->
-		<link rel="stylesheet" href="{{ Plugin::get('main')->getCssUrl('bootstrap.min.css') }}" />
-		<!-- Bootstrap Colorpicker -->
-		<link rel="stylesheet" href="{{ Plugin::get('main')->getCssUrl('bootstrap-colorpicker.min.css') }}" />
-		<!-- Bootstrap Datepicker -->
-		<link rel="stylesheet" href="{{ Plugin::get('main')->getCssUrl('bootstrap-datepicker.min.css') }}" />
-		
 		<!-- Base CSS file of the theme -->
 		<link rel="stylesheet" id="theme-base-stylesheet" href="{{ $themeBaseCss }}" />
 		<!-- Customized file of the theme -->
 		<link rel="stylesheet" id="theme-custom-stylesheet" href="{{ $themeCustomCss }}" />
+
+		<!-- Bootstrap Colorpicker -->
+		<link rel="stylesheet" href="{{ Plugin::get('main')->getCssUrl('bootstrap-colorpicker.min.css') }}" />
+		<!-- Bootstrap Datepicker -->
+		<link rel="stylesheet" href="{{ Plugin::get('main')->getCssUrl('bootstrap-datepicker.min.css') }}" />
 
 		<script type="text/javascript" src="{{ Router::getUri('js-conf') }}"></script>
 

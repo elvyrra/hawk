@@ -237,10 +237,8 @@ App.prototype.start = function(){
 		if(appConf.user.canAccessApplication){
 			this.openLastTabs(appConf.tabs.open);
 		}
-		else{
-			this.dialog(this.getUri('login'));
-		}
-
+		
+		
 		/**
 		 * Customize app HttpRequestObject
 		 */

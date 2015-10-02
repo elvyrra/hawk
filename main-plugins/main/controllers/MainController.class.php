@@ -3,9 +3,14 @@
 namespace Hawk\Plugins\Main;
 
 class MainController extends Controller{
+	
 	/**
-	 * Display the main page
-	 * */
+	 * Display a while HTML page
+	 * @param string $body The HTML code to insert in the <body> tag
+	 * @param string $title The page title, visible in the browser tab
+	 * @param string $description The page description, in the meta tag "description"
+	 * @param string $keywords The page keywords, in the meta tag "keywords"
+	 */
 	public function index($body, $title = '', $description = '', $keywords = ''){			
 		$labels = array(
 			'main' => Lang::keys('javascript'),
@@ -37,11 +42,15 @@ class MainController extends Controller{
 	}
 
 
-	public function main(){
+	/**
+	 * Display the main page
+	 * @param string $content A content to set to override the default index content
+	 */
+	public function main($content = ""){
 		$canAccessApplication = Session::getUser()->canAccessApplication();		
 
 		$pages = array();
-		if(Session::isConnected() && Option::get('main.open-last-tabs') && !empty($_COOKIE['open-tabs'])){
+		if($canAccessApplication && Option::get('main.open-last-tabs') && !empty($_COOKIE['open-tabs'])){
 			// Open the last tabs the users opened before logout
 			$pages = json_decode($_COOKIE['open-tabs'], true);
 		}
@@ -53,6 +62,7 @@ class MainController extends Controller{
 		$body = View::make(Theme::getSelected()->getView('body.tpl'), array(
 			'pages' => json_encode($pages),			
 			'canAccessApplication' => $canAccessApplication,
+			'content' => $content
 		));	
 
 		$title = Conf::has('db') ? Option::get('main.page-title-' . LANGUAGE) : DEFAULT_HTML_TITLE;
@@ -63,6 +73,9 @@ class MainController extends Controller{
 	}
 
 
+	/**
+	 * Display a new tab
+	 */
 	public function newTab(){
 		$type = Option::get('main.home-page-type');
 
@@ -98,18 +111,15 @@ class MainController extends Controller{
 		));
 	}
 	
+
+	/**
+	 * Display the page 404 : page not found
+	 */
 	public function page404(){
 		return View::make(Plugin::current()->getViewsDir() . 'page-404.tpl');
 	}
 	
-	public function javascriptLangKeys(){
-		Response::setJavaScript();
-		
-		
-		return View::makestr(Plugin::current()->getView('lang.js.tpl'), array(
-			'labels' => $labels,	
-		));		
-	}
+
 
 	/**
 	 * Get the application favicon URL
@@ -120,7 +130,7 @@ class MainController extends Controller{
 		}
 
 		if(empty($favicon)){
-			return Plugin::current()->getStaticUrl() . 'img/hawk-favicon.ico';
+			return Plugin::current()->getStaticUrl('img/hawk-favicon.ico');
 		}
 		else{
 			return Plugin::current()->getUserfilesUrl($favicon);
@@ -133,9 +143,7 @@ class MainController extends Controller{
 	public function terms(){
 		$content = Option::get('main.terms');
 
-		$pdf = new PDF($content);
-
-		return $pdf->display('conditions.pdf');
+		return $this->compute('main', $content);		
 	}
 
 

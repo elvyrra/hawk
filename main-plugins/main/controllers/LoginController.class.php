@@ -201,7 +201,7 @@ class LoginController extends Controller{
 
 		$questions = ProfileQuestion::getRegisterQuestions();
 		foreach($questions as $question){
-			$classname = ucwords($question->type) . 'Input';
+			$classname = 'Hawk\\' . ucwords($question->type) . 'Input';
             $field = json_decode($question->parameters, true);
             $field['name'] = $question->name;
             $field['independant'] = true;

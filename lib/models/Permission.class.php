@@ -1,13 +1,36 @@
 <?php
+/**
+ * Permission.class.php
+ * @author Elvyrra SAS
+ * @license MIT
+ */
+
 namespace Hawk;
 
+/**
+ * This class describes the permission model
+ */
 class Permission extends Model{
+	/**
+	 * The associated table
+	 */
 	protected static $tablename = "Permission";
-	protected static $primaryColumn = "id";
-	
+
+	/**
+	 * The id of the permission giving rights on all permissions
+	 */	
 	const ALL_PRIVILEGES_ID = 1;
+
+	/**
+	 * The name of the permission giving rights on all permissions
+	 */	
 	const ALL_PRIVILEGES_NAME = 'admin.all';
 
+
+	/**
+	 * Get all permissions, grouped by plugin name
+	 * @return array The list of permissions, indexed by the plugins names, where each element is an array contaning the plugin permissions
+	 */
 	public static function getAllGroupByPlugin(){
 		$permissions = self::getAll();
 		$groups = array();
@@ -22,10 +45,22 @@ class Permission extends Model{
 		return $groups;
 	}
 
+
+	/**
+	 * Get all the permissions for a given plugin
+	 * @param string $plugin The plugin name
+	 * @return array The list of found permissions
+	 */
 	public static function getPluginPermissions($plugin){
 		return self::getListByExample(new DBExample(array('plugin' => $plugin)));
 	}
 
+
+	/**
+	 * Get a permission by it name, formatted as <plugin>.<permissionName>
+	 * @param string $name The permission name
+	 * @return Permission The found permission
+	 */
 	public static function getByName($name){
 		list($plugin, $key) = explode('.', $name);
 

@@ -219,7 +219,7 @@ class FormInput{
 			if(!isset(self::$uniqid)){
 				self::$uniqid = uniqid();
 			}
-            $this->id = self::$uniqid.'-'.$this->name;
+            $this->id = self::$uniqid.'-'. str_replace(array('.', '#', '[', ']','>'), '-', $this->name);
 		}
 		
 		$this->type = static::TYPE;

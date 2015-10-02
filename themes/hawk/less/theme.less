@@ -1,34 +1,35 @@
-/** Editable variables **/
+/* Editable variables
+define(@btn-default-color; #fff; Default buttons font color; color)
+define(@btn-default-bg; #333; Default buttons background; color)
+define(@btn-default-border; #777; Default buttons border color; color)
 
-// @main-font-color: #777777; "Body text color", color
-// @main-bg-color: #fff; "Body background", color
-// @main-font-size: 12px; "Global font size", dimension
-// @title-color: #337ab7; "Color of title", color
+define(@brand-primary; #337ab7; Base color for primary elements; color)
+define(@brand-success; #1d931d; Base color for success elements; color)
+define(@brand-info; #5bc0de; Base color for information elements; color)
+define(@brand-warning; #f0ad4e; Base color for warning elements; color)
+define(@brand-danger; #d9534f; Base color for error elements; color)
 
-// @header-bg: #333; "Header and footer background", color
-// @header-color: #d6d6d6; "Header and footer font color", color
+define(@text-color; #777777; Body text color; color)
+define(@body-bg; #fff; Body background; color)
+define(@font-size-base; 12px; Global font size)
 
-// @muted-color: #777; "Text color muted", color
+define(@header-bg; #4e3064; Header and footer background; color)
+define(@header-color; #d6d6d6; Header and footer font color; color)
 
-// @default-color: #fff; "Text color for default elements", color
-// @default-bg: #333; "Background color for default elements", color
+define(@state-success-text; #3c763d; Success alerts font color; color)
+define(@state-success-bg; #dff0d8; Success alerts background color; color)
 
-// @primary-color: #337ab7; "Text color primary", color
-// @primary-bg: #337ab7; "background color primary", color
+define(@state-info-text; #31708f; Info alerts font color; color)
+define(@state-info-bg; #d9edf7; Info alerts background color; color)
 
-// @success-color: #3c763d; "Text color success", color
-// @success-bg: #dff0d8; "background color success", color
+define(@state-warning-text; #8a6d3b; Warning alerts font color; color)
+define(@state-warning-bg; #fcf8e3; Warning alerts background color; color)
 
-// @info-color: #31708f; "Text color info", color
-// @info-bg: #d9edf7; "background color info", color
+define(@state-danger-text; #a94442; Error alerts font color; color)
+define(@state-danger-bg; #f2dede; Error alerts background color; color)
+*/
 
-// @warning-color: #8a6d3b; "Text color warning", color
-// @warning-bg: #fcf8e3; "background color warning", color
-
-// @danger-color: #a94442; "Text color danger", color
-// @danger-bg: #f2dede; "background color danger", color
-
-
+@import "bootstrap/bootstrap.less";
 @import "font-awesome/font-awesome.less";
 
 body{
@@ -37,9 +38,9 @@ body{
     height: 100%;
     position: absolute;
     width: 100%;	
-	font-size: 12px;
-	color : @main-font-color;
-    background: @main-bg-color;
+	font-size: @font-size-base;
+	color : @text-color;
+    background: @body-bg;
 	font-family: "Open Sans", Arial;
 }
 
@@ -48,72 +49,9 @@ h1,h2,h3,h4,h5,h6{
 	font-weight: normal;
 }
 
-.text-muted{ 
-    color: @muted-color;
-}
-.text-primary{ 
-    color: @primary-color;
-}
-.text-success{ 
-    color: @success-color;
-}
-.text-info{ 
-    color: @info-color;
-}
-.text-warning{
-    color: @warning-color;
-}
-.text-danger{ 
-    color: @danger-color;
-}
-
-.bg-primary{ 
-    background: @primary-bg;
-}
-.bg-success{ 
-    background: @success-bg;
-}
-.bg-info{ 
-    background: @info-bg;
-}
-.bg-warning{ 
-    background: @warning-bg;
-}
-.bg-danger{ 
-    background: @danger-bg;
-}
-
-.alert-success{ 
-    background: @success-bg; 
-    color: @success-color;
-}
-.alert-info{
-    background: @info-bg; 
-    color: @info-color;
-}
-.alert-warning{ 
-    background: @warning-bg;
-    color: @warning-color;
-}
-.alert-danger{ 
-    background: @danger-bg; 
-    color: @danger-color;
-}
-
 .btn{
 	font-size: inherit;
 	margin-top: 5px;
-}
-
-.btn-default{
-	background: @default-bg;
-	border-color: #777;
-	color: @default-color;
-}
-
-.btn-default:hover{
-	background: #555;
-	color: @default-color;
 }
 
 /* labels */
@@ -218,7 +156,7 @@ form .clearfix{
 input, button, select, textarea {
     font-family: "Open Sans", Arial;
     outline-style: none;
-    color: @main-font-color;
+    color: @text-color;
 }
 
 input[type="text"],
@@ -270,8 +208,8 @@ input[type="file"] {
         border-radius: 0;
         overflow: hidden;
         height: 30px;    
-        background: @default-bg;
-        color: @default-color;
+        background: @btn-default-bg;
+        color: @btn-default-color;
         border-color: #777;
         margin-left: 0;        
 
@@ -338,7 +276,7 @@ input[type="radio"]{
 
     &:checked:before{
         content: "\f111";
-        color: @primary-color;
+        color: @brand-primary;
     }
 
     & + label{
@@ -364,17 +302,17 @@ input[type="checkbox"]{
 
     &:checked:before{
         content: "\f046";
-        color: @primary-color;
+        color: @brand-primary;
     }
 }
 
 
 fieldset{
-	border : 1px solid @primary-color;
+	border : 1px solid @brand-primary;
 	box-shadow: none;
 
     legend{
-        color: @primary-color;
+        color: @brand-primary;
         border: none;
         background: none;
         margin-left: 15px;
@@ -397,7 +335,7 @@ label{
 
     &.required:after{
         content: "*";
-        color: @info-color;
+        color: @state-info-text;
     }
 }
 
@@ -449,7 +387,7 @@ label{
     }
 
     .brand {
-        color: #ffffff;
+        color: @btn-default-color;
         text-transform: uppercase;
         font-weight: lighter;
         padding: 12px 20px 12px;
@@ -467,16 +405,16 @@ label{
 
     & > li > a{
         &:hover, &:focus{
-            background: @info-bg;
-            color: @info-color;
+            background: @state-info-bg;
+            color: @state-info-text;
         }
     }
 }
 
 .dropdown-submenu:hover,.dropdown-submenu:focus {
     a {
-    	background: @info-bg;
-    	color: @info-color;
+    	background: @state-info-bg;
+    	color: @state-info-text;
     }
 }
 
@@ -493,46 +431,45 @@ table {
         border-left: 1px solid #dee3ea;
         height: 10px;
     }
-}
 
-.table {
-    thead{
-        border-top:1px solid #dee3ea;
+    .table {
+        thead{
+            border-top:1px solid #dee3ea;
 
-        & > tr > th{
-            position: relative;
-            padding-bottom: 20px;
-            padding-top: 5px;
-            vertical-align: top;
+            & > tr > th{
+                position: relative;
+                padding-bottom: 20px;
+                padding-top: 5px;
+                vertical-align: top;
+            }
+        }
+        th.sortable {
+            cursor: pointer;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+
+        td{
+            color: #526273;
+            border-top-color: #edf2f7;
+            vertical-align: middle;
+        }
+
+        th, td{
+            &.align-right{
+                text-align: right;
+                padding-right: 10px !important;
+            }
         }
     }
-    th.sortable {
-        cursor: pointer;
-
-        &:hover {
-            text-decoration: underline;
-        }
-    }
-
-    td{
-        color: #526273;
-        border-top-color: #edf2f7;
-        vertical-align: middle;
-    }
-
-    th, td{
-        &.align-right{
-            text-align: right;
-            padding-right: 10px !important;
+    .table-hover tbody tr:hover{
+        td, th {
+            background-color: #f5fafc;
         }
     }
 }
-.table-hover tbody tr:hover{
-    td, th {
-        background-color: #f5fafc;
-    }
-}
-
 
 
 /*------------------------ Panels -------------------------*/
@@ -574,7 +511,7 @@ table {
         cursor: pointer;
 
         &:hover{
-            background-color: #3f3f3f;
+            background-color: darken(@header-bg, 10%);
         }
     }
 
@@ -671,7 +608,7 @@ table {
 
 /*--------------------- Tabs content --------------------*/
 .main-tab-pane .page-title{
-	color: @primary-color;
+	color: @brand-primary;
 	text-align: center;
 	margin: 5px 0;
 }
@@ -699,6 +636,7 @@ a, a:active, a:hover, a:visited, a:focus{
 /*-------------------- Dialog box ---------------------*/
 .modal-dialog{    
     margin-top: 15%;
+    z-index: @zindex-modal;
 }
 
 /*-------------------- Lists -----------------------------*/
@@ -745,7 +683,7 @@ a, a:active, a:hover, a:visited, a:focus{
     }
 
     &.list-sort-active{
-        color: @primary-color;
+        color: @brand-primary;
         opacity: 1;
     }
 }
@@ -760,8 +698,8 @@ a, a:active, a:hover, a:visited, a:focus{
     padding-right: 15px;
 
     &.not-empty {
-        background-color: @info-bg;
-        color: @info-color;
+        background-color: @state-info-bg;
+        color: @state-info-text;
         padding-right: 16px;
     }   
 }
@@ -776,18 +714,18 @@ a, a:active, a:hover, a:visited, a:focus{
     height: 30px;
 
     & > td{
-        color: @main-font-color;    
+        color: @text-color;    
     }
 
     &.selected{
-        background: @info-color;
+        background: @state-info-text;
 
         &> td{
             color: white;    
         }
 
         &:hover > td{
-            color: @main-font-color;
+            color: @text-color;
         }
     }
 }
@@ -879,7 +817,7 @@ a, a:active, a:hover, a:visited, a:focus{
 
 #loading-purcentage{
 	width: 0%;
-	background: #3c763d;
+	background: @brand-success;
 	height: 100%;
 	display: block;
 	border-radius: 5px;
@@ -896,15 +834,15 @@ p .icon{
 /*----------------------- Boxes -----------------------------*/
 .box{
     border-radius: 4px;
-    border: 1px solid #777;    
+    border: 1px solid @panel-primary-border;    
     margin-top: 5px;
     height: 100%;    
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
 
     .box-header{
-        background: @primary-bg;        
+        background: @panel-primary-heading-bg;        
         font-size: 1.2em;
-        color: white;    
+        color: @panel-primary-text;    
         padding-left: 5px;
 
         .box-icon{
@@ -926,12 +864,12 @@ p .icon{
 /*----------------------- Error tooltips -------------------*/
 .tooltip.input-error{
 	.tooltip-inner{
-        background: @danger-bg;
-        color: @danger-color;
+        background: @state-danger-bg;
+        color: @state-danger-text;
     }
 
     .tooltip-arrow{
-        border-right-color: @danger-bg;
+        border-right-color: @state-danger-bg;
     }
 }
 
@@ -1018,7 +956,7 @@ body.dragging, body.dragging * {
 
         &.placeholder {
             position: relative;
-            background: @info-bg;
+            background: @state-info-bg;
             border: 1px solid rgba(0,0,0,0.5);  
             border-radius: 5px;
             min-height: 25px;

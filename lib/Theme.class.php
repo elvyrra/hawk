@@ -105,7 +105,7 @@ class Theme{
      * @return array All the themes
      */
     public static function getAll(){        
-        foreach(glob(THEMES_DIR . '*') as $theme){
+        foreach(glob(THEMES_DIR . '*', GLOB_ONLYDIR) as $theme){
             self::get(basename($theme));
         }
 
@@ -273,20 +273,20 @@ class Theme{
      * Get the variables in a CSS file content. In CSS files, variables are defined with the folowing format :
      * /* define("variableName", color|dimension|file, "variable description that will appear in the customization page of the theme", defaultValue) *\/
      * @param string $less The Less code to parse
-     * @return array The variables, where each element contains the 'name' of the variabme, it 'type', it 'description', and it 'default' value
+     * @return array The variables, where each element contains the 'name' of the variable, it 'type', it 'description', and it 'default' value
      */
     public function getEditableVariables($less = null){
         if(!$less){
             $less = file_get_contents($this->getBaseLessFile());
         }
-        preg_match_all('#^\s*//\s*@([\w\-]+)\s*\:\s*(.*?)\s*\;\s*"(.+?)"\s*,\s*(color|dimension|file)#m', $less, $matches, PREG_SET_ORDER);                     
+        preg_match_all('#^\s*define\(@([\w\-]+)\s*\;\s*(.+?)\s*;\s*(.+?)\s*(?:;(color|file))?\s*\)\s*$#m', $less, $matches, PREG_SET_ORDER);                     
         $variables = array();
         foreach($matches as $match){
             $variables[] = array(
                 'name' => $match[1],
                 'default' => $match[2],
                 'description' => $match[3],
-                'type' => $match[4]
+                'type' => isset($match[4]) ? $match[4] : ''
             );
         }
         return $variables;

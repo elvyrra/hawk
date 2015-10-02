@@ -1,13 +1,33 @@
 <?php
+/**
+ * MenuItem.class.php
+ */
 namespace Hawk;
 
-class MenuItem extends Model{
-	public static $tablename = "MenuItem";
-	protected static $primaryColumn = "id";
 
+/**
+ * This class describes the MenuItem model
+ */
+class MenuItem extends Model{
+	/**
+	 * The associated table
+	 */
+	public static $tablename = "MenuItem";
+
+	/**
+	 * The id of the user menu
+	 */
 	const USER_ITEM_ID = 1;
+
+	/**
+	 * The id of the admin menu
+	 */
 	const ADMIN_ITEM_ID = 2;
 
+	/**
+	 * Constructor
+	 * @param array $data The data to set on the instance properties	 
+	 */
 	public function __construct($data = array()){
 		parent::__construct($data);
 
@@ -27,6 +47,12 @@ class MenuItem extends Model{
 		}
 	}
 	
+
+	/**
+	 * Get the items available for a specific user
+	 * @param User $user The user. If not set, the current session user is set
+	 * @return array The list of items
+	 */
 	public static function getAvailableItems($user = null){
 		if($user == null){
 			$user = Session::getUser();
@@ -51,6 +77,12 @@ class MenuItem extends Model{
 		return $items;
 	}
 
+
+	/**
+	 * Add a new item in the database
+	 * @param array $data The item data to insert
+	 * @return MenuItem The created item
+	 */
 	public static function add($data){
 		if(empty($data['parentId'])){
 			$data['parentId'] = 0;
@@ -75,6 +107,8 @@ class MenuItem extends Model{
 
 	/**
 	 * Find a menu item by it name, formatted as "<plugin>.<name>"
+	 * @param string $name The item name
+	 * @return MenuItem The found item
 	 */
 	public static function getByName($name){
 		list($plugin, $name) = explode('.', $name, 2);
@@ -88,7 +122,7 @@ class MenuItem extends Model{
 	}
 
 	/**
-	 * Delete a menu item
+	 * Delete the menu item
 	 */
 	public function delete(){
 		DB::get(MAINDB)->update(
@@ -99,6 +133,7 @@ class MenuItem extends Model{
 
 		parent::delete();
 
+		// Send an event to compute actions on menu item deletion
 		$event = new Event('menuitem.deleted', array('item' => $this));
 		$event->trigger();
 	}
