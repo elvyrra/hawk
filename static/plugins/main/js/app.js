@@ -152,6 +152,11 @@ App.prototype.start = function(){
 					// Open the url in the current application tab
 					this.load(url);
 					break;
+
+				case 'window' :
+					// Open the URL in the current web page
+					location = url;
+					break
 				
 				default :
 					// Open the url in a given DOM node, represented by it CSS selector
