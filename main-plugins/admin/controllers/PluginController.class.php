@@ -93,7 +93,7 @@ class PluginController extends Controller{
                                             'icon' => 'cogs',
                                             'label' => Lang::get('admin.plugin-settings-button'),
                                             'href' => Router::getUri('plugin-settings', array('plugin' => $plugin->getName())),
-                                            'target' => $actionsTarget
+                                            'target' => 'dialog',
                                         )) : '',
 
                                     // Uninstall button
@@ -115,7 +115,7 @@ class PluginController extends Controller{
                                             'icon' => 'cogs',
                                             'label' => Lang::get('admin.plugin-settings-button'),
                                             'href' => Router::getUri('plugin-settings', array('plugin' => $plugin->getName())),
-                                            'target' => $actionsTarget
+                                            'target' => 'dialog'
                                         )) : '',
 
                                     ButtonInput::create(array(
