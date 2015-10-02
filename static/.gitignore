@@ -1,5 +1,5 @@
-themes
-plugins
+themes/*
+plugins/*
 !plugins/main/img
 !plugins/main/js
 !plugins/main/css
