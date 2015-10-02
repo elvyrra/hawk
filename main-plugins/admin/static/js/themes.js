@@ -51,13 +51,13 @@ $("#manage-themes-page")
     	editor.setShowPrintMargin(false);
 
     	editor.getSession().on("change", function(event){
-    		var value = editor.getValue();
+            var value = editor.getValue();
     		model.css(value);
     	});	
     });
     ko.applyBindings(model, $("#theme-css-form").get(0));
 
-    app.forms['theme-css-form'].onsuccess = function(event, data){
+    app.forms['theme-css-form'].onsuccess = function(data){
     	$("#theme-custom-stylesheet").attr('href', data.href);
     };
 })();

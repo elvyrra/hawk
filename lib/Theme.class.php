@@ -189,6 +189,9 @@ class Theme{
         $publicFilename = $this->getBuildDirname() . self::PREVIEW_BASENAME;
 
         if(is_file($privateFilename) && (!is_file($publicFilename) || filemtime($privateFilename) > filemtime($publicFilename))){
+            if(!is_dir(dirname($publicFilename))){
+                mkdir(dirname($publicFilename), 0755, true);
+            }
             copy($privateFilename, $publicFilename);
         }
         return $this->getRootUrl() . self::PREVIEW_BASENAME;
@@ -279,7 +282,7 @@ class Theme{
         if(!$less){
             $less = file_get_contents($this->getBaseLessFile());
         }
-        preg_match_all('#^\s*define\(@([\w\-]+)\s*\;\s*(.+?)\s*;\s*(.+?)\s*(?:;(color|file))?\s*\)\s*$#m', $less, $matches, PREG_SET_ORDER);                     
+        preg_match_all('#^\s*define\(@([\w\-]+)\s*\;\s*(.+?)\s*\;\s*(.+?)\s*\;?\s*(color|file)?\s*\)\s*$#m', $less, $matches, PREG_SET_ORDER);                     
         $variables = array();
         foreach($matches as $match){
             $variables[] = array(

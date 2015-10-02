@@ -237,10 +237,8 @@ App.prototype.start = function(){
 		evt.initEvent("app-ready", true, false);
 		dispatchEvent(evt);
 		
-		if(appConf.user.canAccessApplication){
-			this.openLastTabs(appConf.tabs.open);
-		}
-		
+		this.openLastTabs(appConf.tabs.open);
+				
 		
 		/**
 		 * Customize app HttpRequestObject

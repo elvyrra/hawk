@@ -9,6 +9,7 @@ define('tabs', ['jquery', 'ko'], function($, ko){
 		this.titleSelector = '#main-tab-title-' + this.id();
 		this.paneSelector = '#main-tab-' + this.id();
 		this.history = [];
+
 		var self = this;
 	};
 
@@ -62,6 +63,8 @@ define('tabs', ['jquery', 'ko'], function($, ko){
 			var tab = this.tabs()[id];
 			history.replaceState({}, "", "#!" + tab.history[tab.history.length - 1]);
 		}.bind(this));
+
+		this.active = ko.observable();
 	};
 
 	Tabset.MAX_TABS_NUMBER = 10;
@@ -84,7 +87,8 @@ define('tabs', ['jquery', 'ko'], function($, ko){
 	};
 
 	Tabset.prototype.activateTab = function(id){
-		this.tabs()[id].activate();	
+		// this.tabs()[id].activate();
+		this.active(id);
 	};
 
 	Tabset.prototype.remove = function(id){
@@ -106,8 +110,8 @@ define('tabs', ['jquery', 'ko'], function($, ko){
 	};
 
 	Tabset.prototype.getActiveTab = function(){
-		var id = parseInt($('.main-tab-title.active').attr('data-tab'));
-		return this.tabs()[id];
+		// var id = parseInt($('.main-tab-title.active').attr('data-tab'));
+		return this.tabs()[this.active()];
 	};
 
 	Tabset.prototype.getNextTab = function(id){
@@ -134,13 +138,11 @@ define('tabs', ['jquery', 'ko'], function($, ko){
 			var tabId = $(event.currentTarget).attr('data-tab');
 
 			this.remove(tabId);
-
-			return false;
 		}
-
 		else{
-			return true;
+			this.activateTab();
 		}
+		return false;
 	}
 
 	return Tabset;

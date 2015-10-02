@@ -13,8 +13,8 @@
 						<div class="theme-item-header">
 							<h4>{{ $theme->getTitle() }}</h4>
 							<span class="icons">
-								{if($name != $selectedTheme->getName())}<i class="icon icon-check text-success select-theme icon-2x" data-theme="{{ $name }}" title="{text key='admin.theme-select-theme'}"></i>{/if}
-								{if($theme->isRemovable())}<i class="icon icon-close text-danger delete-theme icon-2x" data-theme="{{ $name }}" title="{text key='admin.theme-delete-theme'}"></i>{/if}
+								{if($name != $selectedTheme->getName())}<i class="icon icon-check text-success select-theme icon-2x pointer" data-theme="{{ $name }}" title="{text key='admin.theme-select-theme'}"></i>{/if}
+								{if($theme->isRemovable())}<i class="icon icon-close text-danger delete-theme icon-2x pointer" data-theme="{{ $name }}" title="{text key='admin.theme-delete-theme'}"></i>{/if}
 							</span>
 						</div>
 						<div class="theme-preview">		

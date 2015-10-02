@@ -288,7 +288,14 @@ class FormInput{
             ErrorHandler::exception($e);
         }
     }
-	
+
+    /**
+     * Display the input (alias method)
+     * @return string the HTML result of the input displaying
+     */
+	public function display(){
+        return $this->__toString();
+    }
 
     /**
      * Check the submitted value of the input

@@ -31,7 +31,7 @@
 {if(empty($content))}
 	<div id="main-content" role="tabpanel" data-bind="with: tabset">
 		<!-- Nav tabs -->
-		<!-- {if($canAccessApplication)} -->
+		{if($canAccessApplication)}
 			<ul class="nav nav-tabs" role="tablist" id="main-nav-tabs">
 				<!-- ko foreach: tabs -->
 				<li role="presentation" class="main-tab-title corner-top" data-toggle="tooltip" data-placement="bottom" data-bind="attr: { 
@@ -39,6 +39,7 @@
 																						'data-tab' : $index,
 																						title : title 
 																					}, 
+																					css : {active : $parent.active() == $index() },
 																					click : $parent.clickTab.bind($parent), 
 																					style : { 
 																						width: 'calc((100% - 25px )/ ' + $parent.tabs().length + ' - 2px )' 
@@ -57,11 +58,11 @@
 					</span>
 				</li>
 			</ul>
-		<!-- {/if} -->
+		{/if}
 		
 		<!-- Tab panes -->
 		<div class="tab-content" id="main-tab-content" data-bind="foreach: tabs">
-			<div role="tabpanel" class="tab-pane main-tab-pane" data-bind="attr : { id : 'main-tab-' + id(), 'data-tab' : $index}, html : content"></div>
+			<div role="tabpanel" class="tab-pane main-tab-pane" data-bind="attr : { id : 'main-tab-' + id(), 'data-tab' : $index}, html : content, css : {active : $parent.active() == $index()}"></div>
 		</div>
 	</div>
 {else}

@@ -12,7 +12,7 @@
 					{foreach($category['files'] as $file)}
 						<div class="box pull-left theme-media-item">					
 							<div class="box-content">
-								<span class="icon icon-close text-danger pull-right delete-theme-media" data-filename="{{ basename($file['url']) }}"></span>
+								<span class="icon icon-close text-danger pull-right delete-theme-media pointer icon-lg" data-filename="{{ basename($file['url']) }}"></span>
 								<div>{{ $file['display']}} </div>
 								<input type="text" readonly value="{{ $file['url']}}" title="{{ $file['url']}}" class="theme-media-url"/>
 							</div>

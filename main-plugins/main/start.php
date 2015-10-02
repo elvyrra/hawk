@@ -6,7 +6,7 @@ Router::setProperties(
 	array('namespace' => __NAMESPACE__), 
 	function(){
 		Router::get('index', '/', array('action' => 'MainController.main'));
-		Router::get('new-tab', '/newtab', array('auth' => Request::isAjax() && (Session::isConnected() || Option::get('main.allow-guest')), 'action' => 'MainController.newTab'));
+		Router::get('new-tab', '/newtab', array('action' => 'MainController.newTab'));
 			
 		Router::auth(Session::isConnected(), function(){
 			Router::auth(Request::isAjax(), function(){

@@ -49,18 +49,7 @@ class MainController extends Controller{
 	public function main($content = ""){
 		$canAccessApplication = Session::getUser()->canAccessApplication();		
 
-		$pages = array();
-		if($canAccessApplication && Option::get('main.open-last-tabs') && !empty($_COOKIE['open-tabs'])){
-			// Open the last tabs the users opened before logout
-			$pages = json_decode($_COOKIE['open-tabs'], true);
-		}
-		
-		if(empty($pages) && $canAccessApplication){
-			$pages[] = Router::getUri('new-tab');
-		}
-
 		$body = View::make(Theme::getSelected()->getView('body.tpl'), array(
-			'pages' => json_encode($pages),			
 			'canAccessApplication' => $canAccessApplication,
 			'content' => $content
 		));	
@@ -185,7 +174,7 @@ class MainController extends Controller{
 			$pages = json_decode($_COOKIE['open-tabs'], true);
 		}
 		
-		if(empty($pages) && $canAccessApplication){
+		if(empty($pages)){
 			$pages[] = Router::getUri('new-tab');
 		}
 

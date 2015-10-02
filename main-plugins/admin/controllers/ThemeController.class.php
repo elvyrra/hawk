@@ -223,7 +223,7 @@ class ThemeController extends Controller{
 
 					new HtmlInput(array(	
 						'name' => 'ace',					
-						'value' => '<style id="editing-css-computed" data-binding="text: css">' . $css . '</style>
+						'value' => '<style id="editing-css-computed" data-bind="text: css">' . $css . '</style>
 									<div id="theme-css-edit" contenteditable >' . $css . '</div>'
 					)),
 				)
@@ -322,7 +322,7 @@ class ThemeController extends Controller{
 					new SubmitInput(array(
 						'name' => 'valid',
 						'icon' => 'upload',
-						'value' => Lang::get('admin.theme-add-submit-value'),
+						'value' => Lang::get('admin.theme-add-media-submit'),
 					)),
 				)
 			),
