@@ -1,4 +1,9 @@
 define('tabs', ['jquery', 'ko'], function($, ko){
+	
+	/**
+	 * This class describes the behavior of a tab
+	 * @param int id The unique tab id
+	 */
 	window.Tab = function(id){
 		this.id = ko.observable(id);
 		this.title = ko.observable("");
@@ -6,125 +11,90 @@ define('tabs', ['jquery', 'ko'], function($, ko){
 		this.content = ko.observable("");
 		this.route = ko.observable("");
 
-		this.titleSelector = '#main-tab-title-' + this.id();
-		this.paneSelector = '#main-tab-' + this.id();
 		this.history = [];
 
 		var self = this;
 	};
 
-	Tab.create = function(id){
-		return new Tab(id);	
-	};
-
-	Tab.prototype.getPaneNode = function(){
-		return $(this.paneSelector);
-	};
-
-	Tab.prototype.getContent = function(){
-		return this.content();
-	};
-
-	Tab.prototype.setContent = function(html){
-		this.content(html);	
-	};
-
-	Tab.prototype.getTitleNode = function(){
-		return $(this.titleSelector);	
-	};
-
-	Tab.prototype.getTitle = function(){
-		return this.title();
-	};
-
-	Tab.prototype.setTitle = function(title){
-		this.title(title);
-	};
-
-	Tab.prototype.activate = function(){
-		$('#main-tab-title-' + this.id() + ' a').tab('show');	
-	};
-
-	Tab.prototype.setUrl = function(url){
-		this.getPaneNode().data('url', url);
-		this.url = url;
-	};
-
-
-	
-
-
 
 	var Tabset = function(){
 		this.tabs = ko.observableArray([]);
 
-		$("body").on("shown.bs.tab", ".main-tab-title", function(evt){
-			var id = $(evt.currentTarget).attr('data-tab');
-			var tab = this.tabs()[id];
+		this.activeId = ko.observable();
+
+		this.activeTab = ko.computed({
+			read : function(){
+				for(var i = 0; i< this.tabs().length; i++){
+					if(this.tabs()[i].id() === this.activeId()){
+						return this.tabs()[i];
+					}
+				}
+			}.bind(this),
+			write : function(tab){
+				this.activeId(tab.id());
+			}.bind(this)
+		});
+
+		this.activeTab.subscribe(function(tab){
 			history.replaceState({}, "", "#!" + tab.history[tab.history.length - 1]);
 		}.bind(this));
-
-		this.active = ko.observable();
 	};
 
+	/**
+	 * Default max tabs number
+	 */
 	Tabset.MAX_TABS_NUMBER = 10;
-	Tabset.titlesContainer = "#main-nav-tabs";
-	Tabset.panesContainer = "#main-tab-content";
+
+	/**
+	 * This index is incremented each time a tab is created, to generate a unique id for each tab
+	 */
 	Tabset.index = 0;
 
+
+	/**
+	 * Push a new tab in the tabset
+	 */
 	Tabset.prototype.push = function(){
 		if(this.tabs().length < Tabset.MAX_TABS_NUMBER){
 			/* Create the tab */
-			var index = this.tabs.push(new Tab(Tabset.index ++)) - 1;
+			var tab = new Tab(Tabset.index ++);
+			this.tabs.push(tab);
 			
 			/*** Activate the new tab ***/
-			this.activateTab(index);
-			
+			this.activeId(tab.id());
 		}		
 		else{
 			app.notify('info', Lang.get('main.all-tabs-open'));
 		}	
 	};
 
-	Tabset.prototype.activateTab = function(id){
-		// this.tabs()[id].activate();
-		this.active(id);
-	};
 
-	Tabset.prototype.remove = function(id){
+	/**
+	 * Remove a tab by it index in the tabset
+	 * @param int index The tab index in the tabset
+	 */
+	Tabset.prototype.remove = function(index){
 		if(this.tabs().length > 1){
-			if (this.getActiveTab() == this.tabs()[id]){
-				var next = this.getNextTab(id);
+			if (this.activeTab() == this.tabs()[index]){
+				var next = index == this.tabs().length - 1 ? this.tabs()[index - 1] : this.tabs()[index + 1];
 				if(next){
 					/* Activate the next tab */
-					next.activate();
+					this.activeId(next.id());
 				}
 			}
 			
 			/* Delete the tab nodes */
-			this.tabs.splice(id, 1);	
+			this.tabs.splice(index, 1);	
 
 			/* Register the new list of tabs */
 			this.registerTabs();
 		}		
 	};
 
-	Tabset.prototype.getActiveTab = function(){
-		// var id = parseInt($('.main-tab-title.active').attr('data-tab'));
-		return this.tabs()[this.active()];
-	};
 
-	Tabset.prototype.getNextTab = function(id){
-		id = parseInt(id);
-		if (id == this.tabs().length - 1){
-			// This tab is the last one, get the previous one
-			return this.tabs()[id - 1];
-		}
-		else{
-			return this.tabs()[id + 1];
-		}	
-	};
-
+	/**
+	 * Save the tabs last urls in a cookie
+	 */
 	Tabset.prototype.registerTabs = function(){	
 		var data = [];
 		for(var i = 0; i < this.tabs().length; i++){
@@ -133,17 +103,21 @@ define('tabs', ['jquery', 'ko'], function($, ko){
 		$.cookie('open-tabs', JSON.stringify(data), {expire : 365, path : '/'});
 	};
 
-	Tabset.prototype.clickTab = function(data, event){
-		if(event.which === 2){
-			var tabId = $(event.currentTarget).attr('data-tab');
 
-			this.remove(tabId);
+	/**
+	 * Perform click action on tab title
+	 * @param int $index The tab index in the tabset
+	 * @param Event event The triggered event
+	 */
+	Tabset.prototype.clickTab = function($index, event){
+		if(event.which === 2){
+			this.remove($index);
 		}
 		else{
-			this.activateTab();
+			this.activeId(this.tabs()[$index].id());
 		}
 		return false;
-	}
+	};
 
 	return Tabset;
 });

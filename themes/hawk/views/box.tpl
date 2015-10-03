@@ -1,6 +1,6 @@
 <div class="box">
     {if($title || $icon)}
-        <div class="box-header">
+        <div class="box-header corner-top">
             <i class="icon icon-{{ $icon }} box-icon"></i> {{ $title }}
         </div>
     {/if}

@@ -1,4 +1,4 @@
 all-tabs-open = "Tous les onglets sont déjà ouverts"
-loading-page-error = "Une erreur est survenue pendant le chargement de la page. Si cette erreur persiste, n'hésitez pas à nous contacter"
+loading-page-selector-not-exists = "L'élément dans lequel l'URL devrait être chargée n'existe pas dans la page"
 page-loaded-error = "Cette page est déjà chargée dans l'onglet courant"
 refresh-list-error = "Une erreur est survenue pendant le rafraichissement de la liste. Si cette erreur persiste, n'hésitez pas à nous contacter"

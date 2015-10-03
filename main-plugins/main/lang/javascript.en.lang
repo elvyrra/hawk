@@ -1,4 +1,4 @@
 all-tabs-open = "All tabs are already open"
-loading-page-error = "An error occured while loading this page."
+loading-page-selector-not-exists = "The wanted element to load the URL does not exists in the page"
 page-loaded-error = "This page is already loaded in the current tab"
 refresh-list-error = "An error occured while refreshing the list."

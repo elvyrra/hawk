@@ -64,18 +64,14 @@ require.config({
  * @class App - This class describes the behavior of the application 
  */
 var App = function(){
-	this.language = '';
-	this.rootUrl = '';
-	this.isConnected = false;
-	this.routes = [];
-	this.forms = {};
-	this.lists = {};
-	this.scripts = {};
-	this.tabs = {};
-	this.readyCallbacks = [];
+	this.language = ''; // The application language
+	this.rootUrl = ''; // The application root url
+	this.isConnected = false; // The user is connected or not ?
+	this.routes = []; // The application routes
+	this.forms = {}; // The instanciated forms
+	this.lists = {}; // The instanciated lists
 	
-	this.isReady = false;
-
+	this.isReady = false; // The ready state of the application
 };
 
 
@@ -114,7 +110,6 @@ App.prototype.start = function(){
 		}
 
 		this.tabset = new Tabset();
-		var self = this;
 
 		/**
 		 * Call URIs by AJAX on click on links
@@ -188,17 +183,17 @@ App.prototype.start = function(){
 		 */
 		window.onpopstate = function(event){
 			event.preventDefault();
-			if(self.tabset.getActiveTab()){
-				var history = self.tabset.getActiveTab().history;
+			if(this.tabset.activeTab()){
+				var history = this.tabset.activeTab().history;
 				if(event.state){
 					// call back button					
 					if(history.length > 1){
 						history.pop();
 						var url = history[history.length - 1];
-						self.load(url);
+						this.load(url);
 					}
 					else{
-						self.load(self.getUri("new-tab"));
+						this.load(this.getUri("new-tab"));
 					}				
 				}
 				else{
@@ -207,7 +202,7 @@ App.prototype.start = function(){
 					window.history.replaceState({}, '', "#!" + url);
 				}
 			}
-		};
+		}.bind(this);
 
 		this.loading = {
 			display : ko.observable(false),
@@ -238,6 +233,8 @@ App.prototype.start = function(){
 			}
 		};
 
+
+		// trigger the application is ready
 		var evt = document.createEvent("Event");
 		evt.initEvent("app-ready", true, false);
 		dispatchEvent(evt);
@@ -255,9 +252,9 @@ App.prototype.start = function(){
 	        	if (evt.lengthComputable) {
 	                var percentComplete = parseInt(evt.loaded / evt.total * 100);
 	                //Do something with upload progress here
-	                window.app.loading.progress(percentComplete);
+	                this.loading.progress(percentComplete);
 	            }
-	        }
+	        }.bind(this);
 
 	        /**
 	         * Compute progression on upload AJAX requests
@@ -270,7 +267,9 @@ App.prototype.start = function(){
 	        xhr.addEventListener("progress", this.computeProgession);
 		        
 	        return xhr;
+		
 		}.bind(this);
+
 	}.bind(this));
 };
 
@@ -288,8 +287,7 @@ App.prototype.ready = function(callback){
 			this.isReady = true;
 			callback();
 		}.bind(this));
-	}
-	
+	}	
 };
 
 
@@ -306,7 +304,8 @@ App.prototype.load = function(url, data){
 	var options = {			
 		newtab : false,
 		onload : null,
-		post : null
+		post : null,
+		selector : null
 	};
 	
 	for(var i in data){
@@ -316,16 +315,15 @@ App.prototype.load = function(url, data){
 	if(url){					            
 		/*** we first check that page does not already exist in a tab ***/
 		var route = this.getRouteFromUri(url);
-		if(url != this.getUri('MainController.newTab')){
 
-			for(var i= 0; i < this.tabset.tabs().length; i++){
-				if (this.tabset.tabs()[i].url() == url || this.tabset.tabs()[i].route() == route) {
-					if (i !== this.tabset.getActiveTab().id) {
-						this.tabset.activateTab(i);
-					}
-					options.newtab = false;
-					break;
+		for(var i= 0; i < this.tabset.tabs().length; i++){
+			var tab = this.tabset.tabs()[i];
+			if (tab.url() == url || tab.route() == route) {
+				if (tab !== this.tabset.activeTab()) {
+					this.tabset.activeTab(tab);
 				}
+				options.newtab = false;
+				break;
 			}
 		}
 		
@@ -335,12 +333,11 @@ App.prototype.load = function(url, data){
         if(options.newtab){
             this.tabset.push();
         }
-		if(!options.selector){
-			options.selector = this.tabset.getActiveTab().getPaneNode();
-		}
-        
+		
+		var element = options.selector ? $(options.selector).get(0) : this.tabset.activeTab();
+		        
 		/*** DETERMINE THE NODE THAT WILL BE LOADED THE PAGE ***/			
-		if($(options.selector).length){
+		if(element){
 			$.ajax({
 				xhr : this.xhr,
 				url : url, 
@@ -351,28 +348,27 @@ App.prototype.load = function(url, data){
 			.done(function(response){					
 				this.loading.stop();
 				
-				if(this.tabset.getActiveTab() && $(options.selector).get(0) == this.tabset.getActiveTab().getPaneNode().get(0)){
+				if(element === this.tabset.activeTab()){
 					// The page has been loaded in a whole tab
-					// Register the tab url
-					var activeTab = this.tabset.getActiveTab();
-					activeTab.url(url);
-					activeTab.route(route);
+					// Register the tab url					
+					element.url(url);
+					element.route(route);
 
-					activeTab.content(response);
+					element.content(response);
 
 					// Set the tab title
-					activeTab.title($(options.selector).find(".page-name").first().val());
+					element.title($(".page-name", response).first().val());
 					
 					// Regiter the tabs in the cookie
 					this.tabset.registerTabs();
 					
 					// register the url in the tab history
-					activeTab.history.push(url);
+					element.history.push(url);
 					
 					history.pushState({}, '', "#!" + url);
 				}
 				else{
-					$(options.selector).html(response);
+					$(element).html(response);
 				}
 
 				if(options.onload){
@@ -391,7 +387,7 @@ App.prototype.load = function(url, data){
 		else{
 	        /*** The selector to home the loaded url doesn't exist ***/
 			this.loading.stop();
-			this.notify("danger", Lang.get('main.loading-page-error'));
+			this.notify("danger", Lang.get('main.loading-page-selector-not-exists'));
 		}			
 	}
 	else{

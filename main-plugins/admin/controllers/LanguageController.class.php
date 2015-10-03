@@ -127,7 +127,7 @@ class LanguageController extends Controller{
                         'label' => Lang::get('language.key-form-plugin-label'),
                         'readonly' => true,
                         'required' => true,
-                        'default' => self::DEFAULT_KEY_PLUGIN
+                        'default' => self::DEFAULT_KEY_PLUGIN,                        
                     )),
                     
                     new TextInput(array(
@@ -152,7 +152,8 @@ class LanguageController extends Controller{
             $param['fieldsets']['form'][] = new TextareaInput(array(                
                 'name' => "translation[{$language->tag}]",
                 'label' => $language->label,
-                'placeholder' => Lang::get('language.key-form-translation-placeholder', array('tag' => $language->tag))
+                'placeholder' => Lang::get('language.key-form-translation-placeholder', array('tag' => $language->tag)),
+                'rows' => 3
             ));
         }
 
@@ -225,7 +226,9 @@ class LanguageController extends Controller{
 		$files = array();
 		$dirs = array(MAIN_PLUGINS_DIR, PLUGINS_DIR, USERFILES_PLUGINS_DIR . Lang::TRANSLATIONS_DIR);
 		foreach($dirs as $dir){
-			$result = FileSystem::find($dir, '*.*.lang', FileSystem::FIND_FILE_ONLY);
+			if(is_dir($dir)){
+				$result = FileSystem::find($dir, '*.*.lang', FileSystem::FIND_FILE_ONLY);
+			}
 			
 			foreach($result as $file){
 				list($plugin, $language, $ext) = explode('.', basename($file));

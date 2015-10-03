@@ -118,7 +118,7 @@ class UserProfileController extends Controller{
 
                         if($upload){
                             $file = $upload->getFile(0);
-                            $dir = Plugin::current()->getUserfilesDir()  . 'img/';
+                            $dir = Plugin::current()->getPublicUserfilesDir()  . 'img/';
                             $url = Plugin::current()->getUserfilesUrl() . 'img/';
                             if(!is_dir($dir)){
                                 mkdir($dir, 0755, true);
