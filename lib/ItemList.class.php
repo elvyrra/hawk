@@ -147,8 +147,7 @@ class ItemList{
 
 		if(!class_exists($this->model)){
 			$trace = debug_backtrace();
-			$class = $trace[0]['class'];
-			$reflection = new \ReflectionClass($trace[0]['class']);
+			$reflection = new \ReflectionClass($trace[1]['class']);
 			$this->model = $reflection->getNamespaceName() . '\\' . $this->model;
 		}
 
