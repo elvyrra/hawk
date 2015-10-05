@@ -14,6 +14,12 @@ class Route{
 	use Utils;
 
 	/**
+	 * The route name
+	 * @var string
+	 */
+	private $name;
+
+	/**
 	 * The route data, declared like '{dataname}' in the route definition
 	 * @var array
 	 */
@@ -70,10 +76,13 @@ class Route{
 	
 	/**
 	 * Constructor
+	 * @param string $name The route name
 	 * @param string $url The route URI pattern
 	 * @param array $param The route parameters, containing the pattern rules, the default values, the action associated with this route
 	 */
-	public function __construct($url, $param){
+	public function __construct($name, $url, $param){
+		$this->name = $name;
+
 		$this->map($param);
 		
 		$this->args = array();
@@ -87,6 +96,15 @@ class Route{
 		if($this->namespace){
 			$this->action = $this->namespace . '\\' . $this->action;
 		}
+	}
+
+
+	/**
+	 * Get the route name
+	 * @return string the route name
+	 */
+	public function getName(){
+		return $this->name;
 	}
 	
 

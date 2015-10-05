@@ -73,7 +73,7 @@ class Router{
 			trigger_error("The route named '$name' already exists", E_USER_WARNING);
 		}
 		else{
-			$route = new Route($uri, $param);
+			$route = new Route($name, $uri, $param);
 					
 			self::$routes[$name] = &$route;
 			
