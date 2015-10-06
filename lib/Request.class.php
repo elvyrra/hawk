@@ -20,7 +20,12 @@ class Request{
     /**
      * The request headers
      */
-    $headers;
+    $headers,
+
+    /**
+     * The request body
+     */
+    $body;
 
     /**
      * Get the HTTP request method
@@ -95,11 +100,19 @@ class Request{
      * @return string|array The parameter value or all the body
      */
     public static function getBody($name = ""){
+        if(!self::$body){
+            if(self::getHeaders('Content-Type') === 'application/json'){
+                self::$body = json_decode(file_get_contents('php://input'), true);
+            }
+            else{
+                self::$body = $_POST;
+            }
+        }
         if($name){
-            return isset($_POST[$name]) ? $_POST[$name] : null;
+            return isset(self::$body[$name]) ? self::$body[$name] : null;
         }
         else{            
-            return $_POST;
+            return self::$body;
         }
     }
 
