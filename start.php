@@ -38,8 +38,8 @@ session_set_cookie_params((int) Conf::get('session.lifetime'), '/');
 session_start();
 
 /*** Constants depending to the options ***/
-if(!empty($_COOKIE['language'])){
-    define('LANGUAGE', $_COOKIE['language']);
+if(Request::getCookies('language')){
+    define('LANGUAGE', Request::getCookies('language'));
 }
 elseif(Conf::has('db')){
     if(Session::getUser()->getProfileData('language')){

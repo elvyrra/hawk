@@ -137,7 +137,10 @@ class Theme{
      * @return mixed The value of the property $prop if it is set, else, all the theme data
      */
     public function getDefinition($prop = ""){    
-        if(!isset($this->data)){            
+        if(!isset($this->data)){ 
+            if(!is_file($this->getRootDirname() . self::MANIFEST_BASENAME)) {
+                throw new \Exception('Impossible to get the manifest.json file for the theme '  . $this->name . ' : No such file or directory');
+            }
             $this->data = json_decode(file_get_contents($this->getRootDirname() . self::MANIFEST_BASENAME), true);
         }
         return $prop ? $this->data[$prop] : $this->data;

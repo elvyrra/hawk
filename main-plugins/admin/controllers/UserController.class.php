@@ -132,7 +132,7 @@ class UserController extends Controller{
 		
 		$list = new ItemList($param);
 
-		if(!empty($_GET['refresh'])){
+		if(Request::getParams('refresh')) {
 			return $list->__toString();	
 		}
 		else{
@@ -168,6 +168,8 @@ class UserController extends Controller{
 						'name' => 'username',
 						'required' => true,
 						'unique' => true,
+						'readonly' => $user->id !== Session::getUser()->id,
+						'insert' => $user->id !== Session::getUser()->id,
 						'label' => Lang::get('admin.user-form-username-label'),
 					)),
 					
@@ -175,6 +177,8 @@ class UserController extends Controller{
 						'name' => 'email',
 						'required' => true,
 						'unique' => true,
+						'readonly' => $user->id !== Session::getUser()->id,
+						'insert' => $user->id !== Session::getUser()->id,
 						'label' => Lang::get('admin.user-form-email-label'),
 					)),
 					

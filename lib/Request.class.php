@@ -15,15 +15,20 @@ class Request{
      * The clientIp, registered as static variable, to avoid to calculate it each time
      * @static
      */
-    private static $clientIp;
+    private static $clientIp,
+
+    /**
+     * The request headers
+     */
+    $headers;
 
     /**
      * Get the HTTP request method
      * @static
      * @return string the HTTP request method
      */
-    public static function method(){        
-        return strtolower($_SERVER['REQUEST_METHOD']);
+    public static function getMethod(){        
+        return strtolower(getenv('REQUEST_METHOD'));
     }
     
 
@@ -32,8 +37,8 @@ class Request{
      * @static
      * @return string The HTTP request URI 
      */
-    public static function uri(){
-        return $_SERVER['REQUEST_URI'];
+    public static function getUri(){
+        return getenv('REQUEST_URI');
     }
     
 
@@ -43,7 +48,7 @@ class Request{
      * @return true if the request is an AJAX request else false
      */
     public static function isAjax(){
-        return ( isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtoupper($_SERVER['HTTP_X_REQUESTED_WITH']) === 'XMLHTTPREQUEST' );
+        return strtolower(self::getHeaders('X-Requested-With')) === 'xmlhttprequest';
     }
     
 
@@ -57,16 +62,16 @@ class Request{
             return self::$clientIp;
         }
 
-        if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        if (self::getHeaders('X-Forwarded-For')) {
             // The user is behind a proxy that transmit HTTP_X_FORWARDED_FOR header
-            if ( ! preg_match('![0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}!', $_SERVER['HTTP_X_FORWARDED_FOR']) ){
+            if ( ! preg_match('![0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}!', self::getHeaders('X-Forwarded-For')) ){
                 // The format of HTTP_X_FORWARDED_FOR header is not correct
-                self::$clientIp = $_SERVER['REMOTE_ADDR'];
+                self::$clientIp = getenv('REMOTE_ADDR');
                 return self::$clientIp;
             }
             else{
                 // Get the last public IP in HTTP_X_FORWARDED_FOR header
-                $chain = explode(',', preg_replace('/[^0-9,.]/', '', $_SERVER['HTTP_X_FORWARDED_FOR']));
+                $chain = explode(',', preg_replace('/[^0-9,.]/', '', self::getHeaders('X-Forwarded-For')));
                 for($i = 0 ; $i <= count($chain); $i ++){
                     $ip = $chain[$i];
 
@@ -78,94 +83,83 @@ class Request{
             }
         }
     
-        // HTTP_X_FORWARDED_FOR header has not been transmitted, get the REMOTE_ADDR header
-        self::$clientIp = $_SERVER['REMOTE_ADDR'];
+        // X-Forwarded-For header has not been transmitted, get the REMOTE_ADDR header
+        self::$clientIp = getenv('REMOTE_ADDR');
         return self::$clientIp;
     }
 
 
     /**
-     * Get the request body
-     * @return array the request body
+     * This function returns the value of the variable $name in the request body, or all the body if $name is not provided
+     * @param string $name The variable name
+     * @return string|array The parameter value or all the body
      */
-    public static function getBody(){
-        return $_POST;
+    public static function getBody($name = ""){
+        if($name){
+            return isset($_POST[$name]) ? $_POST[$name] : null;
+        }
+        else{            
+            return $_POST;
+        }
     }
 
+    /**
+     * Get the request uploaded files for the given name, or all files if $name is not provided
+     * @param string $name The key in $_FILES to get
+     * @return string|array The file or all files
+     */
+    public static function getFiles($name = ''){
+        if($name){
+            return isset($_FILES[$name]) ? $_FILES[$name] : array();
+        }
+        else{
+            return $_FILES;
+        }
+    }
 
     /**
-     * Populate $_POST and $_FILES from php://input
+     * This function returns the value of the parameter $name, or all the parameters if $name is not provided
+     * @param string $name The parameter name
+     * @return string|array The parameter value or all the parameters
      */
-    public static function parseScriptInput(){
-        $input = file_get_contents("php://input");
+    public static function getParams($name = ""){
+        if($name){
+            return isset($_GET[$name]) ? $_GET[$name] : null;
+        }
+        else{
+            return $_GET;
+        }
+    }
 
-        if(!empty($input)){
-            // Get data boundary
-            preg_match("/^(\-{6}\w+)/i", $input, $m);
-            $boundary = $m[1];
+    /**
+     * This function returns the header value for the key $name, of all the headers if $name is not provided
+     * @param string $name The header key
+     * @return string|array The header value or all the headers
+     */
+    public static function getHeaders($name = ""){
+        if(!isset(self::$headers)){
+            self::$headers = getallheaders();
+        }       
 
-            // Remove first boundary to get only data
-            $input = str_replace($boundary . '--', '', $input);
+        if($name){
+            return isset(self::$headers[$name]) ? self::$headers[$name] : null;
+        }
+        else{
+            return self::$headers;
+        }        
+    }
 
-            // Put each data in an array
-            $data = preg_split('/'.$boundary.'\r?\n/is', $input, -1, PREG_SPLIT_NO_EMPTY);
-
-            $_POST = array();
-            $_FILES = array();
-            foreach($data as $field){
-                if(preg_match('/^Content\-Disposition\: form\-data; name="(.+?)"; filename="(.+)"\r?\nContent\-Type: (.+?)\r?\n\r?\n(.*?)\r?\n$/is', $field, $match)){                              
-                    $name = $match[1];
-                    $filename = $match[2];
-                    $mime = $match[3];
-                    $content = $match[4];
-                    $tmpname = tempnam(TMP_DIR, '');
-                    
-                    file_put_contents($tmpname, $content);
-                    if(preg_match('/^(\w+)\[(.*)\]$/', $name, $m)){
-                        if(!isset($_FILES[$m[1]])){
-                            $_FILES[$m[1]] = array();
-                        }
-                        if(empty($m[2])){
-                            $_FILES[$m[1]]['name'][] = $filename;
-                            $_FILES[$m[1]]['type'][] = $mime;
-                            $_FILES[$m[1]]['tmp_name'][] = $tmpname;
-                            $_FILES[$m[1]]['error'][] = UPLOAD_ERR_OK;
-                            $_FILES[$m[1]]['size'][] = filesize($tmpname);
-                        }
-                        else{
-                            $_FILES[$m[1]]['name'][$m[2]] = $filename;
-                            $_FILES[$m[1]]['type'][$m[2]] = $mime;
-                            $_FILES[$m[1]]['tmp_name'][$m[2]] = $tmpname;
-                            $_FILES[$m[1]]['error'][$m[2]] = UPLOAD_ERR_OK;
-                            $_FILES[$m[1]]['size'][$m[2]] = filesize($tmpname);
-                        }
-                    }
-                    else{
-                        $_FILES[$name]['name'] = $filename;
-                        $_FILES[$name]['type'] = $mime;
-                        $_FILES[$name]['tmp_name'] = $tmpname;
-                        $_FILES[$name]['error'] = UPLOAD_ERR_OK;
-                        $_FILES[$name]['size'] = filesize($tmpname);
-                    }
-                }
-                elseif(preg_match('/^Content\-Disposition\: form\-data; name="(.+?)"\r?\n\r?\n(.*?)\r?\n$/is', $field, $match)){                
-                    $name = $match[1];
-                    $value = $match[2];             
-                    if(preg_match('/^(\w+)\[(.*)\]$/', $name, $m)){
-                        if(!isset($_POST[$m[1]]))
-                            $_POST[$m[1]] = array();
-                        if(empty($m[2])){
-                            $_POST[$m[1]][] = $value;
-                        }
-                        else{
-                            $_POST[$m[1]][$m[2]] = $value;
-                        }
-                    }
-                    else{
-                        $_POST[$name] = $value;
-                    }
-                }
-            }
+    /**
+     * This function returns the value of the cookie named $name, or all cookies if $name is not provided
+     * @param string $name The cookie name
+     * @return string|array The cookie value or all the cookies
+     */
+    public static function getCookies($name = ""){
+        if($name){
+            return isset($_COOKIE[$name]) ? $_COOKIE[$name] : null;
+        }
+        else{
+            return $_COOKIE;
         }
     }
 }

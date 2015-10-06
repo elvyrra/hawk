@@ -98,8 +98,8 @@ App.prototype.start = function(){
 		this.setRoutes(appConf.routes);
 		this.setRootUrl(appConf.rooturl);
 		Lang.init(appConf.Lang.keys);
-		Tabset.MAX_TABS_NUMBER = appConf.tabs.max;
 		this.baseUrl = require.toUrl('');
+		this.isConnected = appConf.user.connected;
 
 
 		// Manage the notification area
@@ -239,9 +239,6 @@ App.prototype.start = function(){
 		evt.initEvent("app-ready", true, false);
 		dispatchEvent(evt);
 		
-		this.openLastTabs(appConf.tabs.open);
-				
-		
 		/**
 		 * Customize app HttpRequestObject
 		 */
@@ -269,6 +266,21 @@ App.prototype.start = function(){
 	        return xhr;
 		
 		}.bind(this);
+
+		/**
+		 * Open the tab asked by the user when it was not connected
+		 */
+		if(this.isConnected && $.cookie('redirect')){
+			appConf.tabs.open.push($.cookie('redirect'));
+			$.cookie('redirect', '', {expires : new Date()});
+		}
+
+		/**
+		 * Open the last tabs
+		 */
+		this.openLastTabs(appConf.tabs.open);
+
+		
 
 	}.bind(this));
 };
@@ -360,7 +372,9 @@ App.prototype.load = function(url, data){
 					element.title($(".page-name", response).first().val());
 					
 					// Regiter the tabs in the cookie
-					this.tabset.registerTabs();
+					if(this.isConnected) {
+						this.tabset.registerTabs();
+					}
 					
 					// register the url in the tab history
 					element.history.push(url);
@@ -379,8 +393,22 @@ App.prototype.load = function(url, data){
 
 			.fail(function(xhr, status, error){
 				var code = xhr.status;
-				var message = xhr.responseText;
-				this.notify("danger", message);
+
+				if(code === 403){
+					var response = JSON.parse(xhr.responseText);
+					if(response.reason == "login"){
+						this.dialog(this.getUri('login') + '?redirect=' + url + '&code=403');
+					}
+					else{
+						var message = response.message;
+						this.notify("danger", message);							
+					}
+				}
+				else{
+					var message = xhr.responseText;
+					this.notify("danger", message);	
+				}
+				
 				this.loading.stop();				
 			}.bind(this));
 		}

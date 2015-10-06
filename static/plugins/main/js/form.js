@@ -90,15 +90,20 @@ define('form', ['jquery', 'ko'], function($, ko){
 				data['_FORM_ACTION_'] = this.activity;
 			}
 
-			
-			$.ajax({
+			var options = {
 				xhr : app.xhr,
 				url : this.action,
 				type : this.method,
 				dataType : 'json',
-				data : this.upload ? new FormData(this.node.get(0)) : data, /*** Send all the data contained in the form ***/
-				processData : ! this.upload
-			})
+				data : this.upload ? new FormData(this.node.get(0)) : data, /*** Send all the data contained in the form ***/	
+				processData : !this.upload				
+			};
+			if(this.upload){
+				options.contentType = false;
+			}
+			
+			$.ajax(	options )
+
 			.done(function(results, code, xhr){
 				/*** treat the response ***/
 				if(results.message){
@@ -113,6 +118,7 @@ define('form', ['jquery', 'ko'], function($, ko){
 			
 			.fail(function(xhr, code, err){			
 				if(! xhr.responseJSON){
+					// The returned result is not a JSON
 					self.displayErrorMessage(xhr.responseText);
 				}
 				else{

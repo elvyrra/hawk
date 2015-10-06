@@ -77,7 +77,7 @@ class Router{
 					
 			self::$routes[$name] = &$route;
 			
-			if(Request::method() == $method || $method == 'any'){
+			if(Request::getMethod() == $method || $method == 'any'){
 				self::$activeRoutes[$name] = &$route;
 			}
 		}
@@ -212,7 +212,12 @@ class Router{
 					Log::debug('URI ' . self::getUri() . ' has been routed => ' . $classname . '::' . $method);
 
 					// Emit an event, saying the routing action is finished
-					$event = new Event('after-routing', array('controller' => $controller, 'method' => $method, 'args' => $route->getData()));
+					$event = new Event('after-routing', array(
+						'route' => $route,
+						'controller' => $controller, 
+						'method' => $method, 
+						'args' => $route->getData()
+					));
 					$event->trigger();
 	                
 	                // Set the controller result to the HTTP response
@@ -223,7 +228,11 @@ class Router{
 					// The route is not accessible
 					Log::warning('A user with the IP address ' . Request::clientIp() . ' tried to access ' . self::getUri() . ' without the necessary privileges');
 					Response::setHttpCode(403);
-					Response::set(Lang::get('main.403-message'));
+					$response = array(
+						'message' => Lang::get('main.403-message'),
+						'reason' => !Session::isConnected() ? 'login' : 'permission'
+					);					
+					Response::set(json_encode($response));
 				}
 				return;
             }            
@@ -286,9 +295,9 @@ class Router{
 	 */
 	public static function getUri($name = '', $args= array()){
 		if(!$name){
-			$fullUrl = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+			$fullUrl = getenv('REQUEST_SCHEME') . '://' . getenv('SERVER_NAME') . getenv('REQUEST_URI');
 			
-			$rooturl = Conf::has('rooturl') ? Conf::get('rooturl') : $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'];
+			$rooturl = Conf::has('rooturl') ? Conf::get('rooturl') : getenv('REQUEST_SCHEME') . '://' . getenv('SERVER_NAME');
 			
 			return str_replace($rooturl, '', $fullUrl);
 		}

@@ -11,7 +11,7 @@ class MainController extends Controller{
 	 * @param string $description The page description, in the meta tag "description"
 	 * @param string $keywords The page keywords, in the meta tag "keywords"
 	 */
-	public function index($body, $title = '', $description = '', $keywords = ''){			
+	public function index($body, $title = '', $description = '', $keywords = ''){					
 		$labels = array(
 			'main' => Lang::keys('javascript'),
 			'form' =>  Lang::keys('form')
@@ -169,9 +169,9 @@ class MainController extends Controller{
 
 		// Get the pages to open
 		$pages = array();
-		if(Session::isConnected() && Option::get('main.open-last-tabs') && !empty($_COOKIE['open-tabs'])){
+		if(Session::isConnected() && Option::get('main.open-last-tabs') && Request::getCookies('open-tabs') ){
 			// Open the last tabs the users opened before logout
-			$pages = json_decode($_COOKIE['open-tabs'], true);
+			$pages = json_decode(Request::getCookies('open-tabs'), true);
 		}
 		
 		if(empty($pages)){
@@ -183,7 +183,6 @@ class MainController extends Controller{
 		return View::make(Plugin::current()->getView('conf.js.tpl'), array(
 			'keys' => $keys,
 			'routes' => json_encode($routes, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRETTY_PRINT),
-			'maxTabs' => Option::get('main.tabsNumber') ? Option::get('main.tabsNumber') : 10,
 			'lastTabs' => json_encode($pages, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRETTY_PRINT),
 			'accessible' => $canAccessApplication
 		));

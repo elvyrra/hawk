@@ -1,5 +1,4 @@
 <?php
-
 namespace Hawk;
 
 /*** Initialize the application ***/

@@ -118,7 +118,7 @@ class QuestionController extends Controller{
 							$save[$qname] = new ProfileQuestion();
 							$save[$qname]->set('name', $qname);
 						}
-						$save[$qname]->set($func, (int) isset($_POST[$name]));
+						$save[$qname]->set($func, (int) Request::getBody($name) );
 					}
 				}
 
@@ -240,7 +240,7 @@ class QuestionController extends Controller{
 						new TextareaInput(array(
 							'name' => 'options',
 							'independant' => true,
-							'required' => isset($_POST['type']) && ($_POST['type'] == "select" || $_POST['type'] == "radio"),
+							'required' => Request::getBody('type') == 'select' || Request::getBody('type') == 'radio',							
 							'label' => Lang::get('admin.profile-question-form-options-label') . '<br />' . Lang::get('admin.profile-question-form-options-description'),
 							'labelClass' => 'required',
 							'attributes' => array(
@@ -299,7 +299,7 @@ class QuestionController extends Controller{
 
 						Language::current()->saveTranslations(array(
 							'admin' => array(
-								'profile-question-' . $form->getData("name") . '-label' => $_POST['label']
+								'profile-question-' . $form->getData("name") . '-label' => Request::getBody('label')
 							)
 						));
 

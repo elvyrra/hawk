@@ -10,8 +10,8 @@ class LoginController extends Controller{
 	_______________________________________________________*/	
 	private function form(){
 		/*** Get the registrered login and passwords ***/
-		$login = !empty($_COOKIE[sha1('login')]) ? Crypto::aes256Decode($_COOKIE[sha1('login')]) : '';
-		$password = !empty($_COOKIE[sha1('password')]) ? $_COOKIE[sha1('password')] : '';
+		$login = Request::getCookies(sha1('login')) ? Crypto::aes256Decode(Request::getCookies(sha1('login'))) : '';
+		$password = Request::getCookies(sha1('password')) ? Request::getCookies(sha1('password')) : '';
 
 		$param = array(
 			"id" => "login-form",
@@ -61,7 +61,7 @@ class LoginController extends Controller{
 						null
 				),
 			),
-			'onsuccess' => 'location = app.getUri("index");',
+			'onsuccess' => '$.cookie("redirect", data.redirect); location = app.getUri("index");',
 		);	
 
 		return new Form($param);
@@ -74,6 +74,10 @@ class LoginController extends Controller{
 	public function login(){
 		$form = $this->form();
 		if(!$form->submitted()){	
+			if(Request::getParams('code') == 403){
+				$form->status = Form::STATUS_ERROR;
+				$form->addReturn('message', Lang::get('main.403-message'));
+			}
 			// Display the login page in a dialog box
 			return View::make(Theme::getSelected()->getView('dialogbox.tpl'), array(
 				'page' => $form->__toString(),
@@ -111,9 +115,13 @@ class LoginController extends Controller{
 						'username' => $user->getUsername(),
 						'ip' => Request::clientIp()
 					);					
-					if(isset($_POST['remember'])){
+					if(Request::getBody('remember')) {
 						setcookie(sha1("login"), Crypto::aes256Encode($form->getData('login')), time() + 3600 * 24 *7, '/');
 						setcookie(sha1("password"), Crypto::aes256Encode($form->getData('password')), time() + 3600 * 24 *7, '/');
+					}
+
+					if(Request::getParams('redirect')){
+						$form->addReturn('redirect',Request::getParams('redirect'));
 					}
 					
 					return $form->response(Form::STATUS_SUCCESS, Lang::get('main.login-success'));

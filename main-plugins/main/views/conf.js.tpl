@@ -8,7 +8,6 @@ window.appConf = {
 	routes : {{ $routes }},
 
 	tabs : {
-		max : {{ $maxTabs }},
 		open : {{ $lastTabs }}
 	},
 

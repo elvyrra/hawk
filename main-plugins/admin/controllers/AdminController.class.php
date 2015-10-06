@@ -9,7 +9,6 @@ class AdminController extends Controller{
 	 * Display and treat application settings
 	 */
 	public function settings(){		
-		
 		$languages = array_map(function($language){ return $language->label; }, Language::getAll('tag'));
 
 		$roleObjects = Role::getListByExample(new DBExample(array(
@@ -69,14 +68,6 @@ class AdminController extends Controller{
 						'default' => Option::get('main.currency'),
 						'label' => Lang::get('admin.settings-currency-label')
 					)),	
-
-					new IntegerInput(array(
-						'name' => 'main.tabsNumber',
-						'default' => Option::get('main.tabsNumber') ? Option::get('main.tabsNumber') : 10,
-						'minimum' => 1,
-						'maximum' => 20,
-						'label' => Lang::get('admin.settings-tabs-number-label'),
-					)),
 
 					new FileInput(array(
 						'name' => 'logo',

@@ -120,16 +120,6 @@ class Form{
 	$action = '',
 
 	/**
-	 * The reference to get the object in the database and update it. This property must be displayed as array('field' => 'value', 'field2' => 'value2')
-	 */
-	$reference = array();
-	
-	/**
-	 * The database example, generated from the reference, to find the object to display and treat in the database
-	 */
-	private $example = null,
-	
-	/**
 	 * The data returned by the form
 	 */
 	$returns = array(),
@@ -139,6 +129,16 @@ class Form{
 	 */
 	$errors = array(),
 
+	/**
+	 * The reference to get the object in the database and update it. This property must be displayed as array('field' => 'value', 'field2' => 'value2')
+	 */
+	$reference = array();
+	
+	/**
+	 * The database example, generated from the reference, to find the object to display and treat in the database
+	 */
+	private $example = null,
+	
 	/**
 	 * The action that is performed on form submission
 	 */
@@ -158,7 +158,7 @@ class Form{
 		/*
 		 * Default values
 		 */
-		$this->action = Request::uri();
+		$this->action = Request::getUri();
 				
 		// Get the parameters of the instance
 		$data = $param;
@@ -273,10 +273,6 @@ class Form{
 	 * Reload the form data
 	 */
 	public function reload(){
-        if($this->upload){
-			Request::parseScriptInput();
-		}
-				
 		// Set default value
 		$data = array();
 		foreach($this->fields as $name => $field){					
@@ -290,10 +286,7 @@ class Form{
 		}
 
 		if($this->submitted()){
-			$entry = strtolower($this->method) == 'get' ? $_GET : $_POST;
-			foreach($entry as $name => $value){
-				$data[$name] = $value;				
-			}
+			$data = strtolower($this->method) == 'get' ? Request::getParams() : Request::getBody();			
 		}
 
 		// Set the value in all inputs instances		
@@ -381,11 +374,12 @@ class Form{
 	 * @return mixed If the form is not submitted, this function will return FALSE. Else, the function will return 'register' or 'delete', depending on the user action
 	 */
     public function submitted(){
-    	if(Request::method() == "delete"){
+    	if(Request::getMethod() == "delete"){
     		return self::ACTION_DELETE;
     	}
-        $entry = $this->method == 'get' ? $_GET : $_POST;
-		return isset($entry['_FORM_ACTION_']) ? $entry['_FORM_ACTION_'] : false;        
+        
+        $action = $this->method == 'get' ? Request::getParams('_FORM_ACTION_') : Request::getBody('_FORM_ACTION_');
+		return $action ? $action : false;        
     }  
 	
 	

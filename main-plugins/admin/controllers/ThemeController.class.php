@@ -82,7 +82,7 @@ class ThemeController extends Controller{
 		$theme = Theme::getSelected();
 		$variables = $theme->getEditableVariables();
 		
-		if(!empty($_GET['reset'])){
+		if(Request::getParams('reset')) {
 			foreach($variables as $var){
 				Option::delete('theme-' . $theme->getName() . '.' . $var['name']);
 			}

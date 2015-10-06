@@ -134,7 +134,7 @@ class User extends Model{
 
 	
 	public function getDisplayName(){
-		return Option::get('user.display-realname') && $this->getProfileData('realname') ? $this->getProfileData('realname') : $this->getUsername();
+		return $this->getProfileData('realname') ? $this->getProfileData('realname') : $this->getUsername();
 	}
 	
 	public function isConnected(){

@@ -1,0 +1,8 @@
+{
+    "title": "Language switcher",
+    "description": "This plugin display a widget to the user to change it language",
+    "version": "0.1",
+    "author": "Elvyrra SAS",
+    "namespace" : "LangSwitcher",
+    "dependencies": []
+}

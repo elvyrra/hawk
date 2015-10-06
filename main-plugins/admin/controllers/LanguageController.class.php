@@ -20,12 +20,12 @@ class LanguageController extends Controller{
 			'keys' => 'all'
 		);
 
-		if(isset($_GET['filters'])){
-			setcookie('languages-filters', $_GET['filters'], 0, '/');
-			$filters = json_decode($_GET['filters'], true);
+		if(Request::getParams('filters')) {
+			setcookie('languages-filters', Request::getParams('filters'), 0, '/');
+			$filters = json_decode(Request::getParams('filters'), true);
 		}
-		elseif(isset($_COOKIE['languages-filters'])){
-			$filters = json_decode($_COOKIE['languages-filters'], true);
+		elseif(Request::getCookies('languages-filters')){
+			$filters = json_decode(Request::getCookies('languages-filters'), true);
 		}
 		
 		return $filters;	 	
@@ -87,8 +87,9 @@ class LanguageController extends Controller{
 			// Register the translations
 			try{
 				$keys = array();
-				if(!empty($_POST['translation'][$filters['tag']])){
-					foreach($_POST['translation'][$filters['tag']] as $langKey => $translation){
+				$translations = Request::getBody('translation');
+				if(!empty($translations[$filters['tag']])){
+					foreach($translations[$filters['tag']] as $langKey => $translation){
 						if(!empty($translation)){						
 							list($plugin, $key) = explode('.', $langKey);
 							$key = str_replace(array('{', '}'), array('[', ']'), $key);
@@ -481,7 +482,8 @@ class LanguageController extends Controller{
 		else{
 			if($form->check()){
 				try{
-					foreach($_FILES['files']['name'] as $i => $filename){
+					$files = Request::getFiles('files');
+					foreach($files['name'] as $i => $filename){
 						// Check the filename is correct
 						if(!preg_match('/^([\w\-]+)\.([a-z]{2})\.lang$/', $filename, $matches)) {
 							throw new Exception(Lang::get('language.import-file-name-error'));
@@ -490,7 +492,7 @@ class LanguageController extends Controller{
 						list($m, $plugin, $lang) = $matches;
 
 						// Check the content of the file is valid
-						$tmpfile = $_FILES['files']['tmp_name'][$i];
+						$tmpfile = $files['tmp_name'][$i];
 						if(($translations = parse_ini_file($tmpfile)) === false){
 							throw new Exception(Lang::get('language.import-file-format-error'));
 						}

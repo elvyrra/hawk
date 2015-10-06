@@ -24,7 +24,7 @@
 				</li>
 				<!-- /ko -->
 
-				<li class="add-tab-button corner-top-left corner-bottom-right" href="{uri action='new-tab'}" target="newtab" data-bind="visible: tabs().length < Tabset.MAX_TABS_NUMBER">
+				<li class="add-tab-button corner-top-left corner-bottom-right" href="{uri action='new-tab'}" target="newtab">
 					<span class="" id="main-tab-add">
 						<span class="icon icon-plus open-new-tab" title="{text key='main.open-new-tab'}" ></span>
 					</span>

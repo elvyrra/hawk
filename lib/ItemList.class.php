@@ -139,8 +139,8 @@ class ItemList{
 	public function __construct($params){
 		/*** Default values ***/		
 		$this->emptyMessage = Lang::get('main.list-no-result');
-		$this->action = $_SERVER['REQUEST_URI'];
-		$this->refresh = empty($_GET['refresh']) ? false : true;
+		$this->action = getenv('REQUEST_URI');
+		$this->refresh = !!Request::getParams('refresh');
 		
 		/*** Get the values from the parameters array **/
 		$this->map($params);

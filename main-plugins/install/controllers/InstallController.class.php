@@ -57,7 +57,7 @@ class InstallController extends Controller{
 						'required' => true,
 						'label' => Lang::get('install.settings-rooturl-label', null, null, $this->language),
 						'placeholder' => 'http://',
-						'default' => $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'],
+						'default' => getenv('REQUEST_SCHEME') . '://' . getenv('SERVER_NAME'),
 					)),
 
 					new SelectInput(array(

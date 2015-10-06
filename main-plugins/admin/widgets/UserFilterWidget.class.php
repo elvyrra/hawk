@@ -13,13 +13,13 @@ class UserFilterWidget extends Widget{
 	public static $filters = array('status', 'roleId');
 
 	public function getFilters(){
-		$result = !empty($_COOKIE['user-filter']) ? json_decode($_COOKIE['user-filter'], true) : array();
+		$result = Request::getCookies('user-filter') ? json_decode(Request::getCookies('user-filter'), true) : array();
 
 		foreach(self::$filters as $name){
-			if(isset($_GET[$name])){
-				$result[$name] = $_GET[$name];
+			if(Request::getParams($name) !== null){
+				$result[$name] = Request::getParams($name);
 			}
-
+			
 			if(empty($result[$name])){
 				$result[$name] = '0';
 			}
@@ -31,13 +31,7 @@ class UserFilterWidget extends Widget{
 
 	public function display(){
 		$filters = $this->getFilters();
-		$roles = array(
-			0 => ' - '
-		);
-		foreach(Role::getAll() as $role){
-			$roles[$role->id] = $role->getLabel();
-		}
-
+		
 		$form = new Form(array(
 			'id' => 'user-filter-form',
 			'fieldsets' => array(

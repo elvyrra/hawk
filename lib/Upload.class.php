@@ -35,28 +35,37 @@ class Upload{
 	 * @param string $name the name of the upload
 	 */
 	private function __construct($name){
-		if(empty($_FILES[$name])){
+		$files = Request::getFiles();
+		if(empty($files[$name])){
 			throw new UploadException();
 		}
 
-		if(is_array($_FILES[$name]['name'])){
-			foreach($_FILES[$name]['name'] as $i => $data){
+		if(is_array($files[$name]['name'])){
+			foreach($files[$name]['name'] as $i => $data){
+				if(!is_file($files[$name]['tmp_name'][$i])){
+					throw new UploadException();
+				}
+
 				$this->files[$i]  = (object) array(
-					'basename' => $_FILES[$name]['name'][$i],
-					'tmpFile' => $_FILES[$name]['tmp_name'][$i],
-					'mime' => $_FILES[$name]['type'][$i],
-					'size' => $_FILES[$name]['size'][$i],
-					'extension' => pathinfo($_FILES[$name]['name'][$i], PATHINFO_EXTENSION)
+					'basename' => $files[$name]['name'][$i],
+					'tmpFile' => $files[$name]['tmp_name'][$i],
+					'mime' => $files[$name]['type'][$i],
+					'size' => $files[$name]['size'][$i],
+					'extension' => pathinfo($files[$name]['name'][$i], PATHINFO_EXTENSION)
 				);				
 			}
 		}
-		else{			
-			$this->files[] = (object) array(
-				'basename' => $_FILES[$name]['name'],
-				'tmpFile' => $_FILES[$name]['tmp_name'],
-				'mime' => $_FILES[$name]['type'],
-				'size' => $_FILES[$name]['size'],
-				'extension' => pathinfo($_FILES[$name]['name'], PATHINFO_EXTENSION)
+		else{
+			if(!is_file($files[$name]['tmp_name'])){
+				throw new UploadException();
+			}
+
+			$this->files[] = (object) array(				
+				'basename' => $files[$name]['name'],
+				'tmpFile' => $files[$name]['tmp_name'],
+				'mime' => $files[$name]['type'],
+				'size' => $files[$name]['size'],
+				'extension' => pathinfo($files[$name]['name'], PATHINFO_EXTENSION)
 			);
 		}
 	}
@@ -95,7 +104,7 @@ class Upload{
 			$filename = $i++ . '_' . $basename;
 		}
 
-		return rename($file->tmpFile, $directory . $filename); //. '/'
+		return move_uploaded_file($file->tmpFile, $directory . $filename); //. '/'
 	}
 }
 

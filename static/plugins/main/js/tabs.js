@@ -41,11 +41,6 @@ define('tabs', ['jquery', 'ko'], function($, ko){
 	};
 
 	/**
-	 * Default max tabs number
-	 */
-	Tabset.MAX_TABS_NUMBER = 10;
-
-	/**
 	 * This index is incremented each time a tab is created, to generate a unique id for each tab
 	 */
 	Tabset.index = 0;
@@ -55,17 +50,12 @@ define('tabs', ['jquery', 'ko'], function($, ko){
 	 * Push a new tab in the tabset
 	 */
 	Tabset.prototype.push = function(){
-		if(this.tabs().length < Tabset.MAX_TABS_NUMBER){
-			/* Create the tab */
-			var tab = new Tab(Tabset.index ++);
-			this.tabs.push(tab);
-			
-			/*** Activate the new tab ***/
-			this.activeId(tab.id());
-		}		
-		else{
-			app.notify('info', Lang.get('main.all-tabs-open'));
-		}	
+		/* Create the tab */
+		var tab = new Tab(Tabset.index ++);
+		this.tabs.push(tab);
+		
+		/*** Activate the new tab ***/
+		this.activeId(tab.id());
 	};
 
 

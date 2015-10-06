@@ -11,7 +11,7 @@
 	
 	<div class='form-result-message'>
 		{if($form->status == Form::STATUS_ERROR)}
-			<p class="alert alert-error">{{ $form->returns['message'] }}</p>
+			<p class="alert alert-danger">{{ $form->returns['message'] }}</p>
 		{/if}
 	</div>	
 	{{ $content }}	
