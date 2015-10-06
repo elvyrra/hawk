@@ -16,14 +16,14 @@
     <div id="sort-menu-template">
         <ol class="sortable active" data-bind="foreach: {data : sortedItems, as : 'item' }" data-parent="0">
             <li data-bind="attr : { 'data-id': item.id, 'data-order': $index}, css : {'no-action-item' : !item.action} ">
-                <div class="sortable-item">
+                <div class="sortable-item" data-bind="attr : {title : item.url}">
                     <span class="drag-handle icon icon-arrows"></span>
                     <span data-bind="text: item.label"></span>                
                     <span class="pull-right text-danger icon icon-trash icon-lg deactivate-item pointer" data-bind="visible: !(item.children && item.children.length), click: $root.deactivateItem.bind($root)"></span>                
                 </div>
                 <ol data-bind="foreach: {data: children, as : 'subitem'}, attr : {'data-parent': item.id}">
                     <li data-bind="attr : { 'data-id': subitem.id, 'data-order': $index}">
-                        <div class="sortable-item">
+                        <div class="sortable-item" data-bind="attr : {title : item.url}">
                             <span class="drag-handle icon icon-arrows"></span>
                             <span data-bind="text: subitem.label"></span>
                             <span class="pull-right text-danger icon icon-trash icon-lg deactivate-item pointer" data-bind="click: $root.deactivateItem.bind($root)"></span>
