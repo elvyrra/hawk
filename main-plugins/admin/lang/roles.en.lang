@@ -1,6 +1,6 @@
 add-role-btn = "New role"
 delete-role-confirmation = "Are you sure you want to remove this role ?"
-edit-permissions-btn = "Manage permissions"
+edit-permissions-btn = "Permissions management"
 form-color-label = "Role color"
 form-name-label = "Role name"
 form-title = "Role definition"

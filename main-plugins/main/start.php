@@ -37,5 +37,16 @@ Router::setProperties(
 		Router::auth(DEV_MODE, function(){
 			Router::get('clear-cache', '/clear-cache', array('action' => 'MainController.clearCache'));
 		});
+
+		// Search for updates
+		Event::on('Hawk\Plugins\Main\MainController.refreshMenu.after Hawk\Plugins\Main\MainController.main.after', function(Event $event){
+			$dom = $event->getData('result');
+			if(Session::isAllowed('admin.all')){
+				$dom->find('#main-menu-collapse')->append(SearchUpdatesWidget::getInstance()->display());
+			}
+		});
+
+		// Update Hawk		
+		Router::get('update-hawk', '/update-hawk', array('auth' => Session::isAllowed('admin.all'), 'action' => 'UpdateController.compute'));
 	}
 );

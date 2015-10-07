@@ -70,7 +70,7 @@ class Autoload{
         }
         elseif(strpos($namespace, 'Hawk\\Plugins\\') === 0){
             if(class_exists("\\Hawk\\$class") || trait_exists("\\Hawk\\$class")){
-                class_alias("\\Hawk\\$class", $classname);
+                class_alias("\\Hawk\\$class", $classname);                
                 return true;
             }
             else{

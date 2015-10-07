@@ -378,7 +378,7 @@ class Form{
     		return self::ACTION_DELETE;
     	}
         
-        $action = $this->method == 'get' ? Request::getParams('_FORM_ACTION_') : Request::getBody('_FORM_ACTION_');
+        $action = $this->method == 'get' ? Request::getParams('_objectAction') : Request::getBody('_objectAction');
 		return $action ? $action : false;        
     }  
 	

@@ -60,15 +60,16 @@ define('form', ['jquery', 'ko'], function($, ko){
 
 
 	/**
-	 * Set the activity of the form. The activity can be "register" or "delete", 
+	 * Set the object action of the form. The object action can be "register" or "delete", 
 	 * and represents the action that will be performed server side
-	 * @param {string} activity - The activity value to set
+	 * @param {string} action - The action value to set
 	 */
-	Form.prototype.setActivity = function(activity){
-		this.activity = activity;
+	Form.prototype.setObjectAction = function(action){
+		this.objectAction = action;
 
-		if(self.name === "delete"){
-			this.node.attr('method', activity);
+		if(action === "delete"){
+			this.node.attr('method', action);
+			this.method = action;
 		}
 	};
 
@@ -81,13 +82,13 @@ define('form', ['jquery', 'ko'], function($, ko){
 		this.removeErrors();
 		var self = this;
 		
-		if(this.activity == "delete" || this.isValid()){		
+		if(this.objectAction == "delete" || this.isValid()){		
 			app.loading.start();
 			
 			/**** Send a POST Ajax request to submit the form ***/
 			var data = this.node.serializeObject();
-			if(this.activity){
-				data['_FORM_ACTION_'] = this.activity;
+			if(this.objectAction){
+				data['_objectAction'] = this.objectAction;
 			}
 
 			var options = {
@@ -177,13 +178,14 @@ define('form', ['jquery', 'ko'], function($, ko){
 
 		if (this.type == "submit") {		
 			this.node.click(function(){			
-				/*** Ask for confirmation ***/
-				if(this.name == "delete" && !confirm(Lang.get("form.confirm-delete")))
-					/*** The user finally doesn't want to delete the record ***/
+				// Ask for confirmation 
+				if(this.name == "delete" && !confirm(Lang.get("form.confirm-delete"))){
+					// The user finally doesn't want to delete the record
 					return false;	
+				}
 				
-				/*** The user confirmed ***/			
-				this.form.setActivity(this.name);
+				// The user confirmed
+				this.form.setObjectAction(this.name);
 			}.bind(this));		
 		}
 	};

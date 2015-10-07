@@ -168,8 +168,8 @@ class UserController extends Controller{
 						'name' => 'username',
 						'required' => true,
 						'unique' => true,
-						'readonly' => $user->id !== Session::getUser()->id,
-						'insert' => $user->id !== Session::getUser()->id,
+						'readonly' => $user && $user->id !== Session::getUser()->id,
+						'insert' => $user && $user->id !== Session::getUser()->id,
 						'label' => Lang::get('admin.user-form-username-label'),
 					)),
 					
@@ -177,8 +177,8 @@ class UserController extends Controller{
 						'name' => 'email',
 						'required' => true,
 						'unique' => true,
-						'readonly' => $user->id !== Session::getUser()->id,
-						'insert' => $user->id !== Session::getUser()->id,
+						'readonly' => $user && $user->id !== Session::getUser()->id,
+						'insert' => $user && $user->id !== Session::getUser()->id,
 						'label' => Lang::get('admin.user-form-email-label'),
 					)),
 					
@@ -226,7 +226,7 @@ class UserController extends Controller{
 					new DeleteInput(array(
 						'name' => 'delete',
 						'value' => Lang::get('main.delete-button'),
-						'notDisplayed' => !$user || $user->id == User::ROOT_USER_ID,
+						'notDisplayed' => !($user && $user->isRemovable()),
 					)),
 
 					new ButtonInput(array(
@@ -249,7 +249,12 @@ class UserController extends Controller{
 			));
 		}
 		else{
-			return $form->treat();			
+			if($form->submitted() == "delete"){
+				$this->compute('remove');
+			}
+			else{
+				return $form->register();
+			}
 		}
 		
 	}	

@@ -298,19 +298,19 @@ input[type="checkbox"]{
         position: absolute;
         height: 20px;
         width: 20px;
-        margin-top: -15px;
-        font-size: 22px;
-        font-family: FontAwesome;
-        content: "\f096";
+        margin-top: -15px; 
+        .pointer();       
+        .fa-icon();        
+        .icon-2x();
+        content: @fa-var-square-o;
     }
 
-    &:hover{
-        color: black;
+    &:hover, &:focus, &:checked{
+        color: @brand-primary;
     }
 
     &:checked:before{
-        content: "\f046";
-        color: @brand-primary;
+        content: @fa-var-check-square-o;        
     }
 }
 
@@ -496,8 +496,9 @@ table {
     color: @header-color;
 }
 
-#main-menu{
-    min-height: 30px;
+@main-menu-height: 30px;
+#main-menu{    
+    min-height: @main-menu-height;
     margin-bottom: 5px;
     border-radius: 0;
 
@@ -506,14 +507,14 @@ table {
     }
 
     .application-logo{
-        width: 30px;
-        height: 30px;
+        width: @main-menu-height;
+        height: @main-menu-height;
     }
 
     .main-menu{
         background: none;
-        height: 30px;
-        line-height: 30px;
+        height: @main-menu-height;
+        line-height: @main-menu-height;
         padding: 0 5px;
         vertical-align: middle;
         cursor: pointer;
@@ -980,3 +981,12 @@ body.dragging, body.dragging * {
     }
 }
 
+/*------------------------------ Available updates -----------------------*/
+.available-updates{
+    width: @main-menu-height;
+    height: @main-menu-height;
+    line-height: @main-menu-height;
+    border-radius: 100%;
+    text-align: center;
+    font-size: 14px;
+}

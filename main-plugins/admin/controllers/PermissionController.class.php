@@ -15,7 +15,7 @@ class PermissionController extends Controller{
 		foreach($data as $value){
 			$values[$value->permissionId][$value->roleId] = $value->value;
 		}
-		$roles = isset($this->roleId) ? array(Role::getById($this->roleId)) : Role::getAll(null, array(), array(), Option::get('main.allow-guest') ? true : false);
+		$roles = isset($this->roleId) ? array(Role::getById($this->roleId)) : Role::getAll(null, array(), array(), true);
 
 		$param = array(
 			'id' => 'permissions-form',
@@ -33,14 +33,12 @@ class PermissionController extends Controller{
 		foreach($roles as $role){
 			foreach($permissionGroups as $group => $permissions){
 				foreach($permissions as $permission){
-					if($role->id != Role::GUEST_ROLE_ID || $permission->availableForGuests){
-						$param['fieldsets']['form'][] = new CheckboxInput(array(
-							'name' => "permission-{$permission->id}-{$role->id}",
-							'disabled' => $role->id == Role::ADMIN_ROLE_ID,
-							'default' => $role->id == Role::ADMIN_ROLE_ID ? 1 : (isset($values[$permission->id][$role->id]) ? $values[$permission->id][$role->id] : 0),
-							'class' => $permission->id == Permission::ALL_PRIVILEGES_ID ? 'select-all' : '',
-						));
-					}
+					$param['fieldsets']['form'][] = new CheckboxInput(array(
+						'name' => "permission-{$permission->id}-{$role->id}",
+						'disabled' => $role->id == Role::ADMIN_ROLE_ID || ($role->id == Role::GUEST_ROLE_ID && !$permission->availableForGuests),
+						'default' => $role->id == Role::ADMIN_ROLE_ID ? 1 : (isset($values[$permission->id][$role->id]) ? $values[$permission->id][$role->id] : 0),
+						'class' => $permission->id == Permission::ALL_PRIVILEGES_ID ? 'select-all' : '',
+					));					
 				}
 			}
 		}
@@ -66,7 +64,7 @@ class PermissionController extends Controller{
 						$roleId = $match[2];
 						$value = Request::getBody($name) ? 1 : 0;
 						
-						if($roleId != Role::ADMIN_ROLE_ID){
+						if($roleId != Role::ADMIN_ROLE_ID && !($roleId == Role::GUEST_ROLE_ID && !$permission->availableForGuests)){
 							$permission = new RolePermission();
 							$permission->set(array(
 								'roleId' => $roleId,

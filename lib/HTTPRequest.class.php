@@ -178,9 +178,16 @@ class HTTPRequest{
 		$opts = array('http' =>
 			array(
 				'method'  => strtoupper($this->method),
-				'header'  => implode(PHP_EOL, array_map(function($key, $value){
-					return "$key: $value";
-				}, array_keys($this->headers), $this->headers)),
+				'header'  => implode(
+					PHP_EOL, 
+					array_map(
+						function($key, $value){
+							return "$key: $value";
+						}, 
+						array_keys($this->headers), 
+						$this->headers
+					)
+				),
 				'content' => $data
 			)
 		);
