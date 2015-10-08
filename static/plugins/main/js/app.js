@@ -366,10 +366,10 @@ App.prototype.load = function(url, data){
 					element.url(url);
 					element.route(route);
 
-					element.content(response);
-
 					// Set the tab title
 					element.title($(".page-name", response).first().val());
+
+					element.content(response);
 					
 					// Regiter the tabs in the cookie
 					if(this.isConnected) {

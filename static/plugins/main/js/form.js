@@ -10,7 +10,7 @@ define('form', ['jquery', 'ko'], function($, ko){
 		this.node = $("[id='" + this.id + "']");
 		this.upload = this.node.hasClass('upload-form');
 		this.action = this.node.attr('action');
-		this.method = this.node.attr('method');
+		this.method = this.node.attr('method').toLowerCase();
 		this.inputs = {};
 		for(var name in fields){
 			this.inputs[name] = new FormInput(fields[name], this);
@@ -65,10 +65,9 @@ define('form', ['jquery', 'ko'], function($, ko){
 	 * @param {string} action - The action value to set
 	 */
 	Form.prototype.setObjectAction = function(action){
-		this.objectAction = action;
+		this.inputs._objectAction.val(action);
 
-		if(action === "delete"){
-			this.node.attr('method', action);
+		if(action.toLowerCase() === 'delete'){			
 			this.method = action;
 		}
 	};
@@ -86,22 +85,23 @@ define('form', ['jquery', 'ko'], function($, ko){
 			app.loading.start();
 			
 			/**** Send a POST Ajax request to submit the form ***/
-			var data = this.node.serializeObject();
-			if(this.objectAction){
-				data['_objectAction'] = this.objectAction;
+			var data;
+			if(this.method === 'get'){
+				data = $(this.node).serializeObject();
 			}
+			else{
+				data = new FormData(this.node.get(0))
+			}			
 
 			var options = {
 				xhr : app.xhr,
 				url : this.action,
 				type : this.method,
 				dataType : 'json',
-				data : this.upload ? new FormData(this.node.get(0)) : data, /*** Send all the data contained in the form ***/	
-				processData : !this.upload				
-			};
-			if(this.upload){
-				options.contentType = false;
-			}
+				data : data,
+				processData : false,
+				contentType : false
+			};			
 			
 			$.ajax(	options )
 

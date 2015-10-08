@@ -307,7 +307,6 @@ class FormInput{
 			$this->errorAt = $this->name;
         }
 		
-
         // Check, if the field is required, that a value was submitted
 		if(!empty($this->required) && ((string)$this->value == '' || $this->emptyValue && $this->value === $this->emptyValue)){
 			// The field is required but not filled

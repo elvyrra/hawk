@@ -43,7 +43,7 @@ class AdminController extends Controller{
 			'fieldsets' => array(
 				'main' => array(
 					new SelectInput(array(
-						'name' => 'main.language',
+						'name' => 'main_language',
 						'required' => true,
 						'options' => $languages,
 						'default' => Option::get('main.language'),						
@@ -51,7 +51,7 @@ class AdminController extends Controller{
 					)),
 					
 					new SelectInput(array(
-						'name' => 'main.timezone',
+						'name' => 'main_timezone',
 						'required' => true,
 						'options' => array_combine(\DateTimeZone::listIdentifiers(), \DateTimeZone::listIdentifiers()),
 						'default' => Option::get('main.timezone'),
@@ -59,7 +59,7 @@ class AdminController extends Controller{
 					)),
 					
 					new SelectInput(array(
-						'name' => 'main.currency',
+						'name' => 'main_currency',
 						'required' => true,
 						'options' => array(
 							'EUR' => 'Euro (€)',
@@ -90,17 +90,17 @@ class AdminController extends Controller{
 					$inputs = array();
 					foreach($languages as $tag => $language){	
 						$inputs[] = new TextInput(array(
-							'name' => 'main.page-title-' . $tag,
+							'name' => 'main_page-title-' . $tag,
 							'default' => Option::get('main.page-title-' . $tag),
 						));
 
 						$inputs[] = new TextareaInput(array(
-							'name' => 'main.page-description-' . $tag,
+							'name' => 'main_page-description-' . $tag,
 							'default' =>  Option::get('main.page-description-' . $tag),
 						));
 
 						$inputs[] = new TextInput(array(
-							'name' => 'main.page-keywords-' . $tag,
+							'name' => 'main_page-keywords-' . $tag,
 							'default' => Option::get('main.page-keywords-' . $tag),
 						));
 					}
@@ -109,7 +109,7 @@ class AdminController extends Controller{
 				
 				'home' => array(
 					new RadioInput(array(
-						'name' => 'main.home-page-type',
+						'name' => 'main_home-page-type',
 						'options' => array(
 							// 'default' => Lang::get('admin.settings-home-page-type-default'),
 							'custom' => Lang::get('admin.settings-home-page-type-custom'),
@@ -124,14 +124,14 @@ class AdminController extends Controller{
 					)),
 					
 					new WysiwygInput(array(
-						'name' => 'main.home-page-html',
+						'name' => 'main_home-page-html',
 						'id' => 'home-page-html',
 						'label' => Lang::get('admin.settings-home-page-html-label'),
 						'default' => Option::get('main.home-page-html'),
 					)),
 
 					new SelectInput(array(
-						'name' => 'main.home-page-item',
+						'name' => 'main_home-page-item',
 						'id' => 'home-page-item',
 						'label' => Lang::get('admin.settings-home-page-item-label'),
 						'options' => $menuItems,
@@ -139,7 +139,7 @@ class AdminController extends Controller{
 					)),
 					
 					new CheckboxInput(array(
-						'name' => 'main.open-last-tabs',
+						'name' => 'main_open-last-tabs',
 						'label' => Lang::get('admin.settings-open-last-tabs'),
 						'default' => Option::get('main.open-last-tabs'),
 						'dataType' => 'int'
@@ -148,7 +148,7 @@ class AdminController extends Controller{
 				
 				'users' => array(
 					new RadioInput(array(
-						'name' => 'main.allow-guest',
+						'name' => 'main_allow-guest',
 						'options' => array(
 							0 => Lang::get('main.no-txt'),
 							1 => Lang::get('main.yes-txt'),
@@ -158,7 +158,7 @@ class AdminController extends Controller{
 					)),
 					
 					new RadioInput(array(
-						'name' => 'main.open-register',
+						'name' => 'main_open-register',
 						'options' => array(
 							0 => Lang::get('admin.settings-open-register-off'),
 							1 => Lang::get('admin.settings-open-register-on'),
@@ -172,7 +172,7 @@ class AdminController extends Controller{
 					)),
 					
 					new CheckboxInput(array(
-						'name' => 'main.confirm-register-email',
+						'name' => 'main_confirm-register-email',
 						'label' => Lang::get('admin.settings-confirm-email-label'),
 						'default' => Option::get('main.confirm-register-email'),
 						'dataType' => 'int',
@@ -182,7 +182,7 @@ class AdminController extends Controller{
 					)),
 
 					new WysiwygInput(array(
-						'name' => 'main.confirm-email-content',
+						'name' => 'main_confirm-email-content',
 						'id' => 'settings-confirm-email-content-input',
 						'default' => Option::get('main.confirm-email-content'),
 						'label' => Lang::get('admin.settings-confirm-email-content-label'),
@@ -190,7 +190,7 @@ class AdminController extends Controller{
 					)),
 					
 					new CheckboxInput(array(
-						'name' => 'main.confirm-register-terms',
+						'name' => 'main_confirm-register-terms',
 						'label' => Lang::get('admin.settings-confirm-terms-label'),
 						'default' => Option::get('main.confirm-register-terms'),
 						'dataType' => 'int',
@@ -201,7 +201,7 @@ class AdminController extends Controller{
 					)),
 
 					new WysiwygInput(array(
-						'name' => 'main.terms',
+						'name' => 'main_terms',
 						'id' => 'settings-terms-input',
 						'label' => Lang::get('admin.settings-terms-label'),
 						'labelWidth' => 'auto',
@@ -209,7 +209,7 @@ class AdminController extends Controller{
 					)),
 
 					new SelectInput(array(
-						'name' => 'roles.default-role',
+						'name' => 'roles_default-role',
 						'label' => Lang::get('admin.settings-default-role-label'),
 						'options' => $roles,
 						'default' => Option::get('roles.default-role')
@@ -218,19 +218,19 @@ class AdminController extends Controller{
 				
 				'email' => array(
 					new EmailInput(array(
-						'name' => 'main.mailer-from',
+						'name' => 'main_mailer-from',
 						'default' => Option::get('main.mailer-from') ? Option::get('main.mailer-from') : Session::getUser()->email,
 						'label' => Lang::get('admin.settings-mailer-from-label')
 					)),					
 
 					new TextInput(array(
-						'name' => 'main.mailer-from-name',
+						'name' => 'main_mailer-from-name',
 						'default' => Option::get('main.mailer-from-name') ? Option::get('main.mailer-from-name') : Session::getUser()->getDisplayName(),
 						'label' => Lang::get('admin.settings-mailer-from-name-label')
 					)),
 
 					new SelectInput(array(
-						'name' => 'main.mailer-type',
+						'name' => 'main_mailer-type',
 						'default' => Option::get('main.mailer-type'),
 						'options' => array(
 							'mail' => Lang::get('admin.settings-mailer-type-mail-value'),
@@ -244,13 +244,13 @@ class AdminController extends Controller{
 					)),
 					
 					new TextInput(array(
-						'name' => 'main.mailer-host',
+						'name' => 'main_mailer-host',
 						'default' => Option::get('main.mailer-host'),
 						'label' => Lang::get('admin.settings-mailer-host-label'),						
 					)),
 					
 					new IntegerInput(array(
-						'name' => 'main.mailer-port',
+						'name' => 'main_mailer-port',
 						'default' => Option::get('main.mailer-port'),
 						'label' => ':',
 						'labelWidth' => 'auto',
@@ -259,13 +259,13 @@ class AdminController extends Controller{
 					)),
 					
 					new TextInput(array(
-						'name' => 'main.mailer-username',
+						'name' => 'main_mailer-username',
 						'default' => Option::get('main.mailer-username'),
 						'label' => Lang::get('admin.settings-mailer-username-label'),						
 					)),
 					
 					new PasswordInput(array(
-						'name' => 'main.mailer-password',
+						'name' => 'main_mailer-password',
 						'encrypt' => 'Crypto::aes256_encode',
 						'decrypt' => 'Crypto::aes256_decode',
 						'default' => Option::get('main.mailer-password'),
@@ -273,7 +273,7 @@ class AdminController extends Controller{
 					)),
 					
 					new SelectInput(array(
-						'name' => 'main.smtp-secured',
+						'name' => 'main_smtp-secured',
 						'options' => array(
 							'' => Lang::get('main.no-txt'),
 							'ssl' => 'SSL',
@@ -322,8 +322,8 @@ class AdminController extends Controller{
 							if($value === null){
 								$value = '0';
 							}
-							$field->set($value);
-							Option::set($name, $value);					
+							$optionName = str_replace('_', '.', $name);
+							Option::set($optionName, $value);					
 						}
 						elseif($field instanceof \Hawk\FileInput){			
 							$upload = Upload::getInstance($name);						
