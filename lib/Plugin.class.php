@@ -22,6 +22,11 @@ class Plugin{
 	const MANIFEST_BASENAME = 'manifest.json';
 
 	/**
+	 * The pattern for a plugin name	 
+	 */
+	const NAME_PATTERN = '[a-zA-Z0-9\-_.]+';
+
+	/**
 	 * The plugin name
 	 */
 	private $name, 

@@ -15,7 +15,9 @@ class SearchUpdatesWidget extends Widget{
 		$updates = 0;
 		$titles = array();
 
-		if(SearchUpdates::coreUpdates()){
+		$api = new HawkApi;
+		$coreUpdates = $api->getCoreUpdates();
+		if(count($coreUpdates)){
 			$updates ++;
 			$titles[] = Lang::get('main.available-updates-title-core');
 		}

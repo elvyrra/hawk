@@ -43,6 +43,11 @@ class Theme{
     const PREVIEW_BASENAME = 'preview.png';
 
     /**
+     * The pattern for a theme name     
+     */
+    const NAME_PATTERN = '[a-zA-Z0-9\-_.]+';
+
+    /**
      * The theme name
      * @var string
      */
