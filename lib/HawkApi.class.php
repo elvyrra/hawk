@@ -149,19 +149,9 @@ class HawkApi{
         ),
 
         'api-core-update' => array(
-            'method' => 'patch',
-            'uri' => '/hawk/update',
-            'input' => array(
-                'from' => array(
-                    'required' => true,
-                    'pattern' => self::VERSION_PATTERN
-                ),
-
-                'to' => array(
-                    'required' => true,
-                    'pattern' => self::VERSION_PATTERN 
-                )
-            )
+            'method' => 'get',
+            'uri' => '/hawk/update/{from}/{to}',
+            'where' => array('from' => self::VERSION_PATTERN, 'to' => self::VERSION_PATTERN)                
         )
     );
 

@@ -174,7 +174,7 @@ class Router{
 	 *						- 'default' array (optionnal) : An array defining the default values of parameters. This is useful to generate a URI from a route name (method getUri), without giving all parameters values
 	 */
 	public static function patch($name, $url, $param){
-		self::add('delete', $name, $url, $param);
+		self::add('patch', $name, $url, $param);
 	}
 
 	/**

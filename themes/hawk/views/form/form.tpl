@@ -7,7 +7,7 @@
 		autocomplete="{{ $form->autocomplete ? "on" : "off" }}" 
 		{{ $form->enctype ? "enctype='{$form->enctype}" : "" }} 
 	>
-	<input type='hidden' name='_objectAction' value='valid'/>
+	<input type='hidden' name='_submittedForm' value='submitted'/>
 	
 	<div class='form-result-message'>
 		{if($form->status == Form::STATUS_ERROR)}

@@ -37,6 +37,11 @@ class HTTPRequest{
 	$body = array(),
 
 	/**
+	 * The files to upload
+	 */
+	$files = array(),
+
+	/**
 	 * The request headers
 	 * @var array
 	 */
@@ -81,7 +86,7 @@ class HTTPRequest{
 		'html' => 'text/html',
 		'json' => 'application/json',
 		'xml' => 'application/xml',
-		'urlencoded' => 'application/x-www-form-urlencoded'
+		'urlencoded' => 'application/x-www-form-urlencoded'	
 	);
 
 
@@ -91,6 +96,7 @@ class HTTPRequest{
 	 *						- 'url' (required): The url to call
 	 *						- 'method' (optionnal, default 'GET') : The HTTP method
 	 *						- 'body' (optionnal) : The request content
+	 *						- 'files' (optionnal) : The files to upload (the filenames)
 	 *						- 'headers' (optionnal) : The request headers
 	 *						- 'dataType' (optionnal, default 'html') : The wanted response type
 	 *						- 'contentType' (optionnal) : The request content type	 
@@ -120,6 +126,14 @@ class HTTPRequest{
 	}
 
 	/**
+	 * Set the files to upload
+	 * @param array $filenames The list of filenames to upload
+	 */
+	public function setFiles($files){
+		$this->files = $files;
+	}
+
+	/**
 	 * Set the expected data type
 	 * @param string $type The expected type of response data. Can be 'text', 'html', 'json', 'xml' or the wanted mime type
 	 */
@@ -130,9 +144,9 @@ class HTTPRequest{
 		else{
 			$value = $type;
 		}
-		$this->setHeaders(array(
-			'Accept' => $value
-		));
+		// $this->setHeaders(array(
+		// 	'Accept' => $value
+		// ));
 		$this->dataType = $type;
 	}
 
@@ -142,7 +156,7 @@ class HTTPRequest{
 	 * @param string $type The expected type of response data. Can be 'text', 'html', 'json', 'xml' or the wanted mime type
 	 */
 	public function setContentType($type){
-		if(self::$dataTypes[$type]){
+		if(isset(self::$dataTypes[$type])) {
 			$value = self::$dataTypes[$type];			
 		}
 		else{
@@ -157,24 +171,62 @@ class HTTPRequest{
 	
 
 	/**
+	 * Build the HTTP resquest body
+	 */
+	private function build(){
+		if(!empty($this->files)){
+			// Upload files
+			$data = '';
+			$boundary = '----' . uniqid();			
+
+			$this->setContentType('multipart/form-data; boundary=' . $boundary);
+			
+			foreach($this->files as $name => $filename){
+				// Add all files
+				$data .= '--' . $boundary . "\r\n" . 
+						'Content-Disposition: form-data; name="' . $name . '"; filename="' . basename($filename) . "\"\r\n" . 
+						"Content-Type: application/octet-stream\r\n\r\n" . 
+						file_get_contents($filename) . "\r\n";
+			}
+
+			foreach($this->body as $key => $value){
+				// Add post data
+				$data .= '--' . $boundary . "\r\n" . 
+						'Content-Disposition: form-data; name="' . $key . "\"\r\n\r\n" . 
+						$value . "\r\n";
+			}
+
+			$data .= '--' . $boundary . '--';
+
+			$this->setHeaders(array(
+				'Content-Length' => strlen($data)
+			));
+			return $data;
+		}
+		else{
+			switch($this->contentType){
+				case 'urlencoded' :
+					return http_build_query($this->body);
+					break;
+
+				case 'json' :
+					return json_encode($this->body);
+					break;
+
+				default :
+					return $this->body;
+					break;
+			}
+		}
+	}
+
+
+	/**
 	 * Send the request and get the result
 	 */
 	public function send(){
-		$data = '';
-		switch($this->contentType){
-			case 'urlencoded' :
-				$data = http_build_query($this->body);
-				break;
+		$data = $this->build();
 
-			case 'json' :
-				$data = json_encode($this->body);
-				break;
-
-			default :
-				$data = $this->body;
-				break;
-		}
-		
 		$opts = array('http' =>
 			array(
 				'method'  => strtoupper($this->method),

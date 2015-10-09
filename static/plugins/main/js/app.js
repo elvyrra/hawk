@@ -448,6 +448,9 @@ App.prototype.openLastTabs = function(uris){
  * @parma {object} options - The options for desktop notifications
  */
 App.prototype.notify = function(level, message, options){
+	if(level === "error"){
+		level = "danger";
+	}
 	if(level == "desktop"){
 		// this is a desktop notification
 		if(! ('Notification' in window)){

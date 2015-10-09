@@ -370,7 +370,7 @@ class Form{
 	
 	
 	/**
-	 * Defines if the form has been submitted, and if so, return the action to perform
+	 * Defines if the form has been submitted, and if so, return the action to perform (submitted or delete)
 	 * @return mixed If the form is not submitted, this function will return FALSE. Else, the function will return 'register' or 'delete', depending on the user action
 	 */
     public function submitted(){
@@ -378,8 +378,8 @@ class Form{
     		return self::ACTION_DELETE;
     	}
         
-        $action = $this->method == 'get' ? Request::getParams('_objectAction') : Request::getBody('_objectAction');
-		return $action ? $action : false;        
+        $action = $this->method == 'get' ? Request::getParams('_submittedForm') : Request::getBody('_submittedForm');
+		return $action ? $action : false;
     }  
 	
 	

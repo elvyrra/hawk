@@ -65,8 +65,6 @@ define('form', ['jquery', 'ko'], function($, ko){
 	 * @param {string} action - The action value to set
 	 */
 	Form.prototype.setObjectAction = function(action){
-		this.inputs._objectAction.val(action);
-
 		if(action.toLowerCase() === 'delete'){			
 			this.method = action;
 		}
