@@ -193,7 +193,7 @@ class HawkApi{
      * @return array The list of available version newer than the current one
      */
     public function getCoreUpdates(){
-        $currentVersion = file_get_contents(ROOT_DIR . 'version.txt');
+        $currentVersion = Utils::getHawkVersion();
 
         $request = $this->callApi('api-core-available-updates', array(), array('version' => $currentVersion));
 
@@ -220,7 +220,7 @@ class HawkApi{
      * @return string The filename of the temporary file created by the content downloaded
      */
     public function getCoreUpdateArchive($version, &$errors){
-        $currentVersion = file_get_contents(ROOT_DIR . 'version.txt');
+        $currentVersion = Utils::getHawkVersion();
 
         $request = $this->callApi('api-core-update', array('from' => $currentVersion, 'to' => $version));
         if($request->getStatusCode() == 200){

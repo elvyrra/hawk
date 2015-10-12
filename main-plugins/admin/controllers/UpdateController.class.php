@@ -16,20 +16,16 @@ class UpdateController extends Controller{
      */
     public function index(){
         $tabs = array();
-
+        $updates = array();
         $api = new HawkApi;
         
         // Get updates on core
         $coreUpdates = $api->getCoreUpdates();
-        if(count($coreUpdates)){
-            $tabs[] = array(
-                'title' => Lang::get('admin.update-page-tab-hawk-title'),
-                'content' => $this->indexHawk($coreUpdates)
-            );
-        }
+        
+        $updates['core'] = $coreUpdates;
 
         $page = View::make(Plugin::current()->getView('updates.tpl'), array(
-            'tabs' => $tabs
+            'updates' => $updates,
         ));
 
         $this->addJavaScript(Plugin::current()->getJsUrl('updates.js'));

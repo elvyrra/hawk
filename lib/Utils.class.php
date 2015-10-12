@@ -33,6 +33,15 @@ trait Utils{
 
 
     /**
+     * Get the current Hawk version
+     * @return string The current version
+     */
+    public static function getHawkVersion(){
+        return file_get_contents(ROOT_DIR . 'version.txt');
+    }
+
+
+    /**
      * Map an array data to the object that use this trait
      * @param array $array The data to map to the object
      * @param Object $object The object to map. If not set, get $this in the execution context of the method
