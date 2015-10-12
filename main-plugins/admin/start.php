@@ -41,7 +41,10 @@ Router::setProperties(
 				Router::any('profile-questions', 'profile-questions/', array('action' => 'QuestionController.listQuestions'));
 				Router::any('edit-profile-question', 'profile-questions/{name}', array('where' => array('name' => '\w+'), 'action' => 'QuestionController.edit'));
 				Router::get('delete-profile-question', 'profile-questions/{name}/delete', array('where' => array('name' => '\w+'), 'action' => 'QuestionController.delete'));
-				
+			});
+
+
+			Router::auth(Session::isAllowed('admin.all'), function(){
 				/*** Manage themes ***/
 				
 				Router::get('manage-themes', 'themes', array('action' => 'ThemeController.index'));
@@ -101,6 +104,29 @@ Router::setProperties(
 				Event::on('menuitem.added menuitem.deleted', function($event){
 		            Router::getCurrentController()->addJavaScriptInline('app.refreshMenu()');
 		        });
+
+
+
+				/*** Manage updates ***/
+				// Display the availabe updates
+				Router::get('updates-index', 'updates', array('action' => 'UpdateController.index'));
+
+				// Update Hawk
+				Router::get('update-hawk', 'updates/hawk/{version}', array('where' => array('version' => HawkApi::VERSION_PATTERN_URI), 'action' => 'UpdateController.updateHawk'));
+
+				// Update a plugin
+				Router::get('update-plugin', 'plugins/{plugin}/update', array('where' => array('plugin' => '[a-zA-Z0-9\-_.]+'), 'action' => 'UpdateController.updatePlugin'));
+
+				// Update a theme
+				Router::get('update-theme', 'themes/{theme}/update', array('where' => array('theme' => '[a-zA-Z0-9\-_.]+'), 'action' => 'UpdateController.updateTheme'));
+
+				// Display number of updates in menu
+				if(Session::isAllowed('admin.all')){
+					Event::on('Hawk\Plugins\Main\MainController.refreshMenu.after Hawk\Plugins\Main\MainController.main.after', function(Event $event){
+						$dom = $event->getData('result');
+						$dom->find('#main-menu-collapse')->append(SearchUpdatesWidget::getInstance()->display());
+					});
+				}
 
 			});
 

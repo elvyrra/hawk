@@ -1,27 +1,30 @@
 <?php
 /**
- * SearchUpdatesWidget.class.php
- * @author Elvyrra SAS
+ * SearchUpdateWidget.class.php
  */
 
 namespace Hawk\Plugins\Admin;
 
 /**
- * This widget searches for Hawk available updates and display the number of available updates on core and plugins
+ * This widget displays in the main menu a little div with the number of available updates
  */
 class SearchUpdatesWidget extends Widget{
-
-    /**
-     * Display the available updates
-     */
+    
     public function display(){
-        // Search for the core update
-        $plugins = Plugin::getAll(true);
-        $plugins[] = Plugin::get('main');
+        // The number of updates
+        $updates = 0;
+        $titles = array();
 
-        foreach($plugins as $plugin){
+        $api = new HawkApi;
+        $coreUpdates = $api->getCoreUpdates();
+        if(count($coreUpdates)){
+            $updates ++;
+            $titles[] = Lang::get('main.available-updates-title-core');
+        }
 
-        }     
-
+        return View::make(Plugin::current()->getView('available-updates.tpl'), array(
+            'updates' => $updates,
+            'title' => implode(', ', $titles)
+        ));
     }
 }

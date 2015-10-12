@@ -19,6 +19,8 @@ class HawkApi{
      */
     const VERSION_PATTERN = '/^(\d+\.){2,3}\d+$/';
 
+    const VERSION_PATTERN_URI = '(?:\d+\.){2,3}\d+';
+
 
     /**
      * The callable routes on the API, with their parameters
@@ -151,7 +153,7 @@ class HawkApi{
         'api-core-update' => array(
             'method' => 'get',
             'uri' => '/hawk/update/{from}/{to}',
-            'where' => array('from' => self::VERSION_PATTERN, 'to' => self::VERSION_PATTERN)                
+            'where' => array('from' => self::VERSION_PATTERN_URI, 'to' => self::VERSION_PATTERN_URI)                
         )
     );
 
@@ -207,6 +209,32 @@ class HawkApi{
         }
         else{
             return array();
+        }
+    }
+
+
+    /**
+     * Download an update file for the core
+     * @param string $version The version update to get
+     * @param array $errors The returned errors
+     * @return string The filename of the temporary file created by the content downloaded
+     */
+    public function getCoreUpdateArchive($version, &$errors){
+        $currentVersion = file_get_contents(ROOT_DIR . 'version.txt');
+
+        $request = $this->callApi('api-core-update', array('from' => $currentVersion, 'to' => $version));
+        if($request->getStatusCode() == 200){
+            $result = $request->getResponse();
+
+            $tmpName = TMP_DIR . uniqid() . '.zip' ;
+
+            file_put_contents($tmpName, $result);
+
+            return $tmpName;
+        }
+        else{
+            $errors = array('code' => $request->getStatusCode(), 'message' => $request->getResponse());
+            return null;
         }
     }
 }
