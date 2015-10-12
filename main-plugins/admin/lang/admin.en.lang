@@ -188,6 +188,7 @@ theme-create-success = "Theme successfully created"
 
 update-page-title = "Update my application"
 update-page-tab-hawk-title = "Update Hawk"
-update-page-update-hawk-btn = "Update"
+update-page-update-hawk-btn = "Update to v{version}"
 update-page-confirm-update-hawk = "Do you really want to update Hawk ?"
 update-hawk-error = "An error occured while updating Hawk."
+update-page-current-hawk-version = "Your current version of Hawk is v{version} : "

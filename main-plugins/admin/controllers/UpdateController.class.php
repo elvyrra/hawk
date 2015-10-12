@@ -45,10 +45,11 @@ class UpdateController extends Controller{
      * Display the page to update Hawk
      */
     private function indexHawk($updates){
+
         $button = new ButtonInput(array(            
             'class' => 'btn-warning update-hawk',            
             'icon' => 'refresh',
-            'value' => Lang::get('admin.update-page-update-hawk-btn'),
+            'value' => Lang::get('admin.update-page-update-hawk-btn', array('version' => end($updates)['version'])),
             'attributes' => array(
                 'data-to' => end($updates)['version']
             )
@@ -56,7 +57,7 @@ class UpdateController extends Controller{
 
         Lang::addKeysToJavaScript('admin.update-page-confirm-update-hawk');
 
-        return $button->display();
+        return Lang::get('admin.update-page-current-hawk-version', array('version' => file_get_contents(ROOT_DIR . 'version.txt'))) . $button->display();
     }
 
 
@@ -68,6 +69,8 @@ class UpdateController extends Controller{
         try{
             $api = new HawkApi;
 
+            $nextVersions = $api->getCoreUpdates();
+
             // Download the update archive
             $archive = $api->getCoreUpdateArchive($this->version, $errors);
             if(! $archive){
@@ -77,7 +80,9 @@ class UpdateController extends Controller{
 
             // Extract the downloaded file
             $zip = new \ZipArchive;
-            $zip->open($archive);
+            if($zip->open($archive) !== true){
+                throw new \Exception('Impossible to open the zip archive');
+            }
             $zip->extractTo(TMP_DIR);
 
             // Put all modified or added files in the right folder
@@ -93,12 +98,21 @@ class UpdateController extends Controller{
                 }
             }
 
-            // Execute the update method if exists
-            $update = new HawkUpdater;
-            $method = 'v' . str_replace('.', '_', $this->version);
-            if(method_exists($updater, $method)){
-                $updater->$method();
+            // Execute the update methods if exist
+            $updater = new HawkUpdater;
+            $methods = get_class_methods($updater);
+
+            foreach($nextVersions as $v){
+                $method = 'v' . str_replace('.', '_', $v['version']);
+                if(method_exists($updater, $method)){
+                    $updater->$method();
+                }
             }
+            
+
+            // Remove temporary files and folders
+            FileSystem::remove($folder);
+            FileSystem::remove($archive);
 
             $response = array('status' => true);
         }

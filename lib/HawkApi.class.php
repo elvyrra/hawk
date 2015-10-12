@@ -228,7 +228,7 @@ class HawkApi{
 
             $tmpName = TMP_DIR . uniqid() . '.zip' ;
 
-            file_put_contents($tmpName, $result);
+            file_put_contents($tmpName, base64_decode($result));
 
             return $tmpName;
         }
