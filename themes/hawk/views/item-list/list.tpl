@@ -65,7 +65,7 @@
 			app.lists["{{ $list->id }}"].maxPages({{ $pages }});	
 			
 
-			ko.applyBindings(app.lists["{{ $list->id }}"], document.getElementById("{{ $list->id }}"));				
+						
 		});
 	});
 </script>

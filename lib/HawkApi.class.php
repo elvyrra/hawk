@@ -35,13 +35,9 @@ class HawkApi{
                 'search' => array(
                     'required' => true,
                 ),
-                'start' => array(
-                    'pattern' => '\d*',
-                    'default' => 0
-                ),
-                'limit' => array(
-                    'pattern' => '\d*',
-                    'default' => 10
+                'price' => array(
+                    'pattern' => '/^(all|free|charged)?$/',
+                    'default' => 'all'
                 )
             )
         ),
@@ -235,6 +231,33 @@ class HawkApi{
         else{
             $errors = array('code' => $request->getStatusCode(), 'message' => $request->getResponse());
             return null;
+        }
+    }
+
+
+    /**
+     * Search plugins
+     * @param string $search The search term
+     * @param string $price The plugin type : 'all', 'free', or 'charged'
+     * @param int $start The first element to get
+     * @param int $limit The maximum number to get
+     * @return array The list of found plugins
+     */
+    public function searchPlugins($search, $price, $start = 0, $limit = 20){
+        $request = $this->callApi(
+            'api-search-plugins', 
+            array(), 
+            array(
+                'search' => $search,
+                'price' => $price,                
+            )
+        );
+
+        if($request->getStatusCode() == 200){
+            return $request->getResponse();
+        }
+        else{
+            return array();
         }
     }
 }

@@ -253,7 +253,7 @@ class HTTPRequest{
 				$this->responseHeaders[$match[1]] = $match[2];
 			}
 			elseif(preg_match('/^HTTP\/[^\s]+\s+(\d+)/', $header, $match)){
-				$this->status = $match[1];
+				$this->status = (int) $match[1];
 			}
 		}
 

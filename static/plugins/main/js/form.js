@@ -85,7 +85,7 @@ define('form', ['jquery', 'ko'], function($, ko){
 			/**** Send a POST Ajax request to submit the form ***/
 			var data;
 			if(this.method === 'get'){
-				data = $(this.node).serializeObject();
+				data = $(this.node).serlialize();
 			}
 			else{
 				data = new FormData(this.node.get(0))
@@ -160,6 +160,51 @@ define('form', ['jquery', 'ko'], function($, ko){
 	Form.prototype.reset = function(){
 		this.node.get(0).reset();
 	}
+
+
+	/**
+	 * Get the form data as Object
+	 */
+	Form.prototype.toObject = function(){
+		var result = {};
+
+		var serialized = this.node.serializeArray();
+		serialized.forEach(function(item, index){
+			var matches = /^(.+?)((?:\[(.*?)\])+)$/.exec(item.name);
+			if(matches !== null){
+				var params = matches[2];
+				if(! result[matches[1]]){
+					result[matches[1]] = {};
+				}
+				var tmp = result[matches[1]];
+				do{
+					var m = /^(\[(.*?)\])(\[(.*?)\])?/.exec(params);
+					if(m !== null){
+						if(m[3]){
+							if(!tmp[m[2]]){
+								tmp[m[2]] = m[4] ? {} : [];
+							}
+							tmp = tmp[m[2]];
+							params = m[3];
+						}
+						else{
+							if(tmp instanceof Array){
+								tmp.push(item.value);
+							}
+							else{
+								tmp[m[2]] = item.value;
+							}							
+						}						
+					}
+				} while(m && m[3]);
+			}
+			else{
+				result[item.name] = item.value;
+			}
+		});
+		
+		return result;
+	};
 
 
 	/*----------------------- CLASS FormInput ------------------------*/

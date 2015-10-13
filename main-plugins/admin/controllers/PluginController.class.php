@@ -6,22 +6,31 @@ class PluginController extends Controller{
     /**
      * display the page to manage the application plugins
      */
-    public function index(){
-        $list = $this->compute('availablePlugins');
+    public function index($content = '', $title = ''){
+        if(!$content){
+            $content = $this->compute('availablePlugins');            
+        }
+        if(!$title){
+            $title = Lang::get('admin.available-plugins-title');
+        }
         $widgets = array(new SearchPluginWidget());        
 
         $this->addCss(Plugin::current()->getCssUrl('plugins.less'));
+
+        $this->addJavaScript(Plugin::current()->getJsUrl('plugins.js'));
+
+        Lang::addKeysToJavaScript('admin.plugins-advert-menu-changed', 'admin.confirm-delete-plugin', 'admin.confirm-uninstall-plugin');
 
         return LeftSidebarTab::make(array(
             'tabId' => self::TABID,
             'icon' => 'plug',
             'tabTitle' => Lang::get('admin.manage-plugins-title'),
-            'title' => Lang::get('admin.available-plugins-title'),
+            'title' => $title,
             'sidebar' => array(
                 'widgets' => $widgets,
             ),
             'page' => array(
-                'content' => $list
+                'content' => $content
             )
         ));
     }    
@@ -94,6 +103,7 @@ class PluginController extends Controller{
                                             'label' => Lang::get('admin.plugin-settings-button'),
                                             'href' => Router::getUri('plugin-settings', array('plugin' => $plugin->getName())),
                                             'target' => 'dialog',
+                                            'class' => 'btn-info'
                                         )) : '',
 
                                     // Uninstall button
@@ -120,7 +130,7 @@ class PluginController extends Controller{
 
                                     ButtonInput::create(array(
                                         'label' => Lang::get('admin.deactivate-plugin-button'),
-                                        'class' => 'btn-danger',
+                                        'class' => 'btn-warning',
                                         'icon' => 'ban',
                                         'href' => Router::getUri('deactivate-plugin', array('plugin' => $plugin->getName())),
                                         'target' => $actionsTarget
@@ -148,8 +158,7 @@ class PluginController extends Controller{
         );
         
         $list = new ItemList($param);
-        Lang::addKeysToJavaScript('admin.plugins-advert-menu-changed', 'admin.confirm-delete-plugin', 'admin.confirm-uninstall-plugin');
-        $this->addJavaScript(Plugin::current()->getJsUrl('plugins.js'));
+        
         return $list;        
     }
 
@@ -166,7 +175,7 @@ class PluginController extends Controller{
             $this->addJavaScriptInline("app.notify('danger', '" . addcslashes($message, "'") . "');");
         }
 
-        return $this->compute('availablePlugins');
+        Response::redirectToAction('plugins-list');
     }
 
 
@@ -183,8 +192,7 @@ class PluginController extends Controller{
             $this->addJavaScriptInline("app.notify('danger', '" . addcslashes($message, "'") . "');");
         }
 
-        return $this->compute('availablePlugins');
-
+        Response::redirectToAction('plugins-list');
     }
 
 
@@ -201,7 +209,7 @@ class PluginController extends Controller{
             $this->addJavaScriptInline("app.notify('danger', '" . addcslashes($message, "'") . "');");
         }
 
-        return $this->compute('availablePlugins');
+        Response::redirectToAction('plugins-list');
     }
 
 
@@ -218,7 +226,7 @@ class PluginController extends Controller{
             $this->addJavaScriptInline("app.notify('danger', '" . addcslashes($message, "'") . "');");
         }
 
-        return $this->compute('availablePlugins');
+        Response::redirectToAction('plugins-list');
     }
 
 
@@ -243,7 +251,60 @@ class PluginController extends Controller{
     /**
      * Search a plugin on the download platform
      */
-    public function search(){}
+    public function search(){
+        $api = new HawkApi;
+
+        $search = Request::getParams('search');
+        $price = Request::getParams('price');
+        
+        // Search plugins on the API
+        $plugins = $api->searchPlugins($search, $price);
+
+        // Remove the plugins already downloaded on the application
+        $plugins = array_filter($plugins, function($plugin){
+            return Plugin::get($plugin['name']) === null;
+        });
+
+        $list = new ItemList(array(
+            'id' => 'search-plugins-list',
+            'data' => $plugins,            
+            'fields' => array(
+                'controls' => array(
+                    'display' => function($value, $field, $plugin) {
+                        // download button
+                        $button = ButtonInput::create(array(
+                            'label' => Lang::get('admin.download-plugin-button'),
+                            'icon' => 'downlaoad',
+                            'href' => Router::getUri('download-plugin', array('plugin' => $plugin['name'])),                                    
+                        ));
+
+                        return  "<h4>" . $plugin['title'] . "</h4><br />" . $button;
+                    },
+                    'label' => Lang::get('admin.plugins-list-controls-label'),
+                    'search' => false,
+                    'sort' => false,
+                ),
+
+                'description' => array(
+                    'search' => false,
+                    'sort' => false,
+                    'label' => Lang::get('admin.plugins-list-description-label'),
+                    'display' => function($value, $field, $plugin){
+                        return View::make(Plugin::current()->getView("plugin-search-list-description.tpl"), $plugin);                        
+                    }
+                )
+
+            )
+        ));
+
+        if($list->isRefreshing()){
+            return $list->display();
+        }
+        else{
+            return $this->compute('index', $list->display(), Lang::get('admin.search-plugins-result-title'));
+        }
+
+    }
 
 
 
@@ -262,7 +323,7 @@ class PluginController extends Controller{
 
         FileSystem::remove($directory);
 
-        return $this->compute('availablePlugins');
+        Response::redirectToAction('plugins-list');
     }
 
     /**
@@ -395,6 +456,12 @@ class PluginController extends Controller{
                     $installer = str_replace(array('{{ $namespace }}', '{{ $name }}'), array($namespace, $plugin->getName()), file_get_contents(Plugin::current()->getRootDir() . 'templates/installer.tpl'));
                     if(file_put_contents($dir . 'classes/Installer.class.php', $installer) === false){
                         throw new \Exception('Impossible to create the file classes/Installer.class.php');
+                    }
+
+                    // Create the file Updater.class.php
+                    $updater = str_replace(array('{{ $namespace }}', '{{ $name }}'), array($namespace, $plugin->getName()), file_get_contents(Plugin::current()->getRootDir() . 'templates/updater.tpl'));
+                    if(file_put_contents($dir . 'classes/Updater.class.php', $updater) === false){
+                        throw new \Exception('Impossible to create the file classes/Updater.class.php');
                     }
 
                     // Create the language file

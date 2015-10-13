@@ -164,8 +164,68 @@ class ItemListField {
 	 */
 	public function getSearchCondition(&$binds){
 		if($this->searchValue){
-			return DBExample::make(array($this->field => array('$like' => '%' . $this->searchValue . '%')), $binds);
+			return DBExample::make(array($this->field => array('$like' => '%' . $this->getInput()->dbvalue() . '%')), $binds);
 		}	
+	}
+
+
+	/**
+	 * Get the input corresponding to the field
+	 * @return FormInput the input instance
+	 */
+	public function getInput(){
+		if(!is_array($this->search)){
+			$this->search = array(
+				'type' => 'text'
+			);
+		}
+
+		switch($this->search['type']){
+			case 'select' :
+				$input = new SelectInput(array(
+					'options' => $this->search['options'],
+					'invitation' => isset($this->search['invitation']) ? $this->search['invitation'] : null,
+					'emptyValue' => isset($this->search['emptyValue']) ? $this->search['emptyValue'] : null,
+					'attributes' => array(
+						'data-bind' => "value: search, css : search() ? 'alert-info not-empty' : 'empty'"
+					)
+				));
+				break;
+
+			case 'checkbox' :
+				$input = new CheckboxInput(array(
+					'attributes' => array(
+						'data-bind' => 'checked: search',
+					)
+				));
+				break;
+
+			case 'date' :
+				$input = new DatetimeInput(array(
+					'id' => uniqid(),
+					'after' => '<i class="icon icon-times-circle clean-search" data-bind="click: function(data){ data.search(null); }, visible: search()"></i>',
+					'attributes' => array(
+						'data-bind' => "value: search, css : search() ? 'alert-info not-empty' : 'empty'"
+					)
+				));
+				break;
+
+			
+			case 'text' :
+			default :
+				$input = new TextInput(array(
+					'after' => '<i class="icon icon-times-circle clean-search" data-bind="click: function(data){ data.search(null); }, visible: search()"></i>',
+					'attributes' => array(
+						'data-bind' => "textInput: search, css : search() ? 'alert-info not-empty' : 'empty'",
+					)
+				));
+				break;
+		}
+		$input->attributes['data-field'] = $this->name;
+		$input->class = ' list-search-input';
+		$input->value = $this->searchValue;
+
+		return $input;
 	}
 
 
@@ -175,45 +235,7 @@ class ItemListField {
 	 */
 	public function displaySearchInput(){
 		if($this->search){
-			if(!is_array($this->search)){
-				$this->search = array(
-					'type' => 'text'
-				);
-			}
-
-			switch($this->search['type']){
-				case 'select' :
-					$input = new SelectInput(array(
-						'options' => $this->search['options'],
-						'invitation' => isset($this->search['invitation']) ? $this->search['invitation'] : null,
-						'emptyValue' => isset($this->search['emptyValue']) ? $this->search['emptyValue'] : null,
-						'attributes' => array(
-							'data-bind' => 'value: search',
-						)
-					));
-					break;
-
-				case 'checkbox' :
-					$input = new CheckboxInput(array(
-						'attributes' => array(
-							'data-bind' => 'checked: search',
-						)
-					));
-					break;
-
-				
-				case 'text' :
-				default :
-					$input = new TextInput(array(
-						'after' => '<i class="icon icon-times-circle clean-search" data-bind="click: function(data){ data.search(null); }, visible: search()"></i>',
-						'attributes' => array(
-							'data-bind' => "textInput: search, css : search() ? 'alert-info not-empty' : 'empty'",
-						)
-					));
-					break;
-			}
-			$input->attributes['data-field'] = $this->name;
-			$input->class = ' list-search-input';
+			$input = $this->getInput();
 
 			return $input->__toString();
 		}

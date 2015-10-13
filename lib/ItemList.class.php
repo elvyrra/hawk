@@ -413,4 +413,12 @@ class ItemList{
 		return $this->__toString();
 	}
 
+
+	/**
+	 * Check if the list is refreshing or displayed for the first time
+	 */
+	public function isRefreshing(){
+		return $this->refresh;
+	}
+
 }

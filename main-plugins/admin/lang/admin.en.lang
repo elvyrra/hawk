@@ -192,3 +192,13 @@ update-page-update-hawk-btn = "Update to v{version}"
 update-page-confirm-update-hawk = "Do you really want to update Hawk ?"
 update-hawk-error = "An error occured while updating Hawk."
 update-page-current-hawk-version = "Your current version of Hawk is v{version} : "
+
+search-plugin-form-title = "Research a plugin"
+search-plugin-form-search-label = "Research"
+search-plugin-form-price-label = "Price"
+search-plugin-form-price-all-value = "All plugins"
+search-plugin-form-price-free-value = "Free plugins"
+search-plugin-form-price-charged-value = "Charged plugins"
+search-plugin-form-submit-btn = "Search"
+
+search-plugins-result-title = "Research a plugin : results"

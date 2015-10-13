@@ -8,7 +8,7 @@ define('list', ['jquery', 'ko'], function($, ko){
         this.target = data.target;
         this.maxPages = ko.observable();
 
-        this.node = $("#"+this.id);
+        this.node = $("#" + this.id);
         this.wrapper = this.node.parent();
         this.refreshContainer = this.node.find(".list > tbody");
 
@@ -78,6 +78,8 @@ define('list', ['jquery', 'ko'], function($, ko){
      * Listen for list parameters changements to refresh the list
      */
     List.prototype.initControls = function(){
+        ko.applyBindings(this, document.getElementById(this.id)); 
+
         var self = this;
         
         /**
