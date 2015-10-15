@@ -7,7 +7,7 @@ define(@brand-primary; #337ab7; Base color for primary elements; color)
 define(@brand-success; #1d931d; Base color for success elements; color)
 define(@brand-info; #5bc0de; Base color for information elements; color)
 define(@brand-warning; #f0ad4e; Base color for warning elements; color)
-define(@brand-danger; #d9534f; Base color for error elements; color)
+define(@brand-danger; #A52A2A; Base color for error elements; color)
 
 define(@text-color; #777777; Body text color; color)
 define(@body-bg; #fff; Body background; color)
@@ -30,7 +30,7 @@ define(@state-danger-bg; #f2dede; Error alerts background color; color)
 */
 
 @import "bootstrap/bootstrap.less";
-@import "font-awesome/font-awesome.less";
+@import "font-awesome.less";
 
 body{
     margin: 0;
@@ -296,12 +296,10 @@ input[type="checkbox"]{
 
     &:before{
         position: absolute;
-        height: 20px;
-        width: 20px;
-        margin-top: -15px; 
+        margin-top: -0.7em; 
         .pointer();       
         .fa-icon();        
-        .icon-2x();
+        .icon-lg();
         content: @fa-var-square-o;
     }
 
@@ -650,6 +648,10 @@ a, a:active, a:hover, a:visited, a:focus{
 .modal-dialog{    
     margin-top: 15%;
     z-index: @zindex-modal;
+
+    .modal-title{
+        color: @brand-primary;
+    }
 }
 
 /*-------------------- Lists -----------------------------*/

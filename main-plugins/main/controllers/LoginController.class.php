@@ -282,7 +282,7 @@ class LoginController extends Controller{
 
 
 						$data = array(
-							'themeBaseCss' => Theme::getSelected()->getBaseCssUrl(),
+							'themeBaseCss' => Theme::getSelected()->getBaseLessUrl(),
 							'themeCustomCss' => Theme::getSelected()->getCustomCssUrl(),
 							'mainCssUrl' => Plugin::current()->getCssUrl(),
 							'logoUrl' =>  Option::get('main.logo') ? Plugin::current()->getUserfilesUrl(Option::get('main.logo')) : Plugin::current()->getStaticUrl('img/hawk-logo.png'),

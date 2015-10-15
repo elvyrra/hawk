@@ -1,7 +1,8 @@
 "use strict";
 
-
-
+less.pageLoadFinished.then(function(){
+	document.body.style.display="block";
+});
 
 /**
  *  Start by configure requirejs paths and shim

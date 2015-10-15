@@ -32,7 +32,7 @@ class MainController extends Controller{
 			'title' => $title,
 			'description' => $description,
 			'keywords' => $keywords,
-			'themeBaseCss' => Theme::getSelected()->getBaseCssUrl(),
+			'themeBaseLess' => Theme::getSelected()->getBaseLessUrl(),
 			'themeCustomCss' => Theme::getSelected()->getCustomCssUrl(),			
 			'body' => $body,
 			'langLabels' => $labelsJSON,
@@ -178,13 +178,35 @@ class MainController extends Controller{
 			$pages[] = Router::getUri('new-tab');
 		}
 
+		// Get the theme variables		
+		$theme = Theme::getSelected();
+        $editableVariables = $theme->getEditableVariables();        
+        if(Conf::has('db')){
+            $options = Option::getPluginOptions('theme-' . $theme->getName());
+        }
+        else{
+            $options = array();
+        }
+
+        $themeVariables = array();
+        foreach($editableVariables as $variable){
+            $themeVariables[$variable['name']] = isset($options[$variable['name']]) ? $options[$variable['name']] : $variable['default'];
+        }
+
+        // Define if the theme.less must rebuilt or not
+        $buildTheme = $theme->build(true);
+
 		Response::setScript();
 
 		return View::make(Plugin::current()->getView('conf.js.tpl'), array(
 			'keys' => $keys,
 			'routes' => json_encode($routes, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRETTY_PRINT),
 			'lastTabs' => json_encode($pages, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRETTY_PRINT),
-			'accessible' => $canAccessApplication
+			'accessible' => $canAccessApplication,
+			'less' => array(
+				'globalVars' => json_encode($themeVariables, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRETTY_PRINT),
+				'useFileCache' => $buildTheme
+			)			
 		));
 	}
 

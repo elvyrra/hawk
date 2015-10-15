@@ -222,6 +222,14 @@ class Theme{
     }
 
 
+    /**
+     * Get the base LESS file URL, after been built
+     * @return string
+     */
+    public function getBuildLessFile(){
+        return $this->getBuildDirname() . 'less/' . self::LESS_BASENAME;
+    }
+
    
     /**
      * Get the base CSS file URL, after been built
@@ -244,38 +252,76 @@ class Theme{
      * Build the theme : build the Less file theme.less into theme.css and copy every resource files in userfiles/themes/{themename}
      * @param boolean $force If set to true, the theme will be rebuilt without condition
      */
-    public function build($force = false){
-        if(!file_exists($this->getBuildDirname())){
-            mkdir($this->getBuildDirname(), 0755, true);
+    public function build($force = false){        
+        $build = false;
+        if($force){
+            $build = true;
         }
 
-        // Listen for compilation success
-        Event::on('built-less', function(Event $event){
-            if($event->getData('source') === $this->getBaseLessFile()){
-                foreach(glob($this->getRootDirname() . '*', GLOB_ONLYDIR ) as $elt){
-                    if(! in_array(basename($elt), array('less', 'views'))) {
-                        FileSystem::copy($elt, $this->getBuildDirname());
+        if(!file_exists($this->getBuildDirname())){
+            mkdir($this->getBuildDirname(), 0755, true);
+            $build = true;
+        }
+
+        
+        if(!$build){
+            $dest = $this->getBuildLessFile();
+
+            if(!is_file($dest)){
+                $build = true;
+            }          
+            else{
+                // Get all files in less/
+                $files = FileSystem::find($this->getLessDirname(), '*.less');
+                $lastUpdate = filemtime($dest);
+                foreach($files as $file){
+                    if(filemtime($file) > $lastUpdate){
+                        $build = true;
+                        break;
                     }
                 }
             }
-        });
-
-        // Get the theme options
-        $editableVariables = $this->getEditableVariables();        
-        if(Conf::has('db')){
-            $options = Option::getPluginOptions('theme-' . $this->name);
-        }
-        else{
-            $options = array();
         }
 
-        $variables = array();
-        foreach($editableVariables as $variable){
-            $variables[$variable['name']] = isset($options[$variable['name']]) ? $options[$variable['name']] : $variable['default'];
+        if($build){
+            // Build the theme => Copy each accessible files in static dir
+            foreach(glob($this->getRootDirname() . '*', GLOB_ONLYDIR ) as $elt){
+                if(! in_array(basename($elt), array('views'))) {
+                    FileSystem::copy($elt, $this->getBuildDirname());
+                }
+            }
         }
 
+        return $build;
+    // }
 
-        Less::compile($this->getBaseLessFile(), $this->getBuildCssFile(), $force, $variables);       
+        // // Listen for compilation success
+        // Event::on('built-less', function(Event $event){
+        //     if($event->getData('source') === $this->getBaseLessFile()){
+        //         foreach(glob($this->getRootDirname() . '*', GLOB_ONLYDIR ) as $elt){
+        //             if(! in_array(basename($elt), array('less', 'views'))) {
+        //                 FileSystem::copy($elt, $this->getBuildDirname());
+        //             }
+        //         }
+        //     }
+        // });
+
+        // // Get the theme options
+        // $editableVariables = $this->getEditableVariables();        
+        // if(Conf::has('db')){
+        //     $options = Option::getPluginOptions('theme-' . $this->name);
+        // }
+        // else{
+        //     $options = array();
+        // }
+
+        // $variables = array();
+        // foreach($editableVariables as $variable){
+        //     $variables[$variable['name']] = isset($options[$variable['name']]) ? $options[$variable['name']] : $variable['default'];
+        // }
+
+
+        // Less::compile($this->getBaseLessFile(), $this->getBuildCssFile(), $force, $variables);       
         
     }
 
@@ -308,9 +354,9 @@ class Theme{
      * Build the base css file of the theme, and get the URL of the built file
      * @return string The URL of the built CSS file
      */
-    public function getBaseCssUrl(){
+    public function getBaseLessUrl(){
         $this->build();
-        return $this->getRootUrl() . self::COMPILED_CSS_BASENAME;
+        return $this->getRootUrl() . 'less/' . self::LESS_BASENAME;
     }
     
     /**
