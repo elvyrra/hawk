@@ -12,13 +12,11 @@ require.config({
 		cookie : "ext/jquery.cookie",
 		mask : "ext/jquery.mask.min",
 		sortable : "ext/jquery-sortable",
-		addons : "jquery.addons",
 		bootstrap : "ext/bootstrap.min",
 		colorpicker : "ext/bootstrap-colorpicker.min",
 		datepicker : "ext/bootstrap-datepicker.min",
 		ko : "ext/knockout-3.3.0",
-		ckeditor : "ext/ckeditor/ckeditor",
-		bindings : "ko.bindings",
+		ckeditor : "ext/ckeditor/ckeditor",		
 		ace : "ext/ace/ace"		
 	},
 
@@ -39,9 +37,6 @@ require.config({
 		sortable : {
 			deps : ['jquery']
 		},
-		addons : {
-			deps : ['jquery'],
-		},
 		bootstrap : {
 			deps : ['jquery']
 		},
@@ -51,7 +46,7 @@ require.config({
 		colorpicker: {
 			deps : ['bootstrap']
 		},		
-		bindings : {
+		'ko-extends' : {
 			deps : ['ko']
 		},
 		ace : {
@@ -84,7 +79,7 @@ App.INVALID_URI = '/INVALID_URI';
  * Initialize the application 
  */
 App.prototype.start = function(){
-	define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 'sortable', 'addons', 'bootstrap', 'colorpicker' , 'datepicker',  'ckeditor', 'bindings', 'extends' , 'date' ], function($, ko, Tabset, Form, List, Lang) {
+	define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 'sortable', 'bootstrap', 'colorpicker' , 'datepicker',  'ckeditor', 'ko-extends', 'extends' , 'date' ], function($, ko, Tabset, Form, List, Lang) {
 		// export libraries to global context
 		window.$ = $;
 		window.ko = ko;

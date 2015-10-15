@@ -14,7 +14,7 @@ define('lang', ['jquery', 'ko'], function($, ko){
 			if(label !== undefined){
 				if(typeof(label) == "object" && number !== undefined){
 					if(number > 1){
-						label = label[number] || labels.p;
+						label = label[number] || label.p;
 					}
 					else{
 						label = label[number] || label.s;

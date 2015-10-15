@@ -238,7 +238,10 @@ class Plugin{
 	 * @return mixed The plugin definition property if $prop is set, or the whoel plugin definition if $prop is not set
 	 */
 	public function getDefinition($prop = null){
-		return $prop ? $this->definition[$prop] : $this->definition;
+		if($prop){
+			return isset($this->definition[$prop]) ? $this->definition[$prop]: null;
+		}
+		return $this->definition;
 	}
 
 

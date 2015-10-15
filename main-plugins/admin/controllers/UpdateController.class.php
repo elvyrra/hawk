@@ -20,7 +20,12 @@ class UpdateController extends Controller{
         $api = new HawkApi;
         
         // Get updates on core
-        $coreUpdates = $api->getCoreUpdates();
+        try{
+            $coreUpdates = $api->getCoreAvailableUpdates();
+        }
+        catch(\Hawk\HawkApiException $e){
+            $coreUpdates = array();
+        }
         
         $updates['core'] = $coreUpdates;
 
@@ -38,41 +43,20 @@ class UpdateController extends Controller{
 
 
     /**
-     * Display the page to update Hawk
-     */
-    private function indexHawk($updates){
-
-        $button = new ButtonInput(array(            
-            'class' => 'btn-warning update-hawk',            
-            'icon' => 'refresh',
-            'value' => Lang::get('admin.update-page-update-hawk-btn', array('version' => end($updates)['version'])),
-            'attributes' => array(
-                'data-to' => end($updates)['version']
-            )
-        ));
-
-        Lang::addKeysToJavaScript('admin.update-page-confirm-update-hawk');
-
-        return Lang::get('admin.update-page-current-hawk-version', array('version' => file_get_contents(ROOT_DIR . 'version.txt'))) . $button->display();
-    }
-
-
-
-    /**
      * Update Hawk
      */
     public function updateHawk(){
         try{
             $api = new HawkApi;
 
-            $nextVersions = $api->getCoreUpdates();
+            $nextVersions = $api->getCoreAvailableUpdates();
+            
+            if(empty($nextVersions)){
+                throw new \Exception("No newer version is available for Hawk");                
+            }
 
             // Download the update archive
-            $archive = $api->getCoreUpdateArchive($this->version, $errors);
-            if(! $archive){
-                // The download failed
-                throw new \Exception($errors['message']);
-            }
+            $archive = $api->getCoreUpdateArchive($this->version);            
 
             // Extract the downloaded file
             $zip = new \ZipArchive;

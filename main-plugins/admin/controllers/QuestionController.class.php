@@ -170,7 +170,7 @@ class QuestionController extends Controller{
 							}, $allowedTypes)),							
 							'label' => Lang::get('admin.profile-question-form-type-label'),
 							'attributes' => array(
-								'data-bind' => 'value: type',
+								'ko-value' => 'type',
 							)
 						)),
 
@@ -193,7 +193,7 @@ class QuestionController extends Controller{
 							'id' => 'question-form-parameters',
 							'hidden' => true,	
 							'attributes' => array(
-								'data-bind' => 'value: parameters'
+								'ko-value' => 'parameters'
 							)
 						)),
 
@@ -202,7 +202,7 @@ class QuestionController extends Controller{
 							'independant' => true,
 							'label' => Lang::get('admin.profile-question-form-required-label'),
 							'attributes' => array(
-								'data-bind' => "checked: required",
+								'ko-checked' => "required",
 							)
 						)),
 
@@ -211,7 +211,7 @@ class QuestionController extends Controller{
 							'independant' => true,
 							'label' => Lang::get('admin.profile-question-form-minDate-label'),
 							'attributes' => array(
-								'data-bind' => "value : minDate"
+								'ko-value' => "minDate"
 							),
 						)),				
 
@@ -220,7 +220,7 @@ class QuestionController extends Controller{
 							'independant' => true,
 							'label' => Lang::get('admin.profile-question-form-maxDate-label'),
 							'attributes' => array(
-								'data-bind' => "value : maxDate"
+								'ko-value' => "maxDate"
 							),
 						)),
 
@@ -244,7 +244,7 @@ class QuestionController extends Controller{
 							'label' => Lang::get('admin.profile-question-form-options-label') . '<br />' . Lang::get('admin.profile-question-form-options-description'),
 							'labelClass' => 'required',
 							'attributes' => array(
-								'data-bind' => "value : options",
+								'ko-value' => "options",
 							),
 							'cols' => 20,
 							'rows' => 10

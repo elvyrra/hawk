@@ -217,13 +217,13 @@ class ThemeController extends Controller{
 						'hidden' => true,
 						'value' => $css,
 						'attributes' => array(
-							'data-bind' => 'value : css'
+							'ko-value' => 'css'
 						)
 					)),
 
 					new HtmlInput(array(	
 						'name' => 'ace',					
-						'value' => '<style id="editing-css-computed" data-bind="text: css">' . $css . '</style>
+						'value' => '<style id="editing-css-computed" ko-text="css">' . $css . '</style>
 									<div id="theme-css-edit" contenteditable >' . $css . '</div>'
 					)),
 				)
@@ -586,7 +586,9 @@ class ThemeController extends Controller{
 				new HiddenInput(array(
 					'name' => 'data',
 					'default' => json_encode($items, JSON_NUMERIC_CHECK),
-					'attributes' => array('data-bind' => 'value: ko.toJSON(items)'),
+					'attributes' => array(
+						'ko-value' => 'ko.toJSON(items)'
+					),
 				)),				
 
 				new SubmitInput(array(

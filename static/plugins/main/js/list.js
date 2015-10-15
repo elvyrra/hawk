@@ -7,6 +7,7 @@ define('list', ['jquery', 'ko'], function($, ko){
         this.action = data.action;
         this.target = data.target;
         this.maxPages = ko.observable();
+        this.recordNumber = ko.observable(0);
 
         this.node = $("#" + this.id);
         this.wrapper = this.node.parent();
@@ -29,6 +30,11 @@ define('list', ['jquery', 'ko'], function($, ko){
                 sort : ko.observable(this.sorts[field])
             }
         }
+
+        // The label displaying the number of the list results
+        this.recordNumberLabel = ko.computed(function(){
+            return Lang.get('main.list-results-number', {number : this.recordNumber()}, this.recordNumber());
+        }.bind(this));
 
         this.initControls();
     };

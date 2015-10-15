@@ -1,4 +1,9 @@
 /**
+ * This file contains native classes extensions
+ */
+
+
+/**
  * Format a number with a given number of decimals, and a custom separator
  */
 Number.prototype.format = function(decimals, decimalSeparator){	
@@ -23,7 +28,7 @@ Function.prototype.extend = function(parent){
 /**
  * Search a key corresponding to a given value 
  */
-Object.getKeyByValue= function(obj, value ) {
+Object.getKeyByValue = function(obj, value ) {
     for( var prop in obj ) {
         if( obj[ prop ] === value ){
             return prop;

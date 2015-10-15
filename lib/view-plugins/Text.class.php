@@ -29,11 +29,6 @@ class Text extends \Hawk\ViewPlugin{
         $data = $this->params;
         unset($data['key']);
         
-        if(empty($this->number)){
-        	return \Hawk\Lang::get($this->key, $data);	
-        }
-        else{
-        	return \Hawk\Lang::get($this->key, $data, $this->number);
-        }
+        return \Hawk\Lang::get($this->key, $data, empty($this->number) ? 0 : $this->number);	        
     }
 }

@@ -165,12 +165,12 @@ define('form', ['jquery', 'ko'], function($, ko){
 	/**
 	 * Get the form data as Object
 	 */
-	Form.prototype.toObject = function(){
+	Form.prototype.valueOf = function(){
 		var result = {};
 
-		var serialized = this.node.serializeArray();
-		serialized.forEach(function(item, index){
-			var matches = /^(.+?)((?:\[(.*?)\])+)$/.exec(item.name);
+		for(var name in this.inputs){
+			var item = this.inputs[name];		
+			var matches = /^(.+?)((?:\[(.*?)\])+)$/.exec(name);
 			if(matches !== null){
 				var params = matches[2];
 				if(! result[matches[1]]){
@@ -189,22 +189,30 @@ define('form', ['jquery', 'ko'], function($, ko){
 						}
 						else{
 							if(tmp instanceof Array){
-								tmp.push(item.value);
+								tmp.push(item.val());
 							}
 							else{
-								tmp[m[2]] = item.value;
+								tmp[m[2]] = item.val();
 							}							
 						}						
 					}
 				} while(m && m[3]);
 			}
 			else{
-				result[item.name] = item.value;
+				result[name] = item.val();
 			}
-		});
+		}
 		
 		return result;
 	};
+
+
+	/**
+	 * Display the content of the form
+	 */
+	Form.prototype.toString = function(){
+		return JSON.stringify(this.valueOf());
+	}
 
 
 	/*----------------------- CLASS FormInput ------------------------*/
@@ -235,14 +243,45 @@ define('form', ['jquery', 'ko'], function($, ko){
 
 
 	/**
-	 * Get the value of the field
+	 * Get or set the value of the field
+	 * @param {string} value The value to set	 
 	 */
 	FormInput.prototype.val = function(value){
 		if(value === undefined){
-			return this.node.val();		
+			// Get the input value
+			switch(this.type){
+				case 'checkbox' :
+					return this.node.prop('checked');
+					
+				case 'radio' :
+					return this.node.find(':checked').val();
+
+				case 'html' :
+					return this.node.html();
+
+				default :
+					return this.node.val();		
+			}
 		}
 		else{
-			this.node.val(value);
+			switch(this.type){
+				case 'checkbox' :
+					this.node.prop('checked', value);
+					break;
+					
+				case 'radio' :
+					this.node.find('[value="' + value + '"]').prop('checked', true);
+					break;
+
+				case 'html' :
+					this.node.html(value);
+					break;
+
+				default :
+					this.node.val(value);
+					break;		
+			}
+			
 		}
 	};
 

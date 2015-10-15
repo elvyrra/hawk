@@ -38,11 +38,11 @@
 			<div role="tabpanel" class="tab-pane" id="settings-form-tab-home">
 			{{ $form->fields['main_home-page-type'] }}
 
-			<div data-bind="visible: homePage.type() == 'custom'">
+			<div ko-visible="homePage.type() == 'custom'">
 				{{ $form->fields['main_home-page-html'] }}
 			</div>
 
-			<div data-bind="visible: homePage.type() == 'page'">
+			<div ko-visible="homePage.type() == 'page'">
 				{{ $form->fields['main_home-page-item'] }}
 			</div>
 
@@ -53,19 +53,19 @@
 				{{ $form->fields['main_allow-guest'] }}		
 				{{ $form->fields['roles_default-role'] }}
 
-				{{ $form->fields['main.open-register'] }}	
-				<div data-bind="visible: parseInt(register.open())">
+				{{ $form->fields['main_open-register'] }}	
+				<div ko-visible="parseInt(register.open())">
 					<div class="clearfix"></div>	
 					<h3>{text key="admin.settings-register-options"}</h3>
 					{{ $form->fields['main_confirm-register-email'] }}	
-					<div data-bind="visible: register.checkEmail">	
+					<div ko-visible="register.checkEmail">	
 						{{ $form->fields['main_confirm-email-content'] }}	
 					</div>
 					
 					<div class="clearfix"></div>
 					<h3>{text key="admin.settings-terms-options"}</h3>
 					{{ $form->fields['main_confirm-register-terms'] }}		
-					<div data-bind="visible: register.checkTerms">	
+					<div ko-visible="register.checkTerms">	
 						{{ $form->fields['main_terms'] }}	
 					</div>
 				</div>
@@ -76,13 +76,13 @@
 				{{ $form->fields['main_mailer-from-name'] }}
 				{{ $form->fields['main_mailer-type'] }}
 
-				<div data-bind="visible: mail.type() == 'smtp' || mail.type() == 'pop3'">
+				<div ko-visible="mail.type() == 'smtp' || mail.type() == 'pop3'">
 					{{ $form->fields['main_mailer-host'] }}
 					{{ $form->fields['main_mailer-port'] }}
 					{{ $form->fields['main_mailer-username'] }}
 					{{ $form->fields['main_mailer-password'] }}				
 				</div>
-				<div data-bind="visible: mail.type() == 'smtp'">
+				<div ko-visible="mail.type() == 'smtp'">
 					{{ $form->fields['main_smtp-secured'] }}
 				</div>
 			</div>

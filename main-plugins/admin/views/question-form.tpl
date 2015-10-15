@@ -9,7 +9,7 @@
 			{{ $form->fields['required'] }}
 		</div>
 
-		<div data-bind="visible: type() == 'datetime'">
+		<div ko-visible="type() == 'datetime'">
 			{{ $form->fields['minDate'] }}
 			{{ $form->fields['maxDate'] }}
 		</div>
@@ -18,7 +18,7 @@
 
 		{{ $form->fields['label'] }}
 
-		<div data-bind="visible: type() == 'radio' || type() == 'select'">
+		<div ko-visible="type() == 'radio' || type() == 'select'">
 			{{ $form->fields['options'] }}
 		</div>
 	</fieldset>

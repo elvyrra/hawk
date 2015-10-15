@@ -186,6 +186,13 @@ theme-create-name-already-exists-error = "A theme with the same name already exi
 theme-create-error = "An error occured while creating the new theme"
 theme-create-success = "Theme successfully created"
 
+available-updates-title-core[s] = "1 Hawk update"
+available-updates-title-core[p] = "{number} Hawk updates"
+available-updates-title-plugins[s] = "1 plugin update"
+available-updates-title-plugins[p] = "{number} plugins updates"
+available-updates-title-themes[s] = "1 themes updates"
+available-updates-title-themes[p] = "{number} themes updates"
+
 update-page-title = "Update my application"
 update-page-tab-hawk-title = "Update Hawk"
 update-page-update-hawk-btn = "Update to v{version}"

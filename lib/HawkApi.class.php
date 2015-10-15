@@ -39,7 +39,7 @@ class HawkApi{
                     'pattern' => '/^(all|free|charged)?$/',
                     'default' => 'all'
                 )
-            )
+            ),
         ),
         
         // Install a plugin
@@ -55,7 +55,7 @@ class HawkApi{
             'uri' => '/plugins/available-updates',
             'input' => array(
                 'plugins' => array(
-                    'required' => true,                    
+                    'required' => true, 
                 )
             )
         ),
@@ -63,19 +63,8 @@ class HawkApi{
         // Update a plugin
         'api-update-plugin' => array(
             'method' => 'patch',
-            'uri' => '/plugins/{name}/update',
-            'where' => array('name' => Plugin::NAME_PATTERN),
-            'input' => array(
-                'from' => array(
-                    'required' => true,
-                    'pattern' => self::VERSION_PATTERN
-                ),
-
-                'to' => array(
-                    'required' => true,
-                    'pattern' => self::VERSION_PATTERN 
-                )
-            )
+            'uri' => '/plugins/{name}/update/{version}',
+            'where' => array('name' => Plugin::NAME_PATTERN, 'version' => self::VERSION_PATTERN_URI),            
         ),
 
 
@@ -87,13 +76,9 @@ class HawkApi{
                 'search' => array(
                     'required' => true,
                 ),
-                'start' => array(
-                    'pattern' => '\d*',
-                    'default' => 0
-                ),
-                'limit' => array(
-                    'pattern' => '\d*',
-                    'default' => 10
+                'price' => array(
+                    'pattern' => '/^(all|free|charged)?$/',
+                    'default' => 'all'
                 )
             )
         ),
@@ -119,19 +104,8 @@ class HawkApi{
         // Update a theme
         'api-update-theme' => array(
             'method' => 'patch',
-            'uri' => '/themes/{name}/update',
-            'where' => array('name' => Theme::NAME_PATTERN),
-            'input' => array(
-                'from' => array(
-                    'required' => true,
-                    'pattern' => self::VERSION_PATTERN
-                ),
-
-                'to' => array(
-                    'required' => true,
-                    'pattern' => self::VERSION_PATTERN 
-                )
-            )
+            'uri' => '/themes/{name}/update/{version}',
+            'where' => array('name' => Theme::NAME_PATTERN, 'version' => self::VERSION_PATTERN_URI),            
         ),
 
         // Search for available updates on the core
@@ -148,8 +122,8 @@ class HawkApi{
 
         'api-core-update' => array(
             'method' => 'get',
-            'uri' => '/hawk/update/{from}/{to}',
-            'where' => array('from' => self::VERSION_PATTERN_URI, 'to' => self::VERSION_PATTERN_URI)                
+            'uri' => '/hawk/update/{to}',
+            'where' => array('to' => self::VERSION_PATTERN_URI)                
         )
     );
 
@@ -180,7 +154,25 @@ class HawkApi{
 
         $request->send();
 
-        return $request;
+        if($request->getStatusCode() === 200){
+            $result = $request->getResponse();
+            $contentType = $request->getResponseHeaders('Content-Type');
+            
+            if($contentType == 'application/octet-stream'){
+
+                $tmpName = TMP_DIR . uniqid() . '.zip' ;
+
+                file_put_contents($tmpName, base64_decode($result));
+
+                return $tmpName;
+            }
+            else{
+                return $result;
+            }
+        }
+        else{
+            throw new HawkApiException($request->getResponse(), $request->getStatusCode());
+        }
     }
 
 
@@ -188,50 +180,20 @@ class HawkApi{
      * Get the available updates of Hawk
      * @return array The list of available version newer than the current one
      */
-    public function getCoreUpdates(){
+    public function getCoreAvailableUpdates(){
         $currentVersion = Utils::getHawkVersion();
 
-        $request = $this->callApi('api-core-available-updates', array(), array('version' => $currentVersion));
-
-        if($request->getStatusCode() == 200){
-            $result = $request->getResponse();
-
-            if(!empty($result)){                
-                return $result;
-            }
-            else{
-                return array();
-            }
-        }
-        else{
-            return array();
-        }
+        return $this->callApi('api-core-available-updates', array(), array('version' => $currentVersion));
     }
 
 
     /**
      * Download an update file for the core
      * @param string $version The version update to get
-     * @param array $errors The returned errors
-     * @return string The filename of the temporary file created by the content downloaded
+     * @return string The filename of the temporary file created by the downloaded content
      */
-    public function getCoreUpdateArchive($version, &$errors){
-        $currentVersion = Utils::getHawkVersion();
-
-        $request = $this->callApi('api-core-update', array('from' => $currentVersion, 'to' => $version));
-        if($request->getStatusCode() == 200){
-            $result = $request->getResponse();
-
-            $tmpName = TMP_DIR . uniqid() . '.zip' ;
-
-            file_put_contents($tmpName, base64_decode($result));
-
-            return $tmpName;
-        }
-        else{
-            $errors = array('code' => $request->getStatusCode(), 'message' => $request->getResponse());
-            return null;
-        }
+    public function getCoreUpdateArchive($version){
+        return $this->callApi('api-core-update', array('to' => $version));        
     }
 
 
@@ -239,25 +201,80 @@ class HawkApi{
      * Search plugins
      * @param string $search The search term
      * @param string $price The plugin type : 'all', 'free', or 'charged'
-     * @param int $start The first element to get
-     * @param int $limit The maximum number to get
      * @return array The list of found plugins
      */
-    public function searchPlugins($search, $price, $start = 0, $limit = 20){
-        $request = $this->callApi(
-            'api-search-plugins', 
-            array(), 
-            array(
-                'search' => $search,
-                'price' => $price,                
-            )
-        );
+    public function searchPlugins($search, $price = 'all'){
+        return $this->callApi('api-search-plugins', array(), array('search' => $search, 'price' => $price) );
+    }
 
-        if($request->getStatusCode() == 200){
-            return $request->getResponse();
-        }
-        else{
-            return array();
-        }
+
+    /**
+     * Download a plugin file
+     * @param string $name The plugin name to download
+     * @return string The filename of the temporary file created by the downloaded content 
+     */
+    public function downloadPlugin($name){
+        return $this->callApi('api-install-plugin', array('name' => $name));
+    }
+
+
+    /**
+     * Search for updates on a list of plugins
+     * @param array $plugins The list of plugins to search available updates for, where keys are plugin names, and values their current version
+     */
+    public function getPluginsAvailableUpdates($plugins){
+        return $this->callApi('api-plugins-available-updates', array(), array('plugins' => json_encode($plugins)));
+    }
+
+
+    /**
+     * Download a plugin update file
+     * @param string $name The plugin name
+     * @param string $version The version to download
+     */
+    public function downloadPluginUpdate($name, $version){
+        return $this->callApi('api-update-plugin', array('name' => $name, 'version' => $version));
+    }
+
+
+    /**
+     * Search themes
+     * @param string $search The search term
+     * @param string $price The theme type : 'all', 'free', or 'charged'
+     * @return array The list of found themes
+     */
+    public function searchThemes($search, $price = 'all'){
+        return $this->callApi('api-search-themes', array(), array('search' => $search, 'price' => $price) );
+    }
+
+
+    /**
+     * Download a theme file
+     * @param string $name The theme name to download
+     * @return string The filename of the temporary file created by the downloaded content 
+     */
+    public function downloadTheme($name){
+        return $this->callApi('api-install-theme', array('name' => $name));
+    }
+
+
+    /**
+     * Search for updates on a list of themes
+     * @param array $themes The list of themes to search available updates for, where keys are themes names, and values their current version
+     */
+    public function getThemesAvailableUpdates($themes){
+        return $this->callApi('api-themes-available-updates', array(), array('themes' => json_encode($themes)));
+    }
+
+
+    /**
+     * Download a theme update file
+     * @param string $name The theme name
+     * @param string $version The version to download
+     */
+    public function downloadThemeUpdate($name, $version){
+        return $this->callApi('api-update-theme', array('name' => $name, 'version' => $version));
     }
 }
+
+class HawkApiException extends \Exception{}

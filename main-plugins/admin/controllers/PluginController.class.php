@@ -258,7 +258,12 @@ class PluginController extends Controller{
         $price = Request::getParams('price');
         
         // Search plugins on the API
-        $plugins = $api->searchPlugins($search, $price);
+        try{
+            $plugins = $api->searchPlugins($search, $price);
+        }
+        catch(\Hawk\HawkApiException $e){
+            $plugins = array();
+        }
 
         // Remove the plugins already downloaded on the application
         $plugins = array_filter($plugins, function($plugin){

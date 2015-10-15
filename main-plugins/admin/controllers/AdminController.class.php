@@ -119,7 +119,7 @@ class AdminController extends Controller{
 						'label' => Lang::get('admin.settings-home-page-type-label'),
 						'layout' => 'vertical',
 						'attributes' => array(
-							'data-bind' => 'checked : homePage.type'
+							'ko-checked' => 'homePage.type'
 						)
 					)),
 					
@@ -167,7 +167,7 @@ class AdminController extends Controller{
 						'label' => Lang::get('admin.settings-open-registers-label'),
 						'default' => Option::get('main.open-register') ?  Option::get('main.open-register') : 0,
 						'attributes' => array(
-							'data-bind' => 'checked: register.open'
+							'ko-checked' => 'register.open'
 						)
 					)),
 					
@@ -177,7 +177,7 @@ class AdminController extends Controller{
 						'default' => Option::get('main.confirm-register-email'),
 						'dataType' => 'int',
 						'attributes' => array(
-							'data-bind' => 'checked: register.checkEmail'
+							'ko-checked' => 'register.checkEmail'
 						)
 					)),
 
@@ -196,7 +196,7 @@ class AdminController extends Controller{
 						'dataType' => 'int',
 						'labelWidth' => 'auto',
 						'attributes' => array(
-							'data-bind' => 'checked: register.checkTerms'
+							'ko-checked' => 'register.checkTerms'
 						)
 					)),
 
@@ -239,7 +239,7 @@ class AdminController extends Controller{
 						),
 						'label' => Lang::get('admin.settings-mailer-type-label'),
 						'attributes' => array(
-							'data-bind' => 'value: mail.type'
+							'ko-value' => 'mail.type'
 						)
 					)),
 					

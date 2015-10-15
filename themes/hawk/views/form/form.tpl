@@ -5,7 +5,7 @@
 		action="{{ $form->action }}" 
 		{{ $form->target ? "target='{$form->target}'" : "" }} novalidate 
 		autocomplete="{{ $form->autocomplete ? "on" : "off" }}" 
-		{{ $form->enctype ? "enctype='{$form->enctype}" : "" }} 
+		{{ $form->enctype ? "enctype='{$form->enctype}" : "" }} 		
 	>
 	<input type='hidden' name='_submittedForm' value='submitted'/>
 	

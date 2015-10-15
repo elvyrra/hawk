@@ -187,7 +187,8 @@ class ItemListField {
 					'invitation' => isset($this->search['invitation']) ? $this->search['invitation'] : null,
 					'emptyValue' => isset($this->search['emptyValue']) ? $this->search['emptyValue'] : null,
 					'attributes' => array(
-						'data-bind' => "value: search, css : search() ? 'alert-info not-empty' : 'empty'"
+						'ko-value' => 'search',
+						'ko-class' => "search() ? 'alert-info not-empty' : 'empty'"
 					)
 				));
 				break;
@@ -195,7 +196,8 @@ class ItemListField {
 			case 'checkbox' :
 				$input = new CheckboxInput(array(
 					'attributes' => array(
-						'data-bind' => 'checked: search',
+						'ko-checked' => 'search'
+						
 					)
 				));
 				break;
@@ -203,9 +205,10 @@ class ItemListField {
 			case 'date' :
 				$input = new DatetimeInput(array(
 					'id' => uniqid(),
-					'after' => '<i class="icon icon-times-circle clean-search" data-bind="click: function(data){ data.search(null); }, visible: search()"></i>',
+					'after' => '<i class="icon icon-times-circle clean-search" ko-click="function(data){ data.search(null); }" ko- visible="search()"></i>',
 					'attributes' => array(
-						'data-bind' => "value: search, css : search() ? 'alert-info not-empty' : 'empty'"
+						'ko-value' => 'search',
+						'ko-class' => "search() ? 'alert-info not-empty' : 'empty'"						
 					)
 				));
 				break;
@@ -214,9 +217,10 @@ class ItemListField {
 			case 'text' :
 			default :
 				$input = new TextInput(array(
-					'after' => '<i class="icon icon-times-circle clean-search" data-bind="click: function(data){ data.search(null); }, visible: search()"></i>',
+					'after' => '<i class="icon icon-times-circle clean-search" ko-click="function(data){ data.search(null); }" ko-visible="search()"></i>',
 					'attributes' => array(
-						'data-bind' => "textInput: search, css : search() ? 'alert-info not-empty' : 'empty'",
+						'ko-textInput' => 'search',
+						'ko-class' => "search() ? 'alert-info not-empty' : 'empty'"
 					)
 				));
 				break;
