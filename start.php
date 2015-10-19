@@ -2,6 +2,9 @@
 namespace Hawk;
 
 require INCLUDES_DIR . 'constants.php';
+if(!is_file(INCLUDES_DIR . 'custom-constants.php')){
+    touch(INCLUDES_DIR . 'custom-constants.php');
+}    
 require INCLUDES_DIR . 'custom-constants.php';
 require INCLUDES_DIR . 'autoload.php';
 
