@@ -100,11 +100,8 @@ class Upload{
 
 		$i = 0;
 		$filename = $basename;
-		while(is_file($directory . '/' . $filename)){
-			$filename = $i++ . '_' . $basename;
-		}
 
-		return move_uploaded_file($file->tmpFile, $directory . $filename); //. '/'
+		return move_uploaded_file($file->tmpFile, $directory . '/' . $filename);
 	}
 }
 
