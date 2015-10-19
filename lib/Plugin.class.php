@@ -66,6 +66,11 @@ class Plugin{
 	 * The plugin instances
 	 */
 	private static $instances = array();
+
+	/**
+	 * Forbidden plugin names
+	 */
+	public static $forbiddenNames = array('custom');
 	
 	/**	 
 	 * Constructor
@@ -508,15 +513,24 @@ class Plugin{
 	
 
 	/**
+	 * Get a plugin namespace by it name
+	 * @param string $name The plugin name
+	 */
+	public static function getNamespaceByName($name){
+		$namespace = preg_replace_callback('/(^|\W|_)(\w?)/', function($m){
+            return strtoupper($m[2]);                    
+		}, $name);  
+
+		return 'Hawk\\Plugins\\' . $namespace;
+	}
+
+
+	/**
 	 * Get the namespace used for all files in the plugin. The namespace is generated from the plugin name
 	 * @return string The plugin namespace
 	 */
 	public function getNamespace(){
-		$namespace = preg_replace_callback('/(^|\-)(\w?)/', function($m){
-            return strtoupper($m[2]);                    
-		}, $this->name);  
-
-		return 'Hawk\\Plugins\\' . $namespace;
+		return self::getNamespaceByName($this->name);
 	}
 
 	/**

@@ -143,10 +143,10 @@ class Theme{
      */
     public function getDefinition($prop = ""){    
         if(!isset($this->data)){ 
-            if(!is_file($this->getRootDirname() . self::MANIFEST_BASENAME)) {
+            if(!is_file($this->getRootDir() . self::MANIFEST_BASENAME)) {
                 throw new \Exception('Impossible to get the manifest.json file for the theme '  . $this->name . ' : No such file or directory');
             }
-            $this->data = json_decode(file_get_contents($this->getRootDirname() . self::MANIFEST_BASENAME), true);
+            $this->data = json_decode(file_get_contents($this->getRootDir() . self::MANIFEST_BASENAME), true);
         }
         return $prop ? $this->data[$prop] : $this->data;
     }
@@ -156,16 +156,16 @@ class Theme{
      * Get the root directory of the theme files
      * @return string The root directory of the theme files
      */
-    public function getRootDirname(){
+    public function getRootDir(){
         return THEMES_DIR . $this->name . '/';    
     }
     
 
     /**
-     * Get the directory where theme is built during script execution
+     * Get the directory for HTTP accessible files. During theme build, the files are copied in this directory
      * @return string
      */
-    public function getBuildDirname(){
+    public function getStaticDir(){
         return STATIC_THEMES_DIR . $this->name . '/';
     }
     
@@ -184,7 +184,7 @@ class Theme{
      * @return string
      */
     public function getPreviewFilename(){
-        return $this->getRootDirname() . self::PREVIEW_BASENAME;
+        return $this->getRootDir() . self::PREVIEW_BASENAME;
     }
 
 
@@ -193,15 +193,8 @@ class Theme{
      * @return string
      */
     public function getPreviewUrl(){
-        $privateFilename = $this->getPreviewFilename();
-        $publicFilename = $this->getBuildDirname() . self::PREVIEW_BASENAME;
+        $this->build();
 
-        if(is_file($privateFilename) && (!is_file($publicFilename) || filemtime($privateFilename) > filemtime($publicFilename))){
-            if(!is_dir(dirname($publicFilename))){
-                mkdir(dirname($publicFilename), 0755, true);
-            }
-            copy($privateFilename, $publicFilename);
-        }
         return $this->getRootUrl() . self::PREVIEW_BASENAME;
     }
     
@@ -210,7 +203,7 @@ class Theme{
      * Get the dirname containing the less files
      */
     public function getLessDirname(){
-        return $this->getRootDirname() . 'less/';
+        return $this->getRootDir() . 'less/';
     }
 
     /**
@@ -223,33 +216,26 @@ class Theme{
 
 
     /**
-     * Get the base LESS file URL, after been built
+     * Get the base built less file theme.less
      * @return string
      */
-    public function getBuildLessFile(){
-        return $this->getBuildDirname() . 'less/' . self::LESS_BASENAME;
+    public function getStaticLessFile(){
+        return $this->getStaticDir() . 'less/' . self::LESS_BASENAME;
+    }
+
+
+    /**
+     * Build the base css file of the theme, and get the URL of the built file
+     * @return string The URL of the built CSS file
+     */
+    public function getBaseLessUrl(){
+        $this->build();
+        return $this->getRootUrl() . 'less/' . self::LESS_BASENAME;
     }
 
    
     /**
-     * Get the base CSS file URL, after been built
-     * @return string
-     */
-    public function getBuildCssFile(){
-        return $this->getBuildDirname() . self::COMPILED_CSS_BASENAME;
-    }
-    
-
-    /**
-     * Get the path of the file contaning the data of the last theme compilation
-     * @return string the path of the file
-     */
-    private function getLastCompilationInfoFilename(){
-        return CACHE_DIR . 'theme-' . $this->name . '-compilation-info.php';
-    }
-
-    /**
-     * Build the theme : build the Less file theme.less into theme.css and copy every resource files in userfiles/themes/{themename}
+     * Build the theme : copy every resource files in themes/{themename}
      * @param boolean $force If set to true, the theme will be rebuilt without condition
      */
     public function build($force = false){        
@@ -258,14 +244,14 @@ class Theme{
             $build = true;
         }
 
-        if(!file_exists($this->getBuildDirname())){
-            mkdir($this->getBuildDirname(), 0755, true);
+        if(!file_exists($this->getStaticDir())){
+            mkdir($this->getStaticDir(), 0755, true);
             $build = true;
         }
 
         
         if(!$build){
-            $dest = $this->getBuildLessFile();
+            $dest = $this->getStaticLessFile();
 
             if(!is_file($dest)){
                 $build = true;
@@ -285,44 +271,14 @@ class Theme{
 
         if($build){
             // Build the theme => Copy each accessible files in static dir
-            foreach(glob($this->getRootDirname() . '*', GLOB_ONLYDIR ) as $elt){
+            foreach(glob($this->getRootDir() . '*' ) as $elt){
                 if(! in_array(basename($elt), array('views'))) {
-                    FileSystem::copy($elt, $this->getBuildDirname());
+                    FileSystem::copy($elt, $this->getStaticDir());
                 }
             }
         }
 
         return $build;
-    // }
-
-        // // Listen for compilation success
-        // Event::on('built-less', function(Event $event){
-        //     if($event->getData('source') === $this->getBaseLessFile()){
-        //         foreach(glob($this->getRootDirname() . '*', GLOB_ONLYDIR ) as $elt){
-        //             if(! in_array(basename($elt), array('less', 'views'))) {
-        //                 FileSystem::copy($elt, $this->getBuildDirname());
-        //             }
-        //         }
-        //     }
-        // });
-
-        // // Get the theme options
-        // $editableVariables = $this->getEditableVariables();        
-        // if(Conf::has('db')){
-        //     $options = Option::getPluginOptions('theme-' . $this->name);
-        // }
-        // else{
-        //     $options = array();
-        // }
-
-        // $variables = array();
-        // foreach($editableVariables as $variable){
-        //     $variables[$variable['name']] = isset($options[$variable['name']]) ? $options[$variable['name']] : $variable['default'];
-        // }
-
-
-        // Less::compile($this->getBaseLessFile(), $this->getBuildCssFile(), $force, $variables);       
-        
     }
 
 
@@ -348,23 +304,76 @@ class Theme{
         }
         return $variables;
     }
+
+
+    /**
+     * Get the customized variables values
+     * @return array The custom values
+     */
+    public function getVariablesCustomValues(){
+        $options = Option::getPluginOptions('theme-' . $this->name);
+        
+        $values = array();
+        foreach($options as $key => $value){
+            if(preg_match('/^custom\-value\-(.+?)$/', $key, $m)){
+                $values[$m[1]] = $value;
+            }
+        }
+        
+        return $values;
+    }
     
 
     /**
-     * Build the base css file of the theme, and get the URL of the built file
-     * @return string The URL of the built CSS file
+     * Set customized variables values
+     * @param array The values to set
      */
-    public function getBaseLessUrl(){
-        $this->build();
-        return $this->getRootUrl() . 'less/' . self::LESS_BASENAME;
+    public function setVariablesCustomValues($values){
+        foreach($values as $key => $value){
+            $varname = 'custom-value-' . $key;
+            Option::set('theme-' . $this->name . '.' . $varname, $value);
+        }
     }
-    
+
+    /**
+     * Get the directory containing theme userfiles
+     */
+    public function getStaticUserfilesDir(){
+        return $this->getStaticDir() . 'userfiles/';
+    }
+
+
+    /**
+     * Get the URL of a static user file
+     */
+    public function getStaticUserfilesUrl($filename = ''){
+        return $this->getRootUrl() . 'userfiles/' . $filename;
+    }
+
+
+    /**
+     * Get the directory containing the medias uplaoded by the administrator
+     * @return string The directory containing the medias uploaded by the administrator
+     */
+    public function getMediasDir(){
+        return $this->getStaticUserfilesDir() . 'medias/';        
+    }
+
+    /**
+     * Get the URL of the directory containing the medias uplaoded by the administrator
+     * @return string The URL of the directory containing the medias uplaoded by the administrator
+     */
+    public function getMediasUrl($filename = ''){
+        return $this->getStaticUserfilesUrl('medias/' . $filename);
+    }
+
+
     /**
      * Get the file path of the CSS file customized by the application administrator
      *  @return string The file path of the custom CSS file
      */
     public function getCustomCssFile(){
-        return $this->getBuildDirname() . self::CSS_CUSTOM_BASENAME;
+        return $this->getStaticUserfilesDir() . self::CSS_CUSTOM_BASENAME;
     }
     
 
@@ -373,37 +382,25 @@ class Theme{
      * @return string The URL of the custom CSS file
      */
     public function getCustomCssUrl(){
-		if(!is_file($this->getCustomCssFile())){
-            file_put_contents($this->getCustomCssFile(), '');
+        $file = $this->getCustomCssFile();
+        if(!is_dir(dirname($file))){
+            mkdir(dirname($file), 0775, true);
+        }
+
+		if(!is_file($file)){
+            file_put_contents($file, '');
         }
 		
-        return $this->getRootUrl() . self::CSS_CUSTOM_BASENAME;		
+        return $this->getStaticUserfilesUrl(self::CSS_CUSTOM_BASENAME);
     }
     
 
-    /**
-     * Get the directory of the theme images, used for CSS and / or views
-     * @return string The directory contaning the theme images
-     */
-    public function getImagesDir(){
-        return $this->getRootDirname() . 'images/';
-    }
-    
-
-    /**
-     * Get the URL of the directory of the theme images
-     * @retur string The URL of the directory containing the theme images
-     */
-    public function getImagesRootUrl(){
-        return $this->getRootUrl() . 'images/';
-    }
-    
     /**
      * Get the directory containing the theme views
      * @return string The directory containing the theme views files
      */
     public function getViewsDir(){
-        return $this->getRootDirname() . 'views/';
+        return $this->getRootDir() . 'views/';
     }
     
 
@@ -426,21 +423,6 @@ class Theme{
         return $file;
     }
 
-    /**
-     * Get the directory containing the medias uplaoded by the administrator
-     * @return string The directory containing the medias uploaded by the administrator
-     */
-    public function getMediasDir(){
-        return $this->getBuildDirname() . 'medias/';        
-    }
-
-    /**
-     * Get the URL of the directory containing the medias uplaoded by the administrator
-     * @return string The URL of the directory containing the medias uplaoded by the administrator
-     */
-    public function getMediasUrl(){
-        return $this->getRootUrl() . 'medias/';
-    }
 
 
     /**

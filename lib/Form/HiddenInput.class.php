@@ -12,4 +12,9 @@ namespace Hawk;
  */
 class HiddenInput extends FormInput{
     const TYPE = "hidden";
+
+    /**
+     * Is the input hidden
+     */
+    public $hidden = true;
 }

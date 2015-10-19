@@ -404,17 +404,17 @@ class PluginController extends Controller{
         else{            
             // Create the plugin
             if($form->check()){
-                $namespace = preg_replace_callback('/(^|\-)(\w?)/', function($m){
-                    return strtoupper($m[2]);                    
-                }, $form->getData('name'));
-                
-                // Check the plugin does not exists
-                foreach(Plugin::getAll(true) as $plugin){
-                    $pluginNamespace= preg_replace_callback('/(^|\-)(\w?)/', function($m){
-                        return strtoupper($m[2]);                    
-                    }, $plugin->getName());
+                if(in_array($form->getData('name'), Plugin::$forbiddenNames)){
+                    $message = Lang::get('admin.new-plugin-forbidden-name', array('forbidden' =>  implode(', ', Plugin::$forbiddenNames)));
+                    $form->error('name', $message);
+                    return $form->response(Form::STATUS_CHECK_ERROR, $message);
+                }                
 
-                    if($namespace === $pluginNamespace){
+                $namespace = Plugin::getNamespaceByName($form->getData('name'));
+                                
+                // Check the plugin does not exists
+                foreach(Plugin::getAll(true) as $plugin){                    
+                    if($namespace === $plugn->getNamespace()){
                         // A plugin with the same name already exists
                         $form->error('name', Lang::get('admin.new-plugin-already-exists-error'));
                         return $form->response(Form::STATUS_CHECK_ERROR, Lang::get('admin.new-plugin-already-exists-error'));

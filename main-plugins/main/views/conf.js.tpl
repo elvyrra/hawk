@@ -17,10 +17,11 @@ window.appConf = {
 	}
 };
 
-less = {
-	globalVars : {{ $less['globalVars'] }},
-	useFileCache : {{ $less['useFileCache'] ? 'true' : 'false'}},
-	async : true
-};
-
-document.body.style.display="none";
+(function(){
+	window.less = {
+		globalVars : {{ $less['globalVars'] }},
+		initVars : {{ $less['initVars'] }},
+		env : 'production',
+		useFileCache : true
+	};
+})();

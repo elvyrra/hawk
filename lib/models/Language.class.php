@@ -70,10 +70,16 @@ class Language extends Model{
 	 * @param array $translations The translations to save
 	 */
 	public function saveTranslations($translations){
-		foreach($translations as $plugin => $translations){
+		foreach($translations as $plugin => $trs){
 			$currentData = Lang::getUserTranslations($plugin, $this->tag);
-			$currentData = array_merge($currentData, $translations);
-			Lang::saveUserTranslations($plugin, $this->tag, $currentData);
+
+			if(empty($currentData)){
+				$data = $trs;
+			}
+			else{
+				$data = array_merge($currentData, $trs);
+			}
+			Lang::saveUserTranslations($plugin, $this->tag, $data);
 		}
 	}
 

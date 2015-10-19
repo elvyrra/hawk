@@ -22,7 +22,7 @@ class Lang{
 	 * The language keys with their translations
 	 * @var array
 	 */
-	private static $langs = array(), 
+	private static $keys = array(), 
 
 	/**
 	 * The currently used language
@@ -175,24 +175,27 @@ class Lang{
 	 * @param string $force If set to true, force to reload the translations
 	 */
 	private static function load($plugin, $language = LANGUAGE, $force = false){
-		if(!isset(self::$langs[$plugin]) || $force){
+		if(!isset(self::$keys[$plugin][$language]) || $force || $language !== self::$usedLanguage){
 			Log::debug('Reload keys for plugin ' . $plugin . ' and for language ' . $language);
-			self::$langs[$plugin] = array();
+			self::$keys[$plugin][$language] = array();
 
 			$instance = new self($plugin, self::DEFAULT_LANGUAGE);
 			$instance->build();
-			self::$langs[$plugin] = include $instance->cacheFile;
+			self::$keys[$plugin][$language] = include $instance->cacheFile;
 
 			if($language !== self::DEFAULT_LANGUAGE){
 				$instance = new self($plugin, $language);
 				$instance->build();
 				$translations = include $instance->cacheFile;
+
 				if(!is_array($translations)){
 					$translations = array();
 				}
 
-				self::$langs[$plugin] = array_merge(self::$langs[$plugin], $translations);
+				self::$keys[$plugin][$language] = array_merge(self::$keys[$plugin][$language], $translations);	
 			}
+
+			self::$usedLanguage = $language;
 		}
 	}
 
@@ -201,14 +204,12 @@ class Lang{
 	 * Get the translations of a language file
 	 * @param string $plugin The plugin to load
 	 * @param string $language The language to get the translations in
-	 * @param string $force If set to true, force to reload the translations
+	 * @param string $reload If set to true, force to reload the translations
 	 */
 	public static function keys($plugin, $language = LANGUAGE, $reload = false){
-		if(!isset(self::$langs[$plugin]) || $reload || $language != self::$usedLanguage){
-			self::load($plugin, $language, $reload);
-		}
+		self::load($plugin, $language, $reload);
 
-		return self::$langs[$plugin];
+		return self::$keys[$plugin][$language];
 	}
 
 
@@ -230,10 +231,9 @@ class Lang{
 		list($plugin, $key) = explode('.', $langKey);
         
 		// get the label(s)
-		if(!isset(self::$langs[$plugin])){			
-			self::load($plugin);			
-		}
-		return isset(self::$langs[$plugin][$key]);
+		self::load($plugin);			
+
+		return isset(self::$keys[$plugin][self::$usedLanguage][$key]);
 	}
 
 
@@ -255,13 +255,11 @@ class Lang{
 		
 		list($plugin, $key) = explode('.', $langKey);
 
-		if(!isset(self::$langs[$plugin]) || $language != self::$usedLanguage){						
-			self::load($plugin, $language, true);
-		}
-		self::$usedLanguage = $language;
-        
+		
+		self::load($plugin, $language);	
+
 		// get the label(s)
-		$labels = isset(self::$langs[$plugin][$key]) ? self::$langs[$plugin][$key] : null;
+		$labels = isset(self::$keys[$plugin][$language][$key]) ? self::$keys[$plugin][$language][$key] : null;
 		
         if($labels !== null){
             if(is_array($labels)){

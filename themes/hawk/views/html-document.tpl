@@ -31,6 +31,7 @@
 		<link rel="stylesheet" href="{{ Plugin::get('main')->getCssUrl('bootstrap-datepicker.min.css') }}" />
 
 		<script type="text/javascript" src="{{ Plugin::get('main')->getJsUrl('ext/require.js') }}" data-main="{{ Plugin::get('main')->getJsUrl('app.js') }}"></script>
+
 	</head>
 	
 	<body>

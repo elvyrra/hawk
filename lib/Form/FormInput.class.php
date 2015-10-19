@@ -14,11 +14,6 @@ class FormInput{
     use Utils;
 
     /**
-     * uniqid used to generate uniq id for input HTML nodes, when is is not specified
-     */
-    protected static $uniqid;
-	
-    /**
      * Attributes properties that can be called at input initialization, and there type
      * @static array $attr 
      */
@@ -216,10 +211,7 @@ class FormInput{
 		}
 			
         if(!isset($this->id)){		
-			if(!isset(self::$uniqid)){
-				self::$uniqid = uniqid();
-			}
-            $this->id = self::$uniqid.'-'. str_replace(array('.', '#', '[', ']','>'), '-', $this->name);
+            $this->id = uniqid().'-'. str_replace(array('.', '#', '[', ']','>'), '-', $this->name);
 		}
 		
 		$this->type = static::TYPE;

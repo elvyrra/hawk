@@ -391,9 +391,22 @@ class Form{
 	 */
 	public function wrap($content){
 		Log::info('display form ' . $this->id);
+
+		// Filter input data that can be sent to the client
+		$clientVars = array('id', 'type', 'name', 'required', 'emptyValue', 'pattern', 'minimum', 'maximum', 'compare', 'errorAt');
+		$clientInputs = array();
+		foreach($this->fields as $field){
+			$clientInputs[$field->name] = array_filter(get_object_vars($field), function($key) use ($clientVars){
+				return in_array($key, $clientVars);
+			}, ARRAY_FILTER_USE_KEY );
+
+			$clientInputs[$field->name]['type'] = $field::TYPE;
+		}
+
 		return View::make(Theme::getSelected()->getView(Form::VIEWS_DIR . 'form.tpl'), array(
 			'form' => $this,
-			'content' => $content
+			'content' => $content,
+			'jsInputs' => $clientInputs
 		));
 	}
 	

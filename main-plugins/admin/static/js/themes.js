@@ -32,6 +32,38 @@ $("#manage-themes-page")
     $(this).select();
 });
 
+/**
+ * Customize the theme variables
+ */
+(function(){
+    var form = app.forms['custom-theme-form'];
+    var model = {
+        vars : {},
+        reset : function(){            
+            for(var i in this.vars){                
+                this.vars[i](less.options.initVars[i]);
+            }
+        },
+        updateTimeout : 0
+    };
+    for(var i in form.inputs){
+        var input = form.inputs[i];
+        model.vars[input.name] = ko.observable(input.val());
+        model.vars[input.name].subscribe(function(value){            
+            clearTimeout(model.updateTimeout);
+
+            model.updateTimeout = setTimeout(function(){                
+                less.modifyVars(form.valueOf());
+            }.bind(this), 50);
+
+            if(this.type === "color"){
+                this.node.parent().colorpicker('setValue', value);
+            }
+        }.bind(input));       
+    } 
+
+    ko.applyBindings(model, form.node.get(0));   
+})();
 
 /***
  * Ace editor for Css editing tab
@@ -66,7 +98,7 @@ $("#manage-themes-page")
 /**
  * Treat the menu sort
  */
-(function(){
+(function(){    
     var activeNode = document.getElementById('sort-menu-active');
     var inactiveNode = document.getElementById('sort-menu-inactive');
 
@@ -131,10 +163,23 @@ $("#manage-themes-page")
     MenuModel.prototype.deactivateItem = function(item, event){
         item.active = 0;
         this.refresh();
+    };
+
+    MenuModel.prototype.editItem = function(item, event){
+        app.dialog(app.getUri('edit-menu', {itemId : item.id}));
     }
+
+    MenuModel.prototype.removeItem = function(item, event){
+        $.get(app.getUri('delete-menu', {itemId : item.id}), function(){
+            this.items.splice(this.items.indexOf(item), 1);
+
+            this.refresh();
+        }.bind(this));
+    };
 
     MenuModel.prototype.refresh = function(){        
     	this.items.valueHasMutated();
+
     	$("#sort-menu-template").remove();
         $("#sort-menu-wrapper").after(this.templateClone.clone());
         this.template = $("#sort-menu-template").get(0);
@@ -190,5 +235,23 @@ $("#manage-themes-page")
     var model = new MenuModel();
     model.refresh(); 
     ko.applyBindings(model, inactiveNode);
+
+
+    // Manage when a new menu item is created
+    app.forms['set-menus-form'].node.on('register-custom-item', function(event, data){
+        var item = model.getItemById(data.id);
+        if(!item){
+            model.items.push(data);
+            this.reset();
+        }
+        else{
+            for(var prop in data){
+                item[prop] = data[prop];
+            }
+            app.dialog("close");
+        }
+
+        model.refresh();
+    });
 
 })();

@@ -58,8 +58,7 @@ Router::setProperties(
 				Router::any('add-theme-media', 'current-theme/medias/add', array('action' => 'ThemeController.addMedia'));
 				// Remove a media
 				Router::get('delete-theme-media', 'current-theme/medias/{filename}/delete', array('where' => array('filename' => '[^\/]+'), 'action' => 'ThemeController.deleteMedia'));		
-				// Set the menu items and order
-				Router::post('set-menu', 'menu/set-order', array('action' => 'ThemeController.menu'));
+				
 				
 				// Display the list of available themes
 				Router::any('available-themes', 'themes/available', array('action' => 'ThemeController.listThemes'));
@@ -71,6 +70,13 @@ Router::setProperties(
 				Router::any('import-theme', 'themes/import', array('action' => 'ThemeController.import'));
 				// Remove a theme
 				Router::get('delete-theme', 'themes/{name}/remove', array('where' => array('name' => '[a-zA-Z0-9\-_.]+'), 'action' => 'ThemeController.delete'));
+
+				// Set the menu items and order
+				Router::post('set-menu', 'menu/set-order', array('action' => 'ThemeController.menu'));
+				// Delete a menu item
+				Router::get('delete-menu', 'menu/{itemId}/remove', array('where' => array('itemId' => '\d+'), 'action' => 'ThemeController.removeCustomMenuItem'));
+				// Edit a menu item
+				Router::any('edit-menu', 'menu/{itemId}', array('where' => array('itemId' => '\d+'), 'action' => 'ThemeController.editCustomMenuItem'));
 
 
 				/*** Manage plugins ***/		

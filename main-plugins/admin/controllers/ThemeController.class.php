@@ -82,14 +82,8 @@ class ThemeController extends Controller{
 		$theme = Theme::getSelected();
 		$variables = $theme->getEditableVariables();
 		
-		if(Request::getParams('reset')) {
-			foreach($variables as $var){
-				Option::delete('theme-' . $theme->getName() . '.' . $var['name']);
-			}
-			$theme->build(true);
-		}
+		$options = $theme->getVariablesCustomValues();
 		
-		$options = $options = Option::getPluginOptions('theme-' . $theme->getName());
 		$param = array(
 			'id' => 'custom-theme-form',
 			'upload' => true,
@@ -107,12 +101,9 @@ class ThemeController extends Controller{
 						'name' => 'reset',
 						'value' => Lang::get('admin.theme-custom-reset'),
 						'class' => 'btn-default',
-						'onclick' => 'app.load(app.getUri("customize-theme") + "?reset=1", {
-										selector : "#admin-themes-customize-tab",
-										onload : function(){
-											app.forms["custom-theme-form"].onsuccess({href : "' . $theme->getBaseCssUrl() . '?" + new Date().getTime() });
-										}
-									})'
+						'attributes' => array(
+							'ko-click' => 'reset',
+						)
 					))
 				)
 			),
@@ -146,7 +137,10 @@ class ThemeController extends Controller{
 					));
 				break;
 			}
-
+			$input->attributes = array(
+				'ko-value' => 'vars["' . $input->name . '"]',
+			);
+			$input->labelWidth = '25em';
 			$param['fieldsets']['form'][] = $input;
 		}
 
@@ -157,28 +151,30 @@ class ThemeController extends Controller{
 		}	
 		else{	
 			try{
+				$options = array();
 				foreach($variables as $var){										
 					if($var['type'] == 'file'){						
 						$upload = Upload::getInstance($var['name']);
 						if($upload){
-							$dir = $theme->getBuildDirname() . 'medias/';
+							$dir = $theme->getStaticDir() . 'medias/';
 							if(!is_dir( $dir)){
 								mkdir( $dir, 0755);
 							}
 
 							$file = $upload->getFile();
 							$upload->move($file, $dir);
-						
-							Option::set('theme-' . $theme->getName() . '.' . $var['name'], $theme->getMediasUrl() . $filename);
+							
+							$options[$var['name']] = $theme->getMediasUrl($filename);							
 						}
 					}
 					else{
-						Option::set('theme-' . $theme->getName() . '.' . $var['name'], $form->getData($var['name']));					
+						$options[$var['name']] = $form->getData($var['name']);						
 					}
 				}
 
-				$theme->build(true);
-				$form->addReturn('href', $theme->getBaseCssUrl() . '?' . time());
+				$theme->setVariablesCustomValues($options);
+				touch($theme->getStaticLessFile());
+
 				return $form->response(Form::STATUS_SUCCESS);
 			}
 			catch(Exception $e){
@@ -252,7 +248,6 @@ class ThemeController extends Controller{
 		$theme = Theme::getSelected();
 
 		$rootDir = $theme->getMediasDir();
-		$rootUrl = $theme->getMediasUrl();
 
 		$files = glob($rootDir . '*');		
 		$medias = array(
@@ -279,7 +274,7 @@ class ThemeController extends Controller{
 					$category = 'other';
 				}
 				
-				$url = $rootUrl . basename($file);
+				$url = $theme->getMediasUrl(basename($file));
 				switch($category){
 					case 'image' :
 						$medias[$category]['files'][] = array(
@@ -529,9 +524,9 @@ class ThemeController extends Controller{
         			$theme = Theme::get($form->getData('name'));
         			if($parent){
         				// The theme extends another one, make a copy of the parent theme except manifest.json and views
-        				foreach(glob($parent->getRootDirname() . '*') as $element) {
+        				foreach(glob($parent->getRootDir() . '*') as $element) {
         					if(! in_array(basename($element), array(Theme::MANIFEST_BASENAME, 'views'))){
-        						FileSystem::copy($element, $theme->getRootDirname());
+        						FileSystem::copy($element, $theme->getRootDir());
         					}
         				}
         			}
@@ -567,7 +562,7 @@ class ThemeController extends Controller{
 	public function delete(){
 		$theme = Theme::get($this->name);
 		if($theme->isRemovable()){
-			$dir = $theme->getRootDirname();
+			$dir = $theme->getRootDir();
 			FileSystem::remove($dir);
 		}
 	}
@@ -628,6 +623,138 @@ class ThemeController extends Controller{
 				return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get('admin.sort-menu-error'));
 			}
 			
+		}
+	}
+
+	/**
+	 * Remove a custom menu item
+	 */
+	public function removeCustomMenuItem(){
+		$item = MenuItem::getById($this->itemId);
+
+		if($item && $item->plugin === 'custom'){
+			$item->delete();
+
+			foreach(Language::getAll() as $language){
+				$language->removeTranslations(array(
+					'custom' => array('menu-item-' . $item->getName() . '-title')
+				));
+			}
+		}
+		else{
+			Response::setHttpCode(412);
+		}
+	}
+
+	/**
+	 * Generate the form to create / edit a custom menu item
+	 */
+	public function customMenuItemForm($itemId){
+		$item = MenuItem::getById($itemId);
+
+		$name = $item ? $item->name : uniqid();
+
+		$param = array(
+			'id' => 'menu-item-form-' . $itemId,
+			'class' => 'menu-item-form',
+			'object' => $item,
+			'model' => 'MenuItem',
+			'reference' => array('id' => $itemId),
+			'action' => Router::getUri('edit-menu', array('itemId' => $itemId)),
+			'fieldsets' => array(
+				'parameters' => array(
+					new HiddenInput(array(
+						'name' => 'plugin',
+						'value' => 'custom'
+					)),
+
+					new HiddenInput(array(
+						'name' => 'parentId',
+						'default' => '0'
+					)),
+
+					new HiddenInput(array(
+						'name' => 'active',
+						'default' => '0'
+					)),
+
+					new HiddenInput(array(
+						'name' => 'name',
+						'default' => $name,
+					)),
+
+					new HiddenInput(array(
+						'name' => 'labelKey',
+						'default' => 'custom.menu-item-' . $name . '-title'
+					))
+				),
+
+				'submits' => array(
+					new SubmitInput(array(
+						'name' => 'valid',
+						'value' => Lang::get('main.valid-button')
+					)),
+
+					new ButtonInput(array(
+						'name' => 'cancel',
+						'onclick' => 'app.dialog("close")',
+						'value' => Lang::get('main.cancel-button'),
+						'notDisplayed' => ! $itemId
+					))
+				),
+			),
+
+			'onsuccess' => 'app.forms["set-menus-form"].node.trigger("register-custom-item", data);'
+		);
+
+		foreach(Language::getAllActive() as $language){
+			$param['fieldsets']['parameters'][] = new TextInput(array(
+				'name' => 'label[' . $language->tag . ']',
+				'independant' => true,
+				'label' => Lang::get('admin.menu-item-form-label', array('language' => $language->tag)),
+				'default' => $itemId ? Lang::get('custom.menu-item-' . $name . '-title', null, null, $language->tag) : ''
+			));
+		}
+
+		return new Form($param);
+	}
+
+
+	/**
+	 * Edit a custom menu item
+	 */
+	public function editCustomMenuItem(){
+		$form = $this->customMenuItemForm($this->itemId);
+
+		if(!$form->submitted()){
+			return View::make(Theme::getSelected()->getView('dialogbox.tpl'), array(
+				'page' => $form->display(),
+				'title' => Lang::get('admin.menu-item-form-edit-title'),
+				'icon' => 'pencil'
+			));
+		}
+		else{
+			if($form->check()){
+				try{
+					$form->register(Form::NO_EXIT);
+
+					// Register the translations of the menu
+					foreach(Request::getBody('label') as $tag => $translation){
+						Language::getByTag($tag)->saveTranslations(array(
+							$form->getData('plugin') => array(
+								'menu-item-' . $form->getData('name') . '-title' => $translation
+							)
+						));
+					}
+
+					$form->addReturn(get_object_vars($form->object));
+					$form->addReturn('label', Request::getBody('label')[LANGUAGE]);
+					return $form->response(Form::STATUS_SUCCESS, Lang::get('admin.menu-item-form-success'));
+				}
+				catch(\Exception $e){
+					return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get('admin.menu-item-form-error'));
+				}
+			}		
 		}
 	}
 }

@@ -58,6 +58,11 @@ class DatabaseSessionHandler implements \SessionHandlerInterface{
         $this->db = DB::get(MAINDB);   
         $this->table = DB::getFullTablename('Session');
 
+        // Update the session mtime
+        if(Request::getCookies($name)){
+            $this->db->update($this->table, new DBExample(array('id' => Request::getCookies($name))), array('mtime' => time()));
+        }
+
         // Clean expired sessions
         $this->gc(0);
     }

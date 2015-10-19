@@ -1,4 +1,11 @@
 /* Editable variables
+define(@text-color; #777; Body text color; color)
+define(@body-bg; #fff; Body background; color)
+define(@font-size-base; 12px; Global font size)
+
+define(@header-bg; #4e3064; Header and footer background; color)
+define(@header-color; #d6d6d6; Header and footer font color; color)
+
 define(@btn-default-color; #fff; Default buttons font color; color)
 define(@btn-default-bg; #333; Default buttons background; color)
 define(@btn-default-border; #777; Default buttons border color; color)
@@ -8,13 +15,6 @@ define(@brand-success; #1d931d; Base color for success elements; color)
 define(@brand-info; #5bc0de; Base color for information elements; color)
 define(@brand-warning; #f0ad4e; Base color for warning elements; color)
 define(@brand-danger; #A52A2A; Base color for error elements; color)
-
-define(@text-color; #777777; Body text color; color)
-define(@body-bg; #fff; Body background; color)
-define(@font-size-base; 12px; Global font size)
-
-define(@header-bg; #4e3064; Header and footer background; color)
-define(@header-color; #d6d6d6; Header and footer font color; color)
 
 define(@state-success-text; #3c763d; Success alerts font color; color)
 define(@state-success-bg; #dff0d8; Success alerts background color; color)
@@ -172,7 +172,7 @@ textarea {
 	font-size: 13px;	
 	box-shadow: inset 0 0px 1px rgba(0, 0, 0, 0.075);
 	border-radius: 4px;
-    border: 1px solid #ddd;
+    border: 1px solid darken(@body-bg, 13.5%);
     height: 30px;
     padding-left: 3px;
     padding-right: 3px;
@@ -214,7 +214,7 @@ input[type="file"] {
         height: 30px;    
         background: @btn-default-bg;
         color: @btn-default-color;
-        border-color: #777;
+        border-color: @btn-default-border;
         margin-left: 0;        
 
         & > .file-chosen-icon{
@@ -226,9 +226,7 @@ input[type="file"] {
     }
 
     &.filled + label{
-        background: #5cb85c;
-        color: #fff;
-        border-color: #4cae4c;
+        .btn-success();
 
         & > .input-file-invitation-text{
             width: calc(~"100% - 16px");
@@ -405,7 +403,7 @@ label{
 }
 
 
-/*----------------------------- Dropdown menus ------------------------------------------*/
+/*---------------------------- Dropdown menus ------------------------------------------*/
 .dropdown-menu{
 	font-size: 1em;
 
@@ -434,13 +432,13 @@ table {
         position: absolute;
         top: 0;
         left: -8px;
-        border-left: 1px solid #dee3ea;
+        // border-left: 1px solid #dee3ea;
         height: 10px;
     }
 
     .table {
         thead{
-            border-top:1px solid #dee3ea;
+            // border-top:1px solid #dee3ea;
 
             & > tr > th{
                 position: relative;
@@ -458,8 +456,6 @@ table {
         }
 
         td{
-            color: #526273;
-            border-top-color: #edf2f7;
             vertical-align: middle;
         }
 
@@ -472,7 +468,7 @@ table {
     }
     .table-hover tbody tr:hover{
         td, th {
-            background-color: #f5fafc;
+            background-color: darken(@body-bg, 5%);
         }
     }
 }
@@ -557,9 +553,9 @@ table {
     width: 100%;
 
     .main-tab-title{    
-        border: 1px solid #DDD; 
+        border: 1px solid darken(@body-bg, 13.5%); 
         border-bottom: none;
-        background: #eee;
+        background: darken(@body-bg, 6.5%);
         height: 20px;
         margin-right: 2px;
         max-width: 200px;
@@ -567,7 +563,7 @@ table {
 
     .main-tab-title{
         &.active{
-            background: #fff;
+            background: @body-bg;
             color: black;   
         }
 
@@ -577,10 +573,8 @@ table {
             border: none;
             background: none;
             width: calc(~"100% - 25px");
-            overflow: hidden;
-            text-overflow: ellipsis;
-            height: 100%;
-            white-space: nowrap; 
+            .text-overflow();            
+            height: 100%;            
 
             & > .icon {
                 margin-right: 5px;
@@ -597,7 +591,7 @@ table {
 
     .add-tab-button{
         padding: 1px 5px 0 5px;
-        border: 1px solid #ddd;
+        border: 1px solid darken(@body-bg, 13.5%);
         margin-left: 3px;   
         width: 22px;
     }
@@ -661,7 +655,7 @@ a, a:active, a:hover, a:visited, a:focus{
 
 .list{
     width: 100%;
-    color: #777777;
+    // color: #777777;
     border-collapse: collapse;
 
     td {
@@ -761,8 +755,8 @@ a, a:active, a:hover, a:visited, a:focus{
 
     td{
         background-color: transparent;
-        border-right: 1px solid #ddd;
-        border-left: 1px solid #ddd;
+        border-right: 1px solid darken(@body-bg, 13.5%);
+        border-left: 1px solid darken(@body-bg, 13.5%);
         padding-left: 5px;
         padding-right: 5px;
     }
@@ -822,7 +816,7 @@ a, a:active, a:hover, a:visited, a:focus{
 	margin-left: -100px;
 	height: 5px;
 	display: block;
-	background: #eee;
+	background: darken(@body-bg, 6.5%);
 	border-radius: 5px;
 
     &:not(.progressing){
@@ -931,8 +925,7 @@ p .icon{
         padding: 5px;
 
         &:hover{
-            background: #d9edf7;
-            color: #31708f;
+            .alert-info();            
         };
     }
 }
@@ -962,7 +955,7 @@ body.dragging, body.dragging * {
 
             .drag-handle{
                 cursor: move;
-                background: #eee;
+                background: darken(@body-bg, 6.5%);
                 padding: 10px;
                 border-radius: 5px 0 0 5px;
                 height: 100%;

@@ -181,20 +181,15 @@ class MainController extends Controller{
 		// Get the theme variables		
 		$theme = Theme::getSelected();
         $editableVariables = $theme->getEditableVariables();        
-        if(Conf::has('db')){
-            $options = Option::getPluginOptions('theme-' . $theme->getName());
-        }
-        else{
-            $options = array();
-        }
+        $options = $theme->getVariablesCustomValues();
+        
 
         $themeVariables = array();
+        $initVariables = array();
         foreach($editableVariables as $variable){
+        	$initVariables[$variable['name']] = $variable['default'];
             $themeVariables[$variable['name']] = isset($options[$variable['name']]) ? $options[$variable['name']] : $variable['default'];
         }
-
-        // Define if the theme.less must rebuilt or not
-        $buildTheme = $theme->build(true);
 
 		Response::setScript();
 
@@ -204,8 +199,8 @@ class MainController extends Controller{
 			'lastTabs' => json_encode($pages, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRETTY_PRINT),
 			'accessible' => $canAccessApplication,
 			'less' => array(
+				'initVars' => json_encode($initVariables, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRETTY_PRINT),
 				'globalVars' => json_encode($themeVariables, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRETTY_PRINT),
-				'useFileCache' => $buildTheme
 			)			
 		));
 	}
@@ -222,7 +217,11 @@ class MainController extends Controller{
 		}
 
 		// Clear the directory of the theme
-		FileSystem::remove(Theme::getSelected()->getBuildDirname());
+		foreach(glob(Theme::getSelected()->getStaticDir() . '*') as $element){
+			if(basename($element) != 'userfiles'){
+				FileSystem::remove($element);
+			}
+		}
 		
 		Response::redirectToAction('index');
 	}
