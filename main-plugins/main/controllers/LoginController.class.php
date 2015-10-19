@@ -79,7 +79,7 @@ class LoginController extends Controller{
 				$form->addReturn('message', Lang::get('main.403-message'));
 			}
 			// Display the login page in a dialog box
-			return View::make(Theme::getSelected()->getView('dialogbox.tpl'), array(
+			return Dialogbox::make(array(
 				'page' => $form->__toString(),
 				'icon' => 'sign-in',
 				'title' => Lang::get('main.login-form-title'),

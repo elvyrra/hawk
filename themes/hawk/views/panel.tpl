@@ -1,7 +1,7 @@
 <div class="panel panel-{{ $type }}" id="{{ $id }}">
     <div class="panel-heading">
         <h4 class="panel-title">
-            <i class="icon icon-{{ $icon }}"></i>
+            <i class="icon icon-{{ !empty($icon) ? $icon : '' }}"></i>
             {{ $title }}            
         </h4>
     </div>
