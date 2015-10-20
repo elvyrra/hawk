@@ -414,7 +414,7 @@ class PluginController extends Controller{
                                 
                 // Check the plugin does not exists
                 foreach(Plugin::getAll(true) as $plugin){                    
-                    if($namespace === $plugn->getNamespace()){
+                    if($namespace === $plugin->getNamespace()){
                         // A plugin with the same name already exists
                         $form->error('name', Lang::get('admin.new-plugin-already-exists-error'));
                         return $form->response(Form::STATUS_CHECK_ERROR, Lang::get('admin.new-plugin-already-exists-error'));
