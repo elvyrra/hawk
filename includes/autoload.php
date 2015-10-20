@@ -1,14 +1,14 @@
 <?php
 /**
- * Autoload.class.php
+ * Autoload.php
  * @author Elvyrra SAS
  */
 
 namespace Hawk;
 
 // Autoload class needs at least FileSystem class and Plugin Class
-require LIB_DIR . 'FileSystem.class.php';
-require LIB_DIR . 'Plugin.class.php';
+require LIB_DIR . 'FileSystem.php';
+require LIB_DIR . 'Plugin.php';
 
 
 /**
@@ -55,9 +55,9 @@ class Autoload{
         }
         $class = end($parts);
 
-        $filename = "$class.class.php";
+        $filename = "$class.php";
 
-		// The file is not registered in cache, let's find it. Any class file must be as <classname>.class.php
+		// The file is not registered in cache, let's find it. Any class file must be as <classname>.php
         $dirs = array();
         $searchDirectories = array(
             'Hawk' => array(LIB_DIR, CUSTOM_LIB_DIR),

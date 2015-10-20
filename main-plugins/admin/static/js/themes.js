@@ -242,7 +242,7 @@ $("#manage-themes-page")
         var item = model.getItemById(data.id);
         if(!item){
             model.items.push(data);
-            this.reset();
+            $(this).reset();
         }
         else{
             for(var prop in data){
