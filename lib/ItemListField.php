@@ -205,7 +205,7 @@ class ItemListField {
 			case 'date' :
 				$input = new DatetimeInput(array(
 					'id' => uniqid(),
-					'after' => '<i class="icon icon-times-circle clean-search" ko-click="function(data){ data.search(null); }" ko- visible="search()"></i>',
+					'after' => '<i class="icon icon-times-circle clean-search" ko-click="function(data){ data.search(null); }" ko-visible="search()"></i>',
 					'attributes' => array(
 						'ko-value' => 'search',
 						'ko-class' => "search() ? 'alert-info not-empty' : 'empty'"						
