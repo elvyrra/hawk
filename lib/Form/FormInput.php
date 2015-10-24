@@ -317,12 +317,12 @@ class FormInput{
 		}
 		
         // If the value of this field must be unique in the database, check this unicity is not compromised
-		if(!empty($this->value) && !empty($this->unique) && $form ){
+		if(!empty($this->value) && $this->unique && $form ){
 			$example = new DBExample(array(
 				'$not' => $form->reference,
 				array($this->name => $this->dbvalue())
 			));
-				
+
 			$model = $form->model;
 			if($model::getByExample($example)){
 				// The field must be unique but is not

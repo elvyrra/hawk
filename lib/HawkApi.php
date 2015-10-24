@@ -12,7 +12,7 @@ class HawkApi{
     /**
      * The API base url
      */
-    const BASE_URL = 'http://hawk-site.dev.elvyrra.fr/api';
+    const BASE_URL = HAWK_SITE_URL . '/api';
 
     /**
      * The pattern for a plugin / theme version

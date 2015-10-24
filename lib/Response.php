@@ -96,8 +96,8 @@ class Response{
     /**
      * Return the HTTP response to the client, ad exit the script
      */
-	public static function end($content = ''){
-        if($content){
+	public static function end($content = null){
+        if($content !== null){
             self::set($content);
         }
         

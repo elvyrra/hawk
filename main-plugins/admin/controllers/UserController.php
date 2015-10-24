@@ -55,8 +55,7 @@ class UserController extends Controller{
 			'model' => 'User',
 			'action' => Router::getUri('list-users'),
 			'reference' => 'id',
-			'filter' => new DBExample($example),
-			'lineClass' => function($line){	return $line->active ? 'bg-success' : 'bg-danger'; },
+			'filter' => new DBExample($example),			
 			'controls' => array(
 				array(
 					'icon' => 'plus',
@@ -115,6 +114,9 @@ class UserController extends Controller{
 					'label' => Lang::get('admin.users-list-active-label'),
 					'search' => false,
 					'sort' => false,
+					'class' => function($value){
+						return 'bold ' . ($value ? 'text-success' : 'text-danger');
+					},
 					'display' => function($value){
 						return $value ? Lang::get('admin.users-list-active') : Lang::get('admin.users-list-inactive');
 					},
@@ -169,7 +171,7 @@ class UserController extends Controller{
 						'required' => true,
 						'unique' => true,
 						'readonly' => $user && $user->id !== Session::getUser()->id,
-						'insert' => $user && $user->id !== Session::getUser()->id,
+						'insert' => ! $user || $user->id === Session::getUser()->id,
 						'label' => Lang::get('admin.user-form-username-label'),
 					)),
 					
@@ -178,7 +180,7 @@ class UserController extends Controller{
 						'required' => true,
 						'unique' => true,
 						'readonly' => $user && $user->id !== Session::getUser()->id,
-						'insert' => $user && $user->id !== Session::getUser()->id,
+						'insert' => ! $user || $user->id !== Session::getUser()->id,
 						'label' => Lang::get('admin.user-form-email-label'),
 					)),
 					
@@ -253,7 +255,9 @@ class UserController extends Controller{
 				$this->compute('remove');
 			}
 			else{
-				return $form->register();
+				if($form->check()){
+					return $form->register();
+				}
 			}
 		}
 		

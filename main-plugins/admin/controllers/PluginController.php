@@ -266,24 +266,20 @@ class PluginController extends Controller{
         }
 
         // Remove the plugins already downloaded on the application
-        $plugins = array_filter($plugins, function($plugin){
-            return Plugin::get($plugin['name']) === null;
-        });
-
+        foreach($plugins as &$plugin){
+            $plugin['detailsUrl'] = HAWK_SITE_URL . '/store/plugins/' . $plugin['id'];
+            $plugin['installed'] = Plugin::get($plugin['name']) !== null;
+        }
+        
         $list = new ItemList(array(
             'id' => 'search-plugins-list',
             'data' => $plugins,            
             'fields' => array(
                 'controls' => array(
                     'display' => function($value, $field, $plugin) {
-                        // download button
-                        $button = ButtonInput::create(array(
-                            'label' => Lang::get('admin.download-plugin-button'),
-                            'icon' => 'downlaoad',
-                            'href' => Router::getUri('download-plugin', array('plugin' => $plugin['name'])),                                    
+                        return View::make(Plugin::current()->getView('plugin-search-list-controls.tpl'), array(
+                            'plugin' => $plugin,
                         ));
-
-                        return  "<h4>" . $plugin['title'] . "</h4><br />" . $button;
                     },
                     'label' => Lang::get('admin.plugins-list-controls-label'),
                     'search' => false,
@@ -295,7 +291,9 @@ class PluginController extends Controller{
                     'sort' => false,
                     'label' => Lang::get('admin.plugins-list-description-label'),
                     'display' => function($value, $field, $plugin){
-                        return View::make(Plugin::current()->getView("plugin-search-list-description.tpl"), $plugin);                        
+                        return View::make(Plugin::current()->getView("plugin-search-list-description.tpl"), array(
+                            'plugin' => $plugin
+                        ));
                     }
                 )
 
@@ -316,7 +314,9 @@ class PluginController extends Controller{
     /**
      * Download and install a plugin from Mint
      */
-    public function download(){}
+    public function download(){
+
+    }
 
 
 

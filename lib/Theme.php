@@ -292,7 +292,8 @@ class Theme{
         if(!$less){
             $less = file_get_contents($this->getBaseLessFile());
         }
-        preg_match_all('#^\s*define\(@([\w\-]+)\s*\;\s*(.+?)\s*\;\s*(.+?)\s*\;?\s*(color|file)?\s*\)\s*$#m', $less, $matches, PREG_SET_ORDER);                     
+        // preg_match_all('#^\s*define\(@([\w\-]+)\s*\;\s*(.+?)\s*\;\s*(.+?)\s*\;?\s*(color|file)?\s*\)\s*$#m', $less, $matches, PREG_SET_ORDER);                     
+        preg_match_all('#^\s*@([\w\-]+)\s*\:\s*(.+?)\s*\;\s*//\s*editable\s*\:\s*"(.+?)"\s*\,\s*(color|file)?\s*$#m', $less, $matches, PREG_SET_ORDER);                     
         $variables = array();
         foreach($matches as $match){
             $variables[] = array(

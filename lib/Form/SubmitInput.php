@@ -23,7 +23,7 @@ class SubmitInput extends ButtonInput{
 	 * @return string The HTML to display
 	 */
 	public function __toString(){				
-		$this->class .= " btn-info";
+		$this->class .= " btn-primary";
 		return parent::__toString();
 	}
 	

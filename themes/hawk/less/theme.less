@@ -1,33 +1,33 @@
-/* Editable variables
-define(@text-color; #777; Body text color; color)
-define(@body-bg; #fff; Body background; color)
-define(@font-size-base; 12px; Global font size)
+/* Editable variables */
+@text-color: #5f6e7d; // editable : "Body text color", color
+@body-bg: #ffffff; // editable : "Body background", color
+@font-size-base: 12px; // editable : "Global font size"
 
-define(@header-bg; #4e3064; Header and footer background; color)
-define(@header-color; #d6d6d6; Header and footer font color; color)
+@header-bg: #5f6e7d; // editable : "Header and footer background", color
+@header-color: #d6d6d6; // edtaible : "Header and footer font color", color
 
-define(@btn-default-color; #fff; Default buttons font color; color)
-define(@btn-default-bg; #333; Default buttons background; color)
-define(@btn-default-border; #777; Default buttons border color; color)
+@btn-default-color: #fff; // editable : "Default buttons font color", color
+@btn-default-bg: #5f6e7d; // editable : "Default buttons background", color
+@btn-default-border: #186467; // editable : "Default buttons border color, color
 
-define(@brand-primary; #337ab7; Base color for primary elements; color)
-define(@brand-success; #1d931d; Base color for success elements; color)
-define(@brand-info; #5bc0de; Base color for information elements; color)
-define(@brand-warning; #f0ad4e; Base color for warning elements; color)
-define(@brand-danger; #A52A2A; Base color for error elements; color)
+@brand-primary: #7db4b5; // editable : "Base color for primary elements", color
+@brand-success: ##8dcc8d; // editable : "Base color for success elements", color
+@brand-info: #5bc0de; // editable : "Base color for information elements", color
+@brand-warning: #f2b661; // editable : "Base color for warning elements", color
+@brand-danger: #cf4242; // editable : "Base color for error elements", color
 
-define(@state-success-text; #3c763d; Success alerts font color; color)
-define(@state-success-bg; #dff0d8; Success alerts background color; color)
+@state-success-text: #1e7527; // editable : "Success alerts font color", color
+@state-success-bg: #c3dec3; // editable : "Success alerts background color", color
 
-define(@state-info-text; #31708f; Info alerts font color; color)
-define(@state-info-bg; #d9edf7; Info alerts background color; color)
+@state-info-text: #7db4b5; // editable : "Info alerts font color", color
+@state-info-bg: #e0eff1; // editable : "Info alerts background color", color
 
-define(@state-warning-text; #8a6d3b; Warning alerts font color; color)
-define(@state-warning-bg; #fcf8e3; Warning alerts background color; color)
+@state-warning-text: #a64e32; // editable : "Warning alerts font color", color
+@state-warning-bg: #f7e9be; // editable : "Warning alerts background color", color
 
-define(@state-danger-text; #a94442; Error alerts font color; color)
-define(@state-danger-bg; #f2dede; Error alerts background color; color)
-*/
+@state-danger-text: #940a0a; // editable : "Error alerts font color", color
+@state-danger-bg: #ebb3b2; // editable : "Error alerts background color", color
+
 
 @import "bootstrap.less";
 @import "font-awesome.less";
@@ -52,6 +52,7 @@ h1,h2,h3,h4,h5,h6{
 .btn{
 	font-size: inherit;
 	margin-top: 5px;
+    border-radius: 1px;
 }
 
 /* labels */
@@ -406,6 +407,7 @@ label{
 /*---------------------------- Dropdown menus ------------------------------------------*/
 .dropdown-menu{
 	font-size: 1em;
+    min-width: 0;
 
     & > li > a{
         &:hover, &:focus{
@@ -515,6 +517,7 @@ table {
 
         &:hover{
             background-color: darken(@header-bg, 10%);
+            color: lighten(@header-color, 10%);            
         }
 
         a {
@@ -601,8 +604,12 @@ table {
 #main-tab-content{
     height: calc(~"100% - 20px");
     width: 100%;
-	overflow-y: auto;
-    overflow-x: hidden;
+	
+    .main-tab-pane{
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+    }
 }
 
 .tab-pane{
@@ -636,6 +643,16 @@ a, a:active, a:hover, a:visited, a:focus{
 	visibility: hidden;
 	opacity: 0;
     transition: visibility .35s, opacity .35s;
+
+    .close{
+        color: inherit;
+        opacity: 0.7;
+        text-shadow: none;
+
+        &:hover, &:focus{
+            opacity: 0.9;
+        }
+    }
 }
 
 /*-------------------- Dialog box ---------------------*/
@@ -722,9 +739,9 @@ a, a:active, a:hover, a:visited, a:focus{
 .list-line{
     height: 30px;
 
-    & > td{
-        color: @text-color;    
-    }
+    // & > td{
+    //     color: @text-color;    
+    // }
 
     &.selected{
         background: @state-info-text;
