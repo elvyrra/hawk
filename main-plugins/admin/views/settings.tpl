@@ -9,7 +9,7 @@
 			<li role="presentation"><a href="#settings-form-tab-users" role="tab" data-toggle="tab">{text key="admin.settings-users-legend"}</a></li>
 			<li role="presentation"><a href="#settings-form-tab-email" role="tab" data-toggle="tab">{text key="admin.settings-email-legend"}</a></li>		
 		</ul>
-		
+
 		<!-- Tab panes -->
 		<div class="tab-content">
 			<div role="tabpanel" class="tab-pane" id="settings-form-tab-main">
@@ -28,7 +28,7 @@
 						<tr>
 							<td>{text key="{'admin.settings-' . $key . '-label'}"}</td>
 							{foreach($languages as $tag => $language)}
-								<th>{{ $form->fields["main.page-$key-$tag"] }}</th>
+								<th>{{ $form->fields["main_page-$key-$tag"] }}</th>
 							{/foreach}
 						</tr>
 					{/foreach}
@@ -36,54 +36,54 @@
 			</div>
 			
 			<div role="tabpanel" class="tab-pane" id="settings-form-tab-home">
-			{{ $form->fields['main.home-page-type'] }}
+			{{ $form->fields['main_home-page-type'] }}
 
-			<div data-bind="visible: homePage.type() == 'custom'">
-				{{ $form->fields['main.home-page-html'] }}
+			<div ko-visible="homePage.type() == 'custom'">
+				{{ $form->fields['main_home-page-html'] }}
 			</div>
 
-			<div data-bind="visible: homePage.type() == 'page'">
-				{{ $form->fields['main.home-page-item'] }}
+			<div ko-visible="homePage.type() == 'page'">
+				{{ $form->fields['main_home-page-item'] }}
 			</div>
 
-			{{ $form->fields['main.open-last-tabs'] }}
+			{{ $form->fields['main_open-last-tabs'] }}
 			</div>
 			
 			<div role="tabpanel" class="tab-pane" id="settings-form-tab-users">
-				{{ $form->fields['main.allow-guest'] }}		
-				{{ $form->fields['roles.default-role'] }}
+				{{ $form->fields['main_allow-guest'] }}		
+				{{ $form->fields['roles_default-role'] }}
 
-				{{ $form->fields['main.open-register'] }}	
-				<div data-bind="visible: parseInt(register.open())">
+				{{ $form->fields['main_open-register'] }}	
+				<div ko-visible="parseInt(register.open())">
 					<div class="clearfix"></div>	
 					<h3>{text key="admin.settings-register-options"}</h3>
-					{{ $form->fields['main.confirm-register-email'] }}	
-					<div data-bind="visible: register.checkEmail">	
-						{{ $form->fields['main.confirm-email-content'] }}	
+					{{ $form->fields['main_confirm-register-email'] }}	
+					<div ko-visible="register.checkEmail">	
+						{{ $form->fields['main_confirm-email-content'] }}	
 					</div>
 					
 					<div class="clearfix"></div>
 					<h3>{text key="admin.settings-terms-options"}</h3>
-					{{ $form->fields['main.confirm-register-terms'] }}		
-					<div data-bind="visible: register.checkTerms">	
-						{{ $form->fields['main.terms'] }}	
+					{{ $form->fields['main_confirm-register-terms'] }}		
+					<div ko-visible="register.checkTerms">	
+						{{ $form->fields['main_terms'] }}	
 					</div>
 				</div>
 			</div>
 			
 			<div role="tabpanel" class="tab-pane" id="settings-form-tab-email">
-				{{ $form->fields['main.mailer-from'] }}
-				{{ $form->fields['main.mailer-from-name'] }}
-				{{ $form->fields['main.mailer-type'] }}
+				{{ $form->fields['main_mailer-from'] }}
+				{{ $form->fields['main_mailer-from-name'] }}
+				{{ $form->fields['main_mailer-type'] }}
 
-				<div data-bind="visible: mail.type() == 'smtp' || mail.type() == 'pop3'">
-					{{ $form->fields['main.mailer-host'] }}
-					{{ $form->fields['main.mailer-port'] }}
-					{{ $form->fields['main.mailer-username'] }}
-					{{ $form->fields['main.mailer-password'] }}				
+				<div ko-visible="mail.type() == 'smtp' || mail.type() == 'pop3'">
+					{{ $form->fields['main_mailer-host'] }}
+					{{ $form->fields['main_mailer-port'] }}
+					{{ $form->fields['main_mailer-username'] }}
+					{{ $form->fields['main_mailer-password'] }}				
 				</div>
-				<div data-bind="visible: mail.type() == 'smtp'">
-					{{ $form->fields['main.smtp-secured'] }}
+				<div ko-visible="mail.type() == 'smtp'">
+					{{ $form->fields['main_smtp-secured'] }}
 				</div>
 			</div>
 		</div>			  

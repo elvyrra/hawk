@@ -1,2 +1,3 @@
 includes/config.php
+includes/custom-constants.php
 phpdoc.xml

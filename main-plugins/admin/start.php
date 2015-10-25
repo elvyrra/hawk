@@ -41,7 +41,10 @@ Router::setProperties(
 				Router::any('profile-questions', 'profile-questions/', array('action' => 'QuestionController.listQuestions'));
 				Router::any('edit-profile-question', 'profile-questions/{name}', array('where' => array('name' => '\w+'), 'action' => 'QuestionController.edit'));
 				Router::get('delete-profile-question', 'profile-questions/{name}/delete', array('where' => array('name' => '\w+'), 'action' => 'QuestionController.delete'));
-				
+			});
+
+
+			Router::auth(Session::isAllowed('admin.all'), function(){
 				/*** Manage themes ***/
 				
 				Router::get('manage-themes', 'themes', array('action' => 'ThemeController.index'));
@@ -55,8 +58,7 @@ Router::setProperties(
 				Router::any('add-theme-media', 'current-theme/medias/add', array('action' => 'ThemeController.addMedia'));
 				// Remove a media
 				Router::get('delete-theme-media', 'current-theme/medias/{filename}/delete', array('where' => array('filename' => '[^\/]+'), 'action' => 'ThemeController.deleteMedia'));		
-				// Set the menu items and order
-				Router::post('set-menu', 'menu/set-order', array('action' => 'ThemeController.menu'));
+				
 				
 				// Display the list of available themes
 				Router::any('available-themes', 'themes/available', array('action' => 'ThemeController.listThemes'));
@@ -68,6 +70,13 @@ Router::setProperties(
 				Router::any('import-theme', 'themes/import', array('action' => 'ThemeController.import'));
 				// Remove a theme
 				Router::get('delete-theme', 'themes/{name}/remove', array('where' => array('name' => '[a-zA-Z0-9\-_.]+'), 'action' => 'ThemeController.delete'));
+
+				// Set the menu items and order
+				Router::post('set-menu', 'menu/set-order', array('action' => 'ThemeController.menu'));
+				// Delete a menu item
+				Router::get('delete-menu', 'menu/{itemId}/remove', array('where' => array('itemId' => '\d+'), 'action' => 'ThemeController.removeCustomMenuItem'));
+				// Edit a menu item
+				Router::any('edit-menu', 'menu/{itemId}', array('where' => array('itemId' => '\d+'), 'action' => 'ThemeController.editCustomMenuItem'));
 
 
 				/*** Manage plugins ***/		
@@ -101,6 +110,29 @@ Router::setProperties(
 				Event::on('menuitem.added menuitem.deleted', function($event){
 		            Router::getCurrentController()->addJavaScriptInline('app.refreshMenu()');
 		        });
+
+
+
+				/*** Manage updates ***/
+				// Display the availabe updates
+				Router::get('updates-index', 'updates', array('action' => 'UpdateController.index'));
+
+				// Update Hawk
+				Router::get('update-hawk', 'updates/hawk/{version}', array('where' => array('version' => HawkApi::VERSION_PATTERN_URI), 'action' => 'UpdateController.updateHawk'));
+
+				// Update a plugin
+				Router::get('update-plugin', 'plugins/{plugin}/update', array('where' => array('plugin' => '[a-zA-Z0-9\-_.]+'), 'action' => 'UpdateController.updatePlugin'));
+
+				// Update a theme
+				Router::get('update-theme', 'themes/{theme}/update', array('where' => array('theme' => '[a-zA-Z0-9\-_.]+'), 'action' => 'UpdateController.updateTheme'));
+
+				// Display number of updates in menu
+				if(Session::isAllowed('admin.all')){
+					Event::on('Hawk\Plugins\Main\MainController.refreshMenu.after Hawk\Plugins\Main\MainController.main.after', function(Event $event){
+						$dom = $event->getData('result');
+						$dom->find('#main-menu-collapse')->append(SearchUpdatesWidget::getInstance()->display());
+					});
+				}
 
 			});
 

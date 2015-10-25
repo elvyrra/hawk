@@ -22,6 +22,12 @@ define('USERFILES_THEMES_DIR', USERFILES_DIR . 'themes/');
 
 define('USERFILES_PLUGINS_DIR', USERFILES_DIR . 'plugins/');
 
+define('STATIC_DIR', ROOT_DIR . 'static/');
+
+define('STATIC_THEMES_DIR', STATIC_DIR . 'themes/');
+
+define('STATIC_PLUGINS_DIR', STATIC_DIR . 'plugins/');
+
 define('TMP_DIR', ROOT_DIR . 'tmp/');
 
 // The main db name
@@ -33,10 +39,10 @@ define('ENCODING', 'utf-8');
 // Allowed image types
 define('ALLOWED_IMAGE_UPLOAD_TYPES', 'image/png image/jpeg image/jpg image/bpm image/gif image/tif');
 
+// Hawk website URL
+define('HAWK_SITE_URL', 'http://hawk-site.dev.elvyrra.fr');
+
 // Default configuration values
 define('DEFAULT_HTML_TITLE', 'Hawk');
 define('DEFAULT_SESSION_ENGINE', 'file');
 define('DEFAULT_TIMEZONE', date_default_timezone_get());
-
-// Hawk API base URL
-define('HAWK_API_BASE_URL', 'http://hawk.elvyrra.com/api/');

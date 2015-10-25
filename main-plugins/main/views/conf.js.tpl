@@ -8,7 +8,6 @@ window.appConf = {
 	routes : {{ $routes }},
 
 	tabs : {
-		max : {{ $maxTabs }},
 		open : {{ $lastTabs }}
 	},
 
@@ -16,4 +15,13 @@ window.appConf = {
 		connected : {{ Session::isConnected() ? 'true' : 'false' }},
 		canAccessApplication : {{ $accessible ? 'true' : 'false' }}
 	}
-}
+};
+
+(function(){
+	window.less = {
+		modifyVars : {{ $less['globalVars'] }},
+		initVars : {{ $less['initVars'] }},
+		env : 'production',
+		useFileCache : true
+	};
+})();

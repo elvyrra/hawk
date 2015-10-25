@@ -12,9 +12,10 @@
 
 <script type="text/javascript">
     app.ready(function(){
-        if(app.lists["{{ $list->id }}"]){
-            app.lists["{{ $list->id }}"].selected = {{ $list->selected !== false ? "'$list->selected'" : "null" }};
-            app.lists["{{ $list->id }}"].maxPages({{ $pages }});
+        if(list = app.lists["{{ $list->id }}"]){
+            list.selected = {{ $list->selected !== false ? "'$list->selected'" : "null" }};
+            list.maxPages({{ $pages }});
+            list.recordNumber({{ $list->recordNumber }});
         }
     });
 </script>

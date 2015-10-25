@@ -39,7 +39,7 @@ $("#language-manage-page")
 var form = app.forms["language-filter-form"];
 	
 form.submit = function(){
-	var data = JSON.stringify($(this.node).serializeObject());
+	var data = this.toString();
 	app.load(app.getUri('language-keys-list') + '?filters=' + data, {selector : $("#language-key-list").parent()});
 	return false;
 };

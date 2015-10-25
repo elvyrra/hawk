@@ -1,9 +1,9 @@
 {if(!$input->notDisplayed)}
-	{if(!isset($input->nl) || $input->nl)}
+	{if($input->nl && !$input->hidden ) }
 		<div class="clearfix"></div>
 	{/if}
 	
-	<div {{ $input->hidden || $input->type == "hidden" ? "style='display:none'" : "" }} class="form-inline form-input-wrap pull-left">
+	<div class="{{ $input->hidden ? 'no-display' : '' }} form-inline form-input-wrap pull-left">
 	
 		{{ $input->before }}
 		

@@ -5,13 +5,13 @@
 		action="{{ $form->action }}" 
 		{{ $form->target ? "target='{$form->target}'" : "" }} novalidate 
 		autocomplete="{{ $form->autocomplete ? "on" : "off" }}" 
-		{{ $form->enctype ? "enctype='{$form->enctype}" : "" }} 
+		{{ $form->enctype ? "enctype='{$form->enctype}" : "" }} 		
 	>
-	<input type='hidden' name='_FORM_ACTION_' value='valid'/>
+	<input type='hidden' name='_submittedForm' value='submitted'/>
 	
 	<div class='form-result-message'>
 		{if($form->status == Form::STATUS_ERROR)}
-			<p class="alert alert-error">{{ $form->returns['message'] }}</p>
+			<p class="alert alert-danger">{{ $form->returns['message'] }}</p>
 		{/if}
 	</div>	
 	{{ $content }}	
@@ -20,7 +20,7 @@
 <script type="text/javascript">	
 	(function(){
 		function init(){
-			var form = new Form("{{ $form->id }}", {{ json_encode($form->fields, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_NUMERIC_CHECK) }});
+			var form = new Form("{{ $form->id }}", {{ json_encode($jsInputs, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_NUMERIC_CHECK) }});
 		
 			{if(!empty($form->onsuccess))}
 				form.onsuccess = function(data){

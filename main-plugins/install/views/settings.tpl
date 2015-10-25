@@ -4,6 +4,6 @@
     </div>
 </div>
 <style>
-	@import url({{ Plugin::get('install')->getCssUrl() . 'install.css' }});
+	@import url({{ Plugin::get('install')->getCssUrl('install.less') }});
 </style>
-<script type="text/javascript" src="{{ Plugin::get('install')->getJsUrl() . 'install.js' }}"></script>
+<script type="text/javascript" src="{{ Plugin::get('install')->getJsUrl('install.js') }}"></script>

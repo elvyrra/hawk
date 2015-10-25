@@ -6,7 +6,8 @@ Router::setProperties(
 	array('namespace' => __NAMESPACE__), 
 	function(){
 		Router::get('index', '/', array('action' => 'MainController.main'));
-		Router::get('new-tab', '/newtab', array('auth' => Request::isAjax() && (Session::isConnected() || Option::get('main.allow-guest')), 'action' => 'MainController.newTab'));
+		Router::get('new-tab', '/newtab', array('action' => 'MainController.newTab'));
+		Router::get('logout', '/logout', array('action' => 'LoginController.logout'));
 			
 		Router::auth(Session::isConnected(), function(){
 			Router::auth(Request::isAjax(), function(){
@@ -14,7 +15,6 @@ Router::setProperties(
 				Router::any('change-password', '/profile/change-password', array('action' => 'UserProfileController.changePassword'));
 			});
 			
-		    Router::get('logout', '/logout', array('action' => 'LoginController.logout'));
 		});
 
 		Router::auth(!Session::isConnected(), function(){
@@ -37,5 +37,6 @@ Router::setProperties(
 		Router::auth(DEV_MODE, function(){
 			Router::get('clear-cache', '/clear-cache', array('action' => 'MainController.clearCache'));
 		});
+
 	}
 );

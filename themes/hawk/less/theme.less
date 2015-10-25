@@ -1,35 +1,36 @@
-/** Editable variables **/
+/* Editable variables */
+@text-color: #5f6e7d; // editable : "Body text color", color
+@body-bg: #ffffff; // editable : "Body background", color
+@font-size-base: 12px; // editable : "Global font size"
 
-// @main-font-color: #777777; "Body text color", color
-// @main-bg-color: #fff; "Body background", color
-// @main-font-size: 12px; "Global font size", dimension
-// @title-color: #337ab7; "Color of title", color
+@header-bg: #5f6e7d; // editable : "Header and footer background", color
+@header-color: #d6d6d6; // edtaible : "Header and footer font color", color
 
-// @header-bg: #333; "Header and footer background", color
-// @header-color: #d6d6d6; "Header and footer font color", color
+@btn-default-color: #fff; // editable : "Default buttons font color", color
+@btn-default-bg: #5f6e7d; // editable : "Default buttons background", color
+@btn-default-border: #186467; // editable : "Default buttons border color, color
 
-// @muted-color: #777; "Text color muted", color
+@brand-primary: #7db4b5; // editable : "Base color for primary elements", color
+@brand-success: ##8dcc8d; // editable : "Base color for success elements", color
+@brand-info: #5bc0de; // editable : "Base color for information elements", color
+@brand-warning: #f2b661; // editable : "Base color for warning elements", color
+@brand-danger: #cf4242; // editable : "Base color for error elements", color
 
-// @default-color: #fff; "Text color for default elements", color
-// @default-bg: #333; "Background color for default elements", color
+@state-success-text: #1e7527; // editable : "Success alerts font color", color
+@state-success-bg: #c3dec3; // editable : "Success alerts background color", color
 
-// @primary-color: #337ab7; "Text color primary", color
-// @primary-bg: #337ab7; "background color primary", color
+@state-info-text: #7db4b5; // editable : "Info alerts font color", color
+@state-info-bg: #e0eff1; // editable : "Info alerts background color", color
 
-// @success-color: #3c763d; "Text color success", color
-// @success-bg: #dff0d8; "background color success", color
+@state-warning-text: #a64e32; // editable : "Warning alerts font color", color
+@state-warning-bg: #f7e9be; // editable : "Warning alerts background color", color
 
-// @info-color: #31708f; "Text color info", color
-// @info-bg: #d9edf7; "background color info", color
-
-// @warning-color: #8a6d3b; "Text color warning", color
-// @warning-bg: #fcf8e3; "background color warning", color
-
-// @danger-color: #a94442; "Text color danger", color
-// @danger-bg: #f2dede; "background color danger", color
+@state-danger-text: #940a0a; // editable : "Error alerts font color", color
+@state-danger-bg: #ebb3b2; // editable : "Error alerts background color", color
 
 
-@import "font-awesome/font-awesome.less";
+@import "bootstrap.less";
+@import "font-awesome.less";
 
 body{
     margin: 0;
@@ -37,9 +38,9 @@ body{
     height: 100%;
     position: absolute;
     width: 100%;	
-	font-size: 12px;
-	color : @main-font-color;
-    background: @main-bg-color;
+	font-size: @font-size-base;
+	color : @text-color;
+    background: @body-bg;
 	font-family: "Open Sans", Arial;
 }
 
@@ -48,72 +49,10 @@ h1,h2,h3,h4,h5,h6{
 	font-weight: normal;
 }
 
-.text-muted{ 
-    color: @muted-color;
-}
-.text-primary{ 
-    color: @primary-color;
-}
-.text-success{ 
-    color: @success-color;
-}
-.text-info{ 
-    color: @info-color;
-}
-.text-warning{
-    color: @warning-color;
-}
-.text-danger{ 
-    color: @danger-color;
-}
-
-.bg-primary{ 
-    background: @primary-bg;
-}
-.bg-success{ 
-    background: @success-bg;
-}
-.bg-info{ 
-    background: @info-bg;
-}
-.bg-warning{ 
-    background: @warning-bg;
-}
-.bg-danger{ 
-    background: @danger-bg;
-}
-
-.alert-success{ 
-    background: @success-bg; 
-    color: @success-color;
-}
-.alert-info{
-    background: @info-bg; 
-    color: @info-color;
-}
-.alert-warning{ 
-    background: @warning-bg;
-    color: @warning-color;
-}
-.alert-danger{ 
-    background: @danger-bg; 
-    color: @danger-color;
-}
-
 .btn{
 	font-size: inherit;
 	margin-top: 5px;
-}
-
-.btn-default{
-	background: @default-bg;
-	border-color: #777;
-	color: @default-color;
-}
-
-.btn-default:hover{
-	background: #555;
-	color: @default-color;
+    border-radius: 1px;
 }
 
 /* labels */
@@ -207,6 +146,10 @@ code {
     border-bottom-right-radius : 4px;
 }
 
+.pointer{
+    cursor: pointer;
+}
+
 /*---------------------------------------------------------------------------*/
 /*------------------------------- FORMS -------------------------------------*/
 /*---------------------------------------------------------------------------*/
@@ -218,7 +161,7 @@ form .clearfix{
 input, button, select, textarea {
     font-family: "Open Sans", Arial;
     outline-style: none;
-    color: @main-font-color;
+    color: @text-color;
 }
 
 input[type="text"],
@@ -230,7 +173,7 @@ textarea {
 	font-size: 13px;	
 	box-shadow: inset 0 0px 1px rgba(0, 0, 0, 0.075);
 	border-radius: 4px;
-    border: 1px solid #ddd;
+    border: 1px solid darken(@body-bg, 13.5%);
     height: 30px;
     padding-left: 3px;
     padding-right: 3px;
@@ -270,10 +213,10 @@ input[type="file"] {
         border-radius: 0;
         overflow: hidden;
         height: 30px;    
-        background: @default-bg;
-        color: @default-color;
-        border-color: #777;
-        margin-left: 0;
+        background: @btn-default-bg;
+        color: @btn-default-color;
+        border-color: @btn-default-border;
+        margin-left: 0;        
 
         & > .file-chosen-icon{
             visibility: hidden;
@@ -284,9 +227,7 @@ input[type="file"] {
     }
 
     &.filled + label{
-        background: #5cb85c;
-        color: #fff;
-        border-color: #4cae4c;
+        .btn-success();
 
         & > .input-file-invitation-text{
             width: calc(~"100% - 16px");
@@ -338,7 +279,7 @@ input[type="radio"]{
 
     &:checked:before{
         content: "\f111";
-        color: @primary-color;
+        color: @brand-primary;
     }
 
     & + label{
@@ -354,27 +295,29 @@ input[type="checkbox"]{
 
     &:before{
         position: absolute;
-        height: 20px;
-        width: 20px;
-        margin-top: -15px;
-        font-size: 22px;
-        font-family: FontAwesome;
-        content: "\f096";
+        margin-top: -0.7em; 
+        .pointer();       
+        .fa-icon();        
+        .icon-lg();
+        content: @fa-var-square-o;
+    }
+
+    &:hover, &:focus, &:checked{
+        color: @brand-primary;
     }
 
     &:checked:before{
-        content: "\f046";
-        color: @primary-color;
+        content: @fa-var-check-square-o;        
     }
 }
 
 
 fieldset{
-	border : 1px solid @primary-color;
+	border : 1px solid @brand-primary;
 	box-shadow: none;
 
     legend{
-        color: @primary-color;
+        color: @brand-primary;
         border: none;
         background: none;
         margin-left: 15px;
@@ -397,7 +340,7 @@ label{
 
     &.required:after{
         content: "*";
-        color: @info-color;
+        color: @state-info-text;
     }
 }
 
@@ -449,7 +392,7 @@ label{
     }
 
     .brand {
-        color: #ffffff;
+        color: @btn-default-color;
         text-transform: uppercase;
         font-weight: lighter;
         padding: 12px 20px 12px;
@@ -461,22 +404,23 @@ label{
 }
 
 
-/*----------------------------- Dropdown menus ------------------------------------------*/
+/*---------------------------- Dropdown menus ------------------------------------------*/
 .dropdown-menu{
 	font-size: 1em;
+    min-width: 0;
 
     & > li > a{
         &:hover, &:focus{
-            background: @info-bg;
-            color: @info-color;
+            background: @state-info-bg;
+            color: @state-info-text;
         }
     }
 }
 
 .dropdown-submenu:hover,.dropdown-submenu:focus {
     a {
-    	background: @info-bg;
-    	color: @info-color;
+    	background: @state-info-bg;
+    	color: @state-info-text;
     }
 }
 
@@ -490,49 +434,46 @@ table {
         position: absolute;
         top: 0;
         left: -8px;
-        border-left: 1px solid #dee3ea;
+        // border-left: 1px solid #dee3ea;
         height: 10px;
     }
-}
 
-.table {
-    thead{
-        border-top:1px solid #dee3ea;
+    .table {
+        thead{
+            // border-top:1px solid #dee3ea;
 
-        & > tr > th{
-            position: relative;
-            padding-bottom: 20px;
-            padding-top: 5px;
-            vertical-align: top;
+            & > tr > th{
+                position: relative;
+                padding-bottom: 20px;
+                padding-top: 5px;
+                vertical-align: top;
+            }
+        }
+        th.sortable {
+            cursor: pointer;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+
+        td{
+            vertical-align: middle;
+        }
+
+        th, td{
+            &.align-right{
+                text-align: right;
+                padding-right: 10px !important;
+            }
         }
     }
-    th.sortable {
-        cursor: pointer;
-
-        &:hover {
-            text-decoration: underline;
-        }
-    }
-
-    td{
-        color: #526273;
-        border-top-color: #edf2f7;
-        vertical-align: middle;
-    }
-
-    th, td{
-        &.align-right{
-            text-align: right;
-            padding-right: 10px !important;
+    .table-hover tbody tr:hover{
+        td, th {
+            background-color: darken(@body-bg, 5%);
         }
     }
 }
-.table-hover tbody tr:hover{
-    td, th {
-        background-color: #f5fafc;
-    }
-}
-
 
 
 /*------------------------ Panels -------------------------*/
@@ -551,8 +492,9 @@ table {
     color: @header-color;
 }
 
-#main-menu{
-    min-height: 30px;
+@main-menu-height: 30px;
+#main-menu{    
+    min-height: @main-menu-height;
     margin-bottom: 5px;
     border-radius: 0;
 
@@ -561,20 +503,25 @@ table {
     }
 
     .application-logo{
-        width: 30px;
-        height: 30px;
+        width: @main-menu-height;
+        height: @main-menu-height;
     }
 
     .main-menu{
         background: none;
-        height: 30px;
-        line-height: 30px;
+        height: @main-menu-height;
+        line-height: @main-menu-height;
         padding: 0 5px;
         vertical-align: middle;
         cursor: pointer;
 
         &:hover{
-            background-color: #3f3f3f;
+            background-color: darken(@header-bg, 10%);
+            color: lighten(@header-color, 10%);            
+        }
+
+        a {
+            display: block;
         }
     }
 
@@ -609,9 +556,9 @@ table {
     width: 100%;
 
     .main-tab-title{    
-        border: 1px solid #DDD; 
+        border: 1px solid darken(@body-bg, 13.5%); 
         border-bottom: none;
-        background: #eee;
+        background: darken(@body-bg, 6.5%);
         height: 20px;
         margin-right: 2px;
         max-width: 200px;
@@ -619,7 +566,7 @@ table {
 
     .main-tab-title{
         &.active{
-            background: #fff;
+            background: @body-bg;
             color: black;   
         }
 
@@ -629,10 +576,8 @@ table {
             border: none;
             background: none;
             width: calc(~"100% - 25px");
-            overflow: hidden;
-            text-overflow: ellipsis;
-            height: 100%;
-            white-space: nowrap; 
+            .text-overflow();            
+            height: 100%;            
 
             & > .icon {
                 margin-right: 5px;
@@ -649,7 +594,7 @@ table {
 
     .add-tab-button{
         padding: 1px 5px 0 5px;
-        border: 1px solid #ddd;
+        border: 1px solid darken(@body-bg, 13.5%);
         margin-left: 3px;   
         width: 22px;
     }
@@ -659,8 +604,12 @@ table {
 #main-tab-content{
     height: calc(~"100% - 20px");
     width: 100%;
-	overflow-y: auto;
-    overflow-x: hidden;
+	
+    .main-tab-pane{
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+    }
 }
 
 .tab-pane{
@@ -671,7 +620,7 @@ table {
 
 /*--------------------- Tabs content --------------------*/
 .main-tab-pane .page-title{
-	color: @primary-color;
+	color: @brand-primary;
 	text-align: center;
 	margin: 5px 0;
 }
@@ -694,11 +643,26 @@ a, a:active, a:hover, a:visited, a:focus{
 	visibility: hidden;
 	opacity: 0;
     transition: visibility .35s, opacity .35s;
+
+    .close{
+        color: inherit;
+        opacity: 0.7;
+        text-shadow: none;
+
+        &:hover, &:focus{
+            opacity: 0.9;
+        }
+    }
 }
 
 /*-------------------- Dialog box ---------------------*/
 .modal-dialog{    
     margin-top: 15%;
+    z-index: @zindex-modal;
+
+    .modal-title{
+        color: @brand-primary;
+    }
 }
 
 /*-------------------- Lists -----------------------------*/
@@ -708,7 +672,7 @@ a, a:active, a:hover, a:visited, a:focus{
 
 .list{
     width: 100%;
-    color: #777777;
+    // color: #777777;
     border-collapse: collapse;
 
     td {
@@ -745,7 +709,7 @@ a, a:active, a:hover, a:visited, a:focus{
     }
 
     &.list-sort-active{
-        color: @primary-color;
+        color: @brand-primary;
         opacity: 1;
     }
 }
@@ -760,8 +724,8 @@ a, a:active, a:hover, a:visited, a:focus{
     padding-right: 15px;
 
     &.not-empty {
-        background-color: @info-bg;
-        color: @info-color;
+        background-color: @state-info-bg;
+        color: @state-info-text;
         padding-right: 16px;
     }   
 }
@@ -775,19 +739,19 @@ a, a:active, a:hover, a:visited, a:focus{
 .list-line{
     height: 30px;
 
-    & > td{
-        color: @main-font-color;    
-    }
+    // & > td{
+    //     color: @text-color;    
+    // }
 
     &.selected{
-        background: @info-color;
+        background: @state-info-text;
 
         &> td{
             color: white;    
         }
 
         &:hover > td{
-            color: @main-font-color;
+            color: @text-color;
         }
     }
 }
@@ -808,8 +772,8 @@ a, a:active, a:hover, a:visited, a:focus{
 
     td{
         background-color: transparent;
-        border-right: 1px solid #ddd;
-        border-left: 1px solid #ddd;
+        border-right: 1px solid darken(@body-bg, 13.5%);
+        border-left: 1px solid darken(@body-bg, 13.5%);
         padding-left: 5px;
         padding-right: 5px;
     }
@@ -869,7 +833,7 @@ a, a:active, a:hover, a:visited, a:focus{
 	margin-left: -100px;
 	height: 5px;
 	display: block;
-	background: #eee;
+	background: darken(@body-bg, 6.5%);
 	border-radius: 5px;
 
     &:not(.progressing){
@@ -879,7 +843,7 @@ a, a:active, a:hover, a:visited, a:focus{
 
 #loading-purcentage{
 	width: 0%;
-	background: #3c763d;
+	background: @brand-success;
 	height: 100%;
 	display: block;
 	border-radius: 5px;
@@ -895,16 +859,16 @@ p .icon{
 
 /*----------------------- Boxes -----------------------------*/
 .box{
-    border-radius: 4px;
-    border: 1px solid #777;    
+    border-radius: 4px;    
+    border : 1px solid @panel-primary-border;  
     margin-top: 5px;
     height: 100%;    
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
 
     .box-header{
-        background: @primary-bg;        
+        background: @panel-primary-heading-bg;      
         font-size: 1.2em;
-        color: white;    
+        color: @panel-primary-text;    
         padding-left: 5px;
 
         .box-icon{
@@ -926,12 +890,12 @@ p .icon{
 /*----------------------- Error tooltips -------------------*/
 .tooltip.input-error{
 	.tooltip-inner{
-        background: @danger-bg;
-        color: @danger-color;
+        background: @state-danger-bg;
+        color: @state-danger-text;
     }
 
     .tooltip-arrow{
-        border-right-color: @danger-bg;
+        border-right-color: @state-danger-bg;
     }
 }
 
@@ -978,8 +942,7 @@ p .icon{
         padding: 5px;
 
         &:hover{
-            background: #d9edf7;
-            color: #31708f;
+            .alert-info();            
         };
     }
 }
@@ -1009,7 +972,7 @@ body.dragging, body.dragging * {
 
             .drag-handle{
                 cursor: move;
-                background: #eee;
+                background: darken(@body-bg, 6.5%);
                 padding: 10px;
                 border-radius: 5px 0 0 5px;
                 height: 100%;
@@ -1018,7 +981,7 @@ body.dragging, body.dragging * {
 
         &.placeholder {
             position: relative;
-            background: @info-bg;
+            background: @state-info-bg;
             border: 1px solid rgba(0,0,0,0.5);  
             border-radius: 5px;
             min-height: 25px;
@@ -1030,3 +993,12 @@ body.dragging, body.dragging * {
     }
 }
 
+/*------------------------------ Available updates -----------------------*/
+.available-updates{
+    width: @main-menu-height;
+    height: @main-menu-height;
+    line-height: @main-menu-height;
+    border-radius: 100%;
+    text-align: center;
+    font-size: 14px;
+}

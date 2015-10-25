@@ -2,6 +2,9 @@
 namespace Hawk;
 
 require INCLUDES_DIR . 'constants.php';
+if(!is_file(INCLUDES_DIR . 'custom-constants.php')){
+    touch(INCLUDES_DIR . 'custom-constants.php');
+}    
 require INCLUDES_DIR . 'custom-constants.php';
 require INCLUDES_DIR . 'autoload.php';
 
@@ -12,13 +15,11 @@ require INCLUDES_DIR . 'error-handler.php';
 
 define("ROOT_URL", (string) Conf::get('rooturl') . '/');
 
-/*** Define the main paths ***/
-define('THEMES_ROOT_URL', ROOT_URL . 'themes/');
-define('PLUGINS_ROOT_URL', ROOT_URL . 'plugins/');
 
-define('USERFILES_ROOT_URL', ROOT_URL . 'userfiles/');
-define('USERFILES_PLUGINS_URL', USERFILES_ROOT_URL . 'plugins/');
-define('USERFILES_THEMES_URL', USERFILES_ROOT_URL . 'themes/');
+/*** Define the main paths ***/
+define('STATIC_URL', ROOT_URL . 'static/');
+define('THEMES_ROOT_URL', STATIC_URL . 'themes/');
+define('PLUGINS_ROOT_URL', STATIC_URL . 'plugins/');
 
 if(Conf::has('db')){
     /*** Access to the OS database (MySQL) ***/   
@@ -40,8 +41,8 @@ session_set_cookie_params((int) Conf::get('session.lifetime'), '/');
 session_start();
 
 /*** Constants depending to the options ***/
-if(!empty($_COOKIE['language'])){
-    define('LANGUAGE', $_COOKIE['language']);
+if(Request::getCookies('language')){
+    define('LANGUAGE', Request::getCookies('language'));
 }
 elseif(Conf::has('db')){
     if(Session::getUser()->getProfileData('language')){

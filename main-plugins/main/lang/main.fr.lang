@@ -1,7 +1,4 @@
 back-button = "Retour"
-list-results-number[0] = "Aucun résultats"
-list-results-number[1] = "1 résultat"
-list-results-number[p] = "{number} résultats"
 403-message = "Vous n'avez pas les droits nécessaires pour accéder à cette fonctionnalité"
 404-message = "La page que vous demandez : {uri} n'existe pas"
 cancel-button = "Annuler"

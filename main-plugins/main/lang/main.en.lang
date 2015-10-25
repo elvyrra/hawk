@@ -20,9 +20,6 @@ list-next-page = "Next page"
 list-page-label = "Page"
 list-pervious-page = "Previous page"
 list-no-result = "No result for this list"
-list-results-number[0] = "No result"
-list-results-number[1] = "1 result"
-list-results-number[p] = "{number} results"
 list-sort-asc = "A > Z"
 list-sort-desc = "Z > A"
 login-menu-title = "<i class=\"icon icon-sign-in\"></i> Connect"
@@ -86,3 +83,5 @@ register-email-content = "<p>You have just registered on {sitename}, and we than
 <p> The {sitename} team. </p>"
 permission-name-user-actions = "Action on his own account"
 clear-cache = "Clear cache"
+
+

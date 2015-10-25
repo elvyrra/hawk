@@ -1,0 +1,4 @@
+themes/*
+plugins/*/
+plugins/main/userfiles
+!plugins/main/

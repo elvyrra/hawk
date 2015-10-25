@@ -10,9 +10,9 @@
 		<div class="pull-right">
 			<table>
 				<tr>
-					<td class='list-result-number'>{text key="main.list-results-number" number="$list->recordNumber"}</td>
+					<td class='list-result-number' ko-text="recordNumberLabel"></td>
 					<td>
-						<select class="list-max-lines" data-bind="value: lines">
+						<select class="list-max-lines" ko-value="lines">
 							{foreach(ItemList::$lineChoice as $v)}
 								<option value='{{ $v }}'> {{ $v }}</option>
 							{/foreach}					
@@ -20,12 +20,12 @@
 						<span class="line-by-page-label">{text key="main.list-line-per-page"}</span>
 					</td>
 					<td class='list-page-choice'>
-						<span class='list-previous-page icon icon-chevron-circle-left' data-bind="click: function(data){ data.page(data.page() - 1); }, visible: page() > 1" title="{text key='main.list-previous-page'}" ></span>
+						<span class='list-previous-page icon icon-chevron-circle-left' ko-click="function(data){ data.page(data.page() - 1); }" ko-visible="page() > 1" title="{text key='main.list-previous-page'}" ></span>
 
 						
-						<input type='text' class='list-page-number' data-bind="value: page"/> / <span data-bind="text: maxPages"></span>
+						<input type='text' class='list-page-number' ko-value="page" /> / <span ko-text="maxPages" ></span>
 						
-						<span class="list-next-page icon icon-chevron-circle-right" data-bind="click: function(data){ data.page(data.page() + 1); }, visible: maxPages() > 1 && page() < maxPages()" title="{text key="main.list-next-page"}"></span>
+						<span class="list-next-page icon icon-chevron-circle-right" ko-click="function(data){ data.page(data.page() + 1); }" ko-visible="maxPages() > 1 && page() < maxPages()" title="{text key="main.list-next-page"}"></span>
 					</td>
 				</tr>
 			</table>
@@ -53,19 +53,21 @@
 </div>
 <script type="text/javascript">
 	require(['app'], function(){
-		app.ready(function(){
-			app.lists["{{ $list->id }}"] = new List({
+		app.ready(function(){			
+			var list = new List({
 				id : "{{ $list->id }}",
 				action : "{{ $list->action }}",
 				target : "{{ $list->target }}",
-				fields : {{ json_encode(array_keys($list->fields)) }}			
+				fields : {{ json_encode(array_keys($list->fields)) }},
 			});
 			
-			app.lists["{{ $list->id }}"].selected = {{ $list->selected !== false ? "'$list->selected'" : "null" }};
-			app.lists["{{ $list->id }}"].maxPages({{ $pages }});	
-			
+			list.selected = {{ $list->selected !== false ? "'$list->selected'" : "null" }};
+			list.maxPages({{ $pages }});
+			list.recordNumber({{ $list->recordNumber }});
 
-			ko.applyBindings(app.lists["{{ $list->id }}"], document.getElementById("{{ $list->id }}"));				
+			app.lists["{{ $list->id }}"] = list;			
+
+						
 		});
 	});
 </script>

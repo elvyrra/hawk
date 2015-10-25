@@ -5,11 +5,11 @@
 			<h2 class="page-title">{{ $title }}</h2>	
 		{/if}
 		{if(!empty($top))}
-			<div class="row">
+			<div class="">
 				{{ $top }}
 			</div>
 		{/if}
-		<div class="row">
+		<div class="">
 			<div class="page-content {{ $page['class'] }}">			
 				{if(!empty($page['content']))}
 					{{ $page['content'] }}
@@ -24,7 +24,7 @@
 			</div>
 		</div>
 		{if(!empty($bottom))}
-			<div class="row">
+			<div class="">
 				{{ $bottom }}
 			</div>
 		{/if}

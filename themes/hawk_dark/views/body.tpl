@@ -33,7 +33,7 @@
 		</li>
 		<!-- /ko -->
 
-		<li class="add-tab-button corner-top-left corner-bottom-right" href="{uri action='MainController.newTab'}" target="newtab" data-bind="visible: tabs().length < Tabset.MAX_TABS_NUMBER">
+		<li class="add-tab-button corner-top-left corner-bottom-right" href="{uri action='MainController.newTab'}" target="newtab">
 			<span class="" id="main-tab-add">
 				<span class="fa fa-plus open-new-tab" title="{text key='main.open-new-tab'}" ></span>
 			</span>
@@ -64,9 +64,6 @@
 
 <script type="text/javascript">
 	app.ready(function(){
-		{if(Option::get('main.tabsNumber'))}
-			Tabset.MAX_TABS_NUMBER = {{ Option::get('main.tabsNumber') }};
-		{/if}
 		{if(!$canAccessApplication)}
 			app.dialog(app.getUri('login'));
 			app.loading.stop();
