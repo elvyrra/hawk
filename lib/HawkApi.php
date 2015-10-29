@@ -1,6 +1,8 @@
 <?php
 /**
  * HawkApi.php
+ * @author Elvyrra SAS
+ * @license MIT
  */
 
 namespace Hawk;
@@ -10,15 +12,13 @@ namespace Hawk;
  */
 class HawkApi{
     /**
-     * The API base url
-     */
-    const BASE_URL = HAWK_SITE_URL . '/api';
-
-    /**
      * The pattern for a plugin / theme version
      */
     const VERSION_PATTERN = '/^(\d+\.){2,3}\d+$/';
 
+    /**
+     * The pattern for a plugin or theme version, in a URI
+     */
     const VERSION_PATTERN_URI = '(?:\d+\.){2,3}\d+';
 
 
@@ -144,7 +144,7 @@ class HawkApi{
         }
 
         $request = new HTTPRequest(array(
-            'url' => self::BASE_URL . $uri,
+            'url' => HAWK_SITE_URL . '/api' . $uri,
             'method' => $route['method'],
             'contentType' => 'json',
             'dataType' => 'json',
@@ -277,4 +277,7 @@ class HawkApi{
     }
 }
 
+/**
+ * This class describes Exceptions throwed by a request to the A.P.I
+ */
 class HawkApiException extends \Exception{}

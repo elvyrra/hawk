@@ -202,23 +202,22 @@ class Router{
             if($route->match($uri)){                  	      	
             	// The URI matches with the route
             	if($route->isAccessible()){
-
             		// The route authentications are validated
-					self::$currentRoute = $route;
+					self::$currentRoute = &$route;
+					
+            		// Emit an event, saying the routing action is finished
+					$event = new Event('after-routing', array(
+						'route' => $route,						
+					));
+					$event->trigger();
+
+					$route = $event->getData('route');
+
 					list($classname, $method) = explode(".", $route->action);
 
 					// call a controller method
 					$controller = new $classname($route->getData());                              
 					Log::debug('URI ' . self::getUri() . ' has been routed => ' . $classname . '::' . $method);
-
-					// Emit an event, saying the routing action is finished
-					$event = new Event('after-routing', array(
-						'route' => $route,
-						'controller' => $controller, 
-						'method' => $method, 
-						'args' => $route->getData()
-					));
-					$event->trigger();
 	                
 	                // Set the controller result to the HTTP response
 					Response::set($controller->compute($method));

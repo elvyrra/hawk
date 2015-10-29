@@ -346,6 +346,8 @@ class Theme{
 
     /**
      * Get the URL of a static user file
+     * @param string $filename The basename of the file to get the url
+     * @return string
      */
     public function getStaticUserfilesUrl($filename = ''){
         return $this->getRootUrl() . 'userfiles/' . $filename;
@@ -362,6 +364,7 @@ class Theme{
 
     /**
      * Get the URL of the directory containing the medias uplaoded by the administrator
+     * @param string $filename The basename of the file to get the URL
      * @return string The URL of the directory containing the medias uplaoded by the administrator
      */
     public function getMediasUrl($filename = ''){

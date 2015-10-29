@@ -643,50 +643,5 @@ class Plugin{
 			Log::error('En error occured while deactivating plugin ' . $this->name . ' : ' . $e->getMessage());
 			throw $e;
 		}
-	}
-
-
-	/**
-	 * Search for available updates
-	 * @return string the last available version on the Hawk Platform
-	 */
-	public function searchLastVersion(){
-		// Call the Hawk API to get the last version of the plugin
-		$request = new HTTPRequest(array(
-			'url' => HAWK_API_BASE_URL . 'plugins/' . $this->name . '/versions/last',
-			'method' => HTTPRequest::METHOD_GET,
-			'dataType' => 'json'
-		));
-
-		$request->send();
-
-		if($request->getStatusCode() !== 200){
-			return null;
-		}
-		else{
-			$body = $request->getResponse();
-
-			return $body['version'];
-		}
-	}
-
-
-	/**
-	 * Check of the plugin as an available update
-	 * @return boolean TRUE if the plugin is updatable, else FALSE
-	 */
-	public function isUpdatable(){
-		$lastVersion = $this->searchLastVersion();
-		return $lastVersion && $lastVersion > $this->getDefinition('version');
-	}
-
-	/**
-	 * Update the plugin
-	 */
-	public function update(){
-		if($this->isUpdatable()){
-			// The plugin is updatable, download the updated files
-			
-		}
-	}
+	}	
 }

@@ -38,7 +38,7 @@ class Form{
 	/**
 	 * The submit method (Default : POST)
 	 */
-	public	$method = 'post',
+	public $method = 'post',
 
 	/**
 	 * The form name

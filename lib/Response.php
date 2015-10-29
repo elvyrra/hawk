@@ -95,6 +95,7 @@ class Response{
 
     /**
      * Return the HTTP response to the client, ad exit the script
+     * @param string $content The content to set in the response body before returning it to the client
      */
 	public static function end($content = null){
         if($content !== null){
