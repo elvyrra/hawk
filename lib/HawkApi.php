@@ -181,9 +181,7 @@ class HawkApi{
      * @return array The list of available version newer than the current one
      */
     public function getCoreAvailableUpdates(){
-        $currentVersion = Utils::getHawkVersion();
-
-        return $this->callApi('api-core-available-updates', array(), array('version' => $currentVersion));
+        return $this->callApi('api-core-available-updates', array(), array('version' => HAWK_VERSION));
     }
 
 

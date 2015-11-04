@@ -109,18 +109,69 @@ define('ko-extends', ['jquery', 'ko'], function($, ko){
 
 
     /**
+     * Custom binding for Ace
+     */
+    ko.bindingHandlers.ace = {
+        update : function(element, valueAccessor, allBindings, viewModel, bindingContext) { 
+            require(['ace'], function(ace){    
+                var parameters = ko.unwrap(valueAccessor());
+
+                ace.config.set("modePath", app.baseUrl + "ext/ace/");
+                ace.config.set("workerPath", app.baseUrl + "ext/ace/") ;
+                ace.config.set("themePath", app.baseUrl + "ext/ace/"); 
+                ace.config.set('readOnly', parameters.readonly || false);
+
+                var editor = ace.edit(element.id);
+                editor.setTheme("ace/theme/" + (parameters.theme || chrome));
+                editor.getSession().setMode("ace/mode/" + (parameters.language));
+                editor.setShowPrintMargin(false);
+
+                editor.getSession().on("change", function(event){
+                    var value = editor.getValue();
+                    if(parameters.change){
+                        parameters.change(value);
+                    }                     
+                }); 
+            });
+        }
+    };
+     
+
+    /**
+     * Custom binding for CKEditor
+     */
+    ko.bindingHandlers.wysiwyg = {
+        update : function(element, valueAccessor, allBindings, viewModel, bindingContext) { 
+            require(['ckeditor'], function(CKEDITOR){
+                var editor = CKEDITOR.replace(element.id, {
+                    language : app.language,
+                    removeButtons : 'Save,Scayt,Rtl,Ltr,Language,Flash',
+                    entities : false,       
+                    on : {              
+                        change : function(event){ 
+                            $("#" + element.id).val(event.editor.getData()).trigger('change');
+                        }
+                    }
+                }); 
+                editor.addContentsCss(document.getElementById('less:static-themes-hawk-less-theme').innerText);
+            });
+        }
+    };
+
+    /**
      * Extend the knockout syntax to allow devs to write ko-{bind}="value" as tag attribute
      */
     ko.bindingProvider.instance.preprocessNode = function(node){
-        var dataBind = $(node).attr('data-bind') || "";
+        var dataBind = node.dataset && node.dataset.bind || "";
+
         for(var name in ko.bindingHandlers){
             var attrName = 'ko-' + name;
-            if($(node).attr(attrName)){
-                dataBind += (dataBind ? ',' : '') + name + ': ' + $(node).attr(attrName);
+            if(node.getAttribute && node.getAttribute(attrName)){
+                dataBind += (dataBind ? ',' : '') + name + ': ' + node.getAttribute(attrName);
             }
         }
         if(dataBind){
-            $(node).attr('data-bind', dataBind);
+            node.dataset.bind = dataBind;
         }
     }
 });

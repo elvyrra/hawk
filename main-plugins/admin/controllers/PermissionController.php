@@ -38,6 +38,7 @@ class PermissionController extends Controller{
 						'disabled' => $role->id == Role::ADMIN_ROLE_ID || ($role->id == Role::GUEST_ROLE_ID && !$permission->availableForGuests),
 						'default' => $role->id == Role::ADMIN_ROLE_ID ? 1 : (isset($values[$permission->id][$role->id]) ? $values[$permission->id][$role->id] : 0),
 						'class' => $permission->id == Permission::ALL_PRIVILEGES_ID ? 'select-all' : '',
+						'nl' => false,
 					));					
 				}
 			}
@@ -47,7 +48,7 @@ class PermissionController extends Controller{
 		if(!$form->submitted()){
 			$page = View::make(Plugin::current()->getView("permissions.tpl"), array(
 				'permissions' => $permissionGroups,
-				'fields' => $form->fields,
+				'fields' => $form->inputs,
 				'roles' => $roles,
 			));
 			return NoSidebarTab::make(array(
@@ -58,7 +59,7 @@ class PermissionController extends Controller{
 		}
 		else{
 			try{
-				foreach($form->fields as $name => $field){
+				foreach($form->inputs as $name => $field){
 					if(preg_match('/^permission\-(\d+)\-(\d+)$/', $name, $match)){
 						$permissionId = $match[1];
 						$roleId = $match[2];

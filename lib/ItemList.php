@@ -391,14 +391,49 @@ class ItemList{
 					}
 				}
 			}
-			
-			$tplFile = $this->refresh ? 'result.tpl' : 'list.tpl';
-			return View::make(Theme::getSelected()->getView('item-list/' . $tplFile), array(			
-				'list' => $this,
-				'data' => $data,
-				'linesParameters' => $param,
-				'pages' => $pages
-			));
+
+			// Generate the script to insert the list in the application , client side
+			if($this->refresh){
+				$tplFile = 'result.tpl';
+				$script = 
+					'app.ready(function(){
+				        if(list = app.lists["' . $this->id . '"]){
+				            list.selected = ' . ($this->selected !== false ? '"' . $this->selected . '"' : 'null') .' 
+							list.maxPages(' . $pages . ');
+							list.recordNumber(' . $this->recordNumber . ');
+				        }
+				    });';
+			}
+			else{
+				$script = 
+					'require(["app"], function(){
+						app.ready(function(){									
+							var list = new List({
+								id : "' . $this->id . '",
+								action : "' . $this->action . '",
+								target : "' . $this->target . '",
+								fields : ' . json_encode(array_keys($this->fields)) .',
+							});
+							
+							list.selected = ' . ($this->selected !== false ? '"' . $this->selected . '"' : 'null') .' 
+							list.maxPages(' . $pages . ');
+							list.recordNumber(' . $this->recordNumber . ');
+
+							app.lists["' . $this->id . '"] = list;			
+						});
+					});';
+				
+				$tplFile = 'list.tpl';
+			}
+
+			return 
+				View::make(Theme::getSelected()->getView('item-list/' . $tplFile), array(			
+					'list' => $this,
+					'data' => $data,
+					'linesParameters' => $param,
+					'pages' => $pages
+				)) . 
+				'<script>' . $script . '</script>';
 		}
 		catch(\Exception $e){
 			ErrorHandler::exception($e);

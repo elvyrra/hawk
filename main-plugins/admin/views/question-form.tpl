@@ -3,23 +3,23 @@
 
 	<fieldset>
 		<legend>{{ $form->fieldsets['parameters']->legend }}</legend>
-		{{ $form->fields['parameters'] }}
+		{{ $form->inputs['parameters'] }}
 
 		<div daat-bind="visible: type() !='checkbox'">
-			{{ $form->fields['required'] }}
+			{{ $form->inputs['required'] }}
 		</div>
 
 		<div ko-visible="type() == 'datetime'">
-			{{ $form->fields['minDate'] }}
-			{{ $form->fields['maxDate'] }}
+			{{ $form->inputs['minDate'] }}
+			{{ $form->inputs['maxDate'] }}
 		</div>
 
-		{{ $form->fields['parameters-description'] }}
+		{{ $form->inputs['parameters-description'] }}
 
-		{{ $form->fields['label'] }}
+		{{ $form->inputs['label'] }}
 
 		<div ko-visible="type() == 'radio' || type() == 'select'">
-			{{ $form->fields['options'] }}
+			{{ $form->inputs['options'] }}
 		</div>
 	</fieldset>
 
@@ -31,9 +31,9 @@
 
 <script type="text/javascript">
 	(function(){
-		var parameters = JSON.parse(app.forms["{{ $form->id }}"].inputs['parameters'].value);
+		var parameters = JSON.parse(app.forms["{{ $form->id }}"].inputs['parameters'].val());
 		var model = {
-			type : ko.observable(app.forms["{{ $form->id }}"].inputs['type'].value),
+			type : ko.observable(app.forms["{{ $form->id }}"].inputs['type'].val()),
 			required : ko.observable(parameters.required),
 			options : ko.observable(parameters.options ? parameters.options.join("\n") : ''),
 			minDate : ko.observable(parameters.min),

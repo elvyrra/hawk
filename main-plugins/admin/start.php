@@ -72,11 +72,11 @@ Router::setProperties(
 				Router::get('delete-theme', 'themes/{name}/remove', array('where' => array('name' => '[a-zA-Z0-9\-_.]+'), 'action' => 'ThemeController.delete'));
 
 				// Set the menu items and order
-				Router::post('set-menu', 'menu/set-order', array('action' => 'ThemeController.menu'));
+				Router::post('set-menu', 'menu/set-order', array('action' => 'MenuController.index'));
 				// Delete a menu item
-				Router::get('delete-menu', 'menu/{itemId}/remove', array('where' => array('itemId' => '\d+'), 'action' => 'ThemeController.removeCustomMenuItem'));
+				Router::get('delete-menu', 'menu/{itemId}/remove', array('where' => array('itemId' => '\d+'), 'action' => 'MenuController.removeCustomMenuItem'));
 				// Edit a menu item
-				Router::any('edit-menu', 'menu/{itemId}', array('where' => array('itemId' => '\d+'), 'action' => 'ThemeController.editCustomMenuItem'));
+				Router::any('edit-menu', 'menu/{itemId}', array('where' => array('itemId' => '\d+'), 'action' => 'MenuController.editCustomMenuItem'));
 
 
 				/*** Manage plugins ***/		

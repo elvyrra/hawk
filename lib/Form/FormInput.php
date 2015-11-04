@@ -377,7 +377,7 @@ class FormInput{
      * Set the value to the input
      * @param mixed $value The value to set
      */
-	public function set($value){
+	public function setValue($value){
 		$this->value = $value;
 	}
 	

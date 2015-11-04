@@ -48,6 +48,9 @@ require.config({
 		},
 		ace : {
 			exports : 'ace'
+		},
+		ckeditor : {
+			exports : 'CKEDITOR'
 		}
 	}
 });
@@ -76,7 +79,7 @@ App.INVALID_URI = '/INVALID_URI';
  * Initialize the application 
  */
 App.prototype.start = function(){
-	define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 'sortable', 'bootstrap', 'colorpicker' , 'datepicker',  'ckeditor', 'ko-extends', 'extends' , 'date' ], function($, ko, Tabset, Form, List, Lang) {
+	define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 'sortable', 'bootstrap', 'colorpicker' , 'datepicker', 'ko-extends', 'extends' , 'date' ], function($, ko, Tabset, Form, List, Lang) {
 		// export libraries to global context
 		window.$ = $;
 		window.ko = ko;
@@ -258,6 +261,8 @@ App.prototype.start = function(){
 	        return xhr;
 		
 		}.bind(this);
+
+
 
 		/**
 		 * Open the tab asked by the user when it was not connected

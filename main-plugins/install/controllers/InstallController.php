@@ -67,14 +67,6 @@ class InstallController extends Controller{
 						'default' => DEFAULT_TIMEZONE,
 						'label' => Lang::get('install.settings-timezone-label')
 					)),
-
-					new TextInput(array(
-						'name' => 'version',
-						'required' => true,
-						'default' => '0.0.1',
-						'label' => Lang::get('install.settings-version-label', null, null, $this->language),
-					))
-
 				),
 
 				'database' => array(

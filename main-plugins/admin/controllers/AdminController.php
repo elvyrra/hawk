@@ -316,7 +316,7 @@ class AdminController extends Controller{
 			try{			
 				if($form->check()){					
 					// register scalar values
-					foreach($form->fields as $name => $field){						
+					foreach($form->inputs as $name => $field){						
 						if(!$field instanceof \Hawk\FileInput && !$field instanceof \Hawk\ButtonInput){
 							$value = $field->dbvalue();
 							if($value === null){

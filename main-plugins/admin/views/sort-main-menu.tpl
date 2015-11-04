@@ -17,9 +17,9 @@
 
 <!-- The structure to sort the menu -->
 {assign name="sortingContent"}
-    {{ $form->fields['valid'] }}
+    {{ $form->inputs['valid'] }}
     <div id="sort-menu-active">    
-        {{ $form->fields['data'] }}
+        {{ $form->inputs['data'] }}
         <div id="sort-menu-wrapper" ko-template="{ nodes : [template] }"></div>
 
         <div id="sort-menu-template">

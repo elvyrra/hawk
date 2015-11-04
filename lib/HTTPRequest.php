@@ -144,9 +144,7 @@ class HTTPRequest{
 		else{
 			$value = $type;
 		}
-		// $this->setHeaders(array(
-		// 	'Accept' => $value
-		// ));
+
 		$this->dataType = $type;
 	}
 
@@ -230,6 +228,7 @@ class HTTPRequest{
 		$opts = array('http' =>
 			array(
 				'method'  => strtoupper($this->method),
+				'ignore_errors' => '1',
 				'header'  => implode(
 					PHP_EOL, 
 					array_map(
@@ -245,16 +244,20 @@ class HTTPRequest{
 		);
 
 		$context  = stream_context_create($opts);
-		
-		$result = @file_get_contents($this->url, false, $context);
 
-		foreach($http_response_header as $header){
-			if(preg_match('/^(.*?)\:\s+(.*)$/', $header, $match)){
-				$this->responseHeaders[$match[1]] = $match[2];
+		$result = @file_get_contents($this->url, false, $context);
+		if(!empty($http_response_header)){
+			foreach($http_response_header as $header){
+				if(preg_match('/^(.*?)\:\s+(.*)$/', $header, $match)){
+					$this->responseHeaders[$match[1]] = $match[2];
+				}
+				elseif(preg_match('/^HTTP\/[^\s]+\s+(\d+)/', $header, $match)){
+					$this->status = (int) $match[1];
+				}
 			}
-			elseif(preg_match('/^HTTP\/[^\s]+\s+(\d+)/', $header, $match)){
-				$this->status = (int) $match[1];
-			}
+		}
+		else{
+			$this->status = 404;
 		}
 
 		$this->response = $result;		

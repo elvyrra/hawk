@@ -4,10 +4,10 @@
 	{/if}
 	<div class="container-fluid">
 		<div class="navbar-header">
-			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-menu-collapse" >
+			<div class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-menu-collapse" >
 		        <span class="sr-only">Toggle navigation</span>
 		        <span class="icon icon-bars"></span>
-	      	</button>
+	      	</div>
 		</div>
 
 		<div class="collapse navbar-collapse" id="main-menu-collapse">

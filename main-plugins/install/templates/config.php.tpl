@@ -40,7 +40,3 @@ if(!defined('DEBUG_MODE')){
 if(!defined('DEV_MODE')){
     define('DEV_MODE', false);
 }
-
-if(!defined('APP_VERSION')){
-    define('APP_VERSION', '{{ $version }}');
-}

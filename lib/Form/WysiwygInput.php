@@ -14,5 +14,15 @@ namespace Hawk;
  */
 class WysiwygInput extends TextareaInput{
 	const TYPE = "wysiwyg";
+
+	/**
+	 * Cosntructor
+	 * @param array $param The input parameters. This arguments is an associative array where each key is the name of a property of this class 
+	 */
+	public function __construct($param){
+		parent::__construct($param);
+
+		$this->attributes['ko-wysiwyg'] = '1';
+	}
 	
 }

@@ -66,7 +66,7 @@ class UserProfileController extends Controller{
         
         
 
-        // Generate the question fields
+        // Generate the question inputs
         foreach($questions as $question){
             $classname = '\Hawk\\' . ucwords($question->type) . 'Input';
             $field = json_decode($question->parameters, true);
@@ -130,7 +130,7 @@ class UserProfileController extends Controller{
                         }
                     }
                     else{
-                        $user->setProfileData($question->name, $form->fields[$question->name]->dbvalue());
+                        $user->setProfileData($question->name, $form->inputs[$question->name]->dbvalue());
                     }
                 }            
 

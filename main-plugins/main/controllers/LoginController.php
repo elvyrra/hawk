@@ -10,9 +10,6 @@ class LoginController extends Controller{
 	_______________________________________________________*/	
 	private function form(){
 		/*** Get the registrered login and passwords ***/
-		$login = Request::getCookies(sha1('login')) ? Crypto::aes256Decode(Request::getCookies(sha1('login'))) : '';
-		$password = Request::getCookies(sha1('password')) ? Request::getCookies(sha1('password')) : '';
-
 		$param = array(
 			"id" => "login-form",
 			"method" => "post",
@@ -23,31 +20,22 @@ class LoginController extends Controller{
 					new TextInput(array(
 						"field" => "login",
 						"required" => true,
-						"default" => $login,
 						"label" => Lang::get('main.login-label'),						
 					)),
 					
 					new PasswordInput(array(
 						"field" => "password",
 						"required" => true,						
-						"default" => $password,
-						"decrypt" => array('Crypto', 'aes256Decode'),
 						"get" => true,						
 						"label" => Lang::get('main.login-password-label'),
 					)),
-					
-					new CheckboxInput(array(
-						"field" => "remember",
-						"independant" => true,
-						"default" => $login || $password ? 1 : 0,
-						"label" => Lang::get('main.login-remember-label'),
-					)),		
 				),
 
 				"_submits" => array(
 					new SubmitInput(array(
 						"name" => "connect",
-						"value" => Lang::get('main.connect-button'),						
+						"value" => Lang::get('main.connect-button'),
+						'icon' => 'sign-in'						
 					)),
 					
 					Option::get('main.open-register') ? 
@@ -56,7 +44,7 @@ class LoginController extends Controller{
 							'value' => Lang::get('main.register-button'),
 							'href' => Router::getUri('register'),
 							'target' => 'dialog',
-							'class' => 'btn-primary'
+							'class' => 'btn-success'
 						)) : 
 						null
 				),
@@ -115,10 +103,6 @@ class LoginController extends Controller{
 						'username' => $user->getUsername(),
 						'ip' => Request::clientIp()
 					);					
-					if(Request::getBody('remember')) {
-						setcookie(sha1("login"), Crypto::aes256Encode($form->getData('login')), time() + 3600 * 24 *7, '/');
-						setcookie(sha1("password"), Crypto::aes256Encode($form->getData('password')), time() + 3600 * 24 *7, '/');
-					}
 
 					if(Request::getParams('redirect')){
 						$form->addReturn('redirect',Request::getParams('redirect'));
@@ -160,7 +144,7 @@ class LoginController extends Controller{
 					new PasswordInput(array(
 						'name' => 'password',
 						'required' => true,
-						'encrypt' => array('Crypto', 'saltHash'),
+						'encrypt' => array('\Hawk\Crypto', 'saltHash'),
 						'label' => Lang::get('main.register-password-label')
 					)),
 
@@ -228,16 +212,16 @@ class LoginController extends Controller{
 				'page' => $form->__toString(),
 				'icon' => 'sign-in',
 				'title' => Lang::get('main.login-form-title'),
-				'width' => '450px',
+				'width' => '50rem',
 			));
 		}
 		else{	
 			if($form->check()){
 				try{
 					$user = new User(array(
-						'username' => $form->fields['username']->dbvalue(),
-						'email' => $form->fields['email']->dbvalue(),
-						'password' => $form->fields['password']->dbvalue(),
+						'username' => $form->inputs['username']->dbvalue(),
+						'email' => $form->inputs['email']->dbvalue(),
+						'password' => $form->inputs['password']->dbvalue(),
 						'active' => Option::get('main.confirm-register-email') ? 0 : 1,
 						'createTime' => time(),
 						'createIp' => Request::clientIp(),
@@ -263,7 +247,7 @@ class LoginController extends Controller{
 	                        }
 	                    }
 	                    else{
-	                        $user->setProfileData($question->name, $form->fields[$question->name]->dbvalue());
+	                        $user->setProfileData($question->name, $form->inputs[$question->name]->dbvalue());
 	                    }
 	                }            
 
@@ -346,7 +330,7 @@ class LoginController extends Controller{
 			}
 		}
 
-		$this->addJavaScriptInline("app.ready(function(){app.notify('$status', '". addcslashes(Lang::get($messageKey), "'") . "');})");
+		$this->addJavaScriptInline("require(['app'], function(){app.ready(function(){app.notify('$status', '". addcslashes(Lang::get($messageKey), "'") . "');});});");
 
 		return MainController::getInstance()->compute('main');
 

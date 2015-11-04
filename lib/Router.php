@@ -282,7 +282,7 @@ class Router{
 	 * Get the last instanciated controller
 	 * @return Controller The last instanciated controller
 	 */
-	public function getCurrentController(){
+	public static function getCurrentController(){
 		return Controller::$currentController;
 	}
 	

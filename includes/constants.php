@@ -46,3 +46,6 @@ define('HAWK_SITE_URL', 'http://hawk-site.dev.elvyrra.fr');
 define('DEFAULT_HTML_TITLE', 'Hawk');
 define('DEFAULT_SESSION_ENGINE', 'file');
 define('DEFAULT_TIMEZONE', date_default_timezone_get());
+
+// The application version
+define('HAWK_VERSION', file_get_contents(ROOT_DIR . 'version.txt'));

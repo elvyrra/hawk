@@ -51,23 +51,3 @@
 		</tbody>
 	</table>
 </div>
-<script type="text/javascript">
-	require(['app'], function(){
-		app.ready(function(){			
-			var list = new List({
-				id : "{{ $list->id }}",
-				action : "{{ $list->action }}",
-				target : "{{ $list->target }}",
-				fields : {{ json_encode(array_keys($list->fields)) }},
-			});
-			
-			list.selected = {{ $list->selected !== false ? "'$list->selected'" : "null" }};
-			list.maxPages({{ $pages }});
-			list.recordNumber({{ $list->recordNumber }});
-
-			app.lists["{{ $list->id }}"] = list;			
-
-						
-		});
-	});
-</script>

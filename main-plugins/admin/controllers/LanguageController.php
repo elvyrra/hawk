@@ -66,22 +66,12 @@ class LanguageController extends Controller{
 		$form = new Form(array(
 			'id' => 'edit-keys-form',
 			'action' => Router::getUri('save-language-keys'),			
-			'fieldsets' => array(
-				'form' => array(
-					'nofieldset' => true,
-					
-					new HtmlInput(array(
-						'name' => 'keyList',
-						'value' => $this->compute('listKeys')
-					))
-				)
-			),
 			'onsuccess' => 'app.lists["language-key-list"].refresh();'
 		));
 
 		if(!$form->submitted()){
 			// Display the form
-			return $form;
+			return $form->wrap($this->compute('listKeys'));
 		}
 		else{
 			// Register the translations
@@ -358,7 +348,8 @@ class LanguageController extends Controller{
 
 		$param = array(
 			'id' => 'language-form',
-			'object' => $language,
+			'model' => 'Language',
+			'reference' => array('tag' => $this->tag),
 			'fieldsets' => array(
 				'form' => array(
 					'nofieldset' => true,
@@ -380,7 +371,7 @@ class LanguageController extends Controller{
 					new CheckboxInput(array(
 						'name' => 'active',
 						'label' => Lang::get('language.lang-form-active-label'),
-						'noDisplayed' => (count($activeLanguages) <= 1 && $language->active) || $language->isDefault
+						'noDisplayed' => ! $language || (count($activeLanguages) <= 1 && $language->active) || $language->isDefault
 					))
 				),
 				
@@ -421,12 +412,13 @@ class LanguageController extends Controller{
 	public function deleteLanguage(){
 		try{
 			$language = Language::getByTag($this->tag);
+
 			if(Option::get('main.language') == $this->tag){
 				// Set a new default language
 				$newDefault = Language::getAllActive()[0];
 				Option::set('main.language', $newDefault->tag);
 			}
-			$language->delete();		
+			$language->delete();	
 
 			Log::info('The language ' . $this->tag . ' has been removed');
 		}

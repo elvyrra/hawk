@@ -12,7 +12,7 @@ $(".edit-lang").click(function(){
 $(".delete-lang").click(function(){
 	if (confirm(Lang.get('language.confirm-delete-lang'))) {
 		var tag = $("#language-filter-form [name='tag']").val();
-		$.get(app.getUri('delete-language', {tag : tag}), function(response){
+		$.get(app.getUri('delete-language', {tag : tag}), function(response){			
 			app.load(app.getUri('manage-languages'));
 		});
 	}
@@ -36,15 +36,19 @@ $("#language-manage-page")
 	});
 });
 
-var form = app.forms["language-filter-form"];
-	
-form.submit = function(){
-	var data = this.toString();
-	app.load(app.getUri('language-keys-list') + '?filters=' + data, {selector : $("#language-key-list").parent()});
-	return false;
-};
 
-form.node
-.on("change", "[name='tag'], [name='keys'], [name='selected']", function(){
-	form.submit();		
-});
+(function(){
+	var form = app.forms["language-filter-form"];
+		
+	form.submit = function(){
+		var data = this.toString();
+		app.load(app.getUri('manage-languages') + '?filters=' + data);
+		return false;
+	};
+
+	form.node
+	.on("change", "[name='tag'], [name='keys'], [name='selected']", function(){
+		form.submit();		
+	});
+
+})();

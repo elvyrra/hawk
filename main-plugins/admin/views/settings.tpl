@@ -28,7 +28,7 @@
 						<tr>
 							<td>{text key="{'admin.settings-' . $key . '-label'}"}</td>
 							{foreach($languages as $tag => $language)}
-								<th>{{ $form->fields["main_page-$key-$tag"] }}</th>
+								<th>{{ $form->inputs["main_page-$key-$tag"] }}</th>
 							{/foreach}
 						</tr>
 					{/foreach}
@@ -36,54 +36,54 @@
 			</div>
 			
 			<div role="tabpanel" class="tab-pane" id="settings-form-tab-home">
-			{{ $form->fields['main_home-page-type'] }}
+			{{ $form->inputs['main_home-page-type'] }}
 
 			<div ko-visible="homePage.type() == 'custom'">
-				{{ $form->fields['main_home-page-html'] }}
+				{{ $form->inputs['main_home-page-html'] }}
 			</div>
 
 			<div ko-visible="homePage.type() == 'page'">
-				{{ $form->fields['main_home-page-item'] }}
+				{{ $form->inputs['main_home-page-item'] }}
 			</div>
 
-			{{ $form->fields['main_open-last-tabs'] }}
+			{{ $form->inputs['main_open-last-tabs'] }}
 			</div>
 			
 			<div role="tabpanel" class="tab-pane" id="settings-form-tab-users">
-				{{ $form->fields['main_allow-guest'] }}		
-				{{ $form->fields['roles_default-role'] }}
+				{{ $form->inputs['main_allow-guest'] }}		
+				{{ $form->inputs['roles_default-role'] }}
 
-				{{ $form->fields['main_open-register'] }}	
+				{{ $form->inputs['main_open-register'] }}	
 				<div ko-visible="parseInt(register.open())">
 					<div class="clearfix"></div>	
 					<h3>{text key="admin.settings-register-options"}</h3>
-					{{ $form->fields['main_confirm-register-email'] }}	
+					{{ $form->inputs['main_confirm-register-email'] }}	
 					<div ko-visible="register.checkEmail">	
-						{{ $form->fields['main_confirm-email-content'] }}	
+						{{ $form->inputs['main_confirm-email-content'] }}	
 					</div>
 					
 					<div class="clearfix"></div>
 					<h3>{text key="admin.settings-terms-options"}</h3>
-					{{ $form->fields['main_confirm-register-terms'] }}		
+					{{ $form->inputs['main_confirm-register-terms'] }}		
 					<div ko-visible="register.checkTerms">	
-						{{ $form->fields['main_terms'] }}	
+						{{ $form->inputs['main_terms'] }}	
 					</div>
 				</div>
 			</div>
 			
 			<div role="tabpanel" class="tab-pane" id="settings-form-tab-email">
-				{{ $form->fields['main_mailer-from'] }}
-				{{ $form->fields['main_mailer-from-name'] }}
-				{{ $form->fields['main_mailer-type'] }}
+				{{ $form->inputs['main_mailer-from'] }}
+				{{ $form->inputs['main_mailer-from-name'] }}
+				{{ $form->inputs['main_mailer-type'] }}
 
 				<div ko-visible="mail.type() == 'smtp' || mail.type() == 'pop3'">
-					{{ $form->fields['main_mailer-host'] }}
-					{{ $form->fields['main_mailer-port'] }}
-					{{ $form->fields['main_mailer-username'] }}
-					{{ $form->fields['main_mailer-password'] }}				
+					{{ $form->inputs['main_mailer-host'] }}
+					{{ $form->inputs['main_mailer-port'] }}
+					{{ $form->inputs['main_mailer-username'] }}
+					{{ $form->inputs['main_mailer-password'] }}				
 				</div>
 				<div ko-visible="mail.type() == 'smtp'">
-					{{ $form->fields['main_smtp-secured'] }}
+					{{ $form->inputs['main_smtp-secured'] }}
 				</div>
 			</div>
 		</div>			  

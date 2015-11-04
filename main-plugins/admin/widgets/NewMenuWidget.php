@@ -61,7 +61,7 @@ class NewMenuWidget extends Widget{
 	}
 
 	public function display(){
-		$form = ThemeController::getInstance()->customMenuItemForm(0);
+		$form = MenuController::getInstance()->customMenuItemForm(0);
 		return $form->display();
 	}
 }

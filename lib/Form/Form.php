@@ -99,9 +99,9 @@ class Form{
 	$enctype = '',
 
 	/**
-	 * The form input fields
+	 * The form inputs
 	 */
-	$fields = array(),
+	$inputs = array(),
 
 	/**
 	 * Defines if the form do an AJAX uplaod
@@ -179,7 +179,7 @@ class Form{
 			$this->model = $reflection->getNamespaceName() . '\\' . $this->model;
 		}
 		
-		if(!isset($this->object)){
+		if(!isset($data['object'])){
 			if(isset($this->model) && !empty($this->reference)){
 				$model = $this->model;				
 				$this->example = new DBExample($this->reference);
@@ -191,9 +191,10 @@ class Form{
 		}
 		else{
 			$this->model = get_class($this->object);
-			$id = $this->object->getPrimaryColumn();
+			$model = $this->model;
+			$id = $model::getPrimaryColumn();
 			$this->reference = array($id => $this->object->$id);
-		}
+		}		
 
 		$this->new = $this->object === null;
 		
@@ -219,7 +220,7 @@ class Form{
         }
         else{
         	$this->addFieldset(new FormFieldset($this, 'form'));
-        	foreach($this->fields as &$field){
+        	foreach($this->inputs as &$field){
         		if($field instanceof FormInput){
         			$this->addInput($field, 'form');
         		}
@@ -275,7 +276,7 @@ class Form{
 	public function reload(){
 		// Set default value
 		$data = array();
-		foreach($this->fields as $name => $field){					
+		foreach($this->inputs as $name => $field){					
 			if(isset($field->default)){
 				$data[$name] = $field->default;
 			}
@@ -290,7 +291,7 @@ class Form{
 		}
 
 		// Set the value in all inputs instances		
-		$this->set($data);		
+		$this->setData($data);		
 	}
 	
 	
@@ -299,14 +300,14 @@ class Form{
 	 * @param array $data The data to set, where the keys are the names of the field, and the array values, the values to affect
 	 * @param string prefix A prefix to apply on the field name, if it is defined as an array (used internally to the class)
 	 */
-	public function set($data, $prefix = ''){
+	public function setData($data, $prefix = ''){
 		foreach($data as $key => $value){
 			$field = $prefix ? $prefix."[$key]" : $key;
-			if(isset($this->fields[$field])){
-				$this->fields[$field]->set($value);				
+			if(isset($this->inputs[$field])){
+				$this->inputs[$field]->setValue($value);				
 			}
 			elseif(is_array($value)){
-				$this->set($value, $field);
+				$this->setData($value, $field);
 			}
 			
 		}
@@ -320,11 +321,11 @@ class Form{
 	 */
 	public function getData($name = null){
 		if($name){
-			return $this->fields[$name]->value;
+			return $this->inputs[$name]->value;
 		}
 		else{
 			$result = array();
-			foreach($this->fields as $name => $field){
+			foreach($this->inputs as $name => $field){
 				$result[$name] = $field->value;
 			}
 			
@@ -344,7 +345,7 @@ class Form{
 	/**
 	 * Add an input to the form
 	 * @param FormInput $input The input to insert in the form
-	 * @param string $fieldset (optionnal) The fieldset where to insert the input. If not set, the input will be just included in $form->fields, out of any fieldset
+	 * @param string $fieldset (optionnal) The fieldset where to insert the input. If not set, the input will be just included in $form->inputs, out of any fieldset
 	 */
 	public function addInput(FormInput $input, $fieldset = ''){
 		if($input::INDEPENDANT){
@@ -361,7 +362,7 @@ class Form{
 		}
 		$input->labelWidth = $labelWidth;
 
-		$this->fields[$input->name] = &$input;
+		$this->inputs[$input->name] = &$input;
 		
 		if($fieldset){
 			$this->fieldsets[$fieldset]->inputs[$input->name] = $input;
@@ -395,7 +396,7 @@ class Form{
 		// Filter input data that can be sent to the client
 		$clientVars = array('id', 'type', 'name', 'required', 'emptyValue', 'pattern', 'minimum', 'maximum', 'compare', 'errorAt');
 		$clientInputs = array();
-		foreach($this->fields as $field){
+		foreach($this->inputs as $field){
 			$clientInputs[$field->name] = array_filter(get_object_vars($field), function($key) use ($clientVars){
 				return in_array($key, $clientVars);
 			}, ARRAY_FILTER_USE_KEY );
@@ -403,11 +404,36 @@ class Form{
 			$clientInputs[$field->name]['type'] = $field::TYPE;
 		}
 
-		return View::make(Theme::getSelected()->getView(Form::VIEWS_DIR . 'form.tpl'), array(
-			'form' => $this,
-			'content' => $content,
-			'jsInputs' => $clientInputs
-		));
+		// Generate the script to include the form in the application, client side
+		$script = '(function(){
+				function init(){
+					var form = new Form("' . $this->id . '", ' . json_encode($clientInputs, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_NUMERIC_CHECK) . ');';
+					if(!empty($this->onsuccess)){
+						$script .= 'form.onsuccess = function(data){ ' . $this->onsuccess . ' };';
+					}
+
+					if($this->status == self::STATUS_ERROR || $this->status == self::STATUS_CHECK_ERROR){
+						$script .= 'form.displayErrors(' . json_encode($this->errors, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_NUMERIC_CHECK) . ');';
+					}
+
+					$script .= 'app.forms["' . $this->id . '"] = form;
+				}
+
+				if(window.app){
+					init();
+				}
+				else{
+					require(["app"], init);
+				}
+			})();';
+
+
+		return 
+			View::make(Theme::getSelected()->getView(Form::VIEWS_DIR . 'form.tpl'), array(
+				'form' => $this,
+				'content' => $content,
+			)) . 
+			'<script>' . $script . '</script>';
 	}
 	
 	/**
@@ -427,7 +453,7 @@ class Form{
 			if(empty($this->fieldsets)){				
 				// Generate a fake fieldset, to keep the same engine for forms that have fieldsets or not
 				$this->addFieldset(new FormFieldset($this, ''));
-				foreach ($this->fields as $name => $input) {
+				foreach ($this->inputs as $name => $input) {
 					$this->fieldsets['']->inputs[$name] = &$input;
 				}
 			}
@@ -456,7 +482,7 @@ class Form{
 		if(empty($this->errors))			
 			$this->errors = array();
 			
-		foreach($this->fields as $name => $field){					
+		foreach($this->inputs as $name => $field){					
 			$field->check($this);
 		}	
 		
@@ -500,7 +526,7 @@ class Form{
 				$this->object->set($this->reference);
 			}
 				
-			foreach($this->fields as $name => $field){								
+			foreach($this->inputs as $name => $field){								
 				/* Determine if we have to insert this field in the set of inserted values
 				 * A field can't be inserted if :
 				 * 	it type is in the independant types

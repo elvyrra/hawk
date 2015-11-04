@@ -70,23 +70,9 @@ $("#manage-themes-page")
  */
 (function(){
     var model = {
-        css : ko.observable(app.forms['theme-css-form'].inputs['css'].value),
+        css : ko.observable(app.forms['theme-css-form'].inputs['css'].val()),
     };
-    require(['ace'], function(ace){    
-    	ace.config.set("modePath", app.baseUrl + "ext/ace/");
-    	ace.config.set("workerPath", app.baseUrl + "ext/ace/") ;
-    	ace.config.set("themePath", app.baseUrl + "ext/ace/"); 
 
-    	var editor = ace.edit("theme-css-edit");
-    	editor.setTheme("ace/theme/chrome");
-    	editor.getSession().setMode("ace/mode/css");
-    	editor.setShowPrintMargin(false);
-
-    	editor.getSession().on("change", function(event){
-            var value = editor.getValue();
-    		model.css(value);
-    	});	
-    });
     ko.applyBindings(model, $("#theme-css-form").get(0));
 
     app.forms['theme-css-form'].onsuccess = function(data){
@@ -242,7 +228,7 @@ $("#manage-themes-page")
         var item = model.getItemById(data.id);
         if(!item){
             model.items.push(data);
-            $(this).reset();
+            this.reset();
         }
         else{
             for(var prop in data){
