@@ -98,10 +98,7 @@ class Upload{
 			$basename = $file->basename;
 		}
 
-		$i = 0;
-		$filename = $basename;
-
-		return move_uploaded_file($file->tmpFile, $directory . '/' . $filename);
+		return move_uploaded_file($file->tmpFile, $directory . '/' . $basename);
 	}
 }
 

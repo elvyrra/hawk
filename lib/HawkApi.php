@@ -14,12 +14,12 @@ class HawkApi{
     /**
      * The pattern for a plugin / theme version
      */
-    const VERSION_PATTERN = '/^(\d+\.){2,3}\d+$/';
+    const VERSION_PATTERN = '/^(\d{1,2}\.){2,3}\d{1,2}$/';
 
     /**
      * The pattern for a plugin or theme version, in a URI
      */
-    const VERSION_PATTERN_URI = '(?:\d+\.){2,3}\d+';
+    const VERSION_PATTERN_URI = '(?:\d{1,2}\.){2,3}\d{1,2}';
 
 
     /**

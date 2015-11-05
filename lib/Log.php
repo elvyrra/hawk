@@ -99,7 +99,11 @@ class Log{
         $object = new \ReflectionClass(__CLASS__);
 
         $levels = $object->getConstants();
-        unset($levels['MAX_FILE_SIZE']);
+        foreach($levels as $const => $val){
+            if(strpos($const, 'LEVEL_') !== 0){
+                unset($levels[$const]);
+            }
+        }
 
         return $levels;
     }

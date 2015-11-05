@@ -48,4 +48,4 @@ define('DEFAULT_SESSION_ENGINE', 'file');
 define('DEFAULT_TIMEZONE', date_default_timezone_get());
 
 // The application version
-define('HAWK_VERSION', file_get_contents(ROOT_DIR . 'version.txt'));
+define('HAWK_VERSION', trim(file_get_contents(ROOT_DIR . 'version.txt')));
