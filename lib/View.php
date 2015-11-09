@@ -29,12 +29,12 @@ class View{
 	/**
 	 * Defines if the view already cached or not
 	 */
-	$cached = false,
+	$cached = false;
 
 	/**
-	 * The other views this views depends on
+	 * The instanced views
 	 */
-	$dependencies = array();
+	private static $instances = array();
 	
 	const PLUGINS_VIEW = 'view-plugins/';
 
@@ -67,31 +67,21 @@ class View{
 		$this->fileCache = new FileCache($this->file, 'views');
 
 		$this->content = file_get_contents($file);				
-		$this->getDependencies();
 		if(! $this->fileCache->isCached()){
 			$this->parse();
 			$this->fileCache->set($this->content);
 		}
-	}
-	
 
-	/**
-	 * Get template dependencies
-	 */
-	private function getDependencies(){
-		preg_match_all(self::IMPORT_REGEX, $this->content, $matches, PREG_SET_ORDER);
-		foreach($matches as $match){
-			$file = $match[2];
-			$this->dependencies[$file] = new View(($file{0} == '/' ? ROOT_DIR : dirname(realpath($this->file))) . '/' . $file);
-		}
+		self::$instances[realpath($this->file)] = $this;
 	}
+
 
 	/**
 	 * Set data to display in the view
 	 * @param array The data to insert in the view. The keys of the data will become variables in the view
 	 * @return View The view itself
 	 */
-	public function set($data = array()){
+	public function setData($data = array()){
 		$this->data = $data;
 		return $this;
 	}
@@ -102,9 +92,18 @@ class View{
 	 * @param array The data to add in the view
 	 * @return View The view itself
 	 */
-	public function add($data = array()){
+	public function addData($data = array()){
 		$this->data = array_merge($this->data, $data);	
 		return $this;
+	}
+
+
+	/**
+	 * Get the data pushed in the view
+	 * @return array 
+	 */
+	public function getData(){
+		return $this->data;
 	}
 	
 
@@ -113,14 +112,6 @@ class View{
 	 * @return View The view itself, to permit chained expressions
 	 */
 	private function parse(){
-		// Import sub templates		
-		$this->content = preg_replace_callback(self::IMPORT_REGEX, function($m){
-			$view = $this->dependencies[$m[2]];
-			
-			return "<?php include '" . $view->fileCache->getFile() . "'; ?>";
-		
-		} , $this->content);
-		
 		// Parse PHP Structures
 		$replaces = array(
 			self::BLOCK_START_REGEX => "<?php $1 $2 : ?>", // structure starts
@@ -155,13 +146,13 @@ class View{
 						$value = $m[2] . $m[4] . $m[2];
 					}
 					
-					$parameters[] = "'" . $name . "' => " . $value;
+					$parameters[$name] = "'" . $name . "' => " . $value;
 					
 					// Remove the argument from the arguments list
 					$arguments = str_replace($m[0], '', $arguments);
 				}				
 				
-				return '<?php $instance = new ' . $componentClass . '( array(' . implode(',',$parameters) . ') ); echo $instance->display(); ?>';
+				return '<?php $instance = new ' . $componentClass . '("' . $this->file . '", $_viewData, array(' . implode(',',$parameters) . ') ); echo $instance->display(); ?>';
 			}
 			catch(\Exception $e){
 				return $matches[0];
@@ -180,6 +171,7 @@ class View{
 	 */
 	public function display(){
 		extract($this->data);
+		$_viewData = $this->data;
 		ob_start();
 		
 		include $this->fileCache->getFile();
@@ -196,7 +188,7 @@ class View{
 	 */
 	public static function make($file, $data = array()){
 		$view = new self($file);
-		$view->set($data);
+		$view->setData($data);
 		return $view->display();
 	}	
 

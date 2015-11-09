@@ -1,2 +1,2 @@
-{import "form-input-textarea.tpl"}
+{import file="form-input-textarea.tpl"}
 

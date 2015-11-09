@@ -213,6 +213,7 @@ update-page-update-hawk-btn = "Update to v{version}"
 update-page-confirm-update-hawk = "Do you really want to update Hawk ?"
 update-hawk-error = "An error occured while updating Hawk."
 update-page-current-hawk-version = "Your current version of Hawk is v{version} : "
+update-page-confirm-update-hawk = "Are you sure you want to upgrade to the last version of Hawk"
 
 search-plugin-form-title = "Research a plugin"
 search-plugin-form-search-label = "Research"

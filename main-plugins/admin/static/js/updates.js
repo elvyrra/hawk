@@ -3,7 +3,6 @@ $(".update-hawk").click(function(){
         $.get(app.getUri('update-hawk', {version : $(this).data('to') }))
 
         .success(function(response){
-            debugger;
             if(response.status){
                 location.reload();
             }
@@ -13,7 +12,7 @@ $(".update-hawk").click(function(){
         })
 
         .error(function(xhr, code, error){
-            debugger;
+            app.notify('error', error);
         });
     }
 });

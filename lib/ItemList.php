@@ -117,7 +117,28 @@ class ItemList{
 	 * Define the message to display if no result are found for the list
 	 * @var string
 	 */
-	$emptyMessage;
+	$emptyMessage,
+
+
+	/**
+	 * The whole list (list + navigation bar) view filename
+	 */
+	$tpl,
+
+	/**
+	 * The navigation bar view filename
+	 */
+	$navigationBarTpl,
+
+	/**
+	 * The list view filename
+	 */
+	$listTpl,
+
+	/**
+	 * The result view filename
+	 */
+	$resultTpl;
 
 
 	/**
@@ -355,13 +376,41 @@ class ItemList{
 	}
 	
 	
+	/**
+	 * Get the list views files
+	 */
+	private function getViews(){
+		if(empty($this->tpl)){
+			$this->tpl = Theme::getSelected()->getView('item-list/container.tpl');
+		}
+
+		if(empty($this->navigationBarTpl)){
+			$this->navigationBarTpl = Theme::getSelected()->getView('item-list/navigation-bar.tpl');
+		}
+
+		if(empty($this->listTpl)){
+			$this->listTpl = Theme::getSelected()->getView('item-list/list.tpl');
+		}
+
+		if(empty($this->resultTpl)){
+			$this->resultTpl = Theme::getSelected()->getView('item-list/result.tpl');
+		}
+	}
 
 	/**
-	 * Display the list
+	 * Display the list (alias)
 	 * @return string The HTML result of displaying
 	 */
 	public function __toString(){
-    	try{
+    	return $this->display();
+	}
+
+	/**
+	 * display the list
+	 * @return string The HTML result of displaying
+	 */	
+	public function display(){
+		try{
 	    	// get the data to display
 	    	$this->get();
 
@@ -392,9 +441,11 @@ class ItemList{
 				}
 			}
 
+			$this->getViews();
+
 			// Generate the script to insert the list in the application , client side
 			if($this->refresh){
-				$tplFile = 'result.tpl';
+				$tplFile = $this->resultTpl;
 				$script = 
 					'app.ready(function(){
 				        if(list = app.lists["' . $this->id . '"]){
@@ -423,11 +474,11 @@ class ItemList{
 						});
 					});';
 				
-				$tplFile = 'list.tpl';
+				$tplFile = $this->tpl;
 			}
 
 			return 
-				View::make(Theme::getSelected()->getView('item-list/' . $tplFile), array(			
+				View::make($tplFile, array(			
 					'list' => $this,
 					'data' => $data,
 					'linesParameters' => $param,
@@ -440,14 +491,6 @@ class ItemList{
 		}
 	}
 
-	/**
-	 * display the list (alias)
-	 * @return string The HTML result of displaying
-	 */	
-	public function display(){
-		return $this->__toString();
-	}
-
 
 	/**
 	 * Check if the list is refreshing or displayed for the first time
@@ -455,5 +498,8 @@ class ItemList{
 	public function isRefreshing(){
 		return $this->refresh;
 	}
+
+
+
 
 }

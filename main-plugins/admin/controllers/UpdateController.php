@@ -34,6 +34,8 @@ class UpdateController extends Controller{
         ));
 
         $this->addJavaScript(Plugin::current()->getJsUrl('updates.js'));
+        Lang::addKeysToJavascript('admin.update-page-confirm-update-hawk');
+
         return NoSidebarTab::make(array(
             'title' => Lang::get('admin.update-page-title'),
             'icon' => 'refresh',

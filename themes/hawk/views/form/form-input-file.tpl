@@ -1,4 +1,4 @@
-{import "form-input.tpl"}
+{import file="form-input.tpl"}
 <label for="{{$input->id}}" class="input-file-invitation" >
 	<span class="input-file-invitation-text">{text key="main.input-file-invitation"}</span>
 	<span class="icon icon-check file-chosen-icon" ></span>

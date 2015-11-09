@@ -15,16 +15,33 @@ namespace Hawk;
 abstract class ViewPlugin{
     use Utils;
 
+    /**
+     * The filename of the view that calls the plugin
+     */
+    protected $viewFile,
+
+    /**
+     * The data in the parent view that calls the plugin
+     */
+    $viewData,
+
 	/**
 	 * The plugin instance parameters
 	 */
-	protected $params;
+	$params;
 	
 	/**
 	 * Contructor
 	 * @param array $params The instance parameters
 	 */
-    public function __construct($params = array()){
+    public function __construct($viewFile, $viewData = array(), $params = array()){
+        $this->viewFile = $viewFile;
+        $this->viewData = $viewData;
+
+        if(isset($params['_attrs'])){
+            $params = $params['_attrs'];
+        }
+
         $this->params = $params;
         $this->map($params);
     }
