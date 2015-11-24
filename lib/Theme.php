@@ -189,6 +189,26 @@ class Theme{
 
 
     /**
+     * Get the URL of a file in the theme
+     */
+    public function getFileUrl($file){
+        $privateFile = $this->getRootDir() . $file;
+        $publicFile = $this->getStaticDir() . $file;
+
+        if(!is_file($privateFile)){
+            throw new \Exception('Impossible to get the URL for the file ' . $privateFile . ' : No such file or directory');
+        }
+
+        if(!is_file($publicFile) || filemtime($publicFile) < filemtime($privateFile)){
+            FileSystem::copy($privateFile, $publicFile);
+        }
+
+        return $this->getRootUrl() . $file;
+    }
+
+
+
+    /**
      * Get the file path for the theme preview image
      * @return string
      */
@@ -202,9 +222,7 @@ class Theme{
      * @return string
      */
     public function getPreviewUrl(){
-        $this->build();
-
-        return $this->getRootUrl() . self::PREVIEW_BASENAME;
+        return $this->getFileUrl(self::PREVIEW_BASENAME);
     }
     
 
