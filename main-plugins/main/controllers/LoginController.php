@@ -4,10 +4,9 @@ namespace Hawk\Plugins\Main;
 	
 class LoginController extends Controller{
 	
-	/*_______________________________________________________
-	
-				Generate the login form
-	_______________________________________________________*/	
+	/**
+	 * Generate the login form
+	 */
 	private function form(){
 		/*** Get the registrered login and passwords ***/
 		$param = array(
@@ -55,10 +54,9 @@ class LoginController extends Controller{
 		return new Form($param);
 	}
 	
-	/*_______________________________________________________
-	
-				Display the login page 
-	_______________________________________________________*/
+	/**
+	 * Display the login page
+	 */
 	public function login(){
 		$form = $this->form();
 		if(!$form->submitted()){	
@@ -117,6 +115,10 @@ class LoginController extends Controller{
 		}
 	}	
 	
+
+	/**
+	 * Register a new user
+	 */
 	public function register(){
 		$param = array(
 			'id' => 'register-form',
@@ -341,9 +343,9 @@ class LoginController extends Controller{
 	 */
 	public function logout(){
 		session_destroy();
-		setcookie("PHPSESSID", "", time() - 1, '/');
-		header("Location: ./");
-		exit;
+
+		Response::redirectToAction('index');
+		Response::end();		
 	}
 
 }

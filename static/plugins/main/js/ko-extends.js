@@ -174,4 +174,45 @@ define('ko-extends', ['jquery', 'ko'], function($, ko){
             node.dataset.bind = dataBind;
         }
     }
+
+
+    var templates = {}, n = {}, engine = new ko.nativeTemplateEngine;
+
+    ko.templateSources.stringTemplate = function(name) {
+        this.templateName = name;
+    };
+    
+    ko.utils.extend(ko.templateSources.stringTemplate.prototype, {
+        data: function(e, t) {
+            n[this.templateName] = n[this.templateName] || {};
+            if (arguments.length === 1){
+                return n[this.templateName][e];
+            }
+            n[this.templateName][e] = t;
+        },
+        text: function(e) {
+            if (arguments.length === 0) {
+                var n = templates[this.templateName];
+                if (typeof n == "undefined"){
+                    throw Error("Template not found: " + this.templateName);
+                }
+                return n;
+            }
+            templates[this.templateName] = e;
+        }
+    });
+
+    engine.makeTemplateSource = function(name, n) {
+        var r;
+        if (typeof name == "string"){
+            r = (n || document).getElementById(name);
+            return r ? new ko.templateSources.domElement(r) : new ko.templateSources.stringTemplate(name);
+        }
+        if (t && name.nodeType === 1 || name.nodeType === 8){
+            return new ko.templateSources.anonymousTemplate(name);
+        }
+    };
+    
+    ko.templates = templates;
+    ko.setTemplateEngine(engine);
 });

@@ -289,7 +289,7 @@ class DB{
 			}
 
 			// Log the query
-			$this->addLog($log, $result, $start, $end);
+			$this->addLog(str_replace(PHP_EOL, ' ', $log), $result, $start, $end);
 
 			return $result;
         }

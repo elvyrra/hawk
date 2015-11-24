@@ -8,7 +8,7 @@ define('tabs', ['jquery', 'ko'], function($, ko){
 		this.id = ko.observable(id);
 		this.title = ko.observable("");
 		this.url = ko.observable("");
-		this.content = ko.observable("");
+		this.content = ko.observable('');
 		this.route = ko.observable("");
 
 		this.history = [];

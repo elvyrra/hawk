@@ -11,6 +11,8 @@ define('list', ['jquery', 'ko'], function($, ko){
 
         this.node = $("#" + this.id);
         this.wrapper = this.node.parent();
+        this.navigationSection = this.wrapper.find('.list-navigation');
+        this.titleLine = this.node.find('.list-title-line');
         this.refreshContainer = this.node.find(".list > tbody");
 
         // Get the list display parameters (number of lines, page number, searches and sorts)
@@ -68,7 +70,7 @@ define('list', ['jquery', 'ko'], function($, ko){
             data : get,
             cache : false,
         })
-        .done(function(response){    
+        .done(function(response){                
             this.refreshContainer.html(response);
         }.bind(this))
 
@@ -84,7 +86,12 @@ define('list', ['jquery', 'ko'], function($, ko){
      * Listen for list parameters changements to refresh the list
      */
     List.prototype.initControls = function(){
-        ko.applyBindings(this, document.getElementById(this.id)); 
+        if(this.navigationSection.length){
+            ko.applyBindings(this, this.navigationSection[0]);
+        }
+        if(this.titleLine){
+            ko.applyBindings(this, this.titleLine[0]);
+        }        
 
         var self = this;
         

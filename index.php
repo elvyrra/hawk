@@ -27,6 +27,11 @@ foreach($plugins as $plugin){
 	}
 }
 
+/*** Initialize the theme ***/
+if(is_file(Theme::getSelected()->getStartFile())){
+    include Theme::getSelected()->getStartFile();
+}
+
 (new Event('before-routing'))->trigger();
 
 /*** Compute the routage ***/

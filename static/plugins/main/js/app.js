@@ -367,7 +367,7 @@ App.prototype.load = function(url, data){
 					element.title($(".page-name", response).first().val());
 
 					element.content(response);
-					
+
 					// Regiter the tabs in the cookie
 					if(this.isConnected) {
 						this.tabset.registerTabs();

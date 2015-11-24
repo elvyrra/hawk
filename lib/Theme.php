@@ -150,6 +150,15 @@ class Theme{
         }
         return $prop ? $this->data[$prop] : $this->data;
     }
+
+
+    /**
+     * Get the start file of the theme. The start file is the file start.php in the theme that initialize special intructions for the theme
+     * @return string
+     */
+    public function getStartFile(){
+        return $this->getRootDir() . 'start.php';
+    }
     
 
     /**

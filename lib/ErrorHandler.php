@@ -9,7 +9,7 @@ namespace Hawk;
  * This class defines the errors and exceptions handlers
  * @package Core
  */
-class ErrorHandler {
+class ErrorHandler {	
 
 	/**
 	 * Handler an error
@@ -19,7 +19,7 @@ class ErrorHandler {
 	 * @param int $line The line in the file where the error was throwed
 	 * @param array $context All the variables in the error context
 	 */
-	public static function error($no, $str, $file, $line, $context){	
+	public function error($no, $str, $file, $line, $context){	
 		if (!(error_reporting() & $no)) {
 	        // This error code is not in error_reporting
 	        return;
@@ -84,7 +84,7 @@ class ErrorHandler {
 	 * Handle an non catched exception
 	 * @param Exception $e The throwed exception
 	 */
-	public static function exception($e){
+	public function exception($e){
 		$param = array(
 			'level' => 'danger',
 			'icon' => 'excalamation-circle',
@@ -101,4 +101,21 @@ class ErrorHandler {
 		}
 		Response::end();
 	}
+
+	/**
+	 * Handle fatal errors
+	 */
+	public function fatalError(){
+		$error = error_get_last();
+
+		if( $error !== NULL) {
+		    $errno   = $error["type"];
+		    $errfile = $error["file"];
+		    $errline = $error["line"];
+		    $errstr  = $error["message"];
+
+		    $this->error($errno, $errstr, $errfile, $errline, array());
+		}
+	}
+	
 }

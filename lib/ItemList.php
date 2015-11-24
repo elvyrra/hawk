@@ -322,7 +322,7 @@ class ItemList{
 
 			$this->results = $this->dbo->select($request);
 			
-			return true;
+			return $this->results;
 		}
 		catch(DBException $e){
 			exit(DEBUG_MODE ? $e->getMessage() : Lang::get('main.list-error'));
@@ -363,7 +363,7 @@ class ItemList{
 		$this->start = ($this->page - 1) * $this->lines;  
 		$this->results = array_slice(array_map(function($line){ return (object)$line; }, $data), $this->start, $this->lines);
 		
-		return true;
+		return $this->results;
 	}
 	
 
@@ -477,14 +477,14 @@ class ItemList{
 				$tplFile = $this->tpl;
 			}
 
-			return 
+			return 				
 				View::make($tplFile, array(			
 					'list' => $this,
 					'data' => $data,
 					'linesParameters' => $param,
 					'pages' => $pages
 				)) . 
-				'<script>' . $script . '</script>';
+				'<script type="text/javascript">' . $script . '</script>';
 		}
 		catch(\Exception $e){
 			ErrorHandler::exception($e);
