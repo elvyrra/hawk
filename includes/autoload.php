@@ -68,7 +68,7 @@ class Autoload{
         if(isset($searchDirectories[$namespace])){
             $dirs = $searchDirectories[$namespace];
         }
-        elseif(strpos($namespace, 'Hawk\\Plugins\\') === 0){
+        elseif(strpos($namespace, 'Hawk\\Plugins\\') === 0 || strpos($namespace, '\\Hawk\\Plugins\\') === 0){
             if(class_exists("\\Hawk\\$class") || trait_exists("\\Hawk\\$class")){
                 class_alias("\\Hawk\\$class", $classname);                
                 return true;
@@ -88,7 +88,7 @@ class Autoload{
             // If the class exists, it is in custom-libs directory
             $dirs = array(CUSTOM_LIB_DIR, LIB_DIR . 'ext/');
         }
-
+        
 		// Cross any search folder to find out the class file
         foreach($dirs as $dir){
             $files = FileSystem::find($dir, $filename, FileSystem::FIND_FILE_ONLY);

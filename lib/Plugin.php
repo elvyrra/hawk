@@ -149,7 +149,7 @@ class Plugin{
 		$plugins = array();
 		$dirs = $noMain ? array(PLUGINS_DIR) : array(MAIN_PLUGINS_DIR, PLUGINS_DIR);
 
-		if(Conf::has('db')){
+		if(App::conf()->has('db')){
 			$configs = DB::get(MAINDB)->select(array(
 				'from' => DB::getFullTablename(self::TABLE),
 				'index' => 'name',			
@@ -542,7 +542,7 @@ class Plugin{
 			return $this->manager;
 		}
 
-		$class = $this->getNamespace() . '\\Installer';
+		$class = '\\' . $this->getNamespace() . '\\Installer';
 		if(!empty($class)){
 			$this->manager = new $class($this);
 			return $this->manager;
@@ -643,5 +643,19 @@ class Plugin{
 			Log::error('En error occured while deactivating plugin ' . $this->name . ' : ' . $e->getMessage());
 			throw $e;
 		}
-	}	
+	}
+
+
+	/**
+	 * Update the plugin to a given version
+	 * @param string $version The version to update the plugin
+	 */
+	public function update($version){
+		$updater = $this->getInstallerInstance();
+
+		$method = 'v' . str_replace('.', '_', $version);
+        if(method_exists($updater, $method)){
+            $updater->$method();
+        }		
+	}
 }

@@ -58,6 +58,7 @@ h1,h2,h3,h4,h5,h6{
 	font-size: inherit;
 	margin-top: .5rem;
     border-radius: 1px;
+    margin-right: .5rem;
 }
 
 /* labels */
@@ -153,6 +154,13 @@ code {
 
 .pointer{
     cursor: pointer;
+}
+
+.center{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -640,11 +648,12 @@ table {
 
 /*----------------------- New tab ------------------------*/
 .new-tab-default-content{
-    .text-center();
-    margin-top: 20%;
-    width: 100%;
-    height: 50%;
-    position: absolute;
+    .text-center();    
+
+    .application-logo{
+        height: 30rem;
+        width: auto;
+    }
 }
 
 /*--------------------- Links -------------------------*/
@@ -1014,11 +1023,13 @@ body.dragging, body.dragging * {
 }
 
 /*------------------------------ Available updates -----------------------*/
-.available-updates{
-    width: @main-menu-height;
-    height: @main-menu-height;
-    line-height: @main-menu-height;
+.available-updates{    
     border-radius: 100%;
-    text-align: center;
-    font-size: 1.4rem;
+    text-align: center;  
+    font-size: 1.2rem;
+    height: 1.5rem;
+    width: 1.5rem;
+    line-height: 1.5rem;      
+    position: absolute;
+    right: .5rem;
 }

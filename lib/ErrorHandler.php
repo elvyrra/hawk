@@ -52,8 +52,7 @@ class ErrorHandler {
 				$title = "PHP Warning";
 			break;
 
-			case E_ERROR :
-			case E_USER_ERROR :
+			default:
 				$level = "danger";
 				$icon = "exclamation-circle";
 				$title = "PHP Error";
@@ -70,9 +69,9 @@ class ErrorHandler {
 			)
 		);
 
-		if(!Response::getType() === "json"){			
-			Response::set(json_encode($param));
-			Response::end();
+		if(!App::response()->getContentType() === "json"){			
+			App::response()->setBody($param);
+			App::response()->end();
 		}
 		else{
 			echo View::make(Theme::getSelected()->getView('error.tpl'), $param);
@@ -93,13 +92,13 @@ class ErrorHandler {
 			'trace' => $e->getTrace()
 		);
 
-		if(Response::getType() === "json"){
-			Response::set(json_encode($param));
+		if(App::response()->getContentType() === "json"){
+			App::response()->setBody($param);
 		}
 		else{				
-			Response::set(View::make(Theme::getSelected()->getView('error.tpl'), $param));
+			App::response()->setBody(View::make(Theme::getSelected()->getView('error.tpl'), $param));
 		}
-		Response::end();
+		App::response()->end();
 	}
 
 	/**

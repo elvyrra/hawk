@@ -9,7 +9,7 @@ class UserProfileController extends Controller{
      */
     public function edit(){
         if(!$this->userId){
-            $user = Session::getUser();
+            $user = App::session()->getUser();
         }         
         else{
             $user = User::getById($this->userId);
@@ -200,7 +200,7 @@ class UserProfileController extends Controller{
         }
         else{
             if($form->check()){
-                $me = Session::getUser();
+                $me = App::session()->getUser();
                 if($me->password != Crypto::saltHash($form->getData('current-password'))){
                     return $form->response(Form::STATUS_ERROR, Lang::get('main.update-password-bad-current-password'));
                 }

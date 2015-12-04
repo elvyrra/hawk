@@ -158,7 +158,7 @@ class Form{
 		/*
 		 * Default values
 		 */
-		$this->action = Request::getUri();
+		$this->action = App::request()->getUri();
 				
 		// Get the parameters of the instance
 		$data = $param;
@@ -287,7 +287,7 @@ class Form{
 		}
 
 		if($this->submitted()){
-			$data = strtolower($this->method) == 'get' ? Request::getParams() : Request::getBody();			
+			$data = strtolower($this->method) == 'get' ? App::request()->getParams() : App::request()->getBody();			
 		}
 
 		// Set the value in all inputs instances		
@@ -375,11 +375,11 @@ class Form{
 	 * @return mixed If the form is not submitted, this function will return FALSE. Else, the function will return 'register' or 'delete', depending on the user action
 	 */
     public function submitted(){
-    	if(Request::getMethod() == "delete"){
+    	if(App::request()->getMethod() == "delete"){
     		return self::ACTION_DELETE;
     	}
         
-        $action = $this->method == 'get' ? Request::getParams('_submittedForm') : Request::getBody('_submittedForm');
+        $action = $this->method == 'get' ? App::request()->getParams('_submittedForm') : App::request()->getBody('_submittedForm');
 		return $action ? $action : false;
     }  
 	
@@ -468,7 +468,7 @@ class Form{
 			return $this->wrap($content);
 		}
 		catch(\Exception $e){
-			ErrorHandler::exception($e);
+			App::errorHandler()->exception($e);
 		}
 	}
 	
@@ -488,10 +488,10 @@ class Form{
 		
 		if(!empty($this->errors)){
 			$this->status = self::STATUS_ERROR;
-			Log::warning(Session::getUser()->username . ' has badly completed the form ' . $this->id);
+			Log::warning(App::session()->getUser()->username . ' has badly completed the form ' . $this->id);
 			if($exit){
 				/*** The form check failed ***/
-				Response::end($this->response(self::STATUS_CHECK_ERROR, Lang::get('form.error-fill')));
+				App::response()->end($this->response(self::STATUS_CHECK_ERROR, Lang::get('form.error-fill')));
 			}
 			else{
 				$this->addReturn('message', Lang::get('form.error-fill'));
@@ -556,10 +556,10 @@ class Form{
 			));	
 			$this->status = self::STATUS_SUCCESS;
 			
-			Log::info(Session::getUser()->username . ' has updated the data on the form ' . $this->id);
+			Log::info(App::session()->getUser()->username . ' has updated the data on the form ' . $this->id);
 			if($exit){
 				// output the response
-				Response::end($this->response(self::STATUS_SUCCESS, $success ? $success : Lang::get('form.success-register')));
+				App::response()->end($this->response(self::STATUS_SUCCESS, $success ? $success : Lang::get('form.success-register')));
 			}
 			return $this->object->$id;	
 		}
@@ -604,7 +604,7 @@ class Form{
 			
 			Log::info('The delete action on the form ' . $this->id . ' was successflully completed');
 			if($exit){
-				Response::end($this->response(self::STATUS_SUCCESS, $success ? $success : Lang::get('form.success-delete')));
+				App::response()->end($this->response(self::STATUS_SUCCESS, $success ? $success : Lang::get('form.success-delete')));
 			}
 			return $this->object->$id;
 		}
@@ -656,7 +656,7 @@ class Form{
 		switch($status){
 			case self::STATUS_SUCCESS :
 				// The form has been submitted correctly
-				Response::setHttpCode(self::HTTP_CODE_SUCCESS);
+				App::response()->setStatus(self::HTTP_CODE_SUCCESS);
 				if(! $this->nomessage){
 					$response['message'] = $message ? $message : Lang::get('form.'.$status.'-'.$this->dbaction);
 				}
@@ -665,20 +665,20 @@ class Form{
 			
 			case self::STATUS_CHECK_ERROR :
 				// An error occured while checking field syntaxes
-				Response::setHttpCode(self::HTTP_CODE_CHECK_ERROR);
+				App::response()->setStatus(self::HTTP_CODE_CHECK_ERROR);
 				$response['message'] = $message ? $message : Lang::get('form.error-fill');
 				$response['errors'] = $this->errors;			
 				break;
 			
 			case self::STATUS_ERROR :
 			default :
-				Response::setHttpCode(self::HTTP_CODE_ERROR);
+				App::response()->setStatus(self::HTTP_CODE_ERROR);
 				$response['message'] = $message ? $message : Lang::get('form.'.$status.'-'.$this->dbaction);
 				$response['errors'] = $this->errors;
 				break;
 		}
 		
-		Response::setJson();
+		App::response()->setContentType('json');
 		return $response;
 	}
 	

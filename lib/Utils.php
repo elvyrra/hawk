@@ -33,6 +33,21 @@ trait Utils{
 
 
     /**
+     * Serialize a version number as integer. This method can be used to compare two versions
+     */
+    public static function getSerializedVersion($version){
+        $digits = explode('.', $version);
+        $number = '';
+        foreach(range(0,3) as $i) {
+            if(empty($digits[$i])){
+                $digits[$i] = '00';
+            }
+            $number .= str_pad($digits[$i], 2, '0', STR_PAD_LEFT);
+        }
+        return $number;
+    }
+
+    /**
      * Map an array data to the object that use this trait
      * @param array $array The data to map to the object
      * @param Object $object The object to map. If not set, get $this in the execution context of the method

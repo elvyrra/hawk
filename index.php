@@ -13,14 +13,14 @@ Log::debug('script has been Initialized');
 
 (new Event('process-start'))->trigger();
 
-if(!Conf::has('db') && (Router::getUri() === '/' || Router::getUri() === 'index.php')) {
+if(!App::conf()->has('db') && (Router::getUri() === '/' || Router::getUri() === 'index.php')) {
     Log::debug('Hawk is not installed yet, redirect to install process page');
-    Response::redirect(Router::getUri('install'));
+    App::response()->redirect(Router::getUri('install'));
     return;
 }
 
 /*** Initialize the plugins ***/
-$plugins = Conf::has('db') ? array_merge(Plugin::getMainPlugins(), Plugin::getActivePlugins()) : array(Plugin::get('main'), Plugin::get('install'));
+$plugins = App::conf()->has('db') ? array_merge(Plugin::getMainPlugins(), Plugin::getActivePlugins()) : array(Plugin::get('main'), Plugin::get('install'));
 foreach($plugins as $plugin){	
 	if(is_file($plugin->getStartFile())){
 		include $plugin->getStartFile();
@@ -39,12 +39,12 @@ Router::route();
 
 Log::debug('end of script');
 $event = new Event('process-end', array(
-	'output' => Response::get(), 
+	'output' => App::response()->getBody(), 
 	'execTime' => microtime(true) - SCRIPT_START_TIME
 ));
 $event->trigger();
 
-Response::set($event->getData('output'));
+App::response()->setBody($event->getData('output'));
 
 /*** Return the response to the client ***/
-Response::end();
+App::response()->end();

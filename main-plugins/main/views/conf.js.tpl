@@ -12,7 +12,7 @@ window.appConf = {
 	},
 
 	user : {
-		connected : {{ Session::isConnected() ? 'true' : 'false' }},
+		connected : {{ App::session()->isConnected() ? 'true' : 'false' }},
 		canAccessApplication : {{ $accessible ? 'true' : 'false' }}
 	}
 };

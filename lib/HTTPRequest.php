@@ -138,7 +138,7 @@ class HTTPRequest{
 	 * @param string $type The expected type of response data. Can be 'text', 'html', 'json', 'xml' or the wanted mime type
 	 */
 	public function setDataType($type){
-		if(self::$dataTypes[$type]){
+		if(isset(self::$dataTypes[$type])) {
 			$value = self::$dataTypes[$type];			
 		}
 		else{

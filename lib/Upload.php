@@ -35,7 +35,7 @@ class Upload{
 	 * @param string $name the name of the upload
 	 */
 	private function __construct($name){
-		$files = Request::getFiles();
+		$files = App::request()->getFiles();
 		if(empty($files[$name])){
 			throw new UploadException();
 		}

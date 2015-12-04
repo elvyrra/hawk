@@ -60,7 +60,7 @@ class LoginController extends Controller{
 	public function login(){
 		$form = $this->form();
 		if(!$form->submitted()){	
-			if(Request::getParams('code') == 403){
+			if(App::request()->getParams('code') == 403){
 				$form->status = Form::STATUS_ERROR;
 				$form->addReturn('message', Lang::get('main.403-message'));
 			}
@@ -95,15 +95,15 @@ class LoginController extends Controller{
 					}
 					
 					// The user can be connected 
-					$_SESSION['user'] = array(
+					App::session()->setData('user', array(						
 						'id' => $user->id,						
 						'email' => $user->email,
 						'username' => $user->getUsername(),
-						'ip' => Request::clientIp()
-					);					
+						'ip' => App::request()->clientIp()						
+					));
 
-					if(Request::getParams('redirect')){
-						$form->addReturn('redirect',Request::getParams('redirect'));
+					if(App::request()->getParams('redirect')){
+						$form->addReturn('redirect',App::request()->getParams('redirect'));
 					}
 					
 					return $form->response(Form::STATUS_SUCCESS, Lang::get('main.login-success'));
@@ -226,7 +226,7 @@ class LoginController extends Controller{
 						'password' => $form->inputs['password']->dbvalue(),
 						'active' => Option::get('main.confirm-register-email') ? 0 : 1,
 						'createTime' => time(),
-						'createIp' => Request::clientIp(),
+						'createIp' => App::request()->clientIp(),
 						'roleId' => Option::get('roles.default-role'),
 					));
 
@@ -344,8 +344,7 @@ class LoginController extends Controller{
 	public function logout(){
 		session_destroy();
 
-		Response::redirectToAction('index');
-		Response::end();		
+		App::response()->redirectToAction('index');
 	}
 
 }

@@ -35,6 +35,13 @@ class AdminController extends Controller{
 			}
 		}
 
+		$api = new HawkApi;
+		try{
+            $updates = $api->getCoreAvailableUpdates();
+        }
+        catch(\Hawk\HawkApiException $e){
+            $updates = array();
+        }
 
 		$param = array(
 			'id' => 'settings-form',
@@ -219,13 +226,13 @@ class AdminController extends Controller{
 				'email' => array(
 					new EmailInput(array(
 						'name' => 'main_mailer-from',
-						'default' => Option::get('main.mailer-from') ? Option::get('main.mailer-from') : Session::getUser()->email,
+						'default' => Option::get('main.mailer-from') ? Option::get('main.mailer-from') : App::session()->getUser()->email,
 						'label' => Lang::get('admin.settings-mailer-from-label')
 					)),					
 
 					new TextInput(array(
 						'name' => 'main_mailer-from-name',
-						'default' => Option::get('main.mailer-from-name') ? Option::get('main.mailer-from-name') : Session::getUser()->getDisplayName(),
+						'default' => Option::get('main.mailer-from-name') ? Option::get('main.mailer-from-name') : App::session()->getUser()->getDisplayName(),
 						'label' => Lang::get('admin.settings-mailer-from-name-label')
 					)),
 
@@ -266,8 +273,8 @@ class AdminController extends Controller{
 					
 					new PasswordInput(array(
 						'name' => 'main_mailer-password',
-						'encrypt' => 'Crypto::aes256_encode',
-						'decrypt' => 'Crypto::aes256_decode',
+						'encrypt' => 'Crypto::aes256Encode',
+						'decrypt' => 'Crypto::aes256Decode',
 						'default' => Option::get('main.mailer-password'),
 						'label' => Lang::get('admin.settings-mailer-password-label'),						
 					)),
@@ -283,7 +290,18 @@ class AdminController extends Controller{
 					))
 				),
 				
-				'_submits' => array(
+				'_submits' => array(	
+					empty($updates) ? null : new ButtonInput(array(
+						'name' => 'update-hawk',
+						'value' => Lang::get('admin.update-page-update-hawk-btn', array('version' => end($updates)['version'])),
+						'icon' => 'refresh',
+						'id' => 'update-hawk-btn',
+						'attributes' => array(
+							'ko-click' => 'function(){ updateHawk("' . end($updates)['version'] . '"); }'
+						),
+						'class' => 'btn-warning'
+					)),
+
 					new SubmitInput(array(
 						'name' => 'save',
 						'value' => Lang::get('main.valid-button'),
@@ -303,7 +321,9 @@ class AdminController extends Controller{
 				'languages' => $languages
 			));
 			
+			Lang::addKeysToJavascript('admin.update-page-confirm-update-hawk');
 			$this->addJavaScript(Plugin::current()->getJsUrl('settings.js'));
+
 			return NoSidebarTab::make(array(
 				'icon' => 'cogs',
 				'title' => Lang::get('admin.settings-page-name'),
@@ -367,7 +387,7 @@ class AdminController extends Controller{
 					}					
 					
 					// Register the favicon
-					Log::info('The options of the application has been updated by ' . Session::getUser()->username);
+					Log::info('The options of the application has been updated by ' . App::session()->getUser()->username);
 					return $form->response(Form::STATUS_SUCCESS, Lang::get('admin.settings-save-success'));
 				}
 			}
@@ -377,5 +397,68 @@ class AdminController extends Controller{
 			}
 		}
 	}
+
+
+	/**
+     * Update Hawk
+     */
+    public function updateHawk(){
+        try{
+            $api = new HawkApi;
+
+            $nextVersions = $api->getCoreAvailableUpdates();
+            
+            if(empty($nextVersions)){
+                throw new \Exception("No newer version is available for Hawk");                
+            }
+
+            // Update incrementally all newer versions
+            foreach($nextVersions as $version){
+                // Download the update archive
+                $archive = $api->getCoreUpdateArchive($version['version']);            
+
+                // Extract the downloaded file
+                $zip = new \ZipArchive;
+                if($zip->open($archive) !== true){
+                    throw new \Exception('Impossible to open the zip archive');
+                }
+                $zip->extractTo(TMP_DIR);
+
+                // Put all modified or added files in the right folder
+                $folder = TMP_DIR . 'update-v' . $version['version'] . '/';
+                FileSystem::copy($folder . 'to-update/*', ROOT_DIR);
+
+                // Delete the files to delete
+                $toDeleteFiles = explode(PHP_EOL, file_get_contents($folder . 'to-delete.txt'));
+
+                foreach($toDeleteFiles as $file){
+                    if(is_file(ROOT_DIR . $file)){
+                        unlink(ROOT_DIR . $file);
+                    }
+                }
+
+                // Execute the update method if exist
+                $updater = new HawkUpdater;
+                $methods = get_class_methods($updater);
+
+                $method = 'v' . str_replace('.', '_', $version['version']);
+                if(method_exists($updater, $method)){
+                    $updater->$method();
+                }
+
+                // Remove temporary files and folders
+                FileSystem::remove($folder);
+                FileSystem::remove($archive);
+            } 
+
+            $response = array('status' => true);
+        }
+        catch(\Exception $e){
+            $response = array('status' => false, 'message' => DEBUG_MODE ? $e->getMessage() : Lang::get('admin.update-hawk-error'));
+        }
+
+        App::response()->setContentType('json');
+        App::response()->end($response);
+    }
 	
 }

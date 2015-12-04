@@ -212,7 +212,7 @@ class User extends Model{
 	 * @return bool
 	 */
 	public function isConnected(){
-		return $this->id && $_SESSION['user']['id'] == $this->id && $this->active;
+		return $this->id && App::session()->getData('user.id') == $this->id && $this->active;
 	}
 	
 
@@ -229,6 +229,6 @@ class User extends Model{
 	 * @return bool
 	 */
 	public function isRemovable(){
-		return $this->id != Session::getUser()->id && $this->id != self::ROOT_USER_ID && $this->id != self::GUEST_USER_ID;
+		return $this->id != App::session()->getUser()->id && $this->id != self::ROOT_USER_ID && $this->id != self::GUEST_USER_ID;
 	}
 }

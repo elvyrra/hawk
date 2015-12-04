@@ -20,12 +20,12 @@ class LanguageController extends Controller{
 			'keys' => 'all'
 		);
 
-		if(Request::getParams('filters')) {
-			setcookie('languages-filters', Request::getParams('filters'), 0, '/');
-			$filters = json_decode(Request::getParams('filters'), true);
+		if(App::request()->getParams('filters')) {
+			setcookie('languages-filters', App::request()->getParams('filters'), 0, '/');
+			$filters = json_decode(App::request()->getParams('filters'), true);
 		}
-		elseif(Request::getCookies('languages-filters')){
-			$filters = json_decode(Request::getCookies('languages-filters'), true);
+		elseif(App::request()->getCookies('languages-filters')){
+			$filters = json_decode(App::request()->getCookies('languages-filters'), true);
 		}
 		
 		return $filters;	 	
@@ -77,7 +77,7 @@ class LanguageController extends Controller{
 			// Register the translations
 			try{
 				$keys = array();
-				$translations = Request::getBody('translation');
+				$translations = App::request()->getBody('translation');
 				if(!empty($translations[$filters['tag']])){
 					foreach($translations[$filters['tag']] as $langKey => $translation){
 						if(!empty($translation)){						
@@ -474,7 +474,7 @@ class LanguageController extends Controller{
 		else{
 			if($form->check()){
 				try{
-					$files = Request::getFiles('files');
+					$files = App::request()->getFiles('files');
 					foreach($files['name'] as $i => $filename){
 						// Check the filename is correct
 						if(!preg_match('/^([\w\-]+)\.([a-z]{2})\.lang$/', $filename, $matches)) {

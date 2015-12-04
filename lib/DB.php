@@ -588,7 +588,7 @@ class DB{
 	 */
 	public static function getFullTablename($table, $prefix = null){
 		if($prefix === null){
-			$prefix = Conf::get('db.prefix');			
+			$prefix = App::conf()->get('db.prefix');			
 		}
 
 		return $prefix . $table;

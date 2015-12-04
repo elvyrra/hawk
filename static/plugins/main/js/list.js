@@ -89,7 +89,7 @@ define('list', ['jquery', 'ko'], function($, ko){
         if(this.navigationSection.length){
             ko.applyBindings(this, this.navigationSection[0]);
         }
-        if(this.titleLine){
+        if(this.titleLine.length){
             ko.applyBindings(this, this.titleLine[0]);
         }        
 

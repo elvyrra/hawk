@@ -45,7 +45,7 @@ class DatabaseSessionHandler implements \SessionHandlerInterface{
      * @param int $maxlifetime The session lifetime (not used)
      */
     public function gc($maxlifetime){
-        return $this->db->delete($this->table, ':lifetime AND mtime + :lifetime < UNIX_TIMESTAMP()', array('lifetime' => Conf::get('session.lifetime'))) ? true : false;
+        return $this->db->delete($this->table, ':lifetime AND mtime + :lifetime < UNIX_TIMESTAMP()', array('lifetime' => App::conf()->get('session.lifetime'))) ? true : false;
     }
     
 
@@ -59,8 +59,8 @@ class DatabaseSessionHandler implements \SessionHandlerInterface{
         $this->table = DB::getFullTablename('Session');
 
         // Update the session mtime
-        if(Request::getCookies($name)){
-            $this->db->update($this->table, new DBExample(array('id' => Request::getCookies($name))), array('mtime' => time()));
+        if(App::request()->getCookies($name)){
+            $this->db->update($this->table, new DBExample(array('id' => App::request()->getCookies($name))), array('mtime' => time()));
         }
 
         // Clean expired sessions

@@ -161,7 +161,7 @@ class ItemList{
 		/*** Default values ***/		
 		$this->emptyMessage = Lang::get('main.list-no-result');
 		$this->action = getenv('REQUEST_URI');
-		$this->refresh = !!Request::getParams('refresh');
+		$this->refresh = !!App::request()->getParams('refresh');
 		
 		/*** Get the values from the parameters array **/
 		$this->map($params);
@@ -487,7 +487,7 @@ class ItemList{
 				'<script type="text/javascript">' . $script . '</script>';
 		}
 		catch(\Exception $e){
-			ErrorHandler::exception($e);
+			App::errorHandler()->exception($e);
 		}
 	}
 

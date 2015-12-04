@@ -9,15 +9,15 @@ Router::setProperties(
 		Router::get('new-tab', '/newtab', array('action' => 'MainController.newTab'));
 		Router::get('logout', '/logout', array('action' => 'LoginController.logout'));
 			
-		Router::auth(Session::isConnected(), function(){
-			Router::auth(Request::isAjax(), function(){
-				Router::any('edit-profile', '/profile/edit/{userId}', array('where' => array('userId' => '\d+'), 'default' => array('userId' => Session::getUser()->id), 'action' => 'UserProfileController.edit'));
+		Router::auth(App::session()->isConnected(), function(){
+			Router::auth(App::request()->isAjax(), function(){
+				Router::any('edit-profile', '/profile/edit/{userId}', array('where' => array('userId' => '\d+'), 'default' => array('userId' => App::session()->getUser()->id), 'action' => 'UserProfileController.edit'));
 				Router::any('change-password', '/profile/change-password', array('action' => 'UserProfileController.changePassword'));
 			});
 			
 		});
 
-		Router::auth(!Session::isConnected(), function(){
+		Router::auth(!App::session()->isConnected(), function(){
 		    Router::any('login', '/login', array('action' => 'LoginController.login'));
 			
 			Router::auth(Option::get('main.open-register'), function(){

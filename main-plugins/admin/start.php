@@ -8,11 +8,8 @@ Router::setProperties(
 		'prefix' => '/admin/'
 	), 
 	function(){
-		Router::auth(Session::isConnected(), function(){
-			/*** Application settings ***/
-			Router::any('main-settings', 'settings', array('auth' => Session::isAllowed('admin.all'), 'action' => 'AdminController.settings'));
-
-			Router::auth(Session::isAllowed('admin.users') || Session::isAllowed('admin.all'), function(){
+		Router::auth(App::session()->isConnected(), function(){
+			Router::auth(App::session()->isAllowed('admin.users') || App::session()->isAllowed('admin.all'), function(){
 				/*** Manage users  ***/
 
 				Router::get('manage-users', 'users', array('action' => 'UserController.index'));	
@@ -44,7 +41,13 @@ Router::setProperties(
 			});
 
 
-			Router::auth(Session::isAllowed('admin.all'), function(){
+			Router::auth(App::session()->isAllowed('admin.all'), function(){
+				/*** Application settings ***/
+				Router::any('main-settings', 'settings', array('action' => 'AdminController.settings'));
+
+				// Update Hawk
+				Router::get('update-hawk', 'updates/hawk/{version}', array('where' => array('version' => HawkApi::VERSION_PATTERN_URI), 'action' => 'AdminController.updateHawk'));
+
 				/*** Manage themes ***/
 				
 				Router::get('manage-themes', 'themes', array('action' => 'ThemeController.index'));
@@ -70,6 +73,8 @@ Router::setProperties(
 				Router::any('import-theme', 'themes/import', array('action' => 'ThemeController.import'));
 				// Remove a theme
 				Router::get('delete-theme', 'themes/{name}/remove', array('where' => array('name' => '[a-zA-Z0-9\-_.]+'), 'action' => 'ThemeController.delete'));
+				// Update a theme
+				Router::get('update-theme', 'themes/{theme}/update', array('where' => array('theme' => '[a-zA-Z0-9\-_.]+'), 'action' => 'ThemeController.update'));
 
 				// Set the menu items and order
 				Router::post('set-menu', 'menu/set-order', array('action' => 'MenuController.index'));
@@ -77,6 +82,7 @@ Router::setProperties(
 				Router::get('delete-menu', 'menu/{itemId}/remove', array('where' => array('itemId' => '\d+'), 'action' => 'MenuController.removeCustomMenuItem'));
 				// Edit a menu item
 				Router::any('edit-menu', 'menu/{itemId}', array('where' => array('itemId' => '\d+'), 'action' => 'MenuController.editCustomMenuItem'));
+
 
 
 				/*** Manage plugins ***/		
@@ -107,30 +113,18 @@ Router::setProperties(
 				// Create a new plugin structure
 				Router::any('create-plugin', 'plugins/_new', array('action' => 'PluginController.create'));
 
+				// Update a plugin
+				Router::get('update-plugin', 'plugins/{plugin}/update', array('where' => array('plugin' => '[a-zA-Z0-9\-_.]+'), 'action' => 'PluginController.update'));
+
 				Event::on('menuitem.added menuitem.deleted', function($event){
 		            Router::getCurrentController()->addJavaScriptInline('app.refreshMenu()');
 		        });
 
 
-
-				/*** Manage updates ***/
-				// Display the availabe updates
-				Router::get('updates-index', 'updates', array('action' => 'UpdateController.index'));
-
-				// Update Hawk
-				Router::get('update-hawk', 'updates/hawk/{version}', array('where' => array('version' => HawkApi::VERSION_PATTERN_URI), 'action' => 'UpdateController.updateHawk'));
-
-				// Update a plugin
-				Router::get('update-plugin', 'plugins/{plugin}/update', array('where' => array('plugin' => '[a-zA-Z0-9\-_.]+'), 'action' => 'UpdateController.updatePlugin'));
-
-				// Update a theme
-				Router::get('update-theme', 'themes/{theme}/update', array('where' => array('theme' => '[a-zA-Z0-9\-_.]+'), 'action' => 'UpdateController.updateTheme'));
-
 				// Display number of updates in menu
-				if(Session::isAllowed('admin.all')){
-					Event::on('Hawk\Plugins\Main\MainController.refreshMenu.after Hawk\Plugins\Main\MainController.main.after', function(Event $event){
-						$dom = $event->getData('result');
-						$dom->find('#main-menu-collapse')->append(SearchUpdatesWidget::getInstance()->display());
+				if(App::session()->isAllowed('admin.all')){
+					Event::on(\Hawk\Plugins\Main\MainMenuWidget::EVENT_AFTER_GET_MENUS, function(Event $event){
+						SearchUpdatesWidget::getInstance()->display();
 					});
 				}
 
@@ -138,7 +132,7 @@ Router::setProperties(
 
 			
 			/*** Manage the languages and languages keys ***/	
-			Router::auth(Session::isAllowed('admin.languages'), function(){
+			Router::auth(App::session()->isAllowed('admin.languages'), function(){
 				// list all the supported languages
 				Router::any('manage-languages', 'languages/', array('action' => 'LanguageController.index'));		
 				Router::get('language-keys-list', 'languages/keys', array('action' => 'LanguageController.listKeys'));

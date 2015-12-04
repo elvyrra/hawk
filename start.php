@@ -8,12 +8,14 @@ if(!is_file(INCLUDES_DIR . 'custom-constants.php')){
 require INCLUDES_DIR . 'custom-constants.php';
 require INCLUDES_DIR . 'autoload.php';
 
+App::getInstance()->init();
+
 if(is_file(INCLUDES_DIR . 'config.php')){
 	require INCLUDES_DIR . 'config.php';
 }
 require INCLUDES_DIR . 'error-handler.php';
 
-define("ROOT_URL", (string) Conf::get('rooturl') . '/');
+define("ROOT_URL", (string) App::conf()->get('rooturl') . '/');
 
 
 /*** Define the main paths ***/
@@ -21,10 +23,10 @@ define('STATIC_URL', ROOT_URL . 'static/');
 define('THEMES_ROOT_URL', STATIC_URL . 'themes/');
 define('PLUGINS_ROOT_URL', STATIC_URL . 'plugins/');
 
-if(Conf::has('db')){
+if(App::conf()->has('db')){
     /*** Access to the OS database (MySQL) ***/   
     try{
-        DB::add(MAINDB, Conf::get('db.maindb'));
+        DB::add(MAINDB, App::conf()->get('db.maindb'));
         DB::get(MAINDB);
     }
     catch(DBException $e){
@@ -34,19 +36,20 @@ if(Conf::has('db')){
 }
 
 /*** Open the session ***/
-if(Conf::has('db')){
+if(App::conf()->has('db')){    
     session_set_save_handler(new DatabaseSessionHandler()); 
 }
-session_set_cookie_params((int) Conf::get('session.lifetime'), '/');
+session_set_cookie_params((int) App::conf()->get('session.lifetime'), '/');
 session_start();
+App::session()->init();
 
 /*** Constants depending to the options ***/
-if(Request::getCookies('language')){
-    define('LANGUAGE', Request::getCookies('language'));
+if(App::request()->getCookies('language')){
+    define('LANGUAGE', App::request()->getCookies('language'));
 }
-elseif(Conf::has('db')){
-    if(Session::getUser()->getProfileData('language')){
-        define('LANGUAGE', Session::getUser()->getProfileData('language'));
+elseif(App::conf()->has('db')){
+    if(App::session()->getUser()->getProfileData('language')){
+        define('LANGUAGE', App::session()->getUser()->getProfileData('language'));
     }
     elseif(Option::get('main.language')){
         define('LANGUAGE', Option::get('main.language'));
@@ -57,5 +60,5 @@ else{
 }
     
 /*** Timezone ***/
-define("TIMEZONE", Conf::has('db') && Option::get('main.timezone') ? Option::get('main.timezone')  : DEFAULT_TIMEZONE);
+define("TIMEZONE", App::conf()->has('db') && Option::get('main.timezone') ? Option::get('main.timezone')  : DEFAULT_TIMEZONE);
 date_default_timezone_set(TIMEZONE);

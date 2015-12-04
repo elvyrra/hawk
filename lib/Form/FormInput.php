@@ -284,7 +284,7 @@ class FormInput{
             ));
         }
         catch(\Exception $e){
-            ErrorHandler::exception($e);
+            App::errorHandler()->exception($e);
         }
     }
 

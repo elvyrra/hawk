@@ -77,7 +77,7 @@ class Router{
 					
 			self::$routes[$name] = &$route;
 			
-			if(Request::getMethod() == $method || $method == 'any'){
+			if(App::request()->getMethod() == $method || $method == 'any'){
 				self::$activeRoutes[$name] = &$route;
 			}
 		}
@@ -85,7 +85,7 @@ class Router{
 
 	/**
 	 * Add an authentication condition to match the routes defined inside $action callback. For example, you can write something like :
-	 * Router::auth(Session::getUser()->isAllowed('admin.all'), function(){
+	 * Router::auth(App::session()->getUser()->isAllowed('admin.all'), function(){
 	 *		Router::get('test-route', '/test', array('action' => 'TestController.testMethod'));
 	 * });
 	 * If the user tries to access to /test without the necessary privileges, then a HTTP code 403 (Forbidden) will be returned
@@ -220,18 +220,20 @@ class Router{
 					Log::debug('URI ' . self::getUri() . ' has been routed => ' . $classname . '::' . $method);
 	                
 	                // Set the controller result to the HTTP response
-					Response::set($controller->compute($method));
+					App::response()->setBody($controller->compute($method));
 				}
 				else{					
 
 					// The route is not accessible
-					Log::warning('A user with the IP address ' . Request::clientIp() . ' tried to access ' . self::getUri() . ' without the necessary privileges');
-					Response::setHttpCode(403);
+					Log::warning('A user with the IP address ' . App::request()->clientIp() . ' tried to access ' . self::getUri() . ' without the necessary privileges');
+					App::response()->setStatus(403);
 					$response = array(
 						'message' => Lang::get('main.403-message'),
-						'reason' => !Session::isConnected() ? 'login' : 'permission'
-					);					
-					Response::set(json_encode($response));
+						'reason' => !App::session()->isConnected() ? 'login' : 'permission'
+					);			
+
+					App::response()->setContentType('json');
+					App::response()->end($response);
 				}
 				return;
             }            
@@ -239,8 +241,8 @@ class Router{
 		
 		// The route was not found 
 		Log::warning('The URI ' . self::getUri() . ' has not been routed');
-		Response::setHttpCode(404);
-        Response::set(Lang::get('main.404-message', array('uri' => $uri)));
+		App::response()->setStatus(404);
+        App::response()->setBody(Lang::get('main.404-message', array('uri' => $uri)));
 	}
 	
 
@@ -296,7 +298,7 @@ class Router{
 		if(!$name){
 			$fullUrl = getenv('REQUEST_SCHEME') . '://' . getenv('SERVER_NAME') . getenv('REQUEST_URI');
 			
-			$rooturl = Conf::has('rooturl') ? Conf::get('rooturl') : getenv('REQUEST_SCHEME') . '://' . getenv('SERVER_NAME');
+			$rooturl = App::conf()->has('rooturl') ? App::conf()->get('rooturl') : getenv('REQUEST_SCHEME') . '://' . getenv('SERVER_NAME');
 			
 			return str_replace($rooturl, '', $fullUrl);
 		}
@@ -333,7 +335,7 @@ class Router{
 	 * @see Router::getUri	 
 	 */
     public static function getUrl($name = '', $args = array()){
-        return preg_replace('#/$#', '',Conf::get('rooturl')) . self::getUri($name, $args);
+        return preg_replace('#/$#', '',App::conf()->get('rooturl')) . self::getUri($name, $args);
     }
 
 

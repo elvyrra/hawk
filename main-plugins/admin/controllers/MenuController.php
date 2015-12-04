@@ -85,7 +85,7 @@ class MenuController extends Controller{
 			}
 		}
 		else{
-			Response::setHttpCode(412);
+			App::response()->setStatus(412);
 		}
 	}
 
@@ -182,7 +182,7 @@ class MenuController extends Controller{
 					$form->register(Form::NO_EXIT);
 
 					// Register the translations of the menu
-					foreach(Request::getBody('label') as $tag => $translation){
+					foreach(App::request()->getBody('label') as $tag => $translation){
 						Language::getByTag($tag)->saveTranslations(array(
 							$form->getData('plugin') => array(
 								'menu-item-' . $form->getData('name') . '-title' => $translation
@@ -191,7 +191,7 @@ class MenuController extends Controller{
 					}
 
 					$form->addReturn(get_object_vars($form->object));
-					$form->addReturn('label', Request::getBody('label')[LANGUAGE]);
+					$form->addReturn('label', App::request()->getBody('label')[LANGUAGE]);
 					return $form->response(Form::STATUS_SUCCESS, Lang::get('admin.menu-item-form-success'));
 				}
 				catch(\Exception $e){

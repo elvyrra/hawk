@@ -25,6 +25,11 @@ class MenuItem extends Model{
 	const ADMIN_ITEM_ID = 2;
 
 	/**
+	 * Registered items
+	 */
+	private static $instances = array();
+
+	/**
 	 * Constructor
 	 * @param array $data The data to set on the instance properties	 
 	 */
@@ -45,6 +50,8 @@ class MenuItem extends Model{
 				$this->url = $this->action;
 			}
 		}
+
+		self::$instances[$this->plugin . '.' . $this->name] = $this;
 	}
 	
 
@@ -55,7 +62,7 @@ class MenuItem extends Model{
 	 */
 	public static function getAvailableItems($user = null){
 		if($user == null){
-			$user = Session::getUser();
+			$user = App::session()->getUser();
 		}
 
 		// Get all items
@@ -111,14 +118,19 @@ class MenuItem extends Model{
 	 * @return MenuItem The found item
 	 */
 	public static function getByName($name){
-		list($plugin, $name) = explode('.', $name, 2);
+		if(isset(self::$instances[$name])){
+			return self::$instances[$name];
+		}
+		else{
+			list($plugin, $name) = explode('.', $name, 2);
 
-		return self::getByExample(new DBExample(
-			array(
-				'plugin' => $plugin,
-				'name' => $name
-			)
-		));
+			return self::getByExample(new DBExample(
+				array(
+					'plugin' => $plugin,
+					'name' => $name
+				)
+			));
+		}
 	}
 
 	/**

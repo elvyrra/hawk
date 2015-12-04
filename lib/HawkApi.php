@@ -46,7 +46,8 @@ class HawkApi{
         'api-install-plugin' => array(
             'method' => 'get',
             'uri' => '/plugins/{name}/install',
-            'where' => array('name' => Plugin::NAME_PATTERN)            
+            'where' => array('name' => Plugin::NAME_PATTERN),
+            'dataType' => 'application/octet-stream'
         ),
 
         // Get the available updates on plugins
@@ -64,7 +65,8 @@ class HawkApi{
         'api-update-plugin' => array(
             'method' => 'patch',
             'uri' => '/plugins/{name}/update/{version}',
-            'where' => array('name' => Plugin::NAME_PATTERN, 'version' => self::VERSION_PATTERN_URI),            
+            'where' => array('name' => Plugin::NAME_PATTERN, 'version' => self::VERSION_PATTERN_URI),
+            'dataType' => 'application/octet-stream'
         ),
 
 
@@ -87,7 +89,8 @@ class HawkApi{
         'api-install-theme' => array(
             'method' => 'get',
             'uri' => '/themes/{name}/install',
-            'where' => array('name' => Theme::NAME_PATTERN)            
+            'where' => array('name' => Theme::NAME_PATTERN),
+            'dataType' => 'application/octet-stream'
         ),
 
         // Get the available updates on themes
@@ -105,7 +108,8 @@ class HawkApi{
         'api-update-theme' => array(
             'method' => 'patch',
             'uri' => '/themes/{name}/update/{version}',
-            'where' => array('name' => Theme::NAME_PATTERN, 'version' => self::VERSION_PATTERN_URI),            
+            'where' => array('name' => Theme::NAME_PATTERN, 'version' => self::VERSION_PATTERN_URI),
+            'dataType' => 'application/octet-stream'         
         ),
 
         // Search for available updates on the core
@@ -123,7 +127,8 @@ class HawkApi{
         'api-core-update' => array(
             'method' => 'get',
             'uri' => '/hawk/update/{to}',
-            'where' => array('to' => self::VERSION_PATTERN_URI)                
+            'where' => array('to' => self::VERSION_PATTERN_URI),
+            'dataType' => 'application/octet-stream'
         )
     );
 
@@ -147,7 +152,7 @@ class HawkApi{
             'url' => HAWK_SITE_URL . '/api' . $uri,
             'method' => $route['method'],
             'contentType' => 'json',
-            'dataType' => 'json',
+            'dataType' => isset($route['dataType']) ? $route['dataType'] : 'json',
             'body' => $body,
             'files' => $files
         ));
@@ -221,7 +226,7 @@ class HawkApi{
      * @param array $plugins The list of plugins to search available updates for, where keys are plugin names, and values their current version
      */
     public function getPluginsAvailableUpdates($plugins){
-        return $this->callApi('api-plugins-available-updates', array(), array('plugins' => json_encode($plugins)));
+        return $this->callApi('api-plugins-available-updates', array(), array('plugins' => $plugins));
     }
 
 

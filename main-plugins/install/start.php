@@ -2,7 +2,8 @@
 
 namespace Hawk\Plugins\Install;
 
-if(!Conf::has('db')){
+
+if(!App::conf()->has('db')){
     Router::setProperties(
         array('namespace' => __NAMESPACE__), 
         function(){

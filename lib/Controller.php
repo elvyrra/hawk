@@ -58,7 +58,7 @@ class Controller{
 		/*** Call the controller method ***/
 		$args = array_splice(func_get_args(), 1);
 		$result = call_user_func_array(array($this, $method), $args);
-		if(Response::getType() == 'html'){
+		if(App::response()->getContentType() == 'html'){
 			// Create a phpQuery object to be modified by event listeners (widgets)
 			$result = \phpQuery::newDocument($result);
 		}
@@ -83,7 +83,7 @@ class Controller{
 	 */
 	private function addContentAtEnd($content){	
 		Event::on(Router::getCurrentAction() . '.' . self::AFTER_ACTION, function($event) use($content){			
-			if(Response::getType() === 'html'){	
+			if(App::response()->getContentType() === 'html'){	
 				$dom = $event->getData('result');
 				if($dom->find('body')->length){
 					$dom->find('body')->append($content);

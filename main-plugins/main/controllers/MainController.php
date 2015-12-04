@@ -47,16 +47,16 @@ class MainController extends Controller{
 	 * @param string $content A content to set to override the default index content
 	 */
 	public function main($content = ""){
-		$canAccessApplication = Session::getUser()->canAccessApplication();		
+		$canAccessApplication = App::session()->getUser()->canAccessApplication();		
 
 		$body = View::make(Theme::getSelected()->getView('body.tpl'), array(
 			'canAccessApplication' => $canAccessApplication,
 			'content' => $content
 		));	
 
-		$title = Conf::has('db') ? Option::get('main.page-title-' . LANGUAGE) : DEFAULT_HTML_TITLE;
-		$description = Conf::has('db') ? Option::get('main.page-description-' . LANGUAGE) : '';
-		$keywords = Conf::has('db') ? Option::get('main.page-keywords-' . LANGUAGE) : '';
+		$title = App::conf()->has('db') ? Option::get('main.page-title-' . LANGUAGE) : DEFAULT_HTML_TITLE;
+		$description = App::conf()->has('db') ? Option::get('main.page-description-' . LANGUAGE) : '';
+		$keywords = App::conf()->has('db') ? Option::get('main.page-keywords-' . LANGUAGE) : '';
 
 		return $this->index($body, $title, $description, $keywords);
 	}
@@ -74,7 +74,7 @@ class MainController extends Controller{
 			$route = Router::getRouteByAction($page);
 
 			if($route && $route->isAccessible()){
-				Response::redirectToAction($page);
+				App::response()->redirectToAction($page);
 				return;
 			}
 			else{
@@ -114,7 +114,7 @@ class MainController extends Controller{
 	 * Get the application favicon URL
 	 */
 	public function getFaviconUrl(){
-		if(Conf::has('db')){
+		if(App::conf()->has('db')){
 			$favicon = Option::get('main.favicon') ? Option::get('main.favicon') : Option::get('main.logo');
 		}
 
@@ -147,7 +147,7 @@ class MainController extends Controller{
 	 * Generate the conf.js file
 	 */
 	public function jsConf(){
-		$canAccessApplication = Session::getUser()->canAccessApplication();	
+		$canAccessApplication = App::session()->getUser()->canAccessApplication();	
 
 		// Get all routes
 		$routes = array();
@@ -169,9 +169,9 @@ class MainController extends Controller{
 
 		// Get the pages to open
 		$pages = array();
-		if(Session::isConnected() && Option::get('main.open-last-tabs') && Request::getCookies('open-tabs') ){
+		if(App::session()->isConnected() && Option::get('main.open-last-tabs') && App::request()->getCookies('open-tabs') ){
 			// Open the last tabs the users opened before logout
-			$pages = json_decode(Request::getCookies('open-tabs'), true);
+			$pages = json_decode(App::request()->getCookies('open-tabs'), true);
 		}
 		
 		if(empty($pages)){
@@ -191,7 +191,7 @@ class MainController extends Controller{
             $themeVariables[$variable['name']] = isset($options[$variable['name']]) ? $options[$variable['name']] : $variable['default'];
         }
 
-		Response::setScript();
+		App::response()->setContentType('javascript');
 
 		return View::make(Plugin::current()->getView('conf.js.tpl'), array(
 			'keys' => $keys,
@@ -223,6 +223,6 @@ class MainController extends Controller{
 			}
 		}
 		
-		Response::redirectToAction('index');
+		App::response()->redirectToAction('index');
 	}
 }

@@ -30,6 +30,7 @@ class Model{
      */
     protected static $dbname = MAINDB;
 
+
     /**
      * Constructor : Instanciate a new Model object
      * @param array $data The initial data to set.

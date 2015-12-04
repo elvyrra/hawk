@@ -94,7 +94,7 @@ class Theme{
      * @return Theme The selected theme
      */
     public static function getSelected(){
-        return self::get(Conf::has('db') ? Option::get('main.selected-theme') : self::DEFAULT_THEME);
+        return self::get(App::conf()->has('db') ? Option::get('main.selected-theme') : self::DEFAULT_THEME);
     }
     
     /**

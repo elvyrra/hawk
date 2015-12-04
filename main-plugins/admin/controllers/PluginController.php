@@ -44,6 +44,20 @@ class PluginController extends Controller{
         $plugins = Plugin::getAll(true);
 
         $actionsTarget = '#' . self::TABID . ' .page-content';
+
+        $api = new HawkApi;
+        try{
+            $updates = $api->getPluginsAvailableUpdates(array_map(
+                function($plugin){
+                    return $plugin->getDefinition('version');
+                },
+                $plugins
+            ));
+        }
+        catch(\Hawk\HawkApiException $e){
+            $updates = array();
+        }
+
         $param = array(
             'id' => 'available-plugins-list',
             'reference' => 'name',
@@ -59,7 +73,7 @@ class PluginController extends Controller{
             ),
             'fields' => array(
                 'controls' => array(
-                    'display' => function($value, $field, $plugin) use($actionsTarget){
+                    'display' => function($value, $field, $plugin) use($actionsTarget, $updates){
                         $buttons = array();
                         $installer = $plugin->getInstallerInstance();
                         if(!$plugin->isInstalled()){
@@ -138,7 +152,17 @@ class PluginController extends Controller{
                                 );
                             }
                         }
-                        
+
+                        if(isset($updates[$plugin->getName()])){
+                            $buttons[] = ButtonInput::create(array(
+                                'icon' => 'refresh',
+                                'class' => 'btn-warning',
+                                'label' => Lang::get('admin.update-plugin-button'),
+                                'href' => Router::getUri('update-plugin', array('plugin' => $plugin->getName())),
+                                'target' => $actionsTarget
+                            ));
+                        }
+
                         return  "<h4>" . $plugin->getDefinition("title") . "</h4><br />" . implode("", $buttons);
                     },
                     'label' => Lang::get('admin.plugins-list-controls-label'),
@@ -175,7 +199,7 @@ class PluginController extends Controller{
             $this->addJavaScriptInline("app.notify('danger', '" . addcslashes($message, "'") . "');");
         }
 
-        Response::redirectToAction('plugins-list');
+        App::response()->redirectToAction('plugins-list');
     }
 
 
@@ -192,7 +216,7 @@ class PluginController extends Controller{
             $this->addJavaScriptInline("app.notify('danger', '" . addcslashes($message, "'") . "');");
         }
 
-        Response::redirectToAction('plugins-list');
+        App::response()->redirectToAction('plugins-list');
     }
 
 
@@ -209,7 +233,7 @@ class PluginController extends Controller{
             $this->addJavaScriptInline("app.notify('danger', '" . addcslashes($message, "'") . "');");
         }
 
-        Response::redirectToAction('plugins-list');
+        App::response()->redirectToAction('plugins-list');
     }
 
 
@@ -226,7 +250,7 @@ class PluginController extends Controller{
             $this->addJavaScriptInline("app.notify('danger', '" . addcslashes($message, "'") . "');");
         }
 
-        Response::redirectToAction('plugins-list');
+        App::response()->redirectToAction('plugins-list');
     }
 
 
@@ -254,8 +278,8 @@ class PluginController extends Controller{
     public function search(){
         $api = new HawkApi;
 
-        $search = Request::getParams('search');
-        $price = Request::getParams('price');
+        $search = App::request()->getParams('search');
+        $price = App::request()->getParams('price');
         
         // Search plugins on the API
         try{
@@ -266,38 +290,19 @@ class PluginController extends Controller{
         }
 
         // Remove the plugins already downloaded on the application
-        foreach($plugins as &$plugin){
-            $plugin['detailsUrl'] = HAWK_SITE_URL . '/store/plugins/' . $plugin['id'];
-            $plugin['installed'] = Plugin::get($plugin['name']) !== null;
+        foreach($plugins as &$plugin){            
+            $installed = Plugin::get($plugin['name']);
+            $plugin['installed'] = $installed !== null;
+            if($installed){
+                $plugin['currentVersion'] = $installed->getDefinition('version');
+            }
         }
-        
+
         $list = new ItemList(array(
             'id' => 'search-plugins-list',
-            'data' => $plugins,            
-            'fields' => array(
-                'controls' => array(
-                    'display' => function($value, $field, $plugin) {
-                        return View::make(Plugin::current()->getView('plugin-search-list-controls.tpl'), array(
-                            'plugin' => $plugin,
-                        ));
-                    },
-                    'label' => Lang::get('admin.plugins-list-controls-label'),
-                    'search' => false,
-                    'sort' => false,
-                ),
-
-                'description' => array(
-                    'search' => false,
-                    'sort' => false,
-                    'label' => Lang::get('admin.plugins-list-description-label'),
-                    'display' => function($value, $field, $plugin){
-                        return View::make(Plugin::current()->getView("plugin-search-list-description.tpl"), array(
-                            'plugin' => $plugin
-                        ));
-                    }
-                )
-
-            )
+            'data' => $plugins,       
+            'resultTpl' => Plugin::current()->getView('plugin-search-list.tpl'),     
+            'fields' => array()
         ));
 
         if($list->isRefreshing()){
@@ -315,7 +320,30 @@ class PluginController extends Controller{
      * Download and install a plugin from Mint
      */
     public function download(){
+        App::response()->setContentType('json');
+        try{
+            $api = new HawkApi;
+            $file = $api->downloadPlugin($this->plugin);
 
+            $zip = new \ZipArchive;
+            if($zip->open($file) !== true){
+                throw new \Exception('Impossible to open the zip archive');
+            }
+
+            $zip->extractTo(PLUGINS_DIR);
+
+            $plugin = Plugin::get($this->plugin);            
+            if(!$plugin){
+                throw new \Exception('An error occured while downloading the plugin');
+            }
+            $plugin->install();
+
+            App::response()->setBody($plugin);
+        }
+        catch(\Exception $e){
+            App::response()->setStatus(500);
+            App::response()->end(array('message' => $e->getMessage()));
+        }
     }
 
 
@@ -328,7 +356,7 @@ class PluginController extends Controller{
 
         FileSystem::remove($directory);
 
-        Response::redirectToAction('plugins-list');
+        App::response()->redirectToAction('plugins-list');
     }
 
     /**
@@ -484,5 +512,58 @@ class PluginController extends Controller{
                 }
             }
         }
+    }
+
+
+    /**
+     * Update a plugin from the API
+     */
+    public function update(){        
+        try{
+            $plugin = Plugin::get($this->plugin);
+            if(!$plugin){
+                throw new \Exception('The plugin "' . $this->plugin . '" does not exist');
+            }
+
+            $api = new HawkApi;
+
+            $updates = $api->getPluginsAvailableUpdates(array(
+                $plugin->getName() => $plugin->getDefinition('version')
+            ));
+
+            if(count($updates[$plugin->getName()])){
+                $file = $api->downloadPlugin($this->plugin);
+
+                $zip = new \ZipArchive;
+                if($zip->open($file) !== true){
+                    throw new \Exception('Impossible to open the zip archive');
+                }
+
+                FileSystem::remove($plugin->getRootDir());
+
+                $zip->extractTo(PLUGINS_DIR);
+
+                $plugin = Plugin::get($this->plugin);            
+                if(!$plugin){
+                    throw new \Exception('An error occured while downloading the plugin');
+                } 
+
+                $installer = $plugin->getInstallerInstance();
+                foreach($updates[$plugin->getName()] as $version){
+                    $method = str_replace('.', '_', $version);
+
+                    if(method_exists($installer, $method)){
+                        $installer->$method();
+                    }
+                }
+            }                
+                
+            App::response()->redirectToAction('plugins-list');
+        }
+        catch(\Exception $e){        
+            $this->addJavaScriptInline('app.notify("error", "' . addcslashes($e->getMessage(), '"') . '");');
+            $this->compute('availablePlugins');            
+        }
+
     }
 }

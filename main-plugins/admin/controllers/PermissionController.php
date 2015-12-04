@@ -63,7 +63,7 @@ class PermissionController extends Controller{
 					if(preg_match('/^permission\-(\d+)\-(\d+)$/', $name, $match)){
 						$permissionId = $match[1];
 						$roleId = $match[2];
-						$value = Request::getBody($name) ? 1 : 0;
+						$value = App::request()->getBody($name) ? 1 : 0;
 						
 						if($roleId != Role::ADMIN_ROLE_ID && !($roleId == Role::GUEST_ROLE_ID && !$permission->availableForGuests)){
 							$permission = new RolePermission();

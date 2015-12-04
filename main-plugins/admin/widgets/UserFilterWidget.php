@@ -13,11 +13,11 @@ class UserFilterWidget extends Widget{
 	public static $filters = array('status', 'roleId');
 
 	public function getFilters(){
-		$result = Request::getCookies('user-filter') ? json_decode(Request::getCookies('user-filter'), true) : array();
+		$result = App::request()->getCookies('user-filter') ? json_decode(App::request()->getCookies('user-filter'), true) : array();
 
 		foreach(self::$filters as $name){
-			if(Request::getParams($name) !== null){
-				$result[$name] = Request::getParams($name);
+			if(App::request()->getParams($name) !== null){
+				$result[$name] = App::request()->getParams($name);
 			}
 			
 			if(empty($result[$name])){

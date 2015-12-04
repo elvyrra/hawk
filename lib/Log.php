@@ -119,8 +119,8 @@ class Log{
 
         $data = array(
             'date' => date('Y-m-d H:i:s'),
-            'uri' => Request::getUri(),
-            'ip' => Request::clientIp(),
+            'uri' => App::request()->getUri(),
+            'ip' => App::request()->clientIp(),
             'trace' => $trace->file . ':' . $trace->line,
             'message' => $message,
         );

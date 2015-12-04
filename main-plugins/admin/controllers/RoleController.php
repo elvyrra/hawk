@@ -6,9 +6,9 @@ class RoleController extends Controller{
 	 *  List all the roles
 	 */
 	public function listRoles(){
-		if(Request::getParams('setdefault')) {
-			Option::set('roles.default-role', Request::getParams('setdefault'));
-			$defaultRole = Request::getParams('setdefault');
+		if(App::request()->getParams('setdefault')) {
+			Option::set('roles.default-role', App::request()->getParams('setdefault'));
+			$defaultRole = App::request()->getParams('setdefault');
 		}
 		else{
 			$defaultRole = Option::get('roles.default-role');
@@ -177,7 +177,7 @@ class RoleController extends Controller{
 						$roleId = $form->register(Form::NO_EXIT);
 
 						// Create the language key for the translations of the role name	
-						foreach(Request::getBody('translation') as $tag => $translation){
+						foreach(App::request()->getBody('translation') as $tag => $translation){
 							Language::getByTag($tag)->saveTranslations(array(
 								'roles' => array(
 									"role-$roleId-label" => $translation
