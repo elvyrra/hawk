@@ -131,16 +131,16 @@ class DB{
 		foreach($servers as $i => $server){
             try{
                 self::$instances[$name] = new self($server);
-                Log::debug('Connection to db ' . $name . ' successfull');
+                App::logger()->debug('Connection to db ' . $name . ' successfull');
                 // The connection succeed
                 break;
             }
             catch(DBException $e){
-            	Log::notice('Impossible to connect to db ' . $name . ' on instance ' . $i . ' : ' . $e->getMessage());
+            	App::logger()->notice('Impossible to connect to db ' . $name . ' on instance ' . $i . ' : ' . $e->getMessage());
                 // The connection failed, try to connect to the next slave
                 if(!isset($servers[$i+1])){
                     // the last slave connection failed
-                    Log::error('Impossible to connect to db ' . $name . ' : ' . $e->getMessage());
+                    App::logger()->error('Impossible to connect to db ' . $name . ' : ' . $e->getMessage());
                     throw $e;
                 }
             }            
@@ -619,7 +619,7 @@ class DBException extends \Exception{
 			
 			case self::QUERY_ERROR:
 				$message = "An error was detected : $message in the Database Query : $value";
-				Log::error($message);
+				App::logger()->error($message);
 			break;
 			
 		}

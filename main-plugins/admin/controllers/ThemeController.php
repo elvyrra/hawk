@@ -355,7 +355,7 @@ class ThemeController extends Controller{
 	 */
 	public function deleteMedia(){
 		$filename = urldecode($this->filename);
-		FileSystem::remove(Theme::getSelected()->getMediasDir() . $filename);
+		App::fs()->remove(Theme::getSelected()->getMediasDir() . $filename);
 	}
 
 
@@ -526,7 +526,7 @@ class ThemeController extends Controller{
         				// The theme extends another one, make a copy of the parent theme except manifest.json and views
         				foreach(glob($parent->getRootDir() . '*') as $element) {
         					if(! in_array(basename($element), array(Theme::MANIFEST_BASENAME, 'views'))){
-        						FileSystem::copy($element, $theme->getRootDir());
+        						App::fs()->copy($element, $theme->getRootDir());
         					}
         				}
         			}
@@ -546,7 +546,7 @@ class ThemeController extends Controller{
         		}
         		catch(\Exception $e){
         			if(is_dir($dir)){
-        				FileSystem::remove($dir);
+        				App::fs()->remove($dir);
         			}
         			return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get('admin.theme-create-error'));
         		}
@@ -563,7 +563,7 @@ class ThemeController extends Controller{
 		$theme = Theme::get($this->name);
 		if($theme->isRemovable()){
 			$dir = $theme->getRootDir();
-			FileSystem::remove($dir);
+			App::fs()->remove($dir);
 		}
 	}
 }

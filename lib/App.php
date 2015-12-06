@@ -26,12 +26,23 @@ class App{
     }
 
     public function init(){
+        // Load the application configuration
         $this->singleton('conf', new Conf());
+
+        // Load the application error Handler
         $this->singleton('errorHandler', new ErrorHandler());
+        
+        // Load the application HTTP request
         $this->singleton('request', new Request());
+        
+        // Load the application HTTP response
         $this->singleton('response', new Response());        
 
-        $this->singleton('router', new Router());
+        // Load the filesystem library
+        $this->singleton('fs', new FileSystem());
+
+        // Load the application logger
+        $this->singleton('logger', Logger::getInstance());
     }
 
     public function singleton($name, $instance){

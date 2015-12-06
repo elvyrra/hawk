@@ -453,7 +453,7 @@ class Plugin{
 						// Copy all static files except less and JS
 						foreach(glob($this->getStaticDir() . '*' ) as $elt){
 			                if(! in_array(basename($elt), array('less', 'js'))) {
-			                    FileSystem::copy($elt, $this->getPublicStaticDir());
+			                    App::fs()->copy($elt, $this->getPublicStaticDir());
 			                }
 			            }
 					}
@@ -563,12 +563,12 @@ class Plugin{
 
 		try{
 			$this->getInstallerInstance()->install();		
-			Log::notice('The plugin ' . $this->name . ' has been installed');
+			App::logger()->notice('The plugin ' . $this->name . ' has been installed');
 		}
 		catch(\Exception $e){
 			DB::get(MAINDB)->delete(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)));
 
-			Log::error('En error occured while installing plugin ' . $this->name . ' : ' . $e->getMessage());
+			App::logger()->error('En error occured while installing plugin ' . $this->name . ' : ' . $e->getMessage());
 			throw $e;
 		}
 	}
@@ -582,7 +582,7 @@ class Plugin{
 
 		try{
 			$this->getInstallerInstance()->uninstall();
-			Log::notice('The plugin ' . $this->name . ' has been uninstalled');
+			App::logger()->notice('The plugin ' . $this->name . ' has been uninstalled');
 		}
 		catch(\Exception $e){
 			DB::get(MAINDB)->insert(DB::getFullTablename(self::TABLE), array(
@@ -590,7 +590,7 @@ class Plugin{
 				'active' => 0
 			), 'IGNORE');
 
-			Log::error('En error occured while uninstalling plugin ' . $this->name . ' : ' . $e->getMessage());
+			App::logger()->error('En error occured while uninstalling plugin ' . $this->name . ' : ' . $e->getMessage());
 			throw $e;
 		}
 	}
@@ -614,12 +614,12 @@ class Plugin{
 
 		try{
 			$this->getInstallerInstance()->activate();
-			Log::notice('The plugin ' . $this->name . ' has been activated');
+			App::logger()->notice('The plugin ' . $this->name . ' has been activated');
 		}
 		catch(\Exception $e){
 			DB::get(MAINDB)->update(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)), array('active' => 0));
 			
-			Log::error('En error occured while activating plugin ' . $this->name . ' : ' . $e->getMessage());
+			App::logger()->error('En error occured while activating plugin ' . $this->name . ' : ' . $e->getMessage());
 			throw $e;
 		}
 	}
@@ -635,12 +635,12 @@ class Plugin{
 
 		try{
 			$this->getInstallerInstance()->deactivate();
-			Log::notice('The plugin ' . $this->name . ' has been deactivated');
+			App::logger()->notice('The plugin ' . $this->name . ' has been deactivated');
 		}
 		catch(\Exception $e){
 			DB::get(MAINDB)->update(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)), array('active' => 1));
 			
-			Log::error('En error occured while deactivating plugin ' . $this->name . ' : ' . $e->getMessage());
+			App::logger()->error('En error occured while deactivating plugin ' . $this->name . ' : ' . $e->getMessage());
 			throw $e;
 		}
 	}

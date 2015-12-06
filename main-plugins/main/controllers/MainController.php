@@ -26,7 +26,7 @@ class MainController extends Controller{
 		}
 
 		
-		FileSystem::copy(Plugin::current()->getJsDir() . '/*', Plugin::current()->getPublicJsDir());
+		App::fs()->copy(Plugin::current()->getJsDir() . '/*', Plugin::current()->getPublicJsDir());
 
 		return View::make(Theme::getSelected()->getView('html-document.tpl'), array(
 			'title' => $title,
@@ -213,13 +213,13 @@ class MainController extends Controller{
 		
 		// Clear the directoty cache
 		foreach(glob(CACHE_DIR . '*') as $elt){
-			FileSystem::remove($elt);
+			App::fs()->remove($elt);
 		}
 
 		// Clear the directory of the theme
 		foreach(glob(Theme::getSelected()->getStaticDir() . '*') as $element){
 			if(basename($element) != 'userfiles'){
-				FileSystem::remove($element);
+				App::fs()->remove($element);
 			}
 		}
 		

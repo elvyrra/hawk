@@ -91,7 +91,7 @@ class Autoload{
         
 		// Cross any search folder to find out the class file
         foreach($dirs as $dir){
-            $files = FileSystem::find($dir, $filename, FileSystem::FIND_FILE_ONLY);
+            $files = App::fs()->find($dir, $filename, FileSystem::FIND_FILE_ONLY);
             if(!empty($files)){
                 $file = $files[0];
 

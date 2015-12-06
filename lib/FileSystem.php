@@ -22,12 +22,13 @@ class FileSystem{
 	const FIND_DIR_ONLY = 'dir';
 	const FIND_ANY_TYPE = 'any';
 
+
 	/**
 	 * Get all files in a directory, including those beginning by '.'
 	 * @param string $dir The directory to find files into
 	 * @return array The list of files matching the pattern
 	 */
-	public static function getAllFilesInDir($dir){
+	public function getAllFilesInDir($dir){
 		$files = array_merge(glob($dir . self::DS . '*'), glob($dir . self::DS . '.*'));
 		return array_filter($files, function($file){
 			return basename($file) != '.' && basename($file) != '..';
@@ -40,10 +41,10 @@ class FileSystem{
 	 * @param string $dest The destination file or directory
 	 * @static
 	 */
-	public static function copy($source, $dest){
+	public function copy($source, $dest){
 		if(basename($source) == '*'){
-			foreach(self::getAllFilesInDir(dirname($source)) as $element){
-				self::copy($element, $dest);
+			foreach($this->getAllFilesInDir(dirname($source)) as $element){
+				$this->copy($element, $dest);
 			}
 		}
 		else{
@@ -67,7 +68,7 @@ class FileSystem{
 
 				// Copy all files and folder under this directory
 				foreach(glob($source . self::DS . '*') as $element){				
-					self::copy($element, $dest . self::DS . $base);
+					$this->copy($element, $dest . self::DS . $base);
 				}
 			}
 		}
@@ -81,7 +82,7 @@ class FileSystem{
 	 * @param string $type The type of source to find : 'file', 'dir', 'any'	 
 	 * @return array The list of files or directories found
 	 */
-	public static function find($source, $pattern, $type = self::FIND_ANY_TYPE){
+	public function find($source, $pattern, $type = self::FIND_ANY_TYPE){
 		if(!is_dir($source)){
 			throw new FileSystemException('The method ' . __METHOD__ . ' requires the first argument to be an existing directory : ' . $source . ' is not a directory');
 		}
@@ -113,10 +114,10 @@ class FileSystem{
 	 * @param string $source The file or directory name to remove
 	 * @return boolean, TRUE if the source was removed, else FALSE
 	 */
-	public static function remove($source){	
+	public function remove($source){	
 		if(basename($source) == '*'){
 			foreach(self::getAllFilesInDir(dirname($source)) as $element){
-				self::remove($element);
+				$this->remove($element);
 			}
 		}
 		else{	
@@ -131,7 +132,7 @@ class FileSystem{
 			else{
 				// remove a directory 
 				foreach(self::getAllFilesInDir($source) as $element){
-					self::remove($element);				
+					$this->remove($element);				
 				}
 				return rmdir($source);
 			}

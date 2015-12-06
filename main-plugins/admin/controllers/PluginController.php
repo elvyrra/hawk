@@ -354,7 +354,7 @@ class PluginController extends Controller{
     public function delete(){
         $directory = Plugin::get($this->plugin)->getRootDir();
 
-        FileSystem::remove($directory);
+        App::fs()->remove($directory);
 
         App::response()->redirectToAction('plugins-list');
     }
@@ -506,7 +506,7 @@ class PluginController extends Controller{
                 }
                 catch(\Exception $e){
                     if(is_dir($dir)){
-                        FileSystem::remove($dir);
+                        App::fs()->remove($dir);
                     }
                     return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get('admin.new-plugin-error'));
                 }
@@ -539,23 +539,36 @@ class PluginController extends Controller{
                     throw new \Exception('Impossible to open the zip archive');
                 }
 
-                FileSystem::remove($plugin->getRootDir());
+                // Copy the actual version of the plugin as backup
+                $backup = TMP_DIR . $plugin->getName() . '.bak';
+                rename($plugin->getRootDir(), $backup);
 
-                $zip->extractTo(PLUGINS_DIR);
+                try{
+                    $zip->extractTo(PLUGINS_DIR);
 
-                $plugin = Plugin::get($this->plugin);            
-                if(!$plugin){
-                    throw new \Exception('An error occured while downloading the plugin');
-                } 
+                    $plugin = Plugin::get($this->plugin);            
+                    if(!$plugin){
+                        throw new \Exception('An error occured while downloading the plugin');
+                    } 
 
-                $installer = $plugin->getInstallerInstance();
-                foreach($updates[$plugin->getName()] as $version){
-                    $method = str_replace('.', '_', $version);
+                    $installer = $plugin->getInstallerInstance();
+                    foreach($updates[$plugin->getName()] as $version){
+                        $method = str_replace('.', '_', 'updateV' . $version);
 
-                    if(method_exists($installer, $method)){
-                        $installer->$method();
+                        if(method_exists($installer, $method)){
+                            $installer->$method();
+                        }
                     }
+
+                    App::fs()->remove($backup);
                 }
+                catch(\Exception $e){
+                    // An error occured while installing the new version, rollback to the previous version
+                    App::fs()->remove($plugin->getRootDir());
+                    rename($backup, $plugin->getRootDir());
+                }
+
+                App::fs()->remove($file);
             }                
                 
             App::response()->redirectToAction('plugins-list');

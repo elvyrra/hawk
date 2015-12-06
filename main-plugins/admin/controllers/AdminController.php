@@ -387,12 +387,12 @@ class AdminController extends Controller{
 					}					
 					
 					// Register the favicon
-					Log::info('The options of the application has been updated by ' . App::session()->getUser()->username);
+					App::logger()->info('The options of the application has been updated by ' . App::session()->getUser()->username);
 					return $form->response(Form::STATUS_SUCCESS, Lang::get('admin.settings-save-success'));
 				}
 			}
 			catch(Exception $e){
-				Log::error('An error occured while updating application options');
+				App::logger()->error('An error occured while updating application options');
 				return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get('admin.settings-save-error'));
 			}
 		}
@@ -426,7 +426,7 @@ class AdminController extends Controller{
 
                 // Put all modified or added files in the right folder
                 $folder = TMP_DIR . 'update-v' . $version['version'] . '/';
-                FileSystem::copy($folder . 'to-update/*', ROOT_DIR);
+                App::fs()->copy($folder . 'to-update/*', ROOT_DIR);
 
                 // Delete the files to delete
                 $toDeleteFiles = explode(PHP_EOL, file_get_contents($folder . 'to-delete.txt'));
@@ -447,8 +447,8 @@ class AdminController extends Controller{
                 }
 
                 // Remove temporary files and folders
-                FileSystem::remove($folder);
-                FileSystem::remove($archive);
+                App::fs()->remove($folder);
+                App::fs()->remove($archive);
             } 
 
             $response = array('status' => true);

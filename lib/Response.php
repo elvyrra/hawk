@@ -113,7 +113,7 @@ class Response{
      * @param string $type The type to set
      */
     public function setContentType($type){
-        Log::debug('change content type of response to ' . $type);
+        App::logger()->debug('change content type of response to ' . $type);
 
         $this->contentType = $type;
         if(isset(self::$contentTypes[$type])){
@@ -233,7 +233,7 @@ class Response{
      * @param string $url The URL to redirect to
      */
 	public function redirect($url){
-        Log::debug('redirect to ' . $url);
+        App::logger()->debug('redirect to ' . $url);
         $this->header('Location', $url);
         $this->end();
 	}

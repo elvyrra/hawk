@@ -24,18 +24,21 @@ class ErrorHandler {
 	        // This error code is not in error_reporting
 	        return;
 	    }
+
 		switch($no){
 			case E_NOTICE :
 			case E_USER_NOTICE: 
 				$level = "info";
 				$icon = 'info-circle';
-				$title = "PHP Notice";
+				$title = "PHP Notice";				
+				App::logger()->notice($str);
 			break;
 
 			case E_STRICT :
 				$level = "info";
 				$icon = 'info-circle';
 				$title = "PHP Strict";
+				App::logger()->notice($str);
 			break;
 
 			case E_DEPRECATED :
@@ -43,6 +46,7 @@ class ErrorHandler {
 				$level = "info";
 				$icon = 'info-circle';
 				$title = "PHP Deprecated";
+				App::logger()->notice($str);
 			break;
 
 			case E_USER_WARNING :
@@ -50,12 +54,14 @@ class ErrorHandler {
 				$level = "warning";
 				$icon = "exclamation-triangle";
 				$title = "PHP Warning";
+				App::logger()->warning($str);
 			break;
 
 			default:
 				$level = "danger";
 				$icon = "exclamation-circle";
 				$title = "PHP Error";
+				App::logger()->error($str);
 			break;
 		}
 
@@ -92,6 +98,7 @@ class ErrorHandler {
 			'trace' => $e->getTrace()
 		);
 
+		App::logger()->error($e->getMessage());
 		if(App::response()->getContentType() === "json"){
 			App::response()->setBody($param);
 		}

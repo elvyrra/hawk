@@ -93,11 +93,11 @@ class LanguageController extends Controller{
 					Language::getByTag($filters['tag'])->saveTranslations($keys);
 				}
 				
-				Log::info('The translations has been updated');
+				App::logger()->info('The translations has been updated');
 				return $form->response(Form::STATUS_SUCCESS, Lang::get('language.update-keys-success'));
 			}
 			catch(DBException $e){
-				Log::error('An error occured while updating translations : ' . $e->getMessage());
+				App::logger()->error('An error occured while updating translations : ' . $e->getMessage());
 				return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get('language.update-keys-error'));
 			}
 		}
@@ -177,11 +177,11 @@ class LanguageController extends Controller{
 					}
 				}
 
-				Log::info('A new language key has been added');
+				App::logger()->info('A new language key has been added');
 				return $form->response(Form::STATUS_SUCCESS);
 			}
 			catch(Exception $e){
-				Log::error('An error occured while adding a language key : ' . $e->getMessage());
+				App::logger()->error('An error occured while adding a language key : ' . $e->getMessage());
 				return $form->response(Form::STATUS_ERROR);
 			}
 		}
@@ -196,10 +196,10 @@ class LanguageController extends Controller{
 			Language::getByTag($this->tag)->removeTranslations(array(
 				$this->plugin => array($this->key)
 			));
-			Log::info('A translation has been reset : ' . $this->plugin . '.' . $this->key);
+			App::logger()->info('A translation has been reset : ' . $this->plugin . '.' . $this->key);
 		}
 		catch(Exception $e){
-			Log::error('An error occured while reseting the language key ' . $this->plugin . '.' . $this->key);
+			App::logger()->error('An error occured while reseting the language key ' . $this->plugin . '.' . $this->key);
 		}	
 	}
 	
@@ -218,7 +218,7 @@ class LanguageController extends Controller{
 		$dirs = array(MAIN_PLUGINS_DIR, PLUGINS_DIR, USERFILES_PLUGINS_DIR . Lang::TRANSLATIONS_DIR);
 		foreach($dirs as $dir){
 			if(is_dir($dir)){
-				$result = FileSystem::find($dir, '*.*.lang', FileSystem::FIND_FILE_ONLY);
+				$result = App::fs()->find($dir, '*.*.lang', FileSystem::FIND_FILE_ONLY);
 			}
 			
 			foreach($result as $file){
@@ -420,10 +420,10 @@ class LanguageController extends Controller{
 			}
 			$language->delete();	
 
-			Log::info('The language ' . $this->tag . ' has been removed');
+			App::logger()->info('The language ' . $this->tag . ' has been removed');
 		}
 		catch(Exception $e){
-			Log::error('An error occured while removing the language ' . $this->tag . ' : ' . $e->getMessage());
+			App::logger()->error('An error occured while removing the language ' . $this->tag . ' : ' . $e->getMessage());
 		}
 	}
 	
@@ -496,11 +496,11 @@ class LanguageController extends Controller{
 						unlink($tmpfile);
 					}
 					
-					Log::info('Language files were successfully imported');
+					App::logger()->info('Language files were successfully imported');
 					return $form->response(Form::STATUS_SUCCESS);
 				}
 				catch(Exception $e){
-					Log::error('An error occured whiel importing language files : ' . $e->getMessage());
+					App::logger()->error('An error occured whiel importing language files : ' . $e->getMessage());
 					$form->error('files[]', $e->getMessage());					
 					return $form->response(Form::STATUS_CHECK_ERROR);
 				}

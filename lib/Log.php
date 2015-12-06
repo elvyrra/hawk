@@ -16,7 +16,7 @@ class Log{
     const LEVEL_WARNING = 'warning';
     const LEVEL_ERROR = 'error';
 
-    const MAX_FILE_SIZE = 200000;
+    const MAX_FILE_SIZE = 204800;
     const MAX_FILES_BY_LEVEL = 9;
 
     /**

@@ -77,12 +77,12 @@ class PermissionController extends Controller{
 					}
 				}
 				
-				Log::info('Permissions were succesfully updated');
+				App::logger()->info('Permissions were succesfully updated');
 				return $form->response(Form::STATUS_SUCCESS, Lang::get("roles.permissions-update-success"));
 				
 			}
 			catch(Exception $e){
-				Log::error('An error occured while updating permissions');
+				App::logger()->error('An error occured while updating permissions');
 				return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get("roles.permissions-update-error"));
 			}
 		}

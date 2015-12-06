@@ -9,12 +9,12 @@ define('INCLUDES_DIR', ROOT_DIR . 'includes/');
 
 require ROOT_DIR . 'start.php';
 
-Log::debug('script has been Initialized');
+App::logger()->debug('script has been Initialized');
 
 (new Event('process-start'))->trigger();
 
 if(!App::conf()->has('db') && (Router::getUri() === '/' || Router::getUri() === 'index.php')) {
-    Log::debug('Hawk is not installed yet, redirect to install process page');
+    App::logger()->debug('Hawk is not installed yet, redirect to install process page');
     App::response()->redirect(Router::getUri('install'));
     return;
 }
@@ -37,7 +37,7 @@ if(is_file(Theme::getSelected()->getStartFile())){
 /*** Compute the routage ***/
 Router::route();
 
-Log::debug('end of script');
+App::logger()->debug('end of script');
 $event = new Event('process-end', array(
 	'output' => App::response()->getBody(), 
 	'execTime' => microtime(true) - SCRIPT_START_TIME

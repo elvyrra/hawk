@@ -95,7 +95,7 @@ class Lang{
 
 		// The file is not present in the cache, search it. We use the method Autoload::find that already performs this action		
 		foreach(array(MAIN_PLUGINS_DIR, PLUGINS_DIR) as $dir){
-			$files = FileSystem::find($dir, $this->plugin . '.' . $this->lang . '.lang', FileSystem::FIND_FILE_ONLY);
+			$files = App::fs()->find($dir, $this->plugin . '.' . $this->lang . '.lang', FileSystem::FIND_FILE_ONLY);
 			if(!empty($files)){
 				$file = $files[0];
 
@@ -176,7 +176,7 @@ class Lang{
 	 */
 	private static function load($plugin, $language = LANGUAGE, $force = false){
 		if(!isset(self::$keys[$plugin][$language]) || $force || $language !== self::$usedLanguage){
-			Log::debug('Reload keys for plugin ' . $plugin . ' and for language ' . $language);
+			App::logger()->debug('Reload keys for plugin ' . $plugin . ' and for language ' . $language);
 			self::$keys[$plugin][$language] = array();
 
 			$instance = new self($plugin, self::DEFAULT_LANGUAGE);

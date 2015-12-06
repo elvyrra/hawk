@@ -200,7 +200,7 @@ class Theme{
         }
 
         if(!is_file($publicFile) || filemtime($publicFile) < filemtime($privateFile)){
-            FileSystem::copy($privateFile, $publicFile);
+            App::fs()->copy($privateFile, $publicFile);
         }
 
         return $this->getRootUrl() . $file;
@@ -285,7 +285,7 @@ class Theme{
             }          
             else{
                 // Get all files in less/
-                $files = FileSystem::find($this->getLessDirname(), '*.less');
+                $files = App::fs()->find($this->getLessDirname(), '*.less');
                 $lastUpdate = filemtime($dest);
                 foreach($files as $file){
                     if(filemtime($file) > $lastUpdate){
@@ -300,7 +300,7 @@ class Theme{
             // Build the theme => Copy each accessible files in static dir
             foreach(glob($this->getRootDir() . '*' ) as $elt){
                 if(! in_array(basename($elt), array('views'))) {
-                    FileSystem::copy($elt, $this->getStaticDir());
+                    App::fs()->copy($elt, $this->getStaticDir());
                 }
             }
         }

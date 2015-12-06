@@ -217,7 +217,7 @@ class Router{
 
 					// call a controller method
 					$controller = new $classname($route->getData());                              
-					Log::debug('URI ' . self::getUri() . ' has been routed => ' . $classname . '::' . $method);
+					App::logger()->debug('URI ' . self::getUri() . ' has been routed => ' . $classname . '::' . $method);
 	                
 	                // Set the controller result to the HTTP response
 					App::response()->setBody($controller->compute($method));
@@ -225,7 +225,7 @@ class Router{
 				else{					
 
 					// The route is not accessible
-					Log::warning('A user with the IP address ' . App::request()->clientIp() . ' tried to access ' . self::getUri() . ' without the necessary privileges');
+					App::logger()->warning('A user with the IP address ' . App::request()->clientIp() . ' tried to access ' . self::getUri() . ' without the necessary privileges');
 					App::response()->setStatus(403);
 					$response = array(
 						'message' => Lang::get('main.403-message'),
@@ -240,7 +240,7 @@ class Router{
 		}
 		
 		// The route was not found 
-		Log::warning('The URI ' . self::getUri() . ' has not been routed');
+		App::logger()->warning('The URI ' . self::getUri() . ' has not been routed');
 		App::response()->setStatus(404);
         App::response()->setBody(Lang::get('main.404-message', array('uri' => $uri)));
 	}
