@@ -30,12 +30,12 @@
 
                     {if($plugin->installed)}
                         {if(Utils::getSerializedVersion($plugin->availableVersion) > Utils::getSerializedVersion($plugin->currentVersion))}
-                            {button label="{Lang::get('admin.update-plugin-button')}" icon="refresh" href="{Router::getUri('update-plugin', array('plugin' => $plugin->name)) }" class="pull-right update-plugin btn-warning"}
+                            {button label="{Lang::get('admin.update-plugin-button')}" icon="refresh" href="{App::router()->getUri('update-plugin', array('plugin' => $plugin->name)) }" class="pull-right update-plugin btn-warning"}
                         {else}
                             <span class="btn btn-success pull-right">{text key="admin.search-plugin-result-list-installed"}</span>
                         {/if}
                     {else}
-                        {button label="{Lang::get('admin.download-plugin-button')}" icon="download" href="{Router::getUri('download-plugin', array('plugin' => $plugin->name))}" class="pull-right download-plugin"}
+                        {button label="{Lang::get('admin.download-plugin-button')}" icon="download" href="{App::router()->getUri('download-plugin', array('plugin' => $plugin->name))}" class="pull-right download-plugin"}
                     {/if}
                     <div class="clearfix"></div>
                     {text key="admin.search-plugin-downloads" downloads="{$plugin->downloads}"}

@@ -12,22 +12,33 @@ namespace Hawk;
  * This class is used to generate the application singletons
  */
 class App{
+    /**
+     * The application instance
+     */
     private static $instance;
 
+    /**
+     * Constructor
+     */
     private function __construct(){}
 
+    /**
+     * Get the application instance
+     */
     public function getInstance(){
-        if(isset(self::$instance)){
-            return self::$instance;            
+        if(!isset(self::$instance)){
+            self::$instance = new self;            
         }
 
-        self::$instance = new self;
         return self::$instance;
     }
 
+    /**
+     * Initialize the application
+     */
     public function init(){
         // Load the application configuration
-        $this->singleton('conf', new Conf());
+        $this->singleton('conf', Conf::getInstance());
 
         // Load the application error Handler
         $this->singleton('errorHandler', new ErrorHandler());
@@ -43,8 +54,15 @@ class App{
 
         // Load the application logger
         $this->singleton('logger', Logger::getInstance());
+
+        // Load the application router
+        $this->singleton('router', Router::getInstance());
     }
 
+
+    /**
+     * Create an application singleton
+     */
     public function singleton($name, $instance){
         $this->$name = $instance;
     }

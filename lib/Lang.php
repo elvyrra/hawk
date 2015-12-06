@@ -306,7 +306,7 @@ class Lang{
 			$script .= "Lang.set('$key', '" . addcslashes(self::get($key), "'") . "');";
 		}
 		
-		Router::getCurrentController()->addJavaScriptInline($script);			
+		App::router()->getCurrentController()->addJavaScriptInline($script);			
 	}
 
 

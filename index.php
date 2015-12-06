@@ -13,9 +13,9 @@ App::logger()->debug('script has been Initialized');
 
 (new Event('process-start'))->trigger();
 
-if(!App::conf()->has('db') && (Router::getUri() === '/' || Router::getUri() === 'index.php')) {
+if(!App::conf()->has('db') && (App::router()->getUri() === '/' || App::router()->getUri() === 'index.php')) {
     App::logger()->debug('Hawk is not installed yet, redirect to install process page');
-    App::response()->redirect(Router::getUri('install'));
+    App::response()->redirect(App::router()->getUri('install'));
     return;
 }
 
@@ -35,7 +35,7 @@ if(is_file(Theme::getSelected()->getStartFile())){
 (new Event('before-routing'))->trigger();
 
 /*** Compute the routage ***/
-Router::route();
+App::router()->route();
 
 App::logger()->debug('end of script');
 $event = new Event('process-end', array(

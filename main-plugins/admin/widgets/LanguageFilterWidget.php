@@ -22,7 +22,7 @@ class LanguageFilterWidget extends Widget{
 		$param = array(
 			'id' => 'language-filter-form',
 			'method' => 'get',
-			'action' => Router::getUri('language-keys-list'),
+			'action' => App::router()->getUri('language-keys-list'),
 			'fieldsets' => array(
 				'filters' => array(
 					'nofieldset' => true,

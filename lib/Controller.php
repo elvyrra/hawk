@@ -82,7 +82,7 @@ class Controller{
 	 * @param string $content The content to add
 	 */
 	private function addContentAtEnd($content){	
-		Event::on(Router::getCurrentAction() . '.' . self::AFTER_ACTION, function($event) use($content){			
+		Event::on(App::router()->getCurrentAction() . '.' . self::AFTER_ACTION, function($event) use($content){			
 			if(App::response()->getContentType() === 'html'){	
 				$dom = $event->getData('result');
 				if($dom->find('body')->length){

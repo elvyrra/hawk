@@ -16,6 +16,30 @@ class Conf{
 	 * @var array
 	 */
 	private $conf;
+
+
+	/**
+	 * The configuration instance
+	 */
+	private static $instance;
+
+	/**
+	 * Constrcutor
+	 */
+	private function __construct(){
+
+	}
+
+	/**
+	 * Get the configuration instance
+	 */
+	public static function getInstance(){
+		if(!isset(self::$instance)){
+			self::$instance = new self;
+		}
+
+		return self::$instance;
+	}
 	
 	/**
 	 * Get a configuration value 

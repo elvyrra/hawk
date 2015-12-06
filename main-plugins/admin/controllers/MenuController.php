@@ -19,7 +19,7 @@ class MenuController extends Controller{
 
 		$form = new Form(array(
 			'id' => 'set-menus-form',
-			'action' => Router::getUri('set-menu'),
+			'action' => App::router()->getUri('set-menu'),
 			'inputs' => array(
 				new HiddenInput(array(
 					'name' => 'data',
@@ -103,7 +103,7 @@ class MenuController extends Controller{
 			'object' => $item,
 			'model' => 'MenuItem',
 			'reference' => array('id' => $itemId),
-			'action' => Router::getUri('edit-menu', array('itemId' => $itemId)),
+			'action' => App::router()->getUri('edit-menu', array('itemId' => $itemId)),
 			'fieldsets' => array(
 				'parameters' => array(
 					new HiddenInput(array(

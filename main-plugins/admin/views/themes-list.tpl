@@ -1,6 +1,6 @@
 <div class="row">
 	<div class="col-md-2">
-		{button class="btn-success btn-block" icon="plus" label="{Lang::get('admin.theme-create-btn')}" href="{Router::getUri('create-theme')}" target="dialog"}
+		{button class="btn-success btn-block" icon="plus" label="{Lang::get('admin.theme-create-btn')}" href="{App::router()->getUri('create-theme')}" target="dialog"}
 
 		{widget class="Hawk\Plugins\Admin\ImportThemeWidget"}	
 	</div>

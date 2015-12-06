@@ -19,7 +19,7 @@ class MainController extends Controller{
 		$labelsJSON = json_encode($labels, JSON_HEX_APOS | JSON_HEX_QUOT);
 
 		$routes = array();
-		foreach(Router::getRoutes() as $name => $route){
+		foreach(App::router()->getRoutes() as $name => $route){
 			$data = get_object_vars($route);
 			unset($data['action']);
 			$routes[$name] = $data;
@@ -71,7 +71,7 @@ class MainController extends Controller{
 		// Display a page of the application
 		if($type == 'page'){
 			$page = Option::get('main.home-page-item');
-			$route = Router::getRouteByAction($page);
+			$route = App::router()->getRouteByAction($page);
 
 			if($route && $route->isAccessible()){
 				App::response()->redirectToAction($page);
@@ -151,7 +151,7 @@ class MainController extends Controller{
 
 		// Get all routes
 		$routes = array();
-		foreach(Router::getRoutes() as $name => $route){
+		foreach(App::router()->getRoutes() as $name => $route){
 			$routes[$name] = array(
 				'url' => $route->url,
 				'where' => $route->where,
@@ -175,7 +175,7 @@ class MainController extends Controller{
 		}
 		
 		if(empty($pages)){
-			$pages[] = Router::getUri('new-tab');
+			$pages[] = App::router()->getUri('new-tab');
 		}
 
 		// Get the theme variables		

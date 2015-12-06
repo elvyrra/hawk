@@ -41,7 +41,7 @@ class LoginController extends Controller{
 						new ButtonInput(array(
 							'name' => 'register',
 							'value' => Lang::get('main.register-button'),
-							'href' => Router::getUri('register'),
+							'href' => App::router()->getUri('register'),
 							'target' => 'dialog',
 							'class' => 'btn-success'
 						)) : 
@@ -170,7 +170,7 @@ class LoginController extends Controller{
 							'required' => true,
 							'independant' => true,
 							'labelWidth' => 'auto',
-							'label' => Lang::get('main.register-terms-label', array('uri' => Router::getUri('terms'))),
+							'label' => Lang::get('main.register-terms-label', array('uri' => App::router()->getUri('terms'))),
 						)) :
 						null
 				),
@@ -184,7 +184,7 @@ class LoginController extends Controller{
 					new ButtonInput(array(
 						'name' => 'cancel',
 						'value' => Lang::get('main.cancel-button'),
-						'href' => Router::getUri('login'),
+						'href' => App::router()->getUri('login'),
 						'target' => 'dialog',
 					))
 				)
@@ -264,7 +264,7 @@ class LoginController extends Controller{
 							'createIp' => $user->createIp
 						);
 						$token = Crypto::aes256Encode(json_encode($tokenData));
-						$url = Router::getUrl('validate-registration', array('token' => $token));
+						$url = App::router()->getUrl('validate-registration', array('token' => $token));
 
 
 						$data = array(

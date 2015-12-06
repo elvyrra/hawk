@@ -16,13 +16,13 @@ class RoleController extends Controller{
 		
 		$param = array(
 			'id' => 'roles-list',
-			'action' => Router::getUri('list-roles'),			
+			'action' => App::router()->getUri('list-roles'),			
 			'model' => 'Role',
 			'controls' => array(
 				array(
 					'icon' => 'plus',
 					'label' => Lang::get('roles.add-role-btn'),
-					'href' => Router::getUri('edit-role', array('roleId' => -1)),
+					'href' => App::router()->getUri('edit-role', array('roleId' => -1)),
 					'target' => 'dialog',
 					'class' => 'btn-success'
 				),
@@ -30,7 +30,7 @@ class RoleController extends Controller{
 				array(
 					'icon' => 'unlock-alt',
 					'label' => Lang::get('roles.edit-permissions-btn'),
-					'href' => Router::getUri('permissions'),
+					'href' => App::router()->getUri('permissions'),
 					'target' => 'newtab',
 				)
 			),
@@ -48,8 +48,8 @@ class RoleController extends Controller{
 				'actions' => array(
 					'independant' => true,
 					'display' => function($value, $field, $line){
-						return 	"<span class='icon icon-pencil text-info' href='" . Router::getUri('edit-role', array('roleId' => $line->id)) . "' target='dialog'></span>" .
-								"<span class='icon icon-unlock-alt text-success' href='" . Router::getUri('role-permissions', array('roleId' => $line->id)). "' target='newtab'></span>" .
+						return 	"<span class='icon icon-pencil text-info' href='" . App::router()->getUri('edit-role', array('roleId' => $line->id)) . "' target='dialog'></span>" .
+								"<span class='icon icon-unlock-alt text-success' href='" . App::router()->getUri('role-permissions', array('roleId' => $line->id)). "' target='newtab'></span>" .
 								($line->isRemovable() ? "<i class='icon icon-close text-danger delete-role' data-role='{$line->id}'></i>" : "");
 					},
 					'search' => false,

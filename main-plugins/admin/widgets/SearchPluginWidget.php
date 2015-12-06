@@ -7,7 +7,7 @@ class SearchPluginWidget extends Widget{
         $form = new Form(array(
             'id' => 'search-plugins-form',
             'method' => 'get',
-            'action' => Router::getUri('search-plugins'),            
+            'action' => App::router()->getUri('search-plugins'),            
             'inputs' => array(
                 new TextInput(array(
                     'name' => 'search',

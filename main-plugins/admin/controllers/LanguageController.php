@@ -65,7 +65,7 @@ class LanguageController extends Controller{
 		
 		$form = new Form(array(
 			'id' => 'edit-keys-form',
-			'action' => Router::getUri('save-language-keys'),			
+			'action' => App::router()->getUri('save-language-keys'),			
 			'onsuccess' => 'app.lists["language-key-list"].refresh();'
 		));
 
@@ -108,7 +108,7 @@ class LanguageController extends Controller{
 	public function keyForm(){
 		$param = array(
             'id' => 'add-lang-key-form',
-            'action' => Router::getUri('add-language-key'),
+            'action' => App::router()->getUri('add-language-key'),
             'fieldsets' => array(
                 'form' => array(
                     'nofieldset' => true,
@@ -277,7 +277,7 @@ class LanguageController extends Controller{
 
 		$param = array(
 			'id' => 'language-key-list',
-			'action' => Router::getUri('language-keys-list'),
+			'action' => App::router()->getUri('language-keys-list'),
 			'data' => $data,
 			'controls' => array(
 				array(
@@ -290,13 +290,13 @@ class LanguageController extends Controller{
 				array(
 					'icon' => 'plus',
 					'label' => Lang::get('language.new-lang'),
-					'href' => Router::getUri('edit-language', array('tag' => 'new')),
+					'href' => App::router()->getUri('edit-language', array('tag' => 'new')),
 					'target' => 'dialog',
 					'class' => 'btn-success'
 				),
 				
 				array(
-					'href' => Router::getUri('import-language-keys'),
+					'href' => App::router()->getUri('import-language-keys'),
 					'target' => 'dialog',
 					'icon' => 'download',
 					'label' => Lang::get('language.import-btn'),

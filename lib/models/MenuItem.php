@@ -44,7 +44,7 @@ class MenuItem extends Model{
 
 		if(!empty($this->action)){
 			$params = !empty($this->actionParameters) ? json_decode($this->actionParameters, true) : array();
-			$this->url = Router::getUri($this->action, $params);
+			$this->url = App::router()->getUri($this->action, $params);
 
 			if($this->url == Router::INVALID_URL){
 				$this->url = $this->action;

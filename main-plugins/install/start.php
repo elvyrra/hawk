@@ -3,13 +3,13 @@
 namespace Hawk\Plugins\Install;
 
 
-if(!App::conf()->has('db')){
-    Router::setProperties(
+if(!App::conf()->has('db')){    
+    App::router()->setProperties(
         array('namespace' => __NAMESPACE__), 
         function(){
-            Router::get('install', '/install', array('action' => 'InstallController.setLanguage'));
+            App::router()->get('install', '/install', array('action' => 'InstallController.setLanguage'));
 
-            Router::any('install-settings', '/install/settings/{language}', array('where' => array('language' => '[a-z]{2}'), 'action' => 'InstallController.settings'));
+            App::router()->any('install-settings', '/install/settings/{language}', array('where' => array('language' => '[a-z]{2}'), 'action' => 'InstallController.settings'));
         }
     );
 }

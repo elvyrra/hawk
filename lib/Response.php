@@ -244,7 +244,7 @@ class Response{
      * @param array $vars The route parameters value to set
      */
 	public function redirectToAction($route, $vars = array()){
-		$url = Router::getUri($route, $vars = array());
+		$url = App::router()->getUri($route, $vars = array());
 		$this->redirect($url);
 	}
 }

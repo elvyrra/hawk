@@ -87,7 +87,7 @@ class ThemeController extends Controller{
 		$param = array(
 			'id' => 'custom-theme-form',
 			'upload' => true,
-			'action' => Router::getUri('customize-theme'),
+			'action' => App::router()->getUri('customize-theme'),
 			'fieldsets' => array(
 				'form' => array(),
 
@@ -192,7 +192,7 @@ class ThemeController extends Controller{
 		$css = is_file($file) ? file_get_contents($file) : '';
 		$param = array(
 			'id' => 'theme-css-form',
-			'action' => Router::getUri('theme-css'),
+			'action' => App::router()->getUri('theme-css'),
 			'fieldsets' => array(
 				'_submits' => array(			
 					new HtmlInput(array(
@@ -304,7 +304,7 @@ class ThemeController extends Controller{
 		$param = array(
 			'id' => 'add-theme-media-form',
 			'upload' => true,
-			'action' => Router::getUri('add-theme-media'),
+			'action' => App::router()->getUri('add-theme-media'),
 			'fieldsets' => array(
 				'form' => array(
 					new FileInput(array(
@@ -367,7 +367,7 @@ class ThemeController extends Controller{
 		$param = array(
 			'id' => 'import-theme-form',
 			'upload' => true,
-			'action' => Router::getUri('import-theme'),
+			'action' => App::router()->getUri('import-theme'),
 			'fieldsets' => array(
 				'form' => array(
 					new FileInput(array(

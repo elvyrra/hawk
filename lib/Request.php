@@ -172,7 +172,7 @@ class Request{
             return isset($this->files[$name]) ? $this->files[$name] : array();
         }
         else{
-            return $files;
+            return $this->files;
         }
     }
 

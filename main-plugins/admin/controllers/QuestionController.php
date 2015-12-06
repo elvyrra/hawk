@@ -6,7 +6,7 @@ class QuestionController extends Controller{
 		$questions = ProfileQuestion::getAll();
 		$param = array(
 			'id' => 'display-questions-form',	
-			'action' => Router::getUri('profile-questions'),
+			'action' => App::router()->getUri('profile-questions'),
 			'fieldsets' => array(
 				'form' => array(),
 				
@@ -20,7 +20,7 @@ class QuestionController extends Controller{
 						'name' => 'new-question',
 						'value' => Lang::get('admin.new-question-btn'),
 						'class' => 'btn-success',
-						'href' => Router::getUri('edit-profile-question', array('name' => '_new')),
+						'href' => App::router()->getUri('edit-profile-question', array('name' => '_new')),
 						'target' => 'dialog',
 						'icon' => 'plus'
 					))
@@ -64,7 +64,7 @@ class QuestionController extends Controller{
 				'actions' => array(
 					'independant' => true,
 					'display' => function($value, $field, $line){
-						return 	$line->editable ? "<i class='icon icon-pencil text-info' href='" . Router::getUri('edit-profile-question', array('name' => $line->name)) . "' target='dialog' title='". Lang::get('admin.edit-profile-question')."' ></i>".
+						return 	$line->editable ? "<i class='icon icon-pencil text-info' href='" . App::router()->getUri('edit-profile-question', array('name' => $line->name)) . "' target='dialog' title='". Lang::get('admin.edit-profile-question')."' ></i>".
 												 "<i class='icon icon-times text-danger delete-question' data-question='$line->name' title='" . Lang::get('admin.delete-profile-question') . "'></i>" : "";
 					},
 					'sort' => false,

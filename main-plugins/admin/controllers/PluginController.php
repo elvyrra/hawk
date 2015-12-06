@@ -67,7 +67,7 @@ class PluginController extends Controller{
                     'icon' => 'plus',
                     'class' => 'btn-success',
                     'label' => Lang::get('admin.new-plugin-btn'),
-                    'href' => Router::getUri('create-plugin'),
+                    'href' => App::router()->getUri('create-plugin'),
                     'target' => 'dialog'
                 )
             ),
@@ -83,7 +83,7 @@ class PluginController extends Controller{
                                 ButtonInput::create(array(
                                     'label' => Lang::get('admin.install-plugin-button'),
                                     'icon' => 'upload',
-                                    'href' => Router::getUri('install-plugin', array('plugin' => $plugin->getName())),
+                                    'href' => App::router()->getUri('install-plugin', array('plugin' => $plugin->getName())),
                                     'target' => $actionsTarget,                                    
                                 )),
 
@@ -92,7 +92,7 @@ class PluginController extends Controller{
                                     'label' => Lang::get('admin.delete-plugin-button'),
                                     'icon' => 'close',
                                     'class' => 'btn-danger delete-plugin',
-                                    'href' => Router::getUri('delete-plugin', array('plugin' => $plugin->getName())),
+                                    'href' => App::router()->getUri('delete-plugin', array('plugin' => $plugin->getName())),
                                     'target' => $actionsTarget,
                                 ))
                             );
@@ -106,7 +106,7 @@ class PluginController extends Controller{
                                         'label' => Lang::get('admin.activate-plugin-button'),
                                         'class' => 'btn-success',
                                         'icon' => 'check',
-                                        'href' => Router::getUri('activate-plugin', array('plugin' => $plugin->getName())),
+                                        'href' => App::router()->getUri('activate-plugin', array('plugin' => $plugin->getName())),
                                         'target' => $actionsTarget,                                              
                                     )),
                                     
@@ -115,7 +115,7 @@ class PluginController extends Controller{
                                         ButtonInput::create(array(
                                             'icon' => 'cogs',
                                             'label' => Lang::get('admin.plugin-settings-button'),
-                                            'href' => Router::getUri('plugin-settings', array('plugin' => $plugin->getName())),
+                                            'href' => App::router()->getUri('plugin-settings', array('plugin' => $plugin->getName())),
                                             'target' => 'dialog',
                                             'class' => 'btn-info'
                                         )) : '',
@@ -125,7 +125,7 @@ class PluginController extends Controller{
                                         'label' => Lang::get('admin.uninstall-plugin-button'),
                                         'class' => 'btn-danger uninstall-plugin',
                                         'icon' => 'close',
-                                        'href' => Router::getUri('uninstall-plugin', array('plugin' => $plugin->getName())),
+                                        'href' => App::router()->getUri('uninstall-plugin', array('plugin' => $plugin->getName())),
                                         'target' => $actionsTarget
                                     ))
                                 );
@@ -138,7 +138,7 @@ class PluginController extends Controller{
                                         ButtonInput::create(array(
                                             'icon' => 'cogs',
                                             'label' => Lang::get('admin.plugin-settings-button'),
-                                            'href' => Router::getUri('plugin-settings', array('plugin' => $plugin->getName())),
+                                            'href' => App::router()->getUri('plugin-settings', array('plugin' => $plugin->getName())),
                                             'target' => 'dialog'
                                         )) : '',
 
@@ -146,7 +146,7 @@ class PluginController extends Controller{
                                         'label' => Lang::get('admin.deactivate-plugin-button'),
                                         'class' => 'btn-warning',
                                         'icon' => 'ban',
-                                        'href' => Router::getUri('deactivate-plugin', array('plugin' => $plugin->getName())),
+                                        'href' => App::router()->getUri('deactivate-plugin', array('plugin' => $plugin->getName())),
                                         'target' => $actionsTarget
                                     ))                              
                                 );
@@ -158,7 +158,7 @@ class PluginController extends Controller{
                                 'icon' => 'refresh',
                                 'class' => 'btn-warning',
                                 'label' => Lang::get('admin.update-plugin-button'),
-                                'href' => Router::getUri('update-plugin', array('plugin' => $plugin->getName())),
+                                'href' => App::router()->getUri('update-plugin', array('plugin' => $plugin->getName())),
                                 'target' => $actionsTarget
                             ));
                         }

@@ -12,7 +12,7 @@ class NewMenuWidget extends Widget{
 		return new Form(array(
 			'id' => 'new-menu-form',
 			'model' => 'MenuItem',
-			'action' => Router::getUri('edit-item', array('itemId' => $itemId)),
+			'action' => App::router()->getUri('edit-item', array('itemId' => $itemId)),
 			'reference' => array('id' => $itemId),
 			'fieldsets' => array(
 				'parameters' => array(
