@@ -7,6 +7,8 @@
 namespace Hawk;
 
 // Autoload class needs at least FileSystem class and Plugin Class
+require LIB_DIR . 'Singleton.php';
+require LIB_DIR . 'App.php';
 require LIB_DIR . 'FileSystem.php';
 require LIB_DIR . 'Plugin.php';
 
@@ -91,7 +93,7 @@ class Autoload{
         
 		// Cross any search folder to find out the class file
         foreach($dirs as $dir){
-            $files = App::fs()->find($dir, $filename, FileSystem::FIND_FILE_ONLY);
+            $files = FileSystem::getInstance()->find($dir, $filename, FileSystem::FIND_FILE_ONLY);
             if(!empty($files)){
                 $file = $files[0];
 

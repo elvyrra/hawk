@@ -1,19 +1,29 @@
 <?php
 namespace Hawk;
 
+// Get the core constants
 require INCLUDES_DIR . 'constants.php';
+
+// Get the constants customized by developer for the application
 if(!is_file(INCLUDES_DIR . 'custom-constants.php')){
     touch(INCLUDES_DIR . 'custom-constants.php');
 }    
 require INCLUDES_DIR . 'custom-constants.php';
+
+// Load the autoload system
 require INCLUDES_DIR . 'autoload.php';
 
+// Initialize the application and singletons
 App::getInstance()->init();
 
+// Load the application configuration
 if(is_file(INCLUDES_DIR . 'config.php')){
 	require INCLUDES_DIR . 'config.php';
 }
+
+// Load the error handlers
 require INCLUDES_DIR . 'error-handler.php';
+
 
 define("ROOT_URL", (string) App::conf()->get('rooturl') . '/');
 

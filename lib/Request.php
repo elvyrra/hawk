@@ -10,7 +10,7 @@ namespace Hawk;
  * This class define methods to get HTTP request information 
  * @package Core
  */
-class Request{
+final class Request extends Singleton{
     /**
      * The clientIp, registered as static variable, to avoid to calculate it each time
      * @static
@@ -53,9 +53,15 @@ class Request{
     $cookies = array();
 
     /**
+     * The request instance
+     */
+    protected static $instance;
+
+
+    /**
      * Constrcutor, initialize the instance with the HTTP request data
      */
-    public function __construct(){
+    protected function __construct(){
         // Get the request method
         $this->method = strtolower(getenv('REQUEST_METHOD'));
 
@@ -107,6 +113,7 @@ class Request{
         // Get the request cookies
         $this->cookies = $_COOKIE; 
     }
+
 
     /**
      * Get the HTTP request method

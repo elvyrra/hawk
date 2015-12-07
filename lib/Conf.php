@@ -10,7 +10,7 @@ namespace Hawk;
  * This class is used to get and set the application base configuration
  * @package Core
  */
-class Conf{
+final class Conf extends Singleton{
 	/**
 	 * The application configuration cache
 	 * @var array
@@ -21,25 +21,8 @@ class Conf{
 	/**
 	 * The configuration instance
 	 */
-	private static $instance;
+	protected static $instance;
 
-	/**
-	 * Constrcutor
-	 */
-	private function __construct(){
-
-	}
-
-	/**
-	 * Get the configuration instance
-	 */
-	public static function getInstance(){
-		if(!isset(self::$instance)){
-			self::$instance = new self;
-		}
-
-		return self::$instance;
-	}
 	
 	/**
 	 * Get a configuration value 

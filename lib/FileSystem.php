@@ -12,7 +12,7 @@ namespace Hawk;
  * This class has utilities to manage the file system, for missing functions in PHP
  * @package Utils
  */
-class FileSystem{
+final class FileSystem extends Singleton{	
 	/**
 	 * Directory separator
 	 */
@@ -21,6 +21,11 @@ class FileSystem{
 	const FIND_FILE_ONLY = 'file';
 	const FIND_DIR_ONLY = 'dir';
 	const FIND_ANY_TYPE = 'any';
+
+	/**
+	 * The filesystem instance
+	 */
+	protected static $instance;
 
 
 	/**

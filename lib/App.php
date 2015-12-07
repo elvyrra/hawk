@@ -11,27 +11,12 @@ namespace Hawk;
 /**
  * This class is used to generate the application singletons
  */
-class App{
+final class App extends Singleton{
     /**
      * The application instance
      */
-    private static $instance;
-
-    /**
-     * Constructor
-     */
-    private function __construct(){}
-
-    /**
-     * Get the application instance
-     */
-    public function getInstance(){
-        if(!isset(self::$instance)){
-            self::$instance = new self;            
-        }
-
-        return self::$instance;
-    }
+    protected static $instance;
+    
 
     /**
      * Initialize the application
@@ -41,22 +26,25 @@ class App{
         $this->singleton('conf', Conf::getInstance());
 
         // Load the application error Handler
-        $this->singleton('errorHandler', new ErrorHandler());
+        $this->singleton('errorHandler', ErrorHandler::getInstance());
         
-        // Load the application HTTP request
-        $this->singleton('request', new Request());
-        
-        // Load the application HTTP response
-        $this->singleton('response', new Response());        
-
-        // Load the filesystem library
-        $this->singleton('fs', new FileSystem());
-
         // Load the application logger
         $this->singleton('logger', Logger::getInstance());
 
+        // Load the filesystem library
+        $this->singleton('fs', FileSystem::getInstance());
+
+        // Load the application session
+        $this->singleton('session', Session::getInstance());
+
         // Load the application router
         $this->singleton('router', Router::getInstance());
+
+        // Load the application HTTP request
+        $this->singleton('request', Request::getInstance());
+        
+        // Load the application HTTP response
+        $this->singleton('response', Response::getInstance());        
     }
 
 
@@ -75,7 +63,7 @@ class App{
             return self::$instance->$method;
         }
         else{
-            throw new \Exception('The application singleton ' . $method . ' has not been initiated');
+            throw new \Exception('The application singleton "' . $method . '" has not been initiated');
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Hawk;
  * This class defines static methods to prepare and send the HTTP response to the client 
  * @package Core
  */
-class Response{
+final class Response extends Singleton{
     /**
      * The response content
      * @var string|array
@@ -40,7 +40,10 @@ class Response{
     $contentType = 'html';
 
 
-
+    /**
+     * The response instance
+     */
+    protected static $instance;
 
     /**
      * Predefined content types
@@ -58,7 +61,7 @@ class Response{
     /**
      * Constructor
      */
-    public function __constructor(){
+    protected function __construct(){
         $this->setContentType('html');        
     }
 

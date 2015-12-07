@@ -13,18 +13,18 @@ App::logger()->debug('script has been Initialized');
 
 (new Event('process-start'))->trigger();
 
-if(!App::conf()->has('db') && (App::router()->getUri() === '/' || App::router()->getUri() === 'index.php')) {
-    App::logger()->debug('Hawk is not installed yet, redirect to install process page');
-    App::response()->redirect(App::router()->getUri('install'));
-    return;
-}
-
 /*** Initialize the plugins ***/
 $plugins = App::conf()->has('db') ? array_merge(Plugin::getMainPlugins(), Plugin::getActivePlugins()) : array(Plugin::get('main'), Plugin::get('install'));
 foreach($plugins as $plugin){	
 	if(is_file($plugin->getStartFile())){
 		include $plugin->getStartFile();
 	}
+}
+
+if(!App::conf()->has('db') && (App::router()->getUri() === '/' || App::router()->getUri() === 'index.php')) {
+    App::logger()->debug('Hawk is not installed yet, redirect to install process page');    
+    App::response()->redirectToAction('install');
+    return;
 }
 
 /*** Initialize the theme ***/

@@ -9,7 +9,12 @@ namespace Hawk;
  * This class defines the errors and exceptions handlers
  * @package Core
  */
-class ErrorHandler {	
+final class ErrorHandler extends Singleton{	
+
+	/**
+	 * The error handler instance
+	 */
+	protected static $instance;
 
 	/**
 	 * Handler an error

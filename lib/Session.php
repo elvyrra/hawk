@@ -12,7 +12,7 @@ namespace Hawk;
  * the session management (manage licences, number of simultaneous connections, ...)
  * @package Core
  */
-class Session{
+class Session extends Singleton{
 	/**
 	 * Static variable that registers the connected state of the current user	
 	 * @var boolean
@@ -23,13 +23,20 @@ class Session{
 	 * Static variable that registers the current user of the session	 
 	 * @var User
 	 */
-	$user;
+	$user,
 
 
 	/**
 	 * The session data, stored in $_SESSION
 	 */
-	private $data = array();
+	$data = array();
+
+
+	/**
+	 * The session instance
+	 */
+	protected static $instance;
+
 
 	/**
 	 * Initialize the session user

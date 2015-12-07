@@ -11,7 +11,7 @@ namespace Hawk;
  * This class describes the application router. It is used in any plugin to route URIs to controllers methods
  * @package Core\Router
  */
-class Router{
+final class Router extends Singleton{
 	/**
 	 * Invalid URL. This URI is displayed when no URI was found for a given route name	 
 	 */
@@ -48,24 +48,8 @@ class Router{
     /**
      * The router instance
      */
-    private static $instance;
+    protected static $instance;
 
-    /**
-     * Constrcutor
-     */
-    private function __construct(){}
-
-    /**
-     * Get the router instance
-     */
-    public static function getInstance(){
-    	if(!isset(self::$instance)){
-    		self::$instance = new self;
-    	}
-
-    	return self::$instance;
-    }
-    
 	/**
 	 * Add a new accessible route to the router
 	 * @param string $method The HTTP method the route is accessible for

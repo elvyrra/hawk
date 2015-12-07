@@ -9,7 +9,7 @@ namespace Hawk;
  * This class is used to log data in /logs directory. You can use it to log the action of the users on the application, for example to make stats.
  * @package Core
  */
-class Logger{
+final class Logger extends Singleton{
     const LEVEL_DEBUG = 'debug';
     const LEVEL_INFO = 'info';
     const LEVEL_NOTICE = 'notice';
@@ -19,20 +19,18 @@ class Logger{
     const MAX_FILE_SIZE = 204800;
     const MAX_FILES_BY_LEVEL = 9;
 
-    private static $instance;
+    /**
+     * The logger instance
+     * @var Logger
+     */
+    protected static $instance;
 
+    /**
+     * The file resources
+     */
     private $resources = array();
 
-    private function __construct(){}
-
-    public function getInstance(){
-        if(! isset(self::$instance)){
-            self::$instance = new self;
-        }
-
-        return self::$instance;
-    }
-
+    
     /**
      * Open a log file
      * @param string $level The level of the log file
