@@ -55,7 +55,7 @@ class DatabaseSessionHandler implements \SessionHandlerInterface{
      * @param string $name Not used
      */
     public function open($savePath, $name){
-        $this->db = DB::get(MAINDB);   
+        $this->db = App::db();   
         $this->table = DB::getFullTablename('Session');
 
         // Update the session mtime

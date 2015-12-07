@@ -489,13 +489,7 @@ class PluginController extends Controller{
                     $installer = str_replace(array('{{ $namespace }}', '{{ $name }}'), array($namespace, $plugin->getName()), file_get_contents(Plugin::current()->getRootDir() . 'templates/installer.tpl'));
                     if(file_put_contents($dir . 'classes/Installer.php', $installer) === false){
                         throw new \Exception('Impossible to create the file classes/Installer.php');
-                    }
-
-                    // Create the file Updater.php
-                    $updater = str_replace(array('{{ $namespace }}', '{{ $name }}'), array($namespace, $plugin->getName()), file_get_contents(Plugin::current()->getRootDir() . 'templates/updater.tpl'));
-                    if(file_put_contents($dir . 'classes/Updater.php', $updater) === false){
-                        throw new \Exception('Impossible to create the file classes/Updater.php');
-                    }
+                    }                   
 
                     // Create the language file
                     if(!touch($dir . 'lang/' . $plugin->getName() . '.en.lang')){

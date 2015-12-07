@@ -95,7 +95,7 @@ class MenuItem extends Model{
 			$data['parentId'] = 0;
 		}
 
-		$data['order'] = DB::get(self::$dbname)->select(array(
+		$data['order'] = App::db()->select(array(
 			'fields' => array('COALESCE(MAX(`order`), 0) + 1' => 'newOrder'),
 			'from' => self::getTable(),
 			'where' => new DBExample(array('parentId' => $data['parentId'])),
@@ -137,7 +137,7 @@ class MenuItem extends Model{
 	 * Delete the menu item
 	 */
 	public function delete(){
-		DB::get(MAINDB)->update(
+		App::db()->update(
 			self::getTable(), 
 			new DBExample(array('parentId' => $this->id)), 
 			array('parentId' => 0)

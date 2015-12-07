@@ -11,7 +11,7 @@
 			</div>
 		{/if}
 		<div class="row">		
-			<div class="col-md-12 page-content">			
+			<div class="col-xs-12 page-content">			
 				{if(!empty($page))}
 					{{ $page }}
 				{/if}

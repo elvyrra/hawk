@@ -163,7 +163,7 @@ class ItemListField {
 	 * @return string The SQL expression for the search on this field
 	 */
 	public function getSearchCondition(&$binds){
-		if($this->searchValue){
+		if($this->searchValue !== null){
 			return DBExample::make(array($this->field => array('$like' => '%' . $this->getInput()->dbvalue() . '%')), $binds);
 		}	
 	}

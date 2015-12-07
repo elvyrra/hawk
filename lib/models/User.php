@@ -89,7 +89,7 @@ class User extends Model{
 						INNER JOIN ' . self::getTable() . ' U ON U.roleId = RP.roleId
 					WHERE U.id = :id AND RP.value=1';
 
-			$permissions = DB::get(self::$dbname)->query($sql, array('id' => $this->id), array('return' => DB::RETURN_OBJECT));
+			$permissions = App::db()->query($sql, array('id' => $this->id), array('return' => DB::RETURN_OBJECT));
 			$this->permissions = array();			
 			foreach($permissions as $permission){
 				// Register the permission by it id
@@ -113,7 +113,7 @@ class User extends Model{
 					FROM ' . ProfileQuestionValue::getTable()  . ' V INNER JOIN ' . ProfileQuestion::getTable() . ' Q ON V.question = Q.name
 					WHERE V.userId = :id';
 
-			$data = DB::get(self::$dbname)->query($sql, array('id' => $this->id), array('return' => DB::RETURN_ARRAY, 'index' => 'name'));			
+			$data = App::db()->query($sql, array('id' => $this->id), array('return' => DB::RETURN_ARRAY, 'index' => 'name'));			
 			$this->profile = array_map(function($v){ return $v['value']; }, $data);
 		}		
 		return $prop ? (isset($this->profile[$prop]) ? $this->profile[$prop] : null) : $this->profile;

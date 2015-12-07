@@ -37,7 +37,8 @@ if(App::conf()->has('db')){
     /*** Access to the OS database (MySQL) ***/   
     try{
         DB::add(MAINDB, App::conf()->get('db.maindb'));
-        DB::get(MAINDB);
+        
+        App::getInstance()->singleton('db', DB::get(MAINDB));
     }
     catch(DBException $e){
         // The database is not configured, redirect to the installation

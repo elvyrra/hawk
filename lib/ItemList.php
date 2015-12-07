@@ -219,7 +219,7 @@ class ItemList{
 		/*** initialize fields default values ***/
 		foreach($this->fields as $name => &$field){
 			$field = new ItemListField($name, $field, $this);
-			if(!empty($this->searches[$name])){
+			if(isset($this->searches[$name])){
 				$field->searchValue = $this->searches[$name];
 			}
 
