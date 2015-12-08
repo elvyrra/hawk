@@ -392,11 +392,23 @@ App.prototype.load = function(url, data){
 				var code = xhr.status;
 
 				if(code === 403){
-					var response = JSON.parse(xhr.responseText);
+					// The page is not accessible for the user
+					var response;
+					try{
+						response = JSON.parse(xhr.responseText);
+					}
+					catch(e){
+						response = {
+							message : Lang.get('main.access-forbidden');
+						}
+					}
+
 					if(response.reason == "login"){
-						this.dialog(this.getUri('login') + '?redirect=' + url + '&code=403');
+						// The user is not connected, display the login form
+						this.dialog(this.getUri('login') + '?redirect=' + url + '&code=' + code);
 					}
 					else{
+						// Other reason, display the message in a notification
 						var message = response.message;
 						this.notify("danger", message);							
 					}
