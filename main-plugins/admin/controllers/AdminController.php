@@ -458,7 +458,7 @@ class AdminController extends Controller{
         }
 
         App::response()->setContentType('json');
-        App::response()->end($response);
+        App::response()->setBody($response);
     }
 	
 }

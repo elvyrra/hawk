@@ -68,3 +68,10 @@ final class App extends Singleton{
         }
     }
 }
+
+/**
+ * Throw this exception to force the script to finish properly
+ */
+class AppStopException extends \Exception{
+
+}

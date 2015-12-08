@@ -342,7 +342,9 @@ class PluginController extends Controller{
         }
         catch(\Exception $e){
             App::response()->setStatus(500);
-            App::response()->end(array('message' => $e->getMessage()));
+            App::response()->setBody(array(
+                'message' => $e->getMessage()
+            ));
         }
     }
 

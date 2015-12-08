@@ -238,8 +238,15 @@ final class Router extends Singleton{
 						'reason' => !App::session()->isConnected() ? 'login' : 'permission'
 					);			
 
-					App::response()->setContentType('json');
-					App::response()->end($response);
+					if(App::request()->isAjax()){
+						App::response()->setContentType('json');
+						App::response()->setBody($response);
+					}
+					else{
+						App::response()->setBody($response['message']);
+					}
+
+					throw new AppStopException();
 				}
 				return;
             }            

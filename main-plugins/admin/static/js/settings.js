@@ -22,7 +22,7 @@ var model = {
 	        .success(function(response){
 	        	app.loading.stop();
 	            if(response.status){
-	                location.reload();
+	                location = app.getUri('clear-cache');
 	            }
 	            else{
 	                app.notify('error', response.message);
