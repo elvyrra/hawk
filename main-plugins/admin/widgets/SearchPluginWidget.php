@@ -12,7 +12,7 @@ class SearchPluginWidget extends Widget{
                 new TextInput(array(
                     'name' => 'search',
                     'required' => true,
-                    'defaul' => App::request()->getParams('search'),
+                    'default' => App::request()->getParams('search'),
                     'placeholder' => Lang::get('admin.search-plugin-form-search-label'),
                 )),
 

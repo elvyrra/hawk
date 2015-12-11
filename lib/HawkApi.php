@@ -269,22 +269,6 @@ class HawkApi{
 
 
     /**
-     * Download a plugin update file
-     * @param string $name The plugin name
-     * @param string $version The version to download
-     */
-    public function downloadPluginUpdate($name, $version){
-        return $this->callApi(
-            'api-update-plugin', 
-            array(
-                'name' => $name, 
-                'version' => $version
-            )
-        );
-    }
-
-
-    /**
      * Search themes
      * @param string $search The search term
      * @return array The list of found themes
@@ -331,23 +315,7 @@ class HawkApi{
                 )
             )
         );
-    }
-
-
-    /**
-     * Download a theme update file
-     * @param string $name The theme name
-     * @param string $version The version to download
-     */
-    public function downloadThemeUpdate($name, $version){
-        return $this->callApi(
-            'api-update-theme', 
-            array(
-                'name' => $name, 
-                'version' => $version
-            )
-        );
-    }
+    }    
 }
 
 /**

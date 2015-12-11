@@ -30,11 +30,7 @@
                         </span>
 
                         {if($plugin->installed)}
-                            {if(Utils::getSerializedVersion($plugin->availableVersion) > Utils::getSerializedVersion($plugin->currentVersion))}
-                                {button label="{text key='admin.update-plugin-button'}" icon="refresh" href="{uri action='update-plugin' plugin='{$plugin->name}'}" class="pull-right update-plugin btn-warning"}
-                            {else}
-                                <span class="btn btn-success pull-right">{text key="admin.search-plugin-result-list-installed"}</span>
-                            {/if}
+                            <span class="btn btn-success pull-right">{text key="admin.search-plugin-result-list-installed"}</span>
                         {else}
                             {button label="{text key='admin.download-plugin-button'}" icon="download" href="{uri action='download-plugin' plugin='{$plugin->name}'}" class="pull-right download-plugin"}
                         {/if}

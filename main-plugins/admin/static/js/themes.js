@@ -38,13 +38,34 @@ $("#manage-themes-page")
  */
 app.forms["search-themes-form"].submit = function(){
     if(this.isValid()){
-        app.load(app.getUri('search-themes') + '?search=' + this.inputs.search.val());
+        var url = app.getUri('search-themes') + '?search=' + this.inputs.search.val();
+        app.load(url);
     }
     else{
         this.displayErrorMessage(Lang.get('form.error-fill'));
     }
     return false;
 };
+
+/** 
+ * Download a plugin from the platform
+ */
+$(".download-theme").click(function(){
+    app.loading.start();
+
+    $.get($(this).attr('href'))
+
+    .success(function(response){
+        app.load(location.hash.substr(2));
+    })
+
+    .error(function(xhr, status, error){
+        app.loading.stop();
+        app.notify('error', error.message);
+    });
+
+    return false;
+});
 
 /**
  * Customize the theme variables

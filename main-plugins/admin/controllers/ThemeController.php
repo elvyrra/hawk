@@ -626,11 +626,47 @@ class ThemeController extends Controller{
 	/**
 	 * Download a remote theme
 	 */
-	public function download(){}
+	public function download(){
+        App::response()->setContentType('json');
+        try{
+            $api = new HawkApi;
+            $file = $api->downloadTheme($this->theme);
+
+            $zip = new \ZipArchive;
+            if($zip->open($file) !== true){
+                throw new \Exception('Impossible to open the zip archive');
+            }
+
+            $zip->extractTo(THEMES_DIR);
+
+            $theme = Theme::get($this->theme);            
+            if(!$theme){
+                throw new \Exception('An error occured while downloading the theme');
+            }            
+
+            return $theme;
+            // App::response()->setBody($theme);
+        }
+        catch(\Exception $e){
+            App::response()->setStatus(500);
+            // App::response()->setBody(array(
+            //     'message' => $e->getMessage()
+            // ));
+            return array(
+                'message' => $e->getMessage()
+            );
+        }
+    }
 
 
 	/**
 	 * Update a theme from the remote platform
 	 */
-	public function update(){}
+	public function update(){
+        $theme = Theme::get($this->theme);
+        if($theme){
+            App::fs()->remove($theme->getRootDir());
+            $this->compute('download');
+        }
+    }
 }
