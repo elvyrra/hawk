@@ -399,8 +399,8 @@ App.prototype.load = function(url, data){
 					}
 					catch(e){
 						response = {
-							message : Lang.get('main.access-forbidden');
-						}
+							message : Lang.get('main.access-forbidden')
+						};
 					}
 
 					if(response.reason == "login"){

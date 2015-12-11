@@ -143,6 +143,7 @@ class MainController extends Controller{
 		return MainMenuWidget::getInstance()->display();
 	}
 
+
 	/**
 	 * Generate the conf.js file
 	 */
@@ -152,12 +153,14 @@ class MainController extends Controller{
 		// Get all routes
 		$routes = array();
 		foreach(App::router()->getRoutes() as $name => $route){
-			$routes[$name] = array(
-				'url' => $route->url,
-				'where' => $route->where,
-				'default' => $route->default,
-				'pattern' => $route->pattern
-			);
+			if($route->isAccessible()){
+				$routes[$name] = array(
+					'url' => $route->url,
+					'where' => $route->where,
+					'default' => $route->default,
+					'pattern' => $route->pattern
+				);
+			}
 		}
 
 		// Get all Lang labels

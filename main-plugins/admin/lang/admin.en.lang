@@ -1,5 +1,4 @@
 
-
 invalid-file-extension = "This file type is not allowed"
 list-questions-profile-visible-label = "Display on the profile"
 list-questions-register-visible-label = "Visible on register form"
@@ -222,16 +221,17 @@ update-page-current-hawk-version = "Your current version of Hawk is v{version} :
 
 search-plugin-form-title = "Research a plugin"
 search-plugin-form-search-label = "Research"
-search-plugin-form-price-label = "Price"
-search-plugin-form-price-all-value = "All plugins"
-search-plugin-form-price-free-value = "Free plugins"
-search-plugin-form-price-charged-value = "Charged plugins"
 search-plugin-form-submit-btn = "Search"
-
-search-plugins-result-title = "Research a plugin : results"
-download-plugin-button =  "Install"
-buy-plugin-button = "Buy"
+search-plugin-no-result = "No plugin for this research"
 search-plugin-result-free = "Free"
 search-plugin-result-list-installed = "Installed"
 search-plugin-downloads = "Downloaded {downloads} times"
+search-plugins-result-title = "Research plugins : {search}"
 update-plugin-button = "Update"
+
+search-theme-form-title = "Research a theme"
+search-theme-form-search-label = "Research"
+search-theme-form-submit-btn = "Search"
+
+download-plugin-button =  "Install"
+buy-plugin-button = "Buy"

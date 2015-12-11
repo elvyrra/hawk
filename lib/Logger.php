@@ -64,7 +64,7 @@ final class Logger extends Singleton{
 
             }            
         }
-        $this->resources[$level] = fopen($filename, 'w+');        
+        $this->resources[$level] = fopen($filename, 'a+');        
     }
 
     /**

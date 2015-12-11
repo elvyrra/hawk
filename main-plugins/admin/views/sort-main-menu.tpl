@@ -53,12 +53,12 @@
 
 <div class="row">  
     <div class="col-sm-4">
-        {panel type="info" id="sort-menu-inactive" title="{Lang::get('admin.sort-menu-inactive-items-title')}" content="{$backlogContent}"}
-        {panel type="success" title="{Lang::get('admin.new-menu-form-title')}" content="{$newMenuItem}"}
+        {panel type="info" id="sort-menu-inactive" title="{text key='admin.sort-menu-inactive-items-title'}" content="{$backlogContent}"}
+        {panel type="success" title="{text key='admin.new-menu-form-title'}" content="{$newMenuItem}"}
     </div>
 
     <div class="col-sm-8" id="">
-        {panel type="primary" title="{Lang::get('admin.sort-menu-active-items-title')}" content="{$sortForm}"}
+        {panel type="primary" title="{text key='admin.sort-menu-active-items-title'}" content="{$sortForm}"}
     </div>
 </div>
 

@@ -109,8 +109,8 @@ final class ErrorHandler extends Singleton{
 		}
 		else{				
 			App::response()->setBody(View::make(Theme::getSelected()->getView('error.tpl'), $param));
+			App::response()->end();
 		}
-		throw new AppStopException();
 	}
 
 	/**

@@ -45,8 +45,8 @@ class View{
 
 	const ASSIGN_REGEX = '#\{assign\s+name=(["\'])(\w+)\\1\s*\}(.*?)\{\/assign\}#ims';
 
-	const PLUGIN_REGEX = '#\{(\w+)((\s+[\w\-]+\=([\'"])((?:\\\\4|.)*?)\\4)*)\s*\}#sm';
-	const PLUGIN_ARGUMENTS_REGEX = '#([\w\-]+)\=([\'"])(\{?)((?:\\\\2|.)*?)(\}?)\\2#sm';
+	const PLUGIN_REGEX = '#\{(\w+)((\s+[\w\-]+\=([\'"])((?:[^\4\\\\]|\\\\.)*?)\4)*?)\s*\}#sm';
+	const PLUGIN_ARGUMENTS_REGEX = '#([\w\-]+)\=([\'"])(\{?)((?:[^\2\\\\]|\\\\.)*?)(\}?)\\2#sm';
 	
 	const TRANSLATION_REGEX = '#{(?!if)([a-zA-Z]{2})}(.*?){/\\1}#ism';
 
@@ -69,7 +69,7 @@ class View{
 		$this->content = file_get_contents($file);				
 		if(! $this->fileCache->isCached()){
 			$this->parse();
-			$this->fileCache->set($this->content);
+			$this->fileCache->set($this->parsed);
 		}
 
 		self::$instances[realpath($this->file)] = $this;
@@ -116,15 +116,28 @@ class View{
 		$replaces = array(
 			self::BLOCK_START_REGEX => "<?php $1 $2 : ?>", // structure starts
 			self::BLOCK_END_REGEX => "<?php end$1; ?>", // structures ends
-			self::ECHO_REGEX => "<?php echo $1; ?>", // echo
+			self::ECHO_REGEX => "<?= $1 ?>", // echo
 			self::TRANSLATION_REGEX => "<?php if(LANGUAGE == '$1'): ?>$2<?php endif; ?>", // Support translations in views
 			self::ASSIGN_REGEX => "<?php ob_start(); ?>$3<?php \$$2 = ob_get_clean(); ?>" // assign template part in variable
 		);		
-		$this->content = preg_replace(array_keys($replaces), $replaces, $this->content);
+		$this->parsed = preg_replace(array_keys($replaces), $replaces, $this->content);
 		
+		// Parse view plugins
+		$this->parsed = $this->parsePlugin($this->parsed);
+
+		$this->parsed = '<?php namespace ' . __NAMESPACE__ . '; ?>' . $this->parsed;
 		
-		// Parse plugins nodes		
-		$this->content = preg_replace_callback(self::PLUGIN_REGEX, function($matches){			
+		return $this;
+	}
+
+
+	/**
+	 * Parse plugins in a view
+	 * @param string $content The content to parse
+	 * @param string $inPlugin Internal variable that indicates if the plugin is another plugin (as  attribute value)
+	 */
+	private function parsePlugin($content, $inPlugin = false){
+		return preg_replace_callback(self::PLUGIN_REGEX, function($matches) use($inPlugin){
 			list($l, $component, $arguments) = $matches;
 			$componentClass = '\\Hawk\\View\\Plugins\\' . ucfirst($component);
 			
@@ -136,32 +149,38 @@ class View{
 				$parameters = array();
 
 				while(preg_match(self::PLUGIN_ARGUMENTS_REGEX, $arguments, $m)){
-					$name= $m[1];
-					if($m[3] && $m[5]){
-						// That is a PHP expression to evaluate
-						$value = $m[4];
+					list($whole, $name, $quote, $lbrace, $value, $rbrace) = $m;
+					if($lbrace && $rbrace){
+						$subPlugin = $lbrace . stripslashes($value) . $rbrace;
+						if(preg_match(self::PLUGIN_REGEX, $subPlugin)){
+							// The value is a view plugin
+							$value = $this->parsePlugin($subPlugin, true);
+						}
+
+						// That is a PHP expression to evaluate => nothing to do						
 					}
 					else{
 						// The value is a static string
-						$value = $m[2] . $m[4] . $m[2];
+						$value = $quote .addcslashes($value, '\\') . $quote;
 					}
 					
-					$parameters[$name] = "'" . $name . "' => " . $value;
+					$parameters[$name] = '\'' . $name . '\' => ' . $value;
 					
 					// Remove the argument from the arguments list
 					$arguments = str_replace($m[0], '', $arguments);
 				}				
 				
-				return '<?php $instance = new ' . $componentClass . '("' . $this->file . '", $_viewData, array(' . implode(',',$parameters) . ') ); echo $instance->display(); ?>';
+				if(! $inPlugin){
+					return '<?= new ' . $componentClass . '("' . $this->file . '", $_viewData, array(' . implode(',',$parameters) . ') ) ?>';
+				}
+				else{
+					return '(new ' . $componentClass . '("' . $this->file . '", $_viewData, array(' . implode(',',$parameters) . ')))->display()';
+				}
 			}
 			catch(\Exception $e){
 				return $matches[0];
 			}
-		}, $this->content);
-
-		$this->content = '<?php namespace ' . __NAMESPACE__ . '; ?>' . $this->content;
-		
-		return $this;
+		}, $content);
 	}
 
 

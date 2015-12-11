@@ -43,7 +43,7 @@ class PluginController extends Controller{
     public function availablePlugins(){
         $plugins = Plugin::getAll(true);
 
-        $actionsTarget = '#' . self::TABID . ' .page-content';
+        
 
         $api = new HawkApi;
         try{
@@ -73,8 +73,10 @@ class PluginController extends Controller{
             ),
             'fields' => array(
                 'controls' => array(
-                    'display' => function($value, $field, $plugin) use($actionsTarget, $updates){
+                    'display' => function($value, $field, $plugin) use($updates){
+                        $actionsTarget = '#' . self::TABID . ' .page-content';
                         $buttons = array();
+                        
                         $installer = $plugin->getInstallerInstance();
                         if(!$plugin->isInstalled()){
                             // the plugin is not installed
@@ -150,18 +152,18 @@ class PluginController extends Controller{
                                         'target' => $actionsTarget
                                     ))                              
                                 );
-                            }
-                        }
+                            }                            
+                        } 
 
                         if(isset($updates[$plugin->getName()])){
-                            $buttons[] = ButtonInput::create(array(
+                            array_unshift($buttons, ButtonInput::create(array(
                                 'icon' => 'refresh',
-                                'class' => 'btn-warning',
+                                'class' => 'btn-info',
                                 'label' => Lang::get('admin.update-plugin-button'),
                                 'href' => App::router()->getUri('update-plugin', array('plugin' => $plugin->getName())),
                                 'target' => $actionsTarget
-                            ));
-                        }
+                            )));
+                        }                       
 
                         return  "<h4>" . $plugin->getDefinition("title") . "</h4><br />" . implode("", $buttons);
                     },
@@ -279,11 +281,10 @@ class PluginController extends Controller{
         $api = new HawkApi;
 
         $search = App::request()->getParams('search');
-        $price = App::request()->getParams('price');
         
         // Search plugins on the API
         try{
-            $plugins = $api->searchPlugins($search, $price);
+            $plugins = $api->searchPlugins($search);
         }
         catch(\Hawk\HawkApiException $e){
             $plugins = array();
@@ -309,7 +310,7 @@ class PluginController extends Controller{
             return $list->display();
         }
         else{
-            return $this->compute('index', $list->display(), Lang::get('admin.search-plugins-result-title'));
+            return $this->compute('index', $list->display(), Lang::get('admin.search-plugins-result-title', array('search' => htmlentities($search))));
         }
 
     }
@@ -514,7 +515,7 @@ class PluginController extends Controller{
     /**
      * Update a plugin from the API
      */
-    public function update(){        
+    public function update(){      
         try{
             $plugin = Plugin::get($this->plugin);
             if(!$plugin){
@@ -566,13 +567,14 @@ class PluginController extends Controller{
 
                 App::fs()->remove($file);
             }                
-                
+            
             App::response()->redirectToAction('plugins-list');
         }
         catch(\Exception $e){        
             $this->addJavaScriptInline('app.notify("error", "' . addcslashes($e->getMessage(), '"') . '");');
-            $this->compute('availablePlugins');            
+            return $this->compute('availablePlugins');            
         }
+
 
     }
 }

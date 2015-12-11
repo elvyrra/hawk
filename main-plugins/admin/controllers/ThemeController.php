@@ -566,4 +566,71 @@ class ThemeController extends Controller{
 			App::fs()->remove($dir);
 		}
 	}
+
+
+	/**
+	 * Search themes on the remote platform
+	 */
+	public function search(){
+		$api = new HawkApi;
+
+        $search = App::request()->getParams('search');
+        
+        // Search themes on the API
+        try{
+            $themes = $api->searchThemes($search);
+        }
+        catch(\Hawk\HawkApiException $e){
+            $themes = array();
+        }
+
+        // Remove the plugins already downloaded on the application
+        foreach($themes as &$theme){
+            $installed = Theme::get($theme['name']);
+            $theme['installed'] = $installed !== null;
+            if($installed){
+                $theme['currentVersion'] = $installed->getDefinition('version');
+            }
+        }
+
+        $list = new ItemList(array(
+            'id' => 'search-themes-list',
+            'data' => $themes,       
+            'resultTpl' => Plugin::current()->getView('theme-search-list.tpl'),     
+            'fields' => array()
+        ));
+
+        if($list->isRefreshing()){
+            return $list->display();
+        }
+        else{
+        	$this->addCss(Plugin::current()->getCssUrl('themes.less'));
+        	$this->addJavaScript(Plugin::current()->getJsUrl('themes.js'));
+
+            return LeftSidebarTab::make(array(
+            	'page' => array(
+            		'content' => $list->display(), 
+            	),
+            	'sidebar' => array(
+            		'widgets' => array(
+            			new SearchThemeWidget()
+            		)
+            	),
+            	'icon' => 'picture-o',
+            	'title' => Lang::get('admin.search-themes-result-title', array('search' => $search))
+            ));
+        }
+	}
+
+
+	/**
+	 * Download a remote theme
+	 */
+	public function download(){}
+
+
+	/**
+	 * Update a theme from the remote platform
+	 */
+	public function update(){}
 }

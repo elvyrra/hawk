@@ -1,12 +1,13 @@
 <div class="row">
 	<div class="col-md-2">
-		{button class="btn-success btn-block" icon="plus" label="{Lang::get('admin.theme-create-btn')}" href="{App::router()->getUri('create-theme')}" target="dialog"}
+		{button class="btn-success btn-block" icon="plus" label="{text key='admin.theme-create-btn'}" href="{uri action='create-theme'}" target="dialog"}
 
-		{widget class="Hawk\Plugins\Admin\ImportThemeWidget"}	
+		{widget class="Hawk\Plugins\Admin\SearchThemeWidget"}			
+
 	</div>
 
 	<div class="col-md-10">		
-		<div class="row">					
+		<div class="row themes-list">					
 			{foreach($themes as $name => $theme)}
 				<div class="theme-item box pull-left {{ $name === $selectedTheme->getName() ? 'bg-success' : '' }}">
 					<div class="box-content">

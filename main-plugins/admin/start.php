@@ -66,16 +66,14 @@ App::router()->setProperties(
 				// Display the list of available themes
 				App::router()->any('available-themes', 'themes/available', array('action' => 'ThemeController.listThemes'));
 				// Select a theme 
-				App::router()->get('select-theme', 'themes/{name}/select', array('where' => array('name' => '[a-zA-Z0-9\-_.]+'), 'action' => 'ThemeController.select'));					
+				App::router()->get('select-theme', 'themes/{name}/select', array('where' => array('name' => Theme::NAME_PATTERN), 'action' => 'ThemeController.select'));					
 				// Create a theme
 				App::router()->any('create-theme', 'themes/create', array('action' => 'ThemeController.create'));
 				// Import new theme
 				App::router()->any('import-theme', 'themes/import', array('action' => 'ThemeController.import'));
 				// Remove a theme
-				App::router()->get('delete-theme', 'themes/{name}/remove', array('where' => array('name' => '[a-zA-Z0-9\-_.]+'), 'action' => 'ThemeController.delete'));
-				// Update a theme
-				App::router()->get('update-theme', 'themes/{theme}/update', array('where' => array('theme' => '[a-zA-Z0-9\-_.]+'), 'action' => 'ThemeController.update'));
-
+				App::router()->get('delete-theme', 'themes/{name}/remove', array('where' => array('name' => Theme::NAME_PATTERN), 'action' => 'ThemeController.delete'));
+				
 				// Set the menu items and order
 				App::router()->post('set-menu', 'menu/set-order', array('action' => 'MenuController.index'));
 				// Delete a menu item
@@ -83,38 +81,43 @@ App::router()->setProperties(
 				// Edit a menu item
 				App::router()->any('edit-menu', 'menu/{itemId}', array('where' => array('itemId' => '\d+'), 'action' => 'MenuController.editCustomMenuItem'));
 
+				// Search for a theme on the remote platform
+				App::router()->get('search-themes', 'themes/search', array('action' => 'ThemeController.search'));
+				// Download a remote theme
+				App::router()->get('download-theme', 'themes/{theme}/download', array('where' => array('theme' => Theme::NAME_PATTERN), 'action' => 'ThemeController.download'));
+				// Update a theme
+				App::router()->get('update-theme', 'themes/{theme}/update', array('where' => array('theme' => Theme::NAME_PATTERN), 'action' => 'ThemeController.update'));
 
-
-				/*** Manage plugins ***/		
 				
+				/*** Manage plugins ***/						
 				App::router()->get('manage-plugins', 'plugins', array('action' => 'PluginController.index'));
 
 				// List all available plugins on file system
 				App::router()->get('plugins-list', 'plugins/list', array('action' => 'PluginController.availablePlugins'));
 				// Install a plugin
-				App::router()->get('install-plugin', 'plugins/{plugin}/install', array('where' => array('plugin' => '[a-zA-Z0-9\-_.]+'), 'action' => 'PluginController.install'));
+				App::router()->get('install-plugin', 'plugins/{plugin}/install', array('where' => array('plugin' => Plugin::NAME_PATTERN), 'action' => 'PluginController.install'));
 				// Uninstall a plugin
-				App::router()->get('uninstall-plugin', 'plugins/{plugin}/uninstall', array('where' => array('plugin' => '[a-zA-Z0-9\-_.]+'), 'action' => 'PluginController.uninstall'));
+				App::router()->get('uninstall-plugin', 'plugins/{plugin}/uninstall', array('where' => array('plugin' => Plugin::NAME_PATTERN), 'action' => 'PluginController.uninstall'));
 				// Activate a plugin
-				App::router()->get('activate-plugin', 'plugins/{plugin}/activate', array('where' => array('plugin' => '[a-zA-Z0-9\-_.]+'), 'action' => 'PluginController.activate'));
+				App::router()->get('activate-plugin', 'plugins/{plugin}/activate', array('where' => array('plugin' => Plugin::NAME_PATTERN), 'action' => 'PluginController.activate'));
 				// Deactivate a plugin
-				App::router()->get('deactivate-plugin', 'plugins/{plugin}/deactivate', array('where' => array('plugin' => '[a-zA-Z0-9\-_.]+'), 'action' => 'PluginController.deactivate'));
+				App::router()->get('deactivate-plugin', 'plugins/{plugin}/deactivate', array('where' => array('plugin' => Plugin::NAME_PATTERN), 'action' => 'PluginController.deactivate'));
 				// Configure a plugin
-				App::router()->any('plugin-settings', 'plugins/{plugin}/settings', array('where' => array('plugin' => '[a-zA-Z0-9\-_.]+'), 'action' => 'PluginController.settings'));
+				App::router()->any('plugin-settings', 'plugins/{plugin}/settings', array('where' => array('plugin' => Plugin::NAME_PATTERN), 'action' => 'PluginController.settings'));
 
 				// Search for a plugin on the remote platform
 				App::router()->get('search-plugins', 'plugins/search', array('action' => 'PluginController.search'));
 				// Download and install a remote plugin
-				App::router()->get('download-plugin', 'plugins/{plugin}/download', array('where' => array('plugin' => '[a-zA-Z0-9\-_.]+'), 'action' => 'PluginController.download'));
+				App::router()->get('download-plugin', 'plugins/{plugin}/download', array('where' => array('plugin' => Plugin::NAME_PATTERN), 'action' => 'PluginController.download'));
 
 				// Definitively remove a plugin
-				App::router()->get('delete-plugin', 'plugins/{plugin}/remove', array('where' => array('plugin' => '[a-zA-Z0-9\-_.]+'), 'action' => 'PluginController.delete'));
+				App::router()->get('delete-plugin', 'plugins/{plugin}/remove', array('where' => array('plugin' => Plugin::NAME_PATTERN), 'action' => 'PluginController.delete'));
 
 				// Create a new plugin structure
 				App::router()->any('create-plugin', 'plugins/_new', array('action' => 'PluginController.create'));
 
 				// Update a plugin
-				App::router()->get('update-plugin', 'plugins/{plugin}/update', array('where' => array('plugin' => '[a-zA-Z0-9\-_.]+'), 'action' => 'PluginController.update'));
+				App::router()->get('update-plugin', 'plugins/{plugin}/update', array('where' => array('plugin' => Plugin::NAME_PATTERN), 'action' => 'PluginController.update'));
 
 				Event::on('menuitem.added menuitem.deleted', function($event){
 		            App::router()->getCurrentController()->addJavaScriptInline('app.refreshMenu()');

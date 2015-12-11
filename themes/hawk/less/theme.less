@@ -175,6 +175,53 @@ input, button, select, textarea {
     font-family: "Open Sans", Arial;
     outline-style: none;
     color: @text-color;
+
+    &.error{
+        .alert-danger();
+
+        & + .input-error-message{
+            opacity: 0;
+            transition: opacity .4s ease;
+            .alert();
+            .alert-danger();
+            position: absolute;
+            z-index: 2000;
+            margin-left: 2rem;
+            min-width: 20rem;
+
+            @arrow-size: 1rem;
+            @arrow-width: .1rem;
+
+            &:before, &:after{
+                width: 0;
+                height: 0;
+                content: " ";
+                position: absolute;
+                border-style: solid;
+                border-color: transparent;                
+                left: 0;
+                top: 0;
+            }
+
+            &:before{
+                border-width: @arrow-size + @arrow-width;
+                border-right-color: @state-danger-border;
+                margin-left: -2 * (@arrow-size + @arrow-width);
+                margin-top: .65rem;
+            }
+
+            &:after{
+                border-width: @arrow-size;
+                border-right-color: @state-danger-bg;
+                margin-left: -2 * @arrow-size;
+                margin-top: .75rem;
+            }
+        }
+
+        &:hover + .input-error-message{
+            opacity: 1;
+        }
+    }
 }
 
 input[type="text"],
@@ -388,6 +435,140 @@ label{
         border: 1px solid #d6e2eb;
         padding: .4rem .8rem;
         font-size: 1.3rem;
+    }
+}
+
+
+/*-------------------- Lists -----------------------------*/
+.list-forced-result{
+    display:none;
+}
+
+.list{
+    width: 100%;
+    border-collapse: collapse;
+
+    tbody > tr > td {
+        text-align: left;
+        padding: .3rem .5rem .2rem .5rem;
+        height: 4em;
+        vertical-align: middle;
+
+        .icon{
+            margin: .3rem;    
+            cursor: pointer;
+            padding: 0.2rem 0.25rem;
+        }
+    }
+
+    th{
+        text-align: left;    
+        padding-left: .5rem;
+        padding-right: .5rem;
+    }
+}
+    
+/*** The icon to sort the list ***/
+.list-title-label{
+    margin-right: 1.5rem;    
+}
+.list-sort-column{
+    background: transparent;
+    border: none;
+    font-size: 1.3rem;
+    opacity: 0.5;
+
+    &:hover{
+        opacity: 1;
+    }
+
+    &.list-sort-active{
+        color: @brand-primary;
+        opacity: 1;
+    }
+}
+    
+/*** The search icon ***/
+.list-search-block > .form-input-wrap{
+    margin: 0;
+}
+
+.list-search-input{
+    width: 15rem;
+    padding-right: 1.5rem;
+
+    &.not-empty {
+        background-color: @state-info-bg;
+        color: @state-info-text;
+        padding-right: 1.6rem;
+    }   
+}
+
+.clean-search{
+    font-size: 1.5rem;
+    margin-left: -1.5rem;
+}
+
+/** The search field ***/
+.list-line{
+    height: 3rem;
+
+    &.selected{
+        background: @state-info-text;
+
+        &> td{
+            color: white;    
+        }
+
+        &:hover > td{
+            color: @text-color;
+        }
+    }
+}
+    
+.list-cell-clickable{
+    cursor: pointer;
+}
+
+.list-cell-hidden{
+    display: none;
+}
+    
+
+/*** Tha navigation table ***/
+.list-navigation{
+    width: auto;
+    font-size: inherit;
+
+    td{
+        background-color: transparent;
+        border-right: 1px solid darken(@body-bg, 13.5%);
+        border-left: 1px solid darken(@body-bg, 13.5%);
+        padding-left: .5rem;
+        padding-right: .5rem;
+    }
+
+    .line-by-page-label{
+        margin-left: .5rem;
+    }
+
+    .list-max-lines{
+        width: 5rem;
+        border : none;
+    }
+
+    .list-next-page, .list-previous-page{
+        font-size: 1.5rem;    
+        top: .2rem;
+        position: relative;
+    }
+
+    input[type="text"].list-page-number{
+        width: 3rem;
+        text-align: center;
+        margin-top: .7rem;
+        font-size: 1.2rem;
+        height: 2rem;   
     }
 }
 
@@ -695,138 +876,7 @@ a, a:active, a:hover, a:visited, a:focus{
     }
 }
 
-/*-------------------- Lists -----------------------------*/
-.list-forced-result{
-	display:none;
-}
 
-.list{
-    width: 100%;
-    border-collapse: collapse;
-
-    tbody > tr > td {
-        text-align: left;
-        padding: .3rem .5rem .2rem .5rem;
-        height: 4em;
-        vertical-align: middle;
-
-        .icon{
-            margin: .3rem;    
-            cursor: pointer;
-            padding: 0.2rem 0.25rem;
-        }
-    }
-
-    th{
-        text-align: left;    
-        padding-left: .5rem;
-        padding-right: .5rem;
-    }
-}
-	
-/*** The icon to sort the list ***/
-.list-title-label{
-    margin-right: 1.5rem;    
-}
-.list-sort-column{
-    background: transparent;
-    border: none;
-    font-size: 1.3rem;
-    opacity: 0.5;
-
-    &:hover{
-        opacity: 1;
-    }
-
-    &.list-sort-active{
-        color: @brand-primary;
-        opacity: 1;
-    }
-}
-    
-/*** The search icon ***/
-.list-search-block > .form-input-wrap{
-    margin: 0;
-}
-
-.list-search-input{
-    width: 15rem;
-    padding-right: 1.5rem;
-
-    &.not-empty {
-        background-color: @state-info-bg;
-        color: @state-info-text;
-        padding-right: 1.6rem;
-    }   
-}
-
-.clean-search{
-    font-size: 1.5rem;
-    margin-left: -1.5rem;
-}
-
-/** The search field ***/
-.list-line{
-    height: 3rem;
-
-    &.selected{
-        background: @state-info-text;
-
-        &> td{
-            color: white;    
-        }
-
-        &:hover > td{
-            color: @text-color;
-        }
-    }
-}
-    
-.list-cell-clickable{
-    cursor: pointer;
-}
-
-.list-cell-hidden{
-	display: none;
-}
-	
-
-/*** Tha navigation table ***/
-.list-navigation{
-    width: auto;
-    font-size: inherit;
-
-    td{
-        background-color: transparent;
-        border-right: 1px solid darken(@body-bg, 13.5%);
-        border-left: 1px solid darken(@body-bg, 13.5%);
-        padding-left: .5rem;
-        padding-right: .5rem;
-    }
-
-    .line-by-page-label{
-        margin-left: .5rem;
-    }
-
-    .list-max-lines{
-        width: 5rem;
-        border : none;
-    }
-
-    .list-next-page, .list-previous-page{
-        font-size: 1.5rem;    
-        top: .2rem;
-        position: relative;
-    }
-
-    input[type="text"].list-page-number{
-        width: 3rem;
-        text-align: center;
-        margin-top: .7rem;
-        font-size: 1.2rem;
-        height: 2rem;   
-    }
-}
 	
 	
 	
@@ -917,16 +967,16 @@ p .icon{
 
 
 /*----------------------- Error tooltips -------------------*/
-.tooltip.input-error{
-	.tooltip-inner{
-        background: @state-danger-bg;
-        color: @state-danger-text;
-    }
+// .tooltip.input-error{
+// 	.tooltip-inner{
+//         background: @state-danger-bg;
+//         color: @state-danger-text;
+//     }
 
-    .tooltip-arrow{
-        border-right-color: @state-danger-bg;
-    }
-}
+//     .tooltip-arrow{
+//         border-right-color: @state-danger-bg;
+//     }
+// }
 
 
 /*------------------- Manage themes page -----------------------*/

@@ -51,4 +51,12 @@ abstract class ViewPlugin{
 	 * @return string The HTML result to display
 	 */
     abstract public function display();
+
+    /**
+     * Display the plugin. This abstract method must be overriden in each inherited class and return the HTML content corresponding to the instance
+     * @return string The HTML result to display
+     */
+    public function __toString(){
+        return $this->display();
+    }    
 }

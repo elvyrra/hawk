@@ -1,6 +1,6 @@
 <div class="container install-container">
     <div class="col-md-8 col-md-offset-2">
-        {panel type="info" title="{Lang::get('install.set-language-title')}" content="{$form}"}
+        {panel type="info" title="{text key='install.set-language-title'}" content="{$form}"}
     </div>
 </div>
 <style>

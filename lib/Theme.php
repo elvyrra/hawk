@@ -82,10 +82,15 @@ class Theme{
      * @return Theme The found theme
      */
     public static function get($name = self::DEFAULT_THEME){
-        if(!isset($themes[$name])){
-            self::$themes[$name] = new self($name);
+        try{
+            if(!isset($themes[$name])){
+                self::$themes[$name] = new self($name);
+            }
+            return self::$themes[$name];
         }
-        return self::$themes[$name];
+        catch(\Exception $e){
+            return null;
+        }
     }
     
 
@@ -121,7 +126,7 @@ class Theme{
      * Constructor
      * @param string $name The theme name     
      */
-    public function __construct($name){
+    private function __construct($name){
         $this->name = $name;
 
         $this->getDefinition();

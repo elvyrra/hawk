@@ -32,6 +32,20 @@ $("#manage-themes-page")
     $(this).select();
 });
 
+
+/**
+ * Search themes from the sidebar widget
+ */
+app.forms["search-themes-form"].submit = function(){
+    if(this.isValid()){
+        app.load(app.getUri('search-themes') + '?search=' + this.inputs.search.val());
+    }
+    else{
+        this.displayErrorMessage(Lang.get('form.error-fill'));
+    }
+    return false;
+};
+
 /**
  * Customize the theme variables
  */
