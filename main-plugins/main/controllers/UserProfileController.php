@@ -30,6 +30,11 @@ class UserProfileController extends Controller{
                         'label' => Lang::get('admin.user-form-username-label'),
                         'disabled' => true,
                     )),
+                  
+                                    new WysiwygInput(array(
+						          'name' => 'email',
+						          'label' => Lang::get('admin.settings-terms-label'),
+					          )),
                     
                     new EmailInput(array(
                         'name' => 'email',
