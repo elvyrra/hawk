@@ -11,26 +11,67 @@ namespace Hawk;
  * This class defines static methods to prepare and send the HTTP response to the client 
  * @package Core
  */
-class Response{
+final class Response extends Singleton{
     /**
      * The response content
      * @var string|array
      */
-    private static $content;
+    private $body,
+
+    /**
+     * The response status
+     */
+    $status = 200,
+
+    /**
+     * The response headers
+     */
+    $headers = array(),
+
+    /**
+     * The response cookies
+     */
+    $cookies = array(),
 
     /**
      * The response type
      * @var string
      */
-    private static $type = 'html';
+    $contentType = 'html';
+
+
+    /**
+     * The response instance
+     */
+    protected static $instance;
+
+    /**
+     * Predefined content types
+     */
+    private static $contentTypes = array(
+        'html' => 'text/html',
+        'json' => 'application/json',
+        'javascript' => 'application/javascript',
+        'css' => 'text/css',
+        'text' => 'text/plain',
+        'xml' => 'application/xml',
+        'stream' => 'application/octet-stream'
+    );
     
+    /**
+     * Constructor
+     */
+    protected function __construct(){
+        $this->setContentType('html');        
+    }
+
 
     /**
      * Get the content to return 
      * @return string
      */
-    public static function get(){
-        return self::$content;
+    public function getBody(){
+        return $this->body;
     }
     
 
@@ -38,8 +79,8 @@ class Response{
      * Set the content to return to the client
      * @param mixed $content The content to set
      */
-    public static function set($content){
-        self::$content = $content;        
+    public function setBody($body){
+        $this->body = $body;
     }
 
     /**
@@ -47,40 +88,70 @@ class Response{
      * @param string $name The header name
      * @param string $value The header value
      */
-    public function header($name, $value){
-        header($name .': ' . $value);
+    public function header($name, $value){        
+        $this->headers[$name] = $value;
+    }
+
+    /**
+     * Set response cookie
+     * @param string $name The cookie name
+     * @param mixed $data The cookie $data. Can be a string value, or an array containing the properties 'value', 'expires', 'path', 'domain', 'secure' or 'httponly'
+     */
+    public function setCookie($name, $data){
+        if(is_string($data)){
+            $data = array(
+                'value' => $data,                         
+            );
+        }
+
+        if(empty($data['path'])){
+            $data['path'] = '/';
+        }
+
+        $this->cookies[$name] = $data;
     }
 
     /**
      * Set the content type of the HTTP response
      * @param string $type The type to set
      */
-    public static function setContentType($type){
-        Log::debug('change content type of response to ' . $type);
-        header('Content-type: ' . $type);
+    public function setContentType($type){
+        App::logger()->debug('change content type of response to ' . $type);
+
+        $this->contentType = $type;
+        if(isset(self::$contentTypes[$type])){
+            $type = self::$contentTypes[$type];
+        }
+        $this->header('Content-type' , $type);
+    }
+
+    
+    /**
+     * set the response as HTML
+     */
+    public function setHtml(){
+        $this->setContentType('html');        
     }
 
     /**
      * Set the response as JSON
      */
-    public static function setJson(){        
-        self::setContentType('application/json');
-        self::$type = 'json';
+    public function setJson(){        
+        $this->setContentType('json');
     }
     
     /**
      * Set the response as JavaScript
      */
-    public static function setScript(){
-        self::setContentType('application/javascript');
-        self::$type = 'script';
+    public function setScript(){
+        $this->setContentType('javascript');        
     }
 
     /**
      * Get the response type
      */
-    public static function getType(){
-        return self::$type;
+    public function getContentType(){
+        return $this->contentType;
     }
 	
 
@@ -88,25 +159,72 @@ class Response{
      * Set the response HTTP code
      * @param int $code The HTTP code to set
      */
-	public static function setHttpCode($code){
-		http_response_code($code);      
+	public function setStatus($code){
+		$this->status = $code;              
 	}
+
+    /**
+     * get the response HTTP status
+     * @return int
+     */
+    public function getStatus(){
+        return $this->status;
+    }
+
     
 
     /**
-     * Return the HTTP response to the client, ad exit the script
+     * Return the HTTP response to the client, add exit the script
+     * @param string $content The content to set in the response body before returning it to the client
      */
-	public static function end($content = null){
-        if($content !== null){
-            self::set($content);
+	public function end($content = null){
+        http_response_code($this->status);
+
+        // Set the response cookies
+        $lines = array();
+        foreach($this->cookies as $name => $data){
+            $line = $name . '=' . $data['value'];
+            if(!empty($data['expires'])){
+                $line .= ';expires=' . gmdate('D, d M Y H:i:s \G\M\T', $data['expires']);
+            }
+            if(!empty($data['path'])){
+                $line .= ';path=' . $data['path'];
+            }
+            if(!empty($data['domain'])){
+                $line .= ';domain=' . $data['domain'];
+            }
+            if(!empty($data['secure'])){
+                $line .= ';secure';
+            }
+            if(!empty($data['httponly'])){
+                $line .= ';httponly';
+            }
+
+            $lines[] = $line;
+        }
+        if(!empty($lines)){
+            $this->header('Set-Cookie', implode(PHP_EOL, $lines));
+        }
+
+
+        // Set the response headers
+        foreach($this->headers as $name => $value){
+            header($name .': ' . $value);
         }
         
-        switch(self::$type){
+
+        // Set the response body
+        if($content !== null){
+            $this->setBody($content);
+        }
+
+        
+        switch($this->contentType){
             case 'json' :
-                echo json_encode(self::$content, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_NUMERIC_CHECK);
+                echo json_encode($this->body, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_NUMERIC_CHECK);
             break;
             default :
-                echo self::$content;
+                echo $this->body;
             break;
         }
         exit();
@@ -117,10 +235,10 @@ class Response{
      * Redirect to another URL
      * @param string $url The URL to redirect to
      */
-	public static function redirect($url){
-        Log::debug('redirect to ' . $url);
-        header("Location: $url");
-		exit();
+	public function redirect($url){
+        App::logger()->debug('redirect to ' . $url);
+        $this->header('Location', $url);
+        $this->end();
 	}
 	
     /**
@@ -128,8 +246,8 @@ class Response{
      * @param string $route The route name to redirect to
      * @param array $vars The route parameters value to set
      */
-	public static function redirectToAction($route, $vars = array()){
-		$url = Router::getUri($route, $vars = array());
-		self::redirect($url);
+	public function redirectToAction($route, $vars = array()){
+		$url = App::router()->getUri($route, $vars = array());
+		$this->redirect($url);
 	}
 }

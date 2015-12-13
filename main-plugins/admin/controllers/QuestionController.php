@@ -6,7 +6,7 @@ class QuestionController extends Controller{
 		$questions = ProfileQuestion::getAll();
 		$param = array(
 			'id' => 'display-questions-form',	
-			'action' => Router::getUri('profile-questions'),
+			'action' => App::router()->getUri('profile-questions'),
 			'fieldsets' => array(
 				'form' => array(),
 				
@@ -20,7 +20,7 @@ class QuestionController extends Controller{
 						'name' => 'new-question',
 						'value' => Lang::get('admin.new-question-btn'),
 						'class' => 'btn-success',
-						'href' => Router::getUri('edit-profile-question', array('name' => '_new')),
+						'href' => App::router()->getUri('edit-profile-question', array('name' => '_new')),
 						'target' => 'dialog',
 						'icon' => 'plus'
 					))
@@ -33,12 +33,14 @@ class QuestionController extends Controller{
 			$param['fieldsets']['form'][] = new CheckboxInput(array(
 				'name' => "register-display-$question->name",
 				'default' => $question->displayInRegister,
+				'nl' => false
 			));
 			
 			// Add the input to display in the user profile
 			$param['fieldsets']['form'][] = new CheckboxInput(array(
 				'name' => "profile-display-$question->name",
 				'default' => $question->displayInProfile,
+				'nl' => false
 			));
 		}
 		
@@ -62,7 +64,7 @@ class QuestionController extends Controller{
 				'actions' => array(
 					'independant' => true,
 					'display' => function($value, $field, $line){
-						return 	$line->editable ? "<i class='icon icon-pencil text-info' href='" . Router::getUri('edit-profile-question', array('name' => $line->name)) . "' target='dialog' title='". Lang::get('admin.edit-profile-question')."' ></i>".
+						return 	$line->editable ? "<i class='icon icon-pencil text-info' href='" . App::router()->getUri('edit-profile-question', array('name' => $line->name)) . "' target='dialog' title='". Lang::get('admin.edit-profile-question')."' ></i>".
 												 "<i class='icon icon-times text-danger delete-question' data-question='$line->name' title='" . Lang::get('admin.delete-profile-question') . "'></i>" : "";
 					},
 					'sort' => false,
@@ -83,7 +85,7 @@ class QuestionController extends Controller{
 					'sort' => false,
 					'search' => false,
 					'display' => function($value, $field, $line) use($form){
-						return $form->fields["register-display-$line->name"];
+						return $form->inputs["register-display-$line->name"];
 					}
 				),
 				
@@ -92,7 +94,7 @@ class QuestionController extends Controller{
 					'sort' => false,
 					'search' => false,
 					'display' => function($value, $field, $line) use($form){
-						return $form->fields["profile-display-$line->name"];
+						return $form->inputs["profile-display-$line->name"];
 					}
 				)
 			),			
@@ -110,7 +112,7 @@ class QuestionController extends Controller{
 		else{
 			try{
 				$save = array();
-				foreach($form->fields as $name => $field){
+				foreach($form->inputs as $name => $field){
 					if(preg_match("/^(register|profile)\-display\-(\w+)$/", $name, $match)){
 						$qname = $match[2];
 						$func = $match[1] == "register" ? 'displayInRegister' : 'displayInProfile';
@@ -118,7 +120,7 @@ class QuestionController extends Controller{
 							$save[$qname] = new ProfileQuestion();
 							$save[$qname]->set('name', $qname);
 						}
-						$save[$qname]->set($func, (int) Request::getBody($name) );
+						$save[$qname]->set($func, (int) App::request()->getBody($name) );
 					}
 				}
 
@@ -240,7 +242,7 @@ class QuestionController extends Controller{
 						new TextareaInput(array(
 							'name' => 'options',
 							'independant' => true,
-							'required' => Request::getBody('type') == 'select' || Request::getBody('type') == 'radio',							
+							'required' => App::request()->getBody('type') == 'select' || App::request()->getBody('type') == 'radio',							
 							'label' => Lang::get('admin.profile-question-form-options-label') . '<br />' . Lang::get('admin.profile-question-form-options-description'),
 							'labelClass' => 'required',
 							'attributes' => array(
@@ -299,12 +301,12 @@ class QuestionController extends Controller{
 
 						Language::current()->saveTranslations(array(
 							'admin' => array(
-								'profile-question-' . $form->getData("name") . '-label' => Request::getBody('label')
+								'profile-question-' . $form->getData("name") . '-label' => App::request()->getBody('label')
 							)
 						));
 
 						// Create the lang options
-						if($form->fields['options']->required){
+						if($form->inputs['options']->required){
 							$keys = array('admin'=> array());
 							foreach(explode(PHP_EOL, $form->getData("options")) as $i => $option){
 								if(!empty($option)){

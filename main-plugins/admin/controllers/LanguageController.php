@@ -20,12 +20,12 @@ class LanguageController extends Controller{
 			'keys' => 'all'
 		);
 
-		if(Request::getParams('filters')) {
-			setcookie('languages-filters', Request::getParams('filters'), 0, '/');
-			$filters = json_decode(Request::getParams('filters'), true);
+		if(App::request()->getParams('filters')) {
+			setcookie('languages-filters', App::request()->getParams('filters'), 0, '/');
+			$filters = json_decode(App::request()->getParams('filters'), true);
 		}
-		elseif(Request::getCookies('languages-filters')){
-			$filters = json_decode(Request::getCookies('languages-filters'), true);
+		elseif(App::request()->getCookies('languages-filters')){
+			$filters = json_decode(App::request()->getCookies('languages-filters'), true);
 		}
 		
 		return $filters;	 	
@@ -65,29 +65,19 @@ class LanguageController extends Controller{
 		
 		$form = new Form(array(
 			'id' => 'edit-keys-form',
-			'action' => Router::getUri('save-language-keys'),			
-			'fieldsets' => array(
-				'form' => array(
-					'nofieldset' => true,
-					
-					new HtmlInput(array(
-						'name' => 'keyList',
-						'value' => $this->compute('listKeys')
-					))
-				)
-			),
+			'action' => App::router()->getUri('save-language-keys'),			
 			'onsuccess' => 'app.lists["language-key-list"].refresh();'
 		));
 
 		if(!$form->submitted()){
 			// Display the form
-			return $form;
+			return $form->wrap($this->compute('listKeys'));
 		}
 		else{
 			// Register the translations
 			try{
 				$keys = array();
-				$translations = Request::getBody('translation');
+				$translations = App::request()->getBody('translation');
 				if(!empty($translations[$filters['tag']])){
 					foreach($translations[$filters['tag']] as $langKey => $translation){
 						if(!empty($translation)){						
@@ -103,11 +93,11 @@ class LanguageController extends Controller{
 					Language::getByTag($filters['tag'])->saveTranslations($keys);
 				}
 				
-				Log::info('The translations has been updated');
+				App::logger()->info('The translations has been updated');
 				return $form->response(Form::STATUS_SUCCESS, Lang::get('language.update-keys-success'));
 			}
 			catch(DBException $e){
-				Log::error('An error occured while updating translations : ' . $e->getMessage());
+				App::logger()->error('An error occured while updating translations : ' . $e->getMessage());
 				return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get('language.update-keys-error'));
 			}
 		}
@@ -118,7 +108,7 @@ class LanguageController extends Controller{
 	public function keyForm(){
 		$param = array(
             'id' => 'add-lang-key-form',
-            'action' => Router::getUri('add-language-key'),
+            'action' => App::router()->getUri('add-language-key'),
             'fieldsets' => array(
                 'form' => array(
                     'nofieldset' => true,
@@ -187,11 +177,11 @@ class LanguageController extends Controller{
 					}
 				}
 
-				Log::info('A new language key has been added');
+				App::logger()->info('A new language key has been added');
 				return $form->response(Form::STATUS_SUCCESS);
 			}
 			catch(Exception $e){
-				Log::error('An error occured while adding a language key : ' . $e->getMessage());
+				App::logger()->error('An error occured while adding a language key : ' . $e->getMessage());
 				return $form->response(Form::STATUS_ERROR);
 			}
 		}
@@ -206,10 +196,10 @@ class LanguageController extends Controller{
 			Language::getByTag($this->tag)->removeTranslations(array(
 				$this->plugin => array($this->key)
 			));
-			Log::info('A translation has been reset : ' . $this->plugin . '.' . $this->key);
+			App::logger()->info('A translation has been reset : ' . $this->plugin . '.' . $this->key);
 		}
 		catch(Exception $e){
-			Log::error('An error occured while reseting the language key ' . $this->plugin . '.' . $this->key);
+			App::logger()->error('An error occured while reseting the language key ' . $this->plugin . '.' . $this->key);
 		}	
 	}
 	
@@ -228,7 +218,7 @@ class LanguageController extends Controller{
 		$dirs = array(MAIN_PLUGINS_DIR, PLUGINS_DIR, USERFILES_PLUGINS_DIR . Lang::TRANSLATIONS_DIR);
 		foreach($dirs as $dir){
 			if(is_dir($dir)){
-				$result = FileSystem::find($dir, '*.*.lang', FileSystem::FIND_FILE_ONLY);
+				$result = App::fs()->find($dir, '*.*.lang', FileSystem::FIND_FILE_ONLY);
 			}
 			
 			foreach($result as $file){
@@ -287,7 +277,7 @@ class LanguageController extends Controller{
 
 		$param = array(
 			'id' => 'language-key-list',
-			'action' => Router::getUri('language-keys-list'),
+			'action' => App::router()->getUri('language-keys-list'),
 			'data' => $data,
 			'controls' => array(
 				array(
@@ -300,13 +290,13 @@ class LanguageController extends Controller{
 				array(
 					'icon' => 'plus',
 					'label' => Lang::get('language.new-lang'),
-					'href' => Router::getUri('edit-language', array('tag' => 'new')),
+					'href' => App::router()->getUri('edit-language', array('tag' => 'new')),
 					'target' => 'dialog',
 					'class' => 'btn-success'
 				),
 				
 				array(
-					'href' => Router::getUri('import-language-keys'),
+					'href' => App::router()->getUri('import-language-keys'),
 					'target' => 'dialog',
 					'icon' => 'download',
 					'label' => Lang::get('language.import-btn'),
@@ -358,7 +348,8 @@ class LanguageController extends Controller{
 
 		$param = array(
 			'id' => 'language-form',
-			'object' => $language,
+			'model' => 'Language',
+			'reference' => array('tag' => $this->tag),
 			'fieldsets' => array(
 				'form' => array(
 					'nofieldset' => true,
@@ -380,7 +371,7 @@ class LanguageController extends Controller{
 					new CheckboxInput(array(
 						'name' => 'active',
 						'label' => Lang::get('language.lang-form-active-label'),
-						'noDisplayed' => (count($activeLanguages) <= 1 && $language->active) || $language->isDefault
+						'noDisplayed' => ! $language || (count($activeLanguages) <= 1 && $language->active) || $language->isDefault
 					))
 				),
 				
@@ -421,17 +412,18 @@ class LanguageController extends Controller{
 	public function deleteLanguage(){
 		try{
 			$language = Language::getByTag($this->tag);
+
 			if(Option::get('main.language') == $this->tag){
 				// Set a new default language
 				$newDefault = Language::getAllActive()[0];
 				Option::set('main.language', $newDefault->tag);
 			}
-			$language->delete();		
+			$language->delete();	
 
-			Log::info('The language ' . $this->tag . ' has been removed');
+			App::logger()->info('The language ' . $this->tag . ' has been removed');
 		}
 		catch(Exception $e){
-			Log::error('An error occured while removing the language ' . $this->tag . ' : ' . $e->getMessage());
+			App::logger()->error('An error occured while removing the language ' . $this->tag . ' : ' . $e->getMessage());
 		}
 	}
 	
@@ -482,7 +474,7 @@ class LanguageController extends Controller{
 		else{
 			if($form->check()){
 				try{
-					$files = Request::getFiles('files');
+					$files = App::request()->getFiles('files');
 					foreach($files['name'] as $i => $filename){
 						// Check the filename is correct
 						if(!preg_match('/^([\w\-]+)\.([a-z]{2})\.lang$/', $filename, $matches)) {
@@ -504,11 +496,11 @@ class LanguageController extends Controller{
 						unlink($tmpfile);
 					}
 					
-					Log::info('Language files were successfully imported');
+					App::logger()->info('Language files were successfully imported');
 					return $form->response(Form::STATUS_SUCCESS);
 				}
 				catch(Exception $e){
-					Log::error('An error occured whiel importing language files : ' . $e->getMessage());
+					App::logger()->error('An error occured whiel importing language files : ' . $e->getMessage());
 					$form->error('files[]', $e->getMessage());					
 					return $form->response(Form::STATUS_CHECK_ERROR);
 				}

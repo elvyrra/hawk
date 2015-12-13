@@ -1,10 +1,5 @@
 (function(){
-	window.advertMenuChanged = function(){
-		app.notify('warning', Lang.get('admin.plugins-advert-menu-changed'));
-		adverted = true;
-	}
-
-    /**
+	/**
      * Remove a plugin
      */
     $(".delete-plugin").click(function(){
@@ -35,4 +30,22 @@
         }
         return false;
     };
+
+    /** 
+     * Download a plugin from the platform
+     */
+    $(".download-plugin").click(function(){
+        app.loading.start();
+
+        $.get($(this).attr('href')).success(function(response){
+            app.load(location.hash.substr(2));
+        })
+
+        .error(function(xhr, status, error){
+            app.loading.stop();
+            app.notify('error', error.message);
+        });
+
+        return false;
+    });    
 })();

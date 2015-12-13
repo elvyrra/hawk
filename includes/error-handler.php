@@ -1,7 +1,12 @@
 <?php
-if(ini_get('display_errors')){
-	set_error_handler('\\Hawk\\ErrorHandler::error', error_reporting());
+namespace Hawk;
 
-	set_exception_handler('\\Hawk\\ErrorHandler::exception');
+if(ini_get('display_errors')){
+    $errorHandler = App::errorHandler();
+
+	set_error_handler(array($errorHandler, 'error'), error_reporting());
+    register_shutdown_function(array($errorHandler, 'fatalError'));
+
+	set_exception_handler(array($errorHandler, 'exception'));
 }
 

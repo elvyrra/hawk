@@ -11,7 +11,7 @@ namespace Hawk;
  * This class describes the application router. It is used in any plugin to route URIs to controllers methods
  * @package Core\Router
  */
-class Router{
+final class Router extends Singleton{
 	/**
 	 * Invalid URL. This URI is displayed when no URI was found for a given route name	 
 	 */
@@ -21,29 +21,35 @@ class Router{
 	 * The defined routes
 	 * @var array
 	 */
-	private static $routes = array();	
+	private $routes = array(),	
 
 	/**
 	 * The routes accessible for the current request method
 	 */
-	private static $activeRoutes = array();	
+	$activeRoutes = array(),
 
 	/**
 	 * The current route, associated to the current URI
 	 */
-	private static $currentRoute;
+	$currentRoute,
 
 	/**
 	 * The authentications required to match the URIs
 	 */
-    private static $auth = array();
+    $auth = array(),
 
 
     /**
      * The predefined data for the routes
      */
-    private static $predefinedData = array();
+    $predefinedData = array();
+
     
+    /**
+     * The router instance
+     */
+    protected static $instance;
+
 	/**
 	 * Add a new accessible route to the router
 	 * @param string $method The HTTP method the route is accessible for
@@ -54,53 +60,53 @@ class Router{
 	 *						- 'where' array (optionnal) : An array defining each parameter pattern, where keys are the names of the route parameters, and values are the regular expression to match (without delimiters)
 	 *						- 'default' array (optionnal) : An array defining the default values of parameters. This is useful to generate a URI from a route name (method getUri), without giving all parameters values
 	 */
-	private static function add($method, $name, $uri, $param){		
+	private function add($method, $name, $uri, $param){		
 		if(isset($param['auth'])){
 			$auth = $param['auth'];
-			$param['auth'] = self::$auth;
+			$param['auth'] = $this->auth;
 			$param['auth'][] = $auth;
 		}
 		else{
-			$param['auth'] = self::$auth;
+			$param['auth'] = $this->auth;
 		}
 
-		foreach(self::$predefinedData as $key => $value){
+		foreach($this->predefinedData as $key => $value){
 			$param[$key] = $value;
 		}
 		
 
-		if(isset(self::$routes[$name])){
+		if(isset($this->routes[$name])){
 			trigger_error("The route named '$name' already exists", E_USER_WARNING);
 		}
 		else{
 			$route = new Route($name, $uri, $param);
 					
-			self::$routes[$name] = &$route;
+			$this->routes[$name] = &$route;
 			
-			if(Request::getMethod() == $method || $method == 'any'){
-				self::$activeRoutes[$name] = &$route;
+			if(App::request()->getMethod() == $method || $method == 'any'){
+				$this->activeRoutes[$name] = &$route;
 			}
 		}
 	}
 
 	/**
 	 * Add an authentication condition to match the routes defined inside $action callback. For example, you can write something like :
-	 * Router::auth(Session::getUser()->isAllowed('admin.all'), function(){
-	 *		Router::get('test-route', '/test', array('action' => 'TestController.testMethod'));
+	 * App::router()->auth(App::session()->getUser()->isAllowed('admin.all'), function(){
+	 *		App::router()->get('test-route', '/test', array('action' => 'TestController.testMethod'));
 	 * });
 	 * If the user tries to access to /test without the necessary privileges, then a HTTP code 403 (Forbidden) will be returned
 	 * @param boolean $auth The authentication. If true, then the routes inside are accessible, else they're not
 	 * @param callable $action The function that defines the routes under this authentication
 	 */
-	public static function auth($auth, $action){
+	public function auth($auth, $action){
 		// Add the authentication for all following route
-		self::$auth[] = $auth;
+		$this->auth[] = $auth;
 
 		// Exceute the action
 		$action();
 		
 		// Remove the authentication for the rest of the scripts
-		array_pop(self::$auth);
+		array_pop($this->auth);
 	}
 
 
@@ -110,15 +116,15 @@ class Router{
 	 * @param array $data The properties to set
 	 * @param callable $action The function that defines the routes with these properties
 	 */
-	public static function setProperties($data, $action){
-		$currentData = self::$predefinedData;
+	public function setProperties($data, $action){
+		$currentData = $this->predefinedData;
 		foreach($data as $key => $value){
-			self::$predefinedData[$key] = $value;
+			$this->predefinedData[$key] = $value;
 		}
 		
 		$action();
 
-		self::$predefinedData = $currentData;
+		$this->predefinedData = $currentData;
 	}
 	
 
@@ -131,8 +137,8 @@ class Router{
 	 *						- 'where' array (optionnal) : An array defining each parameter pattern, where keys are the names of the route parameters, and values are the regular expression to match (without delimiters)
 	 *						- 'default' array (optionnal) : An array defining the default values of parameters. This is useful to generate a URI from a route name (method getUri), without giving all parameters values
 	 */
-	public static function get($name, $url, $param){
-		self::add('get',$name, $url, $param);
+	public function get($name, $url, $param){
+		$this->add('get',$name, $url, $param);
 	}
 	
 
@@ -145,8 +151,8 @@ class Router{
 	 *						- 'where' array (optionnal) : An array defining each parameter pattern, where keys are the names of the route parameters, and values are the regular expression to match (without delimiters)
 	 *						- 'default' array (optionnal) : An array defining the default values of parameters. This is useful to generate a URI from a route name (method getUri), without giving all parameters values
 	 */
-	public static function post($name, $url, $param){
-		self::add('post', $name, $url, $param);
+	public function post($name, $url, $param){
+		$this->add('post', $name, $url, $param);
 	}
 
 
@@ -159,8 +165,8 @@ class Router{
 	 *						- 'where' array (optionnal) : An array defining each parameter pattern, where keys are the names of the route parameters, and values are the regular expression to match (without delimiters)
 	 *						- 'default' array (optionnal) : An array defining the default values of parameters. This is useful to generate a URI from a route name (method getUri), without giving all parameters values
 	 */
-	public static function delete($name, $url, $param){
-		self::add('delete', $name, $url, $param);
+	public function delete($name, $url, $param){
+		$this->add('delete', $name, $url, $param);
 	}
 	
 
@@ -173,8 +179,8 @@ class Router{
 	 *						- 'where' array (optionnal) : An array defining each parameter pattern, where keys are the names of the route parameters, and values are the regular expression to match (without delimiters)
 	 *						- 'default' array (optionnal) : An array defining the default values of parameters. This is useful to generate a URI from a route name (method getUri), without giving all parameters values
 	 */
-	public static function patch($name, $url, $param){
-		self::add('patch', $name, $url, $param);
+	public function patch($name, $url, $param){
+		$this->add('patch', $name, $url, $param);
 	}
 
 	/**
@@ -186,62 +192,70 @@ class Router{
 	 *						- 'where' array (optionnal) : An array defining each parameter pattern, where keys are the names of the route parameters, and values are the regular expression to match (without delimiters)
 	 *						- 'default' array (optionnal) : An array defining the default values of parameters. This is useful to generate a URI from a route name (method getUri), without giving all parameters values
 	 */
-	public static function any($name, $url, $param){
-		self::add('any', $name, $url, $param);		
+	public function any($name, $url, $param){
+		$this->add('any', $name, $url, $param);		
 	}
 	
 
 	/**
 	 * Compute the routing, and execute the controller method associated to the URI	 
 	 */
-	public static function route(){
-		$uri = preg_replace("/\?.*$/", "", self::getUri());
+	public function route(){
+		$uri = preg_replace("/\?.*$/", "", $this->getUri());
 
 		// Scan each row
-		foreach(self::$activeRoutes as $route){
+		foreach($this->activeRoutes as $route){
             if($route->match($uri)){                  	      	
             	// The URI matches with the route
             	if($route->isAccessible()){
-
             		// The route authentications are validated
-					self::$currentRoute = $route;
+					$this->currentRoute = &$route;
+					
+            		// Emit an event, saying the routing action is finished
+					$event = new Event('after-routing', array(
+						'route' => $route,						
+					));
+					$event->trigger();
+
+					$route = $event->getData('route');
+
 					list($classname, $method) = explode(".", $route->action);
 
 					// call a controller method
 					$controller = new $classname($route->getData());                              
-					Log::debug('URI ' . self::getUri() . ' has been routed => ' . $classname . '::' . $method);
-
-					// Emit an event, saying the routing action is finished
-					$event = new Event('after-routing', array(
-						'route' => $route,
-						'controller' => $controller, 
-						'method' => $method, 
-						'args' => $route->getData()
-					));
-					$event->trigger();
+					App::logger()->debug('URI ' . self::getUri() . ' has been routed => ' . $classname . '::' . $method);
 	                
 	                // Set the controller result to the HTTP response
-					Response::set($controller->compute($method));
+					App::response()->setBody($controller->compute($method));
 				}
 				else{					
 
 					// The route is not accessible
-					Log::warning('A user with the IP address ' . Request::clientIp() . ' tried to access ' . self::getUri() . ' without the necessary privileges');
-					Response::setHttpCode(403);
+					App::logger()->warning('A user with the IP address ' . App::request()->clientIp() . ' tried to access ' . $this->getUri() . ' without the necessary privileges');
+					App::response()->setStatus(403);
 					$response = array(
 						'message' => Lang::get('main.403-message'),
-						'reason' => !Session::isConnected() ? 'login' : 'permission'
-					);					
-					Response::set(json_encode($response));
+						'reason' => !App::session()->isConnected() ? 'login' : 'permission'
+					);			
+
+					if(App::request()->isAjax()){
+						App::response()->setContentType('json');
+						App::response()->setBody($response);
+					}
+					else{
+						App::response()->setBody($response['message']);
+					}
+
+					throw new AppStopException();
 				}
 				return;
             }            
 		}
 		
 		// The route was not found 
-		Log::warning('The URI ' . self::getUri() . ' has not been routed');
-		Response::setHttpCode(404);
-        Response::set(Lang::get('main.404-message', array('uri' => $uri)));
+		App::logger()->warning('The URI ' . $this->getUri() . ' has not been routed');
+		App::response()->setStatus(404);
+        App::response()->setBody(Lang::get('main.404-message', array('uri' => $uri)));
 	}
 	
 
@@ -249,16 +263,16 @@ class Router{
 	 * Get all defined routes
 	 * @return array The defined routes
 	 */
-	public static function getRoutes(){
-		return self::$routes;		
+	public function getRoutes(){
+		return $this->routes;		
 	}
     
     /**
      * Get the routes accessible for the current HTTP request method
      * @return array The list of the accessible routes
      */
-    public static function getActiveRoutes(){
-        return self::$activeRoutes;
+    public function getActiveRoutes(){
+        return $this->activeRoutes;
     }
 	
 
@@ -266,8 +280,8 @@ class Router{
 	 * Get the route corresponding to the current HTTP request
 	 * @return Route The current route
 	 */
-	public static function getCurrentRoute(){
-		return isset(self::$currentRoute) ? self::$currentRoute : null;
+	public function getCurrentRoute(){
+		return isset($this->currentRoute) ? $this->currentRoute : null;
 	}
 	
 	/**
@@ -275,8 +289,8 @@ class Router{
 	 * @return string The action of the current route
 	 * @see Router::getCurrentRoute
 	 */
-	public static function getCurrentAction(){
-		return isset(self::$currentRoute) ? self::$currentRoute->action : '';
+	public function getCurrentAction(){
+		return isset($this->currentRoute) ? $this->currentRoute->action : '';
 	}
 
 	/**
@@ -293,16 +307,16 @@ class Router{
 	 * @param array $args The route arguments, where keys define the parameters names and values, the values to affect.
 	 * @return string The generated URI, or the current URI (if $method is not set)
 	 */
-	public static function getUri($name = '', $args= array()){
+	public function getUri($name = '', $args= array()){
 		if(!$name){
 			$fullUrl = getenv('REQUEST_SCHEME') . '://' . getenv('SERVER_NAME') . getenv('REQUEST_URI');
 			
-			$rooturl = Conf::has('rooturl') ? Conf::get('rooturl') : getenv('REQUEST_SCHEME') . '://' . getenv('SERVER_NAME');
+			$rooturl = App::conf()->has('rooturl') ? App::conf()->get('rooturl') : getenv('REQUEST_SCHEME') . '://' . getenv('SERVER_NAME');
 			
 			return str_replace($rooturl, '', $fullUrl);
 		}
 
-		$route = self::getRouteByAction($name);
+		$route = $this->getRouteByAction($name);
 				
 		if(empty($route)){
 			return self::INVALID_URL;
@@ -333,8 +347,8 @@ class Router{
 	 * @return string The generated URI, or the current URI (if $method is not set)
 	 * @see Router::getUri	 
 	 */
-    public static function getUrl($name = '', $args = array()){
-        return preg_replace('#/$#', '',Conf::get('rooturl')) . self::getUri($name, $args);
+    public function getUrl($name = '', $args = array()){
+        return preg_replace('#/$#', '',App::conf()->get('rooturl')) . $this->getUri($name, $args);
     }
 
 
@@ -344,10 +358,10 @@ class Router{
 	 * @param array $args The route arguments, where keys define the parameters names and values, the values to affect.
 	 * @return Route The route corresponding to research
      */
-    public static function getRouteByAction($name){
+    public function getRouteByAction($name){
     	$route = null;
-		if(isset(self::$routes[$name])){
-			return self::$routes[$name];
+		if(isset($this->routes[$name])){
+			return $this->routes[$name];
 		}
 		
 		return null;
@@ -359,8 +373,8 @@ class Router{
      * @param string URI The uri to search the associated route
      * @return Route the found route
      */
-    public static function getRouteByUri($uri){
-    	foreach(self::$routes as $route){
+    public function getRouteByUri($uri){
+    	foreach($this->routes as $route){
     		if($route->match($uri)){
     			return $route;
     		}

@@ -82,10 +82,15 @@ class Theme{
      * @return Theme The found theme
      */
     public static function get($name = self::DEFAULT_THEME){
-        if(!isset($themes[$name])){
-            self::$themes[$name] = new self($name);
+        try{
+            if(!isset($themes[$name])){
+                self::$themes[$name] = new self($name);
+            }
+            return self::$themes[$name];
         }
-        return self::$themes[$name];
+        catch(\Exception $e){
+            return null;
+        }
     }
     
 
@@ -94,7 +99,7 @@ class Theme{
      * @return Theme The selected theme
      */
     public static function getSelected(){
-        return self::get(Conf::has('db') ? Option::get('main.selected-theme') : self::DEFAULT_THEME);
+        return self::get(App::conf()->has('db') ? Option::get('main.selected-theme') : self::DEFAULT_THEME);
     }
     
     /**
@@ -121,7 +126,7 @@ class Theme{
      * Constructor
      * @param string $name The theme name     
      */
-    public function __construct($name){
+    private function __construct($name){
         $this->name = $name;
 
         $this->getDefinition();
@@ -149,6 +154,15 @@ class Theme{
             $this->data = json_decode(file_get_contents($this->getRootDir() . self::MANIFEST_BASENAME), true);
         }
         return $prop ? $this->data[$prop] : $this->data;
+    }
+
+
+    /**
+     * Get the start file of the theme. The start file is the file start.php in the theme that initialize special intructions for the theme
+     * @return string
+     */
+    public function getStartFile(){
+        return $this->getRootDir() . 'start.php';
     }
     
 
@@ -180,6 +194,26 @@ class Theme{
 
 
     /**
+     * Get the URL of a file in the theme
+     */
+    public function getFileUrl($file){
+        $privateFile = $this->getRootDir() . $file;
+        $publicFile = $this->getStaticDir() . $file;
+
+        if(!is_file($privateFile)){
+            throw new \Exception('Impossible to get the URL for the file ' . $privateFile . ' : No such file or directory');
+        }
+
+        if(!is_file($publicFile) || filemtime($publicFile) < filemtime($privateFile)){
+            App::fs()->copy($privateFile, $publicFile);
+        }
+
+        return $this->getRootUrl() . $file;
+    }
+
+
+
+    /**
      * Get the file path for the theme preview image
      * @return string
      */
@@ -193,9 +227,7 @@ class Theme{
      * @return string
      */
     public function getPreviewUrl(){
-        $this->build();
-
-        return $this->getRootUrl() . self::PREVIEW_BASENAME;
+        return $this->getFileUrl(self::PREVIEW_BASENAME);
     }
     
 
@@ -258,7 +290,7 @@ class Theme{
             }          
             else{
                 // Get all files in less/
-                $files = FileSystem::find($this->getLessDirname(), '*.less');
+                $files = App::fs()->find($this->getLessDirname(), '*.less');
                 $lastUpdate = filemtime($dest);
                 foreach($files as $file){
                     if(filemtime($file) > $lastUpdate){
@@ -273,7 +305,7 @@ class Theme{
             // Build the theme => Copy each accessible files in static dir
             foreach(glob($this->getRootDir() . '*' ) as $elt){
                 if(! in_array(basename($elt), array('views'))) {
-                    FileSystem::copy($elt, $this->getStaticDir());
+                    App::fs()->copy($elt, $this->getStaticDir());
                 }
             }
         }
@@ -292,8 +324,7 @@ class Theme{
         if(!$less){
             $less = file_get_contents($this->getBaseLessFile());
         }
-        // preg_match_all('#^\s*define\(@([\w\-]+)\s*\;\s*(.+?)\s*\;\s*(.+?)\s*\;?\s*(color|file)?\s*\)\s*$#m', $less, $matches, PREG_SET_ORDER);                     
-        preg_match_all('#^\s*@([\w\-]+)\s*\:\s*(.+?)\s*\;\s*//\s*editable\s*\:\s*"(.+?)"\s*\,\s*(color|file)?\s*$#m', $less, $matches, PREG_SET_ORDER);                     
+        preg_match_all('#^\s*@([\w\-]+)\s*\:\s*(.+?)\s*\;\s*//\s*editable\s*\:\s*"(.+?)"\s*\,?\s*(color|file)?\s*$#m', $less, $matches, PREG_SET_ORDER);                     
         $variables = array();
         foreach($matches as $match){
             $variables[] = array(
@@ -346,6 +377,8 @@ class Theme{
 
     /**
      * Get the URL of a static user file
+     * @param string $filename The basename of the file to get the url
+     * @return string
      */
     public function getStaticUserfilesUrl($filename = ''){
         return $this->getRootUrl() . 'userfiles/' . $filename;
@@ -362,6 +395,7 @@ class Theme{
 
     /**
      * Get the URL of the directory containing the medias uplaoded by the administrator
+     * @param string $filename The basename of the file to get the URL
      * @return string The URL of the directory containing the medias uplaoded by the administrator
      */
     public function getMediasUrl($filename = ''){

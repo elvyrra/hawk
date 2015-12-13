@@ -10,12 +10,27 @@ namespace Hawk;
  * This class define methods to get HTTP request information 
  * @package Core
  */
-class Request{
+final class Request extends Singleton{
     /**
      * The clientIp, registered as static variable, to avoid to calculate it each time
      * @static
      */
-    private static $clientIp,
+    public $clientIp,
+
+    /**
+     * The request URI
+     */
+    $uri,
+
+    /**
+     * The request method
+     */
+    $method,
+
+    /**
+     * The request parameters
+     */
+    $params,
 
     /**
      * The request headers
@@ -25,54 +40,54 @@ class Request{
     /**
      * The request body
      */
-    $body;
+    $body,
 
     /**
-     * Get the HTTP request method
-     * @static
-     * @return string the HTTP request method
+     * The uploaded files
      */
-    public static function getMethod(){        
-        return strtolower(getenv('REQUEST_METHOD'));
-    }
-    
+    $files = array(),
 
     /**
-     * Get the HTTP request URI
-     * @static
-     * @return string The HTTP request URI 
+     * The request sent cookies
      */
-    public static function getUri(){
-        return getenv('REQUEST_URI');
-    }
-    
+    $cookies = array();
 
     /**
-     * Check if the request is an AJAX request
-     * @static
-     * @return true if the request is an AJAX request else false
+     * The request instance
      */
-    public static function isAjax(){
-        return strtolower(self::getHeaders('X-Requested-With')) === 'xmlhttprequest';
-    }
-    
+    protected static $instance;
+
 
     /**
-     * Get the client IP address.
-     * @static
-     * @return string The IPV4 address of the client that performed the HTTP request
-     */    
-    public static function clientIp(){
-        if(isset(self::$clientIp)){
-            return self::$clientIp;
+     * Constrcutor, initialize the instance with the HTTP request data
+     */
+    protected function __construct(){
+        // Get the request method
+        $this->method = strtolower(getenv('REQUEST_METHOD'));
+
+        // Get the request uri
+        $this->uri = getenv('REQUEST_URI');
+
+        // Get the request headers
+        $this->headers = getallheaders();
+
+        // Get the request parameters
+        $this->params = $_GET;
+
+        // Retrive the body
+        if($this->getHeaders('Content-Type') === 'application/json'){
+            $this->body = json_decode(file_get_contents('php://input'), true);
         }
+        else{
+            $this->body = $_POST;
+        }  
 
-        if (self::getHeaders('X-Forwarded-For')) {
+        // Retreive the client IP
+        if ($this->getHeaders('X-Forwarded-For')) {
             // The user is behind a proxy that transmit HTTP_X_FORWARDED_FOR header
-            if ( ! preg_match('![0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}!', self::getHeaders('X-Forwarded-For')) ){
+            if ( ! preg_match('![0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}!', $this->getHeaders('X-Forwarded-For')) ){
                 // The format of HTTP_X_FORWARDED_FOR header is not correct
-                self::$clientIp = getenv('REMOTE_ADDR');
-                return self::$clientIp;
+                $this->clientIp = getenv('REMOTE_ADDR');                
             }
             else{
                 // Get the last public IP in HTTP_X_FORWARDED_FOR header
@@ -81,16 +96,62 @@ class Request{
                     $ip = $chain[$i];
 
                     if((!preg_match("!^(192\.168|10\.0\.0)!", $ip) && $ip != "127.0.0.1") || $i == count($chain) - 1){
-                        self::$clientIp = $ip;
-                        return self::$clientIp;                        
+                        $this->clientIp = $ip;
+                        break;
                     }
                 }
             }
         }
+        else{
+            // X-Forwarded-For header has not been transmitted, get the REMOTE_ADDR header
+            $this->clientIp = getenv('REMOTE_ADDR');
+        }  
+
+        // Get the request uploaded files
+        $this->files = $_FILES; 
+
+        // Get the request cookies
+        $this->cookies = $_COOKIE; 
+    }
+
+
+    /**
+     * Get the HTTP request method
+     * @static
+     * @return string the HTTP request method
+     */
+    public function getMethod(){        
+        return $this->method;
+    }
     
-        // X-Forwarded-For header has not been transmitted, get the REMOTE_ADDR header
-        self::$clientIp = getenv('REMOTE_ADDR');
-        return self::$clientIp;
+
+    /**
+     * Get the HTTP request URI
+     * @static
+     * @return string The HTTP request URI 
+     */
+    public function getUri(){
+        return $this->uri;
+    }
+    
+
+    /**
+     * Check if the request is an AJAX request
+     * @static
+     * @return true if the request is an AJAX request else false
+     */
+    public function isAjax(){
+        return strtolower($this->getHeaders('X-Requested-With')) === 'xmlhttprequest';
+    }
+    
+
+    /**
+     * Get the client IP address.
+     * @static
+     * @return string The IPV4 address of the client that performed the HTTP request
+     */    
+    public function clientIp(){
+        return $this->clientIp;
     }
 
 
@@ -99,20 +160,12 @@ class Request{
      * @param string $name The variable name
      * @return string|array The parameter value or all the body
      */
-    public static function getBody($name = ""){
-        if(!self::$body){
-            if(self::getHeaders('Content-Type') === 'application/json'){
-                self::$body = json_decode(file_get_contents('php://input'), true);
-            }
-            else{
-                self::$body = $_POST;
-            }
-        }
+    public function getBody($name = ""){        
         if($name){
-            return isset(self::$body[$name]) ? self::$body[$name] : null;
+            return isset($this->body[$name]) ? $this->body[$name] : null;
         }
         else{            
-            return self::$body;
+            return $this->body;
         }
     }
 
@@ -121,12 +174,12 @@ class Request{
      * @param string $name The key in $_FILES to get
      * @return string|array The file or all files
      */
-    public static function getFiles($name = ''){
+    public function getFiles($name = ''){
         if($name){
-            return isset($_FILES[$name]) ? $_FILES[$name] : array();
+            return isset($this->files[$name]) ? $this->files[$name] : array();
         }
         else{
-            return $_FILES;
+            return $this->files;
         }
     }
 
@@ -135,12 +188,12 @@ class Request{
      * @param string $name The parameter name
      * @return string|array The parameter value or all the parameters
      */
-    public static function getParams($name = ""){
+    public function getParams($name = ""){
         if($name){
-            return isset($_GET[$name]) ? $_GET[$name] : null;
+            return isset($this->params[$name]) ? $this->params[$name] : null;
         }
         else{
-            return $_GET;
+            return $this->params;
         }
     }
 
@@ -149,16 +202,12 @@ class Request{
      * @param string $name The header key
      * @return string|array The header value or all the headers
      */
-    public static function getHeaders($name = ""){
-        if(!isset(self::$headers)){
-            self::$headers = getallheaders();
-        }       
-
+    public function getHeaders($name = ""){
         if($name){
-            return isset(self::$headers[$name]) ? self::$headers[$name] : null;
+            return isset($this->headers[$name]) ? $this->headers[$name] : null;
         }
         else{
-            return self::$headers;
+            return $this->headers;
         }        
     }
 
@@ -167,12 +216,12 @@ class Request{
      * @param string $name The cookie name
      * @return string|array The cookie value or all the cookies
      */
-    public static function getCookies($name = ""){
+    public function getCookies($name = ""){
         if($name){
-            return isset($_COOKIE[$name]) ? $_COOKIE[$name] : null;
+            return isset($this->cookies[$name]) ? $this->cookies[$name] : null;
         }
         else{
-            return $_COOKIE;
+            return $this->cookies;
         }
     }
 }

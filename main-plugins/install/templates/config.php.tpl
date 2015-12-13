@@ -10,7 +10,7 @@ define('CRYPTO_IV','{{ $iv }}');
 define('CONFIG_MODE', '{{ $configMode }}');
 
 /** MAIN CONFIGURATION, DEFINED BY THE PROCESS **/
-Conf::set(array(
+App::conf()->set(array(
     'rooturl' => '{{ $rooturl }}',
     'db' => array(
         'maindb' => array(
@@ -39,8 +39,4 @@ if(!defined('DEBUG_MODE')){
 
 if(!defined('DEV_MODE')){
     define('DEV_MODE', false);
-}
-
-if(!defined('APP_VERSION')){
-    define('APP_VERSION', '{{ $version }}');
 }

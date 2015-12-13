@@ -149,8 +149,8 @@ class Plugin{
 		$plugins = array();
 		$dirs = $noMain ? array(PLUGINS_DIR) : array(MAIN_PLUGINS_DIR, PLUGINS_DIR);
 
-		if(Conf::has('db')){
-			$configs = DB::get(MAINDB)->select(array(
+		if(App::conf()->has('db')){
+			$configs = App::db()->select(array(
 				'from' => DB::getFullTablename(self::TABLE),
 				'index' => 'name',			
 				'return' => DB::RETURN_OBJECT
@@ -181,7 +181,7 @@ class Plugin{
 	 * @return array The list of plugin instances
 	 */
 	public static function getActivePlugins(){
-		$configs = DB::get(MAINDB)->select(array(
+		$configs = App::db()->select(array(
 			'from' => DB::getFullTablename(self::TABLE),
 			'where' => 'active = 1',						
 		));
@@ -453,7 +453,7 @@ class Plugin{
 						// Copy all static files except less and JS
 						foreach(glob($this->getStaticDir() . '*' ) as $elt){
 			                if(! in_array(basename($elt), array('less', 'js'))) {
-			                    FileSystem::copy($elt, $this->getPublicStaticDir());
+			                    App::fs()->copy($elt, $this->getPublicStaticDir());
 			                }
 			            }
 					}
@@ -508,7 +508,7 @@ class Plugin{
 	 * @return boolean True if the plugin is installed, False else
 	 */
 	public function isInstalled(){
-		return (bool) DB::get(MAINDB)->count(DB::getFullTablename(self::TABLE), 'name = :name', array('name' => $this->name));
+		return (bool) App::db()->count(DB::getFullTablename(self::TABLE), 'name = :name', array('name' => $this->name));
 	}
 	
 
@@ -542,7 +542,7 @@ class Plugin{
 			return $this->manager;
 		}
 
-		$class = $this->getNamespace() . '\\Installer';
+		$class = '\\' . $this->getNamespace() . '\\Installer';
 		if(!empty($class)){
 			$this->manager = new $class($this);
 			return $this->manager;
@@ -556,19 +556,19 @@ class Plugin{
 	 * Install the plugin
 	 */
 	public function install(){
-		DB::get(MAINDB)->insert(DB::getFullTablename(self::TABLE), array(
+		App::db()->insert(DB::getFullTablename(self::TABLE), array(
 			'name' => $this->name,			
 			'active' => 0
 		), 'IGNORE');
 
 		try{
 			$this->getInstallerInstance()->install();		
-			Log::notice('The plugin ' . $this->name . ' has been installed');
+			App::logger()->notice('The plugin ' . $this->name . ' has been installed');
 		}
 		catch(\Exception $e){
-			DB::get(MAINDB)->delete(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)));
+			App::db()->delete(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)));
 
-			Log::error('En error occured while installing plugin ' . $this->name . ' : ' . $e->getMessage());
+			App::logger()->error('En error occured while installing plugin ' . $this->name . ' : ' . $e->getMessage());
 			throw $e;
 		}
 	}
@@ -578,19 +578,19 @@ class Plugin{
 	 * Uninstall the plugin
 	 */
 	public function uninstall(){
-		Db::get(MAINDB)->delete(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)));
+		App::db()->delete(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)));
 
 		try{
 			$this->getInstallerInstance()->uninstall();
-			Log::notice('The plugin ' . $this->name . ' has been uninstalled');
+			App::logger()->notice('The plugin ' . $this->name . ' has been uninstalled');
 		}
 		catch(\Exception $e){
-			DB::get(MAINDB)->insert(DB::getFullTablename(self::TABLE), array(
+			App::db()->insert(DB::getFullTablename(self::TABLE), array(
 				'name' => $this->name,			
 				'active' => 0
 			), 'IGNORE');
 
-			Log::error('En error occured while uninstalling plugin ' . $this->name . ' : ' . $e->getMessage());
+			App::logger()->error('En error occured while uninstalling plugin ' . $this->name . ' : ' . $e->getMessage());
 			throw $e;
 		}
 	}
@@ -610,16 +610,16 @@ class Plugin{
 	public function activate(){
 		// Activate the plugin
 		$this->active = 1;
-		DB::get(MAINDB)->update(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)), array('active' => 1));	
+		App::db()->update(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)), array('active' => 1));	
 
 		try{
 			$this->getInstallerInstance()->activate();
-			Log::notice('The plugin ' . $this->name . ' has been activated');
+			App::logger()->notice('The plugin ' . $this->name . ' has been activated');
 		}
 		catch(\Exception $e){
-			DB::get(MAINDB)->update(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)), array('active' => 0));
+			App::db()->update(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)), array('active' => 0));
 			
-			Log::error('En error occured while activating plugin ' . $this->name . ' : ' . $e->getMessage());
+			App::logger()->error('En error occured while activating plugin ' . $this->name . ' : ' . $e->getMessage());
 			throw $e;
 		}
 	}
@@ -631,62 +631,31 @@ class Plugin{
 	public function deactivate(){
 		// Deactivate the plugin
 		$this->active = 0;
-		DB::get(MAINDB)->update(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)), array('active' => 0));	
+		App::db()->update(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)), array('active' => 0));	
 
 		try{
 			$this->getInstallerInstance()->deactivate();
-			Log::notice('The plugin ' . $this->name . ' has been deactivated');
+			App::logger()->notice('The plugin ' . $this->name . ' has been deactivated');
 		}
 		catch(\Exception $e){
-			DB::get(MAINDB)->update(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)), array('active' => 1));
+			App::db()->update(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)), array('active' => 1));
 			
-			Log::error('En error occured while deactivating plugin ' . $this->name . ' : ' . $e->getMessage());
+			App::logger()->error('En error occured while deactivating plugin ' . $this->name . ' : ' . $e->getMessage());
 			throw $e;
 		}
 	}
 
 
 	/**
-	 * Search for available updates
-	 * @return string the last available version on the Hawk Platform
+	 * Update the plugin to a given version
+	 * @param string $version The version to update the plugin
 	 */
-	public function searchLastVersion(){
-		// Call the Hawk API to get the last version of the plugin
-		$request = new HTTPRequest(array(
-			'url' => HAWK_API_BASE_URL . 'plugins/' . $this->name . '/versions/last',
-			'method' => HTTPRequest::METHOD_GET,
-			'dataType' => 'json'
-		));
+	public function update($version){
+		$updater = $this->getInstallerInstance();
 
-		$request->send();
-
-		if($request->getStatusCode() !== 200){
-			return null;
-		}
-		else{
-			$body = $request->getResponse();
-
-			return $body['version'];
-		}
-	}
-
-
-	/**
-	 * Check of the plugin as an available update
-	 * @return boolean TRUE if the plugin is updatable, else FALSE
-	 */
-	public function isUpdatable(){
-		$lastVersion = $this->searchLastVersion();
-		return $lastVersion && $lastVersion > $this->getDefinition('version');
-	}
-
-	/**
-	 * Update the plugin
-	 */
-	public function update(){
-		if($this->isUpdatable()){
-			// The plugin is updatable, download the updated files
-			
-		}
+		$method = 'v' . str_replace('.', '_', $version);
+        if(method_exists($updater, $method)){
+            $updater->$method();
+        }		
 	}
 }

@@ -2,9 +2,9 @@
 
 namespace {{ $namespace }};
 
-Router::setProperties(
+App::router()->setProperties(
     array(
-        'namespace' => '{{ $namespace }}',
+        'namespace' => __NAMESPACE__,
         'prefix' => '{{ $name }}'
     ),
     function(){

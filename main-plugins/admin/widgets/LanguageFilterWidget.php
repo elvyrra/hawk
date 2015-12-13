@@ -7,19 +7,22 @@ class LanguageFilterWidget extends Widget{
 		$options = array();
 		// active languages
 		$languages = array(); 
-		foreach(Language::getAll() as $language){
-			$options[$language->tag] = $language->label;
+		$allLanguages = Language::getAll('tag');
+		foreach($allLanguages as $tag => $language){
+			$options[$tag] = $language->label;
 			if($language->active){
-				$languages[$language->tag] = $language;
+				$languages[$tag] = $language;
 			}
 		}	
 
+		if(! in_array($filters['tag'], array_keys($allLanguages))) {
+			$filters['tag'] = Lang::DEFAULT_LANGUAGE;
+		}
 
-		
 		$param = array(
 			'id' => 'language-filter-form',
 			'method' => 'get',
-			'action' => Router::getUri('language-keys-list'),
+			'action' => App::router()->getUri('language-keys-list'),
 			'fieldsets' => array(
 				'filters' => array(
 					'nofieldset' => true,

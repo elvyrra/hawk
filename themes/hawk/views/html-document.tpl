@@ -14,7 +14,7 @@
 			<link rel="icon" href="{{ $favicon }}" />
 		{/if}
 
-		<script type="text/javascript" src="{{ Router::getUri('js-conf') }}"></script>
+		<script type="text/javascript" src="{{ App::router()->getUri('js-conf') }}"></script>
 		
 		<!-- Base Less file of the theme -->		
 		<link rel="stylesheet/less" type="text/css" href="{{$themeBaseLess}}" />

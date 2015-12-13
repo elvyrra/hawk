@@ -35,7 +35,7 @@ class Upload{
 	 * @param string $name the name of the upload
 	 */
 	private function __construct($name){
-		$files = Request::getFiles();
+		$files = App::request()->getFiles();
 		if(empty($files[$name])){
 			throw new UploadException();
 		}
@@ -98,10 +98,7 @@ class Upload{
 			$basename = $file->basename;
 		}
 
-		$i = 0;
-		$filename = $basename;
-
-		return move_uploaded_file($file->tmpFile, $directory . '/' . $filename);
+		return move_uploaded_file($file->tmpFile, $directory . '/' . $basename);
 	}
 }
 

@@ -1,13 +1,11 @@
 <nav id="main-menu" class="navbar navbar-inverse">	
-	{if($logo)}
-		<img class="application-logo pull-left" src="{{ $logo }}" alt="Application logo"/>
-	{/if}
+	<img class="application-logo pull-left" src="{{ $logo ? $logo : Plugin::get('main')->getStaticUrl('img/hawk-logo.png') }}" alt="Application logo"/>
 	<div class="container-fluid">
 		<div class="navbar-header">
-			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-menu-collapse" >
+			<div class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-menu-collapse" >
 		        <span class="sr-only">Toggle navigation</span>
 		        <span class="icon icon-bars"></span>
-	      	</button>
+	      	</div>
 		</div>
 
 		<div class="collapse navbar-collapse" id="main-menu-collapse">

@@ -192,6 +192,11 @@ class FormInput{
      * Define if the input data has to be inserted in database when the form is submitted
      */
     public $insert = true;
+
+    /**
+     * The input view filename
+     */
+    public $tpl = '';
     
     /**
      * This constant is used to force the property $independant for all instances of a input class that extends this class
@@ -216,10 +221,12 @@ class FormInput{
 		
 		$this->type = static::TYPE;
               
-		$theme = Theme::getSelected();
-		
-        $file = Theme::getSelected()->getView(Form::VIEWS_DIR . 'form-input-' . static::TYPE . '.tpl');
-        $this->tpl = is_file($file) ? $file : Theme::getSelected()->getView(Form::VIEWS_DIR . 'form-input.tpl');
+		if(empty($this->tpl)){
+            $theme = Theme::getSelected();
+
+            $file = Theme::getSelected()->getView(Form::VIEWS_DIR . 'form-input-' . static::TYPE . '.tpl');
+            $this->tpl = is_file($file) ? $file : Theme::getSelected()->getView(Form::VIEWS_DIR . 'form-input.tpl');
+        }
     }
 
 
@@ -277,7 +284,7 @@ class FormInput{
             ));
         }
         catch(\Exception $e){
-            ErrorHandler::exception($e);
+            App::errorHandler()->exception($e);
         }
     }
 
@@ -377,7 +384,7 @@ class FormInput{
      * Set the value to the input
      * @param mixed $value The value to set
      */
-	public function set($value){
+	public function setValue($value){
 		$this->value = $value;
 	}
 	

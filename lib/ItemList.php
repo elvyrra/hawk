@@ -117,7 +117,28 @@ class ItemList{
 	 * Define the message to display if no result are found for the list
 	 * @var string
 	 */
-	$emptyMessage;
+	$emptyMessage,
+
+
+	/**
+	 * The whole list (list + navigation bar) view filename
+	 */
+	$tpl,
+
+	/**
+	 * The navigation bar view filename
+	 */
+	$navigationBarTpl,
+
+	/**
+	 * The list view filename
+	 */
+	$listTpl,
+
+	/**
+	 * The result view filename
+	 */
+	$resultTpl;
 
 
 	/**
@@ -140,7 +161,7 @@ class ItemList{
 		/*** Default values ***/		
 		$this->emptyMessage = Lang::get('main.list-no-result');
 		$this->action = getenv('REQUEST_URI');
-		$this->refresh = !!Request::getParams('refresh');
+		$this->refresh = !!App::request()->getParams('refresh');
 		
 		/*** Get the values from the parameters array **/
 		$this->map($params);
@@ -198,7 +219,7 @@ class ItemList{
 		/*** initialize fields default values ***/
 		foreach($this->fields as $name => &$field){
 			$field = new ItemListField($name, $field, $this);
-			if(!empty($this->searches[$name])){
+			if(isset($this->searches[$name])){
 				$field->searchValue = $this->searches[$name];
 			}
 
@@ -301,7 +322,7 @@ class ItemList{
 
 			$this->results = $this->dbo->select($request);
 			
-			return true;
+			return $this->results;
 		}
 		catch(DBException $e){
 			exit(DEBUG_MODE ? $e->getMessage() : Lang::get('main.list-error'));
@@ -342,7 +363,7 @@ class ItemList{
 		$this->start = ($this->page - 1) * $this->lines;  
 		$this->results = array_slice(array_map(function($line){ return (object)$line; }, $data), $this->start, $this->lines);
 		
-		return true;
+		return $this->results;
 	}
 	
 
@@ -355,13 +376,41 @@ class ItemList{
 	}
 	
 	
+	/**
+	 * Get the list views files
+	 */
+	private function getViews(){
+		if(empty($this->tpl)){
+			$this->tpl = Theme::getSelected()->getView('item-list/container.tpl');
+		}
+
+		if(empty($this->navigationBarTpl)){
+			$this->navigationBarTpl = Theme::getSelected()->getView('item-list/navigation-bar.tpl');
+		}
+
+		if(empty($this->listTpl)){
+			$this->listTpl = Theme::getSelected()->getView('item-list/list.tpl');
+		}
+
+		if(empty($this->resultTpl)){
+			$this->resultTpl = Theme::getSelected()->getView('item-list/result.tpl');
+		}
+	}
 
 	/**
-	 * Display the list
+	 * Display the list (alias)
 	 * @return string The HTML result of displaying
 	 */
 	public function __toString(){
-    	try{
+    	return $this->display();
+	}
+
+	/**
+	 * display the list
+	 * @return string The HTML result of displaying
+	 */	
+	public function display(){
+		try{
 	    	// get the data to display
 	    	$this->get();
 
@@ -391,26 +440,55 @@ class ItemList{
 					}
 				}
 			}
-			
-			$tplFile = $this->refresh ? 'result.tpl' : 'list.tpl';
-			return View::make(Theme::getSelected()->getView('item-list/' . $tplFile), array(			
-				'list' => $this,
-				'data' => $data,
-				'linesParameters' => $param,
-				'pages' => $pages
-			));
+
+			$this->getViews();
+
+			// Generate the script to insert the list in the application , client side
+			if($this->refresh){
+				$tplFile = $this->resultTpl;
+				$script = 
+					'app.ready(function(){
+				        if(list = app.lists["' . $this->id . '"]){
+				            list.selected = ' . ($this->selected !== false ? '"' . $this->selected . '"' : 'null') .' 
+							list.maxPages(' . $pages . ');
+							list.recordNumber(' . $this->recordNumber . ');
+				        }
+				    });';
+			}
+			else{
+				$script = 
+					'require(["app"], function(){
+						app.ready(function(){									
+							var list = new List({
+								id : "' . $this->id . '",
+								action : "' . $this->action . '",
+								target : "' . $this->target . '",
+								fields : ' . json_encode(array_keys($this->fields)) .',
+							});
+							
+							list.selected = ' . ($this->selected !== false ? '"' . $this->selected . '"' : 'null') .' 
+							list.maxPages(' . $pages . ');
+							list.recordNumber(' . $this->recordNumber . ');
+
+							app.lists["' . $this->id . '"] = list;			
+						});
+					});';
+				
+				$tplFile = $this->tpl;
+			}
+
+			return 				
+				View::make($tplFile, array(			
+					'list' => $this,
+					'data' => $data,
+					'linesParameters' => $param,
+					'pages' => $pages
+				)) . 
+				'<script type="text/javascript">' . $script . '</script>';
 		}
 		catch(\Exception $e){
-			ErrorHandler::exception($e);
+			App::errorHandler()->exception($e);
 		}
-	}
-
-	/**
-	 * display the list (alias)
-	 * @return string The HTML result of displaying
-	 */	
-	public function display(){
-		return $this->__toString();
 	}
 
 
@@ -420,5 +498,8 @@ class ItemList{
 	public function isRefreshing(){
 		return $this->refresh;
 	}
+
+
+
 
 }

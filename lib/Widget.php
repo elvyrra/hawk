@@ -17,4 +17,12 @@ abstract class Widget extends Controller{
 	 * @return string The HTML result of the widget displaying
 	 */
 	abstract public function display();
+
+    /**
+     * Display the widget
+     * @return string The HTML result of the widget displaying
+     */
+    public function __toString(){
+        return $this->display();
+    }
 }

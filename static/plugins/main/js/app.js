@@ -48,6 +48,9 @@ require.config({
 		},
 		ace : {
 			exports : 'ace'
+		},
+		ckeditor : {
+			exports : 'CKEDITOR'
 		}
 	}
 });
@@ -76,7 +79,7 @@ App.INVALID_URI = '/INVALID_URI';
  * Initialize the application 
  */
 App.prototype.start = function(){
-	define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 'sortable', 'bootstrap', 'colorpicker' , 'datepicker',  'ckeditor', 'ko-extends', 'extends' , 'date' ], function($, ko, Tabset, Form, List, Lang) {
+	define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 'sortable', 'bootstrap', 'colorpicker' , 'datepicker', 'ko-extends', 'extends' , 'date' ], function($, ko, Tabset, Form, List, Lang) {
 		// export libraries to global context
 		window.$ = $;
 		window.ko = ko;
@@ -259,6 +262,8 @@ App.prototype.start = function(){
 		
 		}.bind(this);
 
+
+
 		/**
 		 * Open the tab asked by the user when it was not connected
 		 */
@@ -362,7 +367,7 @@ App.prototype.load = function(url, data){
 					element.title($(".page-name", response).first().val());
 
 					element.content(response);
-					
+
 					// Regiter the tabs in the cookie
 					if(this.isConnected) {
 						this.tabset.registerTabs();
@@ -387,11 +392,23 @@ App.prototype.load = function(url, data){
 				var code = xhr.status;
 
 				if(code === 403){
-					var response = JSON.parse(xhr.responseText);
+					// The page is not accessible for the user
+					var response;
+					try{
+						response = JSON.parse(xhr.responseText);
+					}
+					catch(e){
+						response = {
+							message : Lang.get('main.access-forbidden')
+						};
+					}
+
 					if(response.reason == "login"){
-						this.dialog(this.getUri('login') + '?redirect=' + url + '&code=403');
+						// The user is not connected, display the login form
+						this.dialog(this.getUri('login') + '?redirect=' + url + '&code=' + code);
 					}
 					else{
+						// Other reason, display the message in a notification
 						var message = response.message;
 						this.notify("danger", message);							
 					}

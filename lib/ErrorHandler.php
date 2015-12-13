@@ -9,7 +9,12 @@ namespace Hawk;
  * This class defines the errors and exceptions handlers
  * @package Core
  */
-class ErrorHandler {
+final class ErrorHandler extends Singleton{	
+
+	/**
+	 * The error handler instance
+	 */
+	protected static $instance;
 
 	/**
 	 * Handler an error
@@ -19,23 +24,26 @@ class ErrorHandler {
 	 * @param int $line The line in the file where the error was throwed
 	 * @param array $context All the variables in the error context
 	 */
-	public static function error($no, $str, $file, $line, $context){	
+	public function error($no, $str, $file, $line, $context){	
 		if (!(error_reporting() & $no)) {
 	        // This error code is not in error_reporting
 	        return;
 	    }
+
 		switch($no){
 			case E_NOTICE :
 			case E_USER_NOTICE: 
 				$level = "info";
 				$icon = 'info-circle';
-				$title = "PHP Notice";
+				$title = "PHP Notice";				
+				App::logger()->notice($str);
 			break;
 
 			case E_STRICT :
 				$level = "info";
 				$icon = 'info-circle';
 				$title = "PHP Strict";
+				App::logger()->notice($str);
 			break;
 
 			case E_DEPRECATED :
@@ -43,6 +51,7 @@ class ErrorHandler {
 				$level = "info";
 				$icon = 'info-circle';
 				$title = "PHP Deprecated";
+				App::logger()->notice($str);
 			break;
 
 			case E_USER_WARNING :
@@ -50,13 +59,14 @@ class ErrorHandler {
 				$level = "warning";
 				$icon = "exclamation-triangle";
 				$title = "PHP Warning";
+				App::logger()->warning($str);
 			break;
 
-			case E_ERROR :
-			case E_USER_ERROR :
+			default:
 				$level = "danger";
 				$icon = "exclamation-circle";
 				$title = "PHP Error";
+				App::logger()->error($str);
 			break;
 		}
 
@@ -70,9 +80,9 @@ class ErrorHandler {
 			)
 		);
 
-		if(!Response::getType() === "json"){			
-			Response::set(json_encode($param));
-			Response::end();
+		if(!App::response()->getContentType() === "json"){			
+			App::response()->setBody($param);
+			throw new AppStopException();
 		}
 		else{
 			echo View::make(Theme::getSelected()->getView('error.tpl'), $param);
@@ -84,7 +94,7 @@ class ErrorHandler {
 	 * Handle an non catched exception
 	 * @param Exception $e The throwed exception
 	 */
-	public static function exception($e){
+	public function exception($e){
 		$param = array(
 			'level' => 'danger',
 			'icon' => 'excalamation-circle',
@@ -93,12 +103,30 @@ class ErrorHandler {
 			'trace' => $e->getTrace()
 		);
 
-		if(Response::getType() === "json"){
-			Response::set(json_encode($param));
+		App::logger()->error($e->getMessage());
+		if(App::response()->getContentType() === "json"){
+			App::response()->setBody($param);
 		}
 		else{				
-			Response::set(View::make(Theme::getSelected()->getView('error.tpl'), $param));
+			App::response()->setBody(View::make(Theme::getSelected()->getView('error.tpl'), $param));
+			App::response()->end();
 		}
-		Response::end();
 	}
+
+	/**
+	 * Handle fatal errors
+	 */
+	public function fatalError(){
+		$error = error_get_last();
+
+		if( $error !== NULL) {
+		    $errno   = $error["type"];
+		    $errfile = $error["file"];
+		    $errline = $error["line"];
+		    $errstr  = $error["message"];
+
+		    $this->error($errno, $errstr, $errfile, $errline, array());
+		}
+	}
+	
 }

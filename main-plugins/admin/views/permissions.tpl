@@ -12,13 +12,13 @@
 				<tr>
 					<td></td>
 					{foreach($roles as $role)}
-						<td>{{ Lang::get("roles.role-$role->id-label") }}</td>
+						<td>{text key="{'roles.role-' . $role->id . '-label'}"}</td>
 					{/foreach}
 				</tr>
 
 				{foreach($data as $permission)}
 					<tr>
-						<td>{{ Lang::get("$group.permission-name-$permission->key") }}</td>
+						<td>{text key="{$group . '.permission-name-' . $permission->key}"}</td>
 						{foreach($roles as $role)}
 							<td> {{ isset($fields["permission-$permission->id-$role->id"]) ? $fields["permission-$permission->id-$role->id"] : '' }} </td>
 						{/foreach}

@@ -41,7 +41,7 @@ class Mail{
 			$param['Secure'] = Option::get('main.smtp-secured');
 		}
 
-		$this->maps($param, $this->mailer);
+		$this->map($param, $this->mailer);
 		
 		$this->mailer->CharSet = 'utf-8';
 	}
@@ -191,10 +191,10 @@ class Mail{
 	 */
 	public function send(){
 		if(!$this->mailer->send()){
-			Log::error('The mail could not be sent because : ' . $this->mailer->ErrorInfo);
+			App::logger()->error('The mail could not be sent because : ' . $this->mailer->ErrorInfo);
 			throw new MailException($this->mailer->ErrorInfo);
 		}
-		Log::info('An email was sent to ' . implode(', ', $this->mailer->all_recipients));
+		App::logger()->info('An email was sent to ' . implode(', ', $this->mailer->getAllRecipientAddresses()));
 	}
 }
 

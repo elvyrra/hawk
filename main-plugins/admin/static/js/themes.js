@@ -32,6 +32,41 @@ $("#manage-themes-page")
     $(this).select();
 });
 
+
+/**
+ * Search themes from the sidebar widget
+ */
+app.forms["search-themes-form"].submit = function(){
+    if(this.isValid()){
+        var url = app.getUri('search-themes') + '?search=' + this.inputs.search.val();
+        app.load(url);
+    }
+    else{
+        this.displayErrorMessage(Lang.get('form.error-fill'));
+    }
+    return false;
+};
+
+/** 
+ * Download a plugin from the platform
+ */
+$(".download-theme").click(function(){
+    app.loading.start();
+
+    $.get($(this).attr('href'))
+
+    .success(function(response){
+        app.load(location.hash.substr(2));
+    })
+
+    .error(function(xhr, status, error){
+        app.loading.stop();
+        app.notify('error', error.message);
+    });
+
+    return false;
+});
+
 /**
  * Customize the theme variables
  */
@@ -70,23 +105,9 @@ $("#manage-themes-page")
  */
 (function(){
     var model = {
-        css : ko.observable(app.forms['theme-css-form'].inputs['css'].value),
+        css : ko.observable(app.forms['theme-css-form'].inputs['css'].val()),
     };
-    require(['ace'], function(ace){    
-    	ace.config.set("modePath", app.baseUrl + "ext/ace/");
-    	ace.config.set("workerPath", app.baseUrl + "ext/ace/") ;
-    	ace.config.set("themePath", app.baseUrl + "ext/ace/"); 
 
-    	var editor = ace.edit("theme-css-edit");
-    	editor.setTheme("ace/theme/chrome");
-    	editor.getSession().setMode("ace/mode/css");
-    	editor.setShowPrintMargin(false);
-
-    	editor.getSession().on("change", function(event){
-            var value = editor.getValue();
-    		model.css(value);
-    	});	
-    });
     ko.applyBindings(model, $("#theme-css-form").get(0));
 
     app.forms['theme-css-form'].onsuccess = function(data){
@@ -242,7 +263,7 @@ $("#manage-themes-page")
         var item = model.getItemById(data.id);
         if(!item){
             model.items.push(data);
-            $(this).reset();
+            this.reset();
         }
         else{
             for(var prop in data){

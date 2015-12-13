@@ -12,7 +12,7 @@ class NewMenuWidget extends Widget{
 		return new Form(array(
 			'id' => 'new-menu-form',
 			'model' => 'MenuItem',
-			'action' => Router::getUri('edit-item', array('itemId' => $itemId)),
+			'action' => App::router()->getUri('edit-item', array('itemId' => $itemId)),
 			'reference' => array('id' => $itemId),
 			'fieldsets' => array(
 				'parameters' => array(
@@ -61,7 +61,7 @@ class NewMenuWidget extends Widget{
 	}
 
 	public function display(){
-		$form = ThemeController::getInstance()->customMenuItemForm(0);
+		$form = MenuController::getInstance()->customMenuItemForm(0);
 		return $form->display();
 	}
 }

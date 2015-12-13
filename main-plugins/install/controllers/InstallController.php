@@ -67,14 +67,6 @@ class InstallController extends Controller{
 						'default' => DEFAULT_TIMEZONE,
 						'label' => Lang::get('install.settings-timezone-label')
 					)),
-
-					new TextInput(array(
-						'name' => 'version',
-						'required' => true,
-						'default' => '0.0.1',
-						'label' => Lang::get('install.settings-version-label', null, null, $this->language),
-					))
-
 				),
 
 				'database' => array(
@@ -206,7 +198,7 @@ class InstallController extends Controller{
 						'{{ $email }}' => Db::get('tmp')->quote($form->getData('admin[email]')),
 						'{{ $login }}' => Db::get('tmp')->quote($form->getData('admin[login]')),
 						'{{ $password }}' => Db::get('tmp')->quote(Crypto::saltHash($form->getData('admin[password]'), $salt)),
-						'{{ $ip }}' => Db::get('tmp')->quote(Request::clientIp())
+						'{{ $ip }}' => Db::get('tmp')->quote(App::request()->clientIp())
 					);
 					$sql = strtr(file_get_contents(Plugin::current()->getRootDir() . 'templates/install.sql.tpl'), $param);
 					// file_put_contents($tmpfile, $sql);

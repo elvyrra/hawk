@@ -29,25 +29,14 @@ class Model{
      * @var string
      */
     protected static $dbname = MAINDB;
-        
-    /**
-     * This array contains the properties names of the object that are present in the database table
-     * @var array
-     */
-    protected $dbvars = array();
-    
+
+
     /**
      * Constructor : Instanciate a new Model object
-     * @param array $data The initial data to set. These data will be registered in $dbvars
+     * @param array $data The initial data to set.
      */
 	public function __construct($data = array()){
-        $this->map($data);
-        
-		foreach(get_object_vars($this) as $key => $value){
-			if($key != 'dbvars' && !in_array($key, $this->dbvars)){
-				$this->dbvars[] = $key;
-			}
-		}
+        $this->map($data);        
     }
     
 
@@ -202,11 +191,15 @@ class Model{
      * @return array The data to be inserted for method save or update
      */
     private function prepareDatabaseData(){
+        $fields = self::getDbInstance()->query('SHOW COLUMNS FROM ' . self::getTable(), array(), array('index' => 'Field', 'return' => DB::RETURN_ARRAY));
+
         $insert = array();
-		foreach($this->dbvars as $key){
-            $insert[$key] = $this->$key;    
+		foreach(get_object_vars($this) as $key => $value){
+            if(isset($fields[$key])){
+                $insert[$key] = $value;
+            }            
 		}
-        
+
         return $insert;
     }
     
@@ -299,19 +292,14 @@ class Model{
      * Get the model data, only the data present in the database.
      * @return array The object properties with their value
      */
-	public function getData(){
-		$data = array();
-		foreach($this->dbvars as $key){
-			$data[$key] = $this->$key;
-		}
-		return $data;
+	public function getData(){		
+		return get_object_vars($this);
 	}
     
 
 
     /**
-     * Set a property value to the object. This method adds the property in dbvars, so you have to use this method only if the property exists as field in the corresponding table. 
-     * You can use this method to set only one property, or an array of properties (where key are the names of the properties to set, and values their values)
+     * Set a property value to the object. You can use this method to set only one property, or an array of properties (where key are the names of the properties to set, and values their values)
      * @param string|array $field If a string is set, then it is the name of the property. If an array is set, then set multiple properties will be set
      * @param mixed $value The value to set to the property, only if $field is a string 
      */
@@ -323,9 +311,6 @@ class Model{
         }
         else{
             $this->$field = $value;
-            if(!in_array($field, $this->dbvars)){
-                $this->dbvars[] = $field;
-            }
         }
     }
     

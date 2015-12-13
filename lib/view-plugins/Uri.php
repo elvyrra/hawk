@@ -22,6 +22,6 @@ class Uri extends \Hawk\ViewPlugin{
 	 */
     public function display(){
         unset($this->params['action']);
-        return \Hawk\Router::getUri($this->action, $this->params);
+        return \Hawk\App::router()->getUri($this->action, $this->params);
     }
 }

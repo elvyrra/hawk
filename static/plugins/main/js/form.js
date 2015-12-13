@@ -352,15 +352,7 @@ define('form', ['jquery', 'ko'], function($, ko){
 			this.form.inputs[this.errorAt].addError(text);
 		}
 		else{
-			this.node.tooltip('destroy');
-			this.node.addClass('alert-danger').tooltip({
-				title : text,
-				placement: 'right',
-				template: 	'<div class="tooltip input-error" role="tooltip">'+
-								'<div class="tooltip-arrow"></div>'+
-								'<div class="tooltip-inner"></div>'+
-							'</div>'
-			});
+			this.node.addClass('error').after('<span class="input-error-message">'+ text + '</span>');
 		}			
 	};
 
@@ -368,7 +360,7 @@ define('form', ['jquery', 'ko'], function($, ko){
 	 * Remove the errors on the field 
 	 */
 	FormInput.prototype.removeError = function(){
-		this.node.removeClass("alert-danger").tooltip("destroy");
+		this.node.removeClass('error').next('.input-error-message').remove();
 	};
 
 	return Form;

@@ -3,14 +3,13 @@
 namespace Hawk\Plugins\Main;
 
 class MainMenuWidget extends Widget{
-	const EVENT_AFTER_GET_MENUS = 'menu.after_get_items';
-	const EVENT_AFTER_GET_USER_MENU = 'menu.after_get_user_items';
+	const EVENT_AFTER_GET_MENUS = 'menu.after-get-items';
 
 	/**
 	 * Display the main menu. The menu is separated in two : The applications (plugins), and the user menu (containing the access to user data, and admin data if the user is administrator)
 	 * */
 	public function display(){
-		$user = Session::getUser();
+		$user = App::session()->getUser();
 		
 		$menus= array(
 			'applications' => array(),
@@ -40,8 +39,10 @@ class MainMenuWidget extends Widget{
 			}			
 		}
 		
-		if(!Session::isConnected()){
+		if(!App::session()->isConnected()){
 			$menus['user'][] = new MenuItem(array(
+				'plugin' => 'main',
+				'name' => 'login',
 				'id' => uniqid(),
 				'labelKey' => 'main.login-menu-title',
 				'action' => 'login',

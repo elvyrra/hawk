@@ -19,14 +19,14 @@ class MainController extends Controller{
 		$labelsJSON = json_encode($labels, JSON_HEX_APOS | JSON_HEX_QUOT);
 
 		$routes = array();
-		foreach(Router::getRoutes() as $name => $route){
+		foreach(App::router()->getRoutes() as $name => $route){
 			$data = get_object_vars($route);
 			unset($data['action']);
 			$routes[$name] = $data;
 		}
 
 		
-		FileSystem::copy(Plugin::current()->getJsDir() . '/*', Plugin::current()->getPublicJsDir());
+		App::fs()->copy(Plugin::current()->getJsDir() . '/*', Plugin::current()->getPublicJsDir());
 
 		return View::make(Theme::getSelected()->getView('html-document.tpl'), array(
 			'title' => $title,
@@ -47,16 +47,16 @@ class MainController extends Controller{
 	 * @param string $content A content to set to override the default index content
 	 */
 	public function main($content = ""){
-		$canAccessApplication = Session::getUser()->canAccessApplication();		
+		$canAccessApplication = App::session()->getUser()->canAccessApplication();		
 
 		$body = View::make(Theme::getSelected()->getView('body.tpl'), array(
 			'canAccessApplication' => $canAccessApplication,
 			'content' => $content
 		));	
 
-		$title = Conf::has('db') ? Option::get('main.page-title-' . LANGUAGE) : DEFAULT_HTML_TITLE;
-		$description = Conf::has('db') ? Option::get('main.page-description-' . LANGUAGE) : '';
-		$keywords = Conf::has('db') ? Option::get('main.page-keywords-' . LANGUAGE) : '';
+		$title = App::conf()->has('db') ? Option::get('main.page-title-' . LANGUAGE) : DEFAULT_HTML_TITLE;
+		$description = App::conf()->has('db') ? Option::get('main.page-description-' . LANGUAGE) : '';
+		$keywords = App::conf()->has('db') ? Option::get('main.page-keywords-' . LANGUAGE) : '';
 
 		return $this->index($body, $title, $description, $keywords);
 	}
@@ -71,10 +71,10 @@ class MainController extends Controller{
 		// Display a page of the application
 		if($type == 'page'){
 			$page = Option::get('main.home-page-item');
-			$route = Router::getRouteByAction($page);
+			$route = App::router()->getRouteByAction($page);
 
 			if($route && $route->isAccessible()){
-				Response::redirectToAction($page);
+				App::response()->redirectToAction($page);
 				return;
 			}
 			else{
@@ -114,7 +114,7 @@ class MainController extends Controller{
 	 * Get the application favicon URL
 	 */
 	public function getFaviconUrl(){
-		if(Conf::has('db')){
+		if(App::conf()->has('db')){
 			$favicon = Option::get('main.favicon') ? Option::get('main.favicon') : Option::get('main.logo');
 		}
 
@@ -143,21 +143,24 @@ class MainController extends Controller{
 		return MainMenuWidget::getInstance()->display();
 	}
 
+
 	/**
 	 * Generate the conf.js file
 	 */
 	public function jsConf(){
-		$canAccessApplication = Session::getUser()->canAccessApplication();	
+		$canAccessApplication = App::session()->getUser()->canAccessApplication();	
 
 		// Get all routes
 		$routes = array();
-		foreach(Router::getRoutes() as $name => $route){
-			$routes[$name] = array(
-				'url' => $route->url,
-				'where' => $route->where,
-				'default' => $route->default,
-				'pattern' => $route->pattern
-			);
+		foreach(App::router()->getRoutes() as $name => $route){
+			if($route->isAccessible()){
+				$routes[$name] = array(
+					'url' => $route->url,
+					'where' => $route->where,
+					'default' => $route->default,
+					'pattern' => $route->pattern
+				);
+			}
 		}
 
 		// Get all Lang labels
@@ -169,13 +172,13 @@ class MainController extends Controller{
 
 		// Get the pages to open
 		$pages = array();
-		if(Session::isConnected() && Option::get('main.open-last-tabs') && Request::getCookies('open-tabs') ){
+		if(App::session()->isConnected() && Option::get('main.open-last-tabs') && App::request()->getCookies('open-tabs') ){
 			// Open the last tabs the users opened before logout
-			$pages = json_decode(Request::getCookies('open-tabs'), true);
+			$pages = json_decode(App::request()->getCookies('open-tabs'), true);
 		}
 		
 		if(empty($pages)){
-			$pages[] = Router::getUri('new-tab');
+			$pages[] = App::router()->getUri('new-tab');
 		}
 
 		// Get the theme variables		
@@ -191,7 +194,7 @@ class MainController extends Controller{
             $themeVariables[$variable['name']] = isset($options[$variable['name']]) ? $options[$variable['name']] : $variable['default'];
         }
 
-		Response::setScript();
+		App::response()->setContentType('javascript');
 
 		return View::make(Plugin::current()->getView('conf.js.tpl'), array(
 			'keys' => $keys,
@@ -213,16 +216,16 @@ class MainController extends Controller{
 		
 		// Clear the directoty cache
 		foreach(glob(CACHE_DIR . '*') as $elt){
-			FileSystem::remove($elt);
+			App::fs()->remove($elt);
 		}
 
 		// Clear the directory of the theme
 		foreach(glob(Theme::getSelected()->getStaticDir() . '*') as $element){
 			if(basename($element) != 'userfiles'){
-				FileSystem::remove($element);
+				App::fs()->remove($element);
 			}
 		}
 		
-		Response::redirectToAction('index');
+		App::response()->redirectToAction('index');
 	}
 }

@@ -8,8 +8,8 @@
 {{ $message }}
 
 {foreach($trace as $i => $line)}
-	#{{ $i }} {{ $line['file'] }}:{{ $line['line'] }}
-
+	#{{ $i }} {{ empty($line['file']) ? '' : $line['file'] }}{{ empty($line['line']) ? '' : ':' . $line['line'] }}
+    
 {/foreach}
 </pre>
 	</div>

@@ -1,6 +1,3 @@
 {if($updates)}
-    <div class="available-updates alert-info navbar-right pointer" title="{{ $title }}" href="{uri action='updates-index'}" target="newtab">
-        <i class="icon icon-exclamation"></i>
-        {{ $updates }}
-    </div>
+    <span class="available-updates alert-warning pointer icon icon-exclamation" title="{{ $title }}"></span>
 {/if}

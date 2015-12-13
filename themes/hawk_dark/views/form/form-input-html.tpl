@@ -1,1 +1,0 @@
-{{ $input->plainText ? nl2br($input->value) : $input->value }}

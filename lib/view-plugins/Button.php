@@ -32,17 +32,6 @@ class Button extends \Hawk\ViewPlugin{
 	$param = array();
 
 	/**
-	 * Constructor
-	 * @param array $params The button parameters
-	 */
-	public function __construct($params = array()){
-		if(isset($params['data'])){
-			$params = $params['data'];
-		}
-		parent::__construct($params);
-	}
-	
-	/**
 	 * display the button
 	 * @return string The html result describing the button
 	 */

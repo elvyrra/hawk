@@ -1,9 +1,19 @@
 <?php
-
+/**
+ * ProfileQuestionValue.php
+ * @author Elvyrra SAS
+ * @license MIT
+ */
 namespace Hawk;
 
+/**
+ * This model describes a the value of the permissions for a role
+ */
 class RolePermission extends Model{
+	/**
+	 * The associated table
+	 * @var string
+	 */
 	protected static $tablename = "RolePermission";
-	protected static $primaryColumn = "id";	
 
 }

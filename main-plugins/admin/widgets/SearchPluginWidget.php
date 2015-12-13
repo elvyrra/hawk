@@ -7,25 +7,25 @@ class SearchPluginWidget extends Widget{
         $form = new Form(array(
             'id' => 'search-plugins-form',
             'method' => 'get',
-            'action' => Router::getUri('search-plugins'),            
-            'fields' => array(
+            'action' => App::router()->getUri('search-plugins'),            
+            'inputs' => array(
                 new TextInput(array(
                     'name' => 'search',
                     'required' => true,
-                    'defaul' => Request::getParams('search'),
+                    'default' => App::request()->getParams('search'),
                     'placeholder' => Lang::get('admin.search-plugin-form-search-label'),
                 )),
 
-                new SelectInput(array(
-                    'name' => 'price',
-                    'options' => array(
-                        'all' => Lang::get('admin.search-plugin-form-price-all-value'),
-                        'free' => Lang::get('admin.search-plugin-form-price-free-value'),
-                        'charged' => Lang::get('admin.search-plugin-form-price-charged-value')
-                    ),
-                    'default' => Request::getParams('price') ? Request::getParams('price') : 'all',
-                    'label' => Lang::get('admin.search-plugin-form-price-label')
-                )),
+                // new SelectInput(array(
+                //     'name' => 'price',
+                //     'options' => array(
+                //         'all' => Lang::get('admin.search-plugin-form-price-all-value'),
+                //         'free' => Lang::get('admin.search-plugin-form-price-free-value'),
+                //         'charged' => Lang::get('admin.search-plugin-form-price-charged-value')
+                //     ),
+                //     'default' => App::request()->getParams('price') ? App::request()->getParams('price') : 'all',
+                //     'label' => Lang::get('admin.search-plugin-form-price-label')
+                // )),
 
                 new SubmitInput(array(
                     'name' => 'valid',

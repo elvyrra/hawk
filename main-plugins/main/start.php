@@ -2,40 +2,40 @@
 
 namespace Hawk\Plugins\Main;
 
-Router::setProperties(
+App::router()->setProperties(
 	array('namespace' => __NAMESPACE__), 
 	function(){
-		Router::get('index', '/', array('action' => 'MainController.main'));
-		Router::get('new-tab', '/newtab', array('action' => 'MainController.newTab'));
-		Router::get('logout', '/logout', array('action' => 'LoginController.logout'));
+		App::router()->get('index', '/', array('action' => 'MainController.main'));
+		App::router()->get('new-tab', '/newtab', array('action' => 'MainController.newTab'));
+		App::router()->get('logout', '/logout', array('action' => 'LoginController.logout'));
 			
-		Router::auth(Session::isConnected(), function(){
-			Router::auth(Request::isAjax(), function(){
-				Router::any('edit-profile', '/profile/edit/{userId}', array('where' => array('userId' => '\d+'), 'default' => array('userId' => Session::getUser()->id), 'action' => 'UserProfileController.edit'));
-				Router::any('change-password', '/profile/change-password', array('action' => 'UserProfileController.changePassword'));
+		App::router()->auth(App::session()->isConnected(), function(){
+			App::router()->auth(App::request()->isAjax(), function(){
+				App::router()->any('edit-profile', '/profile/edit/{userId}', array('where' => array('userId' => '\d+'), 'default' => array('userId' => App::session()->getUser()->id), 'action' => 'UserProfileController.edit'));
+				App::router()->any('change-password', '/profile/change-password', array('action' => 'UserProfileController.changePassword'));
 			});
 			
 		});
 
-		Router::auth(!Session::isConnected(), function(){
-		    Router::any('login', '/login', array('action' => 'LoginController.login'));
+		App::router()->auth(!App::session()->isConnected(), function(){
+		    App::router()->any('login', '/login', array('action' => 'LoginController.login'));
 			
-			Router::auth(Option::get('main.open-register'), function(){
-				Router::any('register', '/register', array('action' => 'LoginController.register'));
+			App::router()->auth(Option::get('main.open-register'), function(){
+				App::router()->any('register', '/register', array('action' => 'LoginController.register'));
 
-				Router::get('validate-registration', '/register/{token}', array('where' => array('token' => '[^\s]+'), 'action' => 'LoginController.validateRegister'));
+				App::router()->get('validate-registration', '/register/{token}', array('where' => array('token' => '[^\s]+'), 'action' => 'LoginController.validateRegister'));
 			});
 		});
 
-		Router::get('terms', '/terms-of-application', array('action' => 'MainController.terms'));
+		App::router()->get('terms', '/terms-of-application', array('action' => 'MainController.terms'));
 
-		Router::get('refresh-menu', '/main-menu', array('action' => 'MainController.refreshMenu'));
+		App::router()->get('refresh-menu', '/main-menu', array('action' => 'MainController.refreshMenu'));
 
-		Router::get('js-conf', '/conf.js', array('action' => 'MainController.jsConf'));
+		App::router()->get('js-conf', '/conf.js', array('action' => 'MainController.jsConf'));
 
 		// Clear the cache
-		Router::auth(DEV_MODE, function(){
-			Router::get('clear-cache', '/clear-cache', array('action' => 'MainController.clearCache'));
+		App::router()->auth(DEV_MODE, function(){
+			App::router()->get('clear-cache', '/clear-cache', array('action' => 'MainController.clearCache'));
 		});
 
 	}

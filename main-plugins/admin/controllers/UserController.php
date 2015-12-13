@@ -53,7 +53,7 @@ class UserController extends Controller{
 		$param = array(
 			'id' => 'admin-users-list',
 			'model' => 'User',
-			'action' => Router::getUri('list-users'),
+			'action' => App::router()->getUri('list-users'),
 			'reference' => 'id',
 			'filter' => new DBExample($example),			
 			'controls' => array(
@@ -61,7 +61,7 @@ class UserController extends Controller{
 					'icon' => 'plus',
 					'label' => Lang::get('admin.new-user-btn'),
 					'class' => 'btn-success',
-					'href' => Router::getUri("edit-user", array('username' => '_new')),
+					'href' => App::router()->getUri("edit-user", array('username' => '_new')),
 					'target' => 'dialog',
 				),
 			),
@@ -69,7 +69,7 @@ class UserController extends Controller{
 				'actions' => array(
 					'independant' => true,
 					'display' => function($value, $field, $user){
-						$return = "<i class='icon icon-pencil text-primary' href='". Router::getUri('edit-user', array('username' => $user->username)) . "' target='dialog'></i>";
+						$return = "<i class='icon icon-pencil text-primary' href='". App::router()->getUri('edit-user', array('username' => $user->username)) . "' target='dialog'></i>";
 						if($user->isRemovable()){
 							$return .= "<i class='icon icon-close text-danger delete-user' data-user='{$user->username}'></i>";
 
@@ -134,7 +134,7 @@ class UserController extends Controller{
 		
 		$list = new ItemList($param);
 
-		if(Request::getParams('refresh')) {
+		if(App::request()->getParams('refresh')) {
 			return $list->__toString();	
 		}
 		else{
@@ -170,8 +170,8 @@ class UserController extends Controller{
 						'name' => 'username',
 						'required' => true,
 						'unique' => true,
-						'readonly' => $user && $user->id !== Session::getUser()->id,
-						'insert' => ! $user || $user->id === Session::getUser()->id,
+						'readonly' => $user && $user->id !== App::session()->getUser()->id,
+						'insert' => ! $user || $user->id === App::session()->getUser()->id,
 						'label' => Lang::get('admin.user-form-username-label'),
 					)),
 					
@@ -179,8 +179,8 @@ class UserController extends Controller{
 						'name' => 'email',
 						'required' => true,
 						'unique' => true,
-						'readonly' => $user && $user->id !== Session::getUser()->id,
-						'insert' => ! $user || $user->id !== Session::getUser()->id,
+						'readonly' => $user && $user->id !== App::session()->getUser()->id,
+						'insert' => ! $user || $user->id !== App::session()->getUser()->id,
 						'label' => Lang::get('admin.user-form-email-label'),
 					)),
 					

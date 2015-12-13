@@ -1,20 +1,50 @@
 <?php
 /**
  * User.php
+ * @author Elvyrra SAS
+ * @license MIT
  */
 
 namespace Hawk;
 
 
+/**
+ * This model describes the user data
+ */
 class User extends Model{
-	protected static $tablename = "User";	
-	protected static $primaryColumn = "id";
+	/**
+	 * The associated table
+	 * @var string
+	 */
+	protected static $tablename = "User";
 
-	private $profile, $permissions;
 
+	/**
+	 * The user profile data
+	 * @var array
+	 */
+	private $profile, 
+
+	/**
+	 * The user permissions
+	 * @var array
+	 */
+	$permissions;
+
+	/**
+	 * The id of guest users
+	 */
 	const GUEST_USER_ID = 0;
+
+	/**
+	 * The id for the first administrator user
+	 */
 	const ROOT_USER_ID = 1;
 	
+	/**
+	 * Constructor
+	 * @param array $data The data to set to the user
+	 */
 	public function __construct($data = array()){
 		parent::__construct($data);
 		if(!empty($this->roleId)){
@@ -22,15 +52,35 @@ class User extends Model{
 		}
 	}
 
+	/**
+	 * Get all users except guest user
+	 * @param string $index The field to use as key in the returned array
+	 * @param array $fields The table fields to get
+	 * @param array $order The order instruction to get the users
+	 * @return array
+	 */
 	public static function getAll($index = null, $fields = array(), $order = array()){
-		$example = array('id' => array('$ne' => self::GUEST_USER_ID));
+		$example = array(
+			'id' => array(
+				'$ne' => self::GUEST_USER_ID
+			)
+		);
 		return self::getListByExample(new DBExample($example), $index, $fields, $order);
 	}
 	
+
+	/**
+	 * Get a user by it username
+	 * @param string $username The username to search
+	 * @return User
+	 */
 	public static function getByUsername($username){
 		return self::getByExample(new DBExample(array('username' => $username)));
 	}
 	
+	/**
+	 * Set all the permissions on the user
+	 */
 	private function getPermissions(){
 		if(!isset($this->permissions)){
 			$sql = 'SELECT P.plugin, P.key, P.id
@@ -39,7 +89,7 @@ class User extends Model{
 						INNER JOIN ' . self::getTable() . ' U ON U.roleId = RP.roleId
 					WHERE U.id = :id AND RP.value=1';
 
-			$permissions = DB::get(self::$dbname)->query($sql, array('id' => $this->id), array('return' => DB::RETURN_OBJECT));
+			$permissions = App::db()->query($sql, array('id' => $this->id), array('return' => DB::RETURN_OBJECT));
 			$this->permissions = array();			
 			foreach($permissions as $permission){
 				// Register the permission by it id
@@ -51,22 +101,39 @@ class User extends Model{
 		}		
 	}	
 
+
+	/**
+	 * Get the user's profile data
+	 * @param string $prop The property name to get. If not set, the function will return an array containing all the profile data
+	 * @return mixed
+	 */
 	public function getProfileData($prop = ""){
 		if(!isset($this->profile)){
 			$sql = 'SELECT Q.name, V.value 
 					FROM ' . ProfileQuestionValue::getTable()  . ' V INNER JOIN ' . ProfileQuestion::getTable() . ' Q ON V.question = Q.name
 					WHERE V.userId = :id';
 
-			$data = DB::get(self::$dbname)->query($sql, array('id' => $this->id), array('return' => DB::RETURN_ARRAY, 'index' => 'name'));			
+			$data = App::db()->query($sql, array('id' => $this->id), array('return' => DB::RETURN_ARRAY, 'index' => 'name'));			
 			$this->profile = array_map(function($v){ return $v['value']; }, $data);
 		}		
 		return $prop ? (isset($this->profile[$prop]) ? $this->profile[$prop] : null) : $this->profile;
 	}
 
+
+	/**
+	 * Set the user's profile data. This method does not register the data in database, only set in the user properties
+	 * @param string $prop The property name to set
+	 * @param string $value The value to set
+	 * @see saveProfile	 
+	 */
 	public function setProfileData($prop, $value){
 		$this->profile[$prop] = $value;
 	}
 
+
+	/**
+	 * Save the user's profile in the database
+	 */
 	public function saveProfile(){
 		foreach($this->profile as $prop => $value){
 			$questionValue = new ProfileQuestionValue(array(
@@ -132,20 +199,36 @@ class User extends Model{
 	}
 	
 
-	
+	/**
+	 * Get the user's full name. This method returns the real name if it set in the user's profile, else, it returns his username
+	 * @return string
+	 */
 	public function getDisplayName(){
 		return $this->getProfileData('realname') ? $this->getProfileData('realname') : $this->getUsername();
 	}
 	
+	/**
+	 * Check if the user is connected or not
+	 * @return bool
+	 */
 	public function isConnected(){
-		return $this->id && $_SESSION['user']['id'] == $this->id && $this->active;
+		return $this->id && App::session()->getData('user.id') == $this->id && $this->active;
 	}
 	
+
+	/**
+	 * Check if the user can access the application
+	 * @return bool
+	 */
 	public function canAccessApplication(){
 		return $this->isConnected() || Option::get('main.allow-guest');
 	}
 
+	/**
+	 * Check of the user is removable. A user is removable if he's not the one executing the current script, and if he's not a guest or the main application administrator
+	 * @return bool
+	 */
 	public function isRemovable(){
-		return $this->id != Session::getUser()->id && $this->id != self::ROOT_USER_ID && $this->id != self::GUEST_USER_ID;
+		return $this->id != App::session()->getUser()->id && $this->id != self::ROOT_USER_ID && $this->id != self::GUEST_USER_ID;
 	}
 }

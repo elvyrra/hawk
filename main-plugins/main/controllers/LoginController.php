@@ -4,15 +4,11 @@ namespace Hawk\Plugins\Main;
 	
 class LoginController extends Controller{
 	
-	/*_______________________________________________________
-	
-				Generate the login form
-	_______________________________________________________*/	
+	/**
+	 * Generate the login form
+	 */
 	private function form(){
 		/*** Get the registrered login and passwords ***/
-		$login = Request::getCookies(sha1('login')) ? Crypto::aes256Decode(Request::getCookies(sha1('login'))) : '';
-		$password = Request::getCookies(sha1('password')) ? Request::getCookies(sha1('password')) : '';
-
 		$param = array(
 			"id" => "login-form",
 			"method" => "post",
@@ -23,40 +19,31 @@ class LoginController extends Controller{
 					new TextInput(array(
 						"field" => "login",
 						"required" => true,
-						"default" => $login,
 						"label" => Lang::get('main.login-label'),						
 					)),
 					
 					new PasswordInput(array(
 						"field" => "password",
 						"required" => true,						
-						"default" => $password,
-						"decrypt" => array('Crypto', 'aes256Decode'),
 						"get" => true,						
 						"label" => Lang::get('main.login-password-label'),
 					)),
-					
-					new CheckboxInput(array(
-						"field" => "remember",
-						"independant" => true,
-						"default" => $login || $password ? 1 : 0,
-						"label" => Lang::get('main.login-remember-label'),
-					)),		
 				),
 
 				"_submits" => array(
 					new SubmitInput(array(
 						"name" => "connect",
-						"value" => Lang::get('main.connect-button'),						
+						"value" => Lang::get('main.connect-button'),
+						'icon' => 'sign-in'						
 					)),
 					
 					Option::get('main.open-register') ? 
 						new ButtonInput(array(
 							'name' => 'register',
 							'value' => Lang::get('main.register-button'),
-							'href' => Router::getUri('register'),
+							'href' => App::router()->getUri('register'),
 							'target' => 'dialog',
-							'class' => 'btn-primary'
+							'class' => 'btn-success'
 						)) : 
 						null
 				),
@@ -67,14 +54,13 @@ class LoginController extends Controller{
 		return new Form($param);
 	}
 	
-	/*_______________________________________________________
-	
-				Display the login page 
-	_______________________________________________________*/
+	/**
+	 * Display the login page
+	 */
 	public function login(){
 		$form = $this->form();
 		if(!$form->submitted()){	
-			if(Request::getParams('code') == 403){
+			if(App::request()->getParams('code') == 403){
 				$form->status = Form::STATUS_ERROR;
 				$form->addReturn('message', Lang::get('main.403-message'));
 			}
@@ -109,19 +95,15 @@ class LoginController extends Controller{
 					}
 					
 					// The user can be connected 
-					$_SESSION['user'] = array(
+					App::session()->setData('user', array(						
 						'id' => $user->id,						
 						'email' => $user->email,
 						'username' => $user->getUsername(),
-						'ip' => Request::clientIp()
-					);					
-					if(Request::getBody('remember')) {
-						setcookie(sha1("login"), Crypto::aes256Encode($form->getData('login')), time() + 3600 * 24 *7, '/');
-						setcookie(sha1("password"), Crypto::aes256Encode($form->getData('password')), time() + 3600 * 24 *7, '/');
-					}
+						'ip' => App::request()->clientIp()						
+					));
 
-					if(Request::getParams('redirect')){
-						$form->addReturn('redirect',Request::getParams('redirect'));
+					if(App::request()->getParams('redirect')){
+						$form->addReturn('redirect',App::request()->getParams('redirect'));
 					}
 					
 					return $form->response(Form::STATUS_SUCCESS, Lang::get('main.login-success'));
@@ -133,6 +115,10 @@ class LoginController extends Controller{
 		}
 	}	
 	
+
+	/**
+	 * Register a new user
+	 */
 	public function register(){
 		$param = array(
 			'id' => 'register-form',
@@ -160,7 +146,7 @@ class LoginController extends Controller{
 					new PasswordInput(array(
 						'name' => 'password',
 						'required' => true,
-						'encrypt' => array('Crypto', 'saltHash'),
+						'encrypt' => array('\Hawk\Crypto', 'saltHash'),
 						'label' => Lang::get('main.register-password-label')
 					)),
 
@@ -184,7 +170,7 @@ class LoginController extends Controller{
 							'required' => true,
 							'independant' => true,
 							'labelWidth' => 'auto',
-							'label' => Lang::get('main.register-terms-label', array('uri' => Router::getUri('terms'))),
+							'label' => Lang::get('main.register-terms-label', array('uri' => App::router()->getUri('terms'))),
 						)) :
 						null
 				),
@@ -198,7 +184,7 @@ class LoginController extends Controller{
 					new ButtonInput(array(
 						'name' => 'cancel',
 						'value' => Lang::get('main.cancel-button'),
-						'href' => Router::getUri('login'),
+						'href' => App::router()->getUri('login'),
 						'target' => 'dialog',
 					))
 				)
@@ -228,19 +214,19 @@ class LoginController extends Controller{
 				'page' => $form->__toString(),
 				'icon' => 'sign-in',
 				'title' => Lang::get('main.login-form-title'),
-				'width' => '450px',
+				'width' => '50rem',
 			));
 		}
 		else{	
 			if($form->check()){
 				try{
 					$user = new User(array(
-						'username' => $form->fields['username']->dbvalue(),
-						'email' => $form->fields['email']->dbvalue(),
-						'password' => $form->fields['password']->dbvalue(),
+						'username' => $form->inputs['username']->dbvalue(),
+						'email' => $form->inputs['email']->dbvalue(),
+						'password' => $form->inputs['password']->dbvalue(),
 						'active' => Option::get('main.confirm-register-email') ? 0 : 1,
 						'createTime' => time(),
-						'createIp' => Request::clientIp(),
+						'createIp' => App::request()->clientIp(),
 						'roleId' => Option::get('roles.default-role'),
 					));
 
@@ -263,7 +249,7 @@ class LoginController extends Controller{
 	                        }
 	                    }
 	                    else{
-	                        $user->setProfileData($question->name, $form->fields[$question->name]->dbvalue());
+	                        $user->setProfileData($question->name, $form->inputs[$question->name]->dbvalue());
 	                    }
 	                }            
 
@@ -278,7 +264,7 @@ class LoginController extends Controller{
 							'createIp' => $user->createIp
 						);
 						$token = Crypto::aes256Encode(json_encode($tokenData));
-						$url = Router::getUrl('validate-registration', array('token' => $token));
+						$url = App::router()->getUrl('validate-registration', array('token' => $token));
 
 
 						$data = array(
@@ -346,7 +332,7 @@ class LoginController extends Controller{
 			}
 		}
 
-		$this->addJavaScriptInline("app.ready(function(){app.notify('$status', '". addcslashes(Lang::get($messageKey), "'") . "');})");
+		$this->addJavaScriptInline("require(['app'], function(){app.ready(function(){app.notify('$status', '". addcslashes(Lang::get($messageKey), "'") . "');});});");
 
 		return MainController::getInstance()->compute('main');
 
@@ -357,9 +343,8 @@ class LoginController extends Controller{
 	 */
 	public function logout(){
 		session_destroy();
-		setcookie("PHPSESSID", "", time() - 1, '/');
-		header("Location: ./");
-		exit;
+
+		App::response()->redirectToAction('index');
 	}
 
 }

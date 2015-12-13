@@ -30,7 +30,7 @@ login-label = "Email / Login"
 login-password-label = "Mot de passe"
 login-remember-label = "Se souvenir de moi ?"
 login-success = "Connexion réussie"
-menu-admin-display-title = "Gestion des thèmes"
+menu-admin-display-title = "Gestion de l'affichage"
 menu-admin-language-title = "Gestion des traductions"
 menu-admin-plugins-title = "Gestion des plugins"
 menu-admin-roles-title = "Gestion des permissions"
@@ -50,11 +50,7 @@ plugin-name = "Application"
 register-button = "S'inscrire"
 register-connection-legend = "Données de connexion"
 register-username-label = "Pseudo"
-register-email-content = "<p>Vous venez de vous inscire sur {sitename}, et nous vous en remercions. </p>\
-<p>Pour valider votre inscription, cliquez sur le lien ci-dessous ou copiez-collez le dans la barre URL de votre navigateur :</p>\
-<a href=\"{uri}\">{uri}</a>\
-<p> Nous espérons vous voir rapidement sur {sitename} </p>\
-<p> L'équipe {sitename}. </p>"
+register-email-content = "<p>Vous venez de vous inscire sur {sitename}, et nous vous en remercions. </p><p>Pour valider votre inscription, cliquez sur le lien ci-dessous ou copiez-collez le dans la barre URL de votre navigateur :</p><a href=\"{url}\">{url}</a><p> Nous espérons vous voir rapidement sur {sitename} </p><p> L'équipe {sitename}. </p>"
 register-email-label = "Adresse email"
 register-email-title = "Validez votre inscription sur {sitename}"
 register-password-label = "Mot de passe"

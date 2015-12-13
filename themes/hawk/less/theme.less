@@ -1,16 +1,16 @@
 /* Editable variables */
-@text-color: #5f6e7d; // editable : "Body text color", color
+@text-color: #4b5259; // editable : "Body text color", color
 @body-bg: #ffffff; // editable : "Body background", color
-@font-size-base: 12px; // editable : "Global font size"
+@font-size-base: 10px; // editable : "Global font size"
 
-@header-bg: #5f6e7d; // editable : "Header and footer background", color
+@header-bg: #37424d; // editable : "Header and footer background", color
 @header-color: #d6d6d6; // edtaible : "Header and footer font color", color
 
 @btn-default-color: #fff; // editable : "Default buttons font color", color
 @btn-default-bg: #5f6e7d; // editable : "Default buttons background", color
 @btn-default-border: #186467; // editable : "Default buttons border color, color
 
-@brand-primary: #7db4b5; // editable : "Base color for primary elements", color
+@brand-primary: #337d87; // editable : "Base color for primary elements", color
 @brand-success: #8dcc8d; // editable : "Base color for success elements", color
 @brand-info: #5bc0de; // editable : "Base color for information elements", color
 @brand-warning: #f2b661; // editable : "Base color for warning elements", color
@@ -19,7 +19,7 @@
 @state-success-text: #1e7527; // editable : "Success alerts font color", color
 @state-success-bg: #c3dec3; // editable : "Success alerts background color", color
 
-@state-info-text: #7db4b5; // editable : "Info alerts font color", color
+@state-info-text: #176566; // editable : "Info alerts font color", color
 @state-info-bg: #e0eff1; // editable : "Info alerts background color", color
 
 @state-warning-text: #a64e32; // editable : "Warning alerts font color", color
@@ -28,9 +28,14 @@
 @state-danger-text: #940a0a; // editable : "Error alerts font color", color
 @state-danger-bg: #ebb3b2; // editable : "Error alerts background color", color
 
+@import url(https://fonts.googleapis.com/css?family=Ubuntu);
 
 @import "bootstrap.less";
 @import "font-awesome.less";
+
+html{
+    font-size: @font-size-base;
+}
 
 body{
     margin: 0;
@@ -38,10 +43,10 @@ body{
     height: 100%;
     position: absolute;
     width: 100%;	
-	font-size: @font-size-base;
+	font-size: 1.2rem;
 	color : @text-color;
     background: @body-bg;
-	font-family: "Open Sans", Arial;
+	font-family: 'Ubuntu';
 }
 
 /* Some overrides from default bootstrap styles */
@@ -51,8 +56,9 @@ h1,h2,h3,h4,h5,h6{
 
 .btn{
 	font-size: inherit;
-	margin-top: 5px;
+	margin-top: .5rem;
     border-radius: 1px;
+    margin-right: .5rem;
 }
 
 /* labels */
@@ -150,18 +156,72 @@ code {
     cursor: pointer;
 }
 
+.center{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
 /*---------------------------------------------------------------------------*/
 /*------------------------------- FORMS -------------------------------------*/
 /*---------------------------------------------------------------------------*/
 form .clearfix{
-    margin-top: 5px;
-    margin-bottom: 5px;
+    margin-top: .5rem;
+    margin-bottom: .5rem;
 }
 
 input, button, select, textarea {
     font-family: "Open Sans", Arial;
     outline-style: none;
     color: @text-color;
+
+    &.error{
+        .alert-danger();
+
+        & + .input-error-message{
+            opacity: 0;
+            transition: opacity .4s ease;
+            .alert();
+            .alert-danger();
+            position: absolute;
+            z-index: 2000;
+            margin-left: 2rem;
+            min-width: 20rem;
+
+            @arrow-size: 1rem;
+            @arrow-width: .1rem;
+
+            &:before, &:after{
+                width: 0;
+                height: 0;
+                content: " ";
+                position: absolute;
+                border-style: solid;
+                border-color: transparent;                
+                left: 0;
+                top: 0;
+            }
+
+            &:before{
+                border-width: @arrow-size + @arrow-width;
+                border-right-color: @state-danger-border;
+                margin-left: -2 * (@arrow-size + @arrow-width);
+                margin-top: .65rem;
+            }
+
+            &:after{
+                border-width: @arrow-size;
+                border-right-color: @state-danger-bg;
+                margin-left: -2 * @arrow-size;
+                margin-top: .75rem;
+            }
+        }
+
+        &:hover + .input-error-message{
+            opacity: 1;
+        }
+    }
 }
 
 input[type="text"],
@@ -170,13 +230,13 @@ input[type="date"],
 input[type="number"],
 select,
 textarea {	
-	font-size: 13px;	
+	font-size: 1.3rem;	
 	box-shadow: inset 0 0px 1px rgba(0, 0, 0, 0.075);
 	border-radius: 4px;
     border: 1px solid darken(@body-bg, 13.5%);
-    height: 30px;
-    padding-left: 3px;
-    padding-right: 3px;
+    height: 3rem;
+    padding-left: .3rem;
+    padding-right: .3rem;
 
     /** readonly inputs **/
     &:disabled, &:readonly{
@@ -187,7 +247,7 @@ textarea {
     &:-moz-placeholder, &:-ms-input-placeholder, &::-webkit-input-placeholder {
         color: #9ba0a5;
         font-family: "Open Sans", Arial;
-        font-size: 12px;
+        font-size: 1.2rem;
     }
 }
 
@@ -209,10 +269,10 @@ input[type="file"] {
 	display: none;
 
     & + label{
-        padding: 6px 12px;
+        padding: .6rem 1.2rem;
         border-radius: 0;
         overflow: hidden;
-        height: 30px;    
+        height: 3rem;    
         background: @btn-default-bg;
         color: @btn-default-color;
         border-color: @btn-default-border;
@@ -220,7 +280,7 @@ input[type="file"] {
 
         & > .file-chosen-icon{
             visibility: hidden;
-            width: 15px;
+            width: 1.5rem;
             display: inline-block;
             float: right;
         }
@@ -230,7 +290,7 @@ input[type="file"] {
         .btn-success();
 
         & > .input-file-invitation-text{
-            width: calc(~"100% - 16px");
+            width: calc(~"100% - 1.6rem");
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
@@ -257,28 +317,29 @@ input[type="file"] {
 
 .input-radio-horizontal li{
     float: left;
-    margin-right: 8px;
+    margin-right: .8rem;
 }
 
 .input-radio-vertical li{
-    margin-top: 8px;
+    margin-top: .8rem;
 }
 
-input[type="radio"]{
-	width:0;
-    height: 0;
-    margin-right: 10px;
+input[type="radio"]{	
+    position: relative;
+    // margin-left: 1rem;
 
     &:before{
         position: absolute;
-        margin-top: -.75em;
-        font-size: 1.3em;
-        font-family: FontAwesome;
-        content: "\f10c";
+        visibility: visible;
+        .fa-icon();
+        font-size: 1.5em;
+        line-height: 2rem;
+        content: @fa-var-circle-o;
+        background: @body-bg;
     }
 
     &:checked:before{
-        content: "\f111";
+        content: @fa-var-circle;
         color: @brand-primary;
     }
 
@@ -289,17 +350,17 @@ input[type="radio"]{
 
 /*------------------------ Checkboxes --------------------------*/
 input[type="checkbox"]{
-    width:0;
-    height: 0;
-    margin-right: 20px;
+    position: relative;
+    // margin-left: 1rem;
 
     &:before{
         position: absolute;
-        margin-top: -0.7em; 
         .pointer();       
         .fa-icon();        
-        .icon-lg();
+        font-size: 1.5rem;
+        line-height: 2rem;
         content: @fa-var-square-o;
+        background: @body-bg;
     }
 
     &:hover, &:focus, &:checked{
@@ -320,23 +381,23 @@ fieldset{
         color: @brand-primary;
         border: none;
         background: none;
-        margin-left: 15px;
+        margin-left: 1.5rem;
         text-align: left;
         display: inline;
         width: auto;
-        padding: 0 5px;
+        padding: 0 .5rem;
     }
 }
 
 .form-input-wrap{
-    margin: 5px;    
+    margin: .5rem;    
 }
 
 label{
     font-weight: normal;    
     vertical-align: middle;
     margin: 0;
-    margin-left: 10px;
+    margin-left: 1rem;
 
     &.required:after{
         content: "*";
@@ -372,8 +433,142 @@ label{
     .add-on{
         background-color: #f2f5f9;
         border: 1px solid #d6e2eb;
-        padding: 4px 8px;
-        font-size: 13px;
+        padding: .4rem .8rem;
+        font-size: 1.3rem;
+    }
+}
+
+
+/*-------------------- Lists -----------------------------*/
+.list-forced-result{
+    display:none;
+}
+
+.list{
+    width: 100%;
+    border-collapse: collapse;
+
+    tbody > tr > td {
+        text-align: left;
+        padding: .3rem .5rem .2rem .5rem;
+        height: 4em;
+        vertical-align: middle;
+
+        .icon{
+            margin: .3rem;    
+            cursor: pointer;
+            padding: 0.2rem 0.25rem;
+        }
+    }
+
+    th{
+        text-align: left;    
+        padding-left: .5rem;
+        padding-right: .5rem;
+    }
+}
+    
+/*** The icon to sort the list ***/
+.list-title-label{
+    margin-right: 1.5rem;    
+}
+.list-sort-column{
+    background: transparent;
+    border: none;
+    font-size: 1.3rem;
+    opacity: 0.5;
+
+    &:hover{
+        opacity: 1;
+    }
+
+    &.list-sort-active{
+        color: @brand-primary;
+        opacity: 1;
+    }
+}
+    
+/*** The search icon ***/
+.list-search-block > .form-input-wrap{
+    margin: 0;
+}
+
+.list-search-input{
+    width: 15rem;
+    padding-right: 1.5rem;
+
+    &.not-empty {
+        background-color: @state-info-bg;
+        color: @state-info-text;
+        padding-right: 1.6rem;
+    }   
+}
+
+.clean-search{
+    font-size: 1.5rem;
+    margin-left: -1.5rem;
+}
+
+/** The search field ***/
+.list-line{
+    height: 3rem;
+
+    &.selected{
+        background: @state-info-text;
+
+        &> td{
+            color: white;    
+        }
+
+        &:hover > td{
+            color: @text-color;
+        }
+    }
+}
+    
+.list-cell-clickable{
+    cursor: pointer;
+}
+
+.list-cell-hidden{
+    display: none;
+}
+    
+
+/*** Tha navigation table ***/
+.list-navigation{
+    width: auto;
+    font-size: inherit;
+
+    td{
+        background-color: transparent;
+        border-right: 1px solid darken(@body-bg, 13.5%);
+        border-left: 1px solid darken(@body-bg, 13.5%);
+        padding-left: .5rem;
+        padding-right: .5rem;
+    }
+
+    .line-by-page-label{
+        margin-left: .5rem;
+    }
+
+    .list-max-lines{
+        width: 5rem;
+        border : none;
+    }
+
+    .list-next-page, .list-previous-page{
+        font-size: 1.5rem;    
+        top: .2rem;
+        position: relative;
+    }
+
+    input[type="text"].list-page-number{
+        width: 3rem;
+        text-align: center;
+        margin-top: .7rem;
+        font-size: 1.2rem;
+        height: 2rem;   
     }
 }
 
@@ -382,20 +577,20 @@ label{
 
 /*-------------------------------- Navbars ----------------------------------------*/
 .navbar-inverse {
-	margin-bottom: 0px;
+	margin-bottom: 0;
     background: @header-bg;
     color: @header-color;
 
     .btn-navbar {
         float: left;
-        margin-top: 10px;
+        margin-top: 1rem;
     }
 
     .brand {
         color: @btn-default-color;
         text-transform: uppercase;
         font-weight: lighter;
-        padding: 12px 20px 12px;
+        padding: 1.2rem 2rem 1.2rem;
 
         strong {
             font-weight: normal;
@@ -433,19 +628,16 @@ table {
     th span.line{
         position: absolute;
         top: 0;
-        left: -8px;
-        // border-left: 1px solid #dee3ea;
-        height: 10px;
+        left: -.8rem;
+        height: 1rem;
     }
 
-    .table {
+    &.table {
         thead{
-            // border-top:1px solid #dee3ea;
-
             & > tr > th{
                 position: relative;
-                padding-bottom: 20px;
-                padding-top: 5px;
+                padding-bottom: 2rem;
+                padding-top: .5rem;
                 vertical-align: top;
             }
         }
@@ -457,18 +649,19 @@ table {
             }
         }
 
-        td{
+        tbody > tr > td{
             vertical-align: middle;
         }
 
         th, td{
             &.align-right{
                 text-align: right;
-                padding-right: 10px !important;
+                padding-right: 1rem !important;
             }
         }
     }
-    .table-hover tbody tr:hover{
+
+    &.table-hover tbody tr:hover{
         td, th {
             background-color: darken(@body-bg, 5%);
         }
@@ -492,10 +685,10 @@ table {
     color: @header-color;
 }
 
-@main-menu-height: 30px;
+@main-menu-height: 3rem;
 #main-menu{    
     min-height: @main-menu-height;
-    margin-bottom: 5px;
+    margin-bottom: .5rem;
     border-radius: 0;
 
     .navbar-header{
@@ -511,7 +704,7 @@ table {
         background: none;
         height: @main-menu-height;
         line-height: @main-menu-height;
-        padding: 0 5px;
+        padding: 0 .5rem;
         vertical-align: middle;
         cursor: pointer;
 
@@ -525,22 +718,30 @@ table {
         }
     }
 
+    @media (max-width: @screen-xs-max) {
+        .main-menu{
+            height: auto;
+        }
+    }
+
     .dropdown-menu li i.icon{
-        width: 20px;    
+        width: 2rem;    
     }
 }
+
+
 
 
 #footer{
     position: fixed;
     left: 0;
     bottom: 0;
-    height: 20px;
+    height: 2rem;
     text-align: center;
 
     .clear-cache-btn{
         cursor: pointer;
-        margin-right: 10px;
+        margin-right: 1rem;
     }
 }
 
@@ -548,20 +749,20 @@ table {
 #main-content{
     position: relative;
     width: 100%;        
-  	height: calc(~"100% - 60px");
+  	height: calc(~"100% - " 2 * @main-menu-height);
 }
 
 #main-nav-tabs{
-    height: 20px;
+    height: 2rem;
     width: 100%;
 
     .main-tab-title{    
         border: 1px solid darken(@body-bg, 13.5%); 
         border-bottom: none;
         background: darken(@body-bg, 6.5%);
-        height: 20px;
-        margin-right: 2px;
-        max-width: 200px;
+        height: 2rem;
+        margin-right: .2rem;
+        max-width: 20rem;
     }	
 
     .main-tab-title{
@@ -571,38 +772,38 @@ table {
         }
 
         & > a{
-            padding: 0 10px;
+            padding: 0 1rem;
             display: inline-block;
             border: none;
             background: none;
-            width: calc(~"100% - 25px");
+            width: calc(~"100% - 2.5rem");
             .text-overflow();            
             height: 100%;            
 
             & > .icon {
-                margin-right: 5px;
+                margin-right: .5rem;
             }
         }
 
         .main-tab-close{
             padding: 0;
-            padding-left: 8px;  
+            padding-left: .8rem;
             height: 100%;
-            width: 20px;
+            width: 2rem;
         }        
     }
 
     .add-tab-button{
-        padding: 1px 5px 0 5px;
+        padding: .1rem .5rem 0 .5rem;
         border: 1px solid darken(@body-bg, 13.5%);
-        margin-left: 3px;   
-        width: 22px;
+        margin-left: .3rem;
+        width: 2.2rem;
     }
 }
 
 
 #main-tab-content{
-    height: calc(~"100% - 20px");
+    height: calc(~"100% - 2rem");
     width: 100%;
 	
     .main-tab-pane{
@@ -613,7 +814,7 @@ table {
 }
 
 .tab-pane{
-    padding: 10px;
+    padding: 1rem;
 }
 
 
@@ -622,7 +823,18 @@ table {
 .main-tab-pane .page-title{
 	color: @brand-primary;
 	text-align: center;
-	margin: 5px 0;
+	margin: .5rem 0;
+}
+
+
+/*----------------------- New tab ------------------------*/
+.new-tab-default-content{
+    .text-center();    
+
+    .application-logo{
+        height: 30rem;
+        width: auto;
+    }
 }
 
 /*--------------------- Links -------------------------*/
@@ -635,11 +847,11 @@ a, a:active, a:hover, a:visited, a:focus{
 .app-notification{
     position: fixed;
     width: 50%;
-    top: 45px;
+    top: 4.5rem;
     left: 25%;
     z-index: 1050;
-    font-size: 1.2em;    
-    min-height: 40px;
+    font-size: 1.5rem;    
+    min-height: 4rem;
 	visibility: hidden;
 	opacity: 0;
     transition: visibility .35s, opacity .35s;
@@ -657,7 +869,6 @@ a, a:active, a:hover, a:visited, a:focus{
 
 /*-------------------- Dialog box ---------------------*/
 .modal-dialog{    
-    margin-top: 15%;
     z-index: @zindex-modal;
 
     .modal-title{
@@ -665,139 +876,7 @@ a, a:active, a:hover, a:visited, a:focus{
     }
 }
 
-/*-------------------- Lists -----------------------------*/
-.list-forced-result{
-	display:none;
-}
 
-.list{
-    width: 100%;
-    // color: #777777;
-    border-collapse: collapse;
-
-    td {
-        text-align: left;
-        padding: 3px 5px 2px 5px;
-        height: 4em;
-
-        .icon{
-            margin: 3px;    
-            cursor: pointer;
-            padding: 0.2em 0.25em;
-        }
-    }
-
-    th{
-        text-align: left;    
-        padding-left: 5px;
-        padding-right: 5px;
-    }
-}
-	
-/*** The icon to sort the list ***/
-.list-title-label{
-    margin-right: 15px;    
-}
-.list-sort-column{
-    background: transparent;
-    border: none;
-    font-size: 13px;
-    opacity: 0.5;
-
-    &:hover{
-        opacity: 1;
-    }
-
-    &.list-sort-active{
-        color: @brand-primary;
-        opacity: 1;
-    }
-}
-    
-/*** The search icon ***/
-.list-search-block > .form-input-wrap{
-    margin: 0;
-}
-
-.list-search-input{
-    width: 150px;
-    padding-right: 15px;
-
-    &.not-empty {
-        background-color: @state-info-bg;
-        color: @state-info-text;
-        padding-right: 16px;
-    }   
-}
-
-.clean-search{
-    font-size: 15px;
-    margin-left: -15px;
-}
-
-/** The search field ***/
-.list-line{
-    height: 30px;
-
-    // & > td{
-    //     color: @text-color;    
-    // }
-
-    &.selected{
-        background: @state-info-text;
-
-        &> td{
-            color: white;    
-        }
-
-        &:hover > td{
-            color: @text-color;
-        }
-    }
-}
-    
-.list-cell-clickable{
-    cursor: pointer;
-}
-
-.list-cell-hidden{
-	display: none;
-}
-	
-
-/*** Tha navigation table ***/
-.list-navigation{
-    width: auto;
-    font-size: inherit;
-
-    td{
-        background-color: transparent;
-        border-right: 1px solid darken(@body-bg, 13.5%);
-        border-left: 1px solid darken(@body-bg, 13.5%);
-        padding-left: 5px;
-        padding-right: 5px;
-    }
-
-    .line-by-page-label{
-        margin-left: 5px;
-    }
-
-    .list-max-lines{
-        width: 50px;        
-        border : none;
-    }
-
-    .list-next-page{
-        font-size: 15px;    
-    }
-
-    input[type="text"].list-page-number{
-        width: 30px;
-        text-align: center;
-        margin-top: 7px;   
-        border: none;
-    }
-}
 	
 	
 	
@@ -806,8 +885,8 @@ a, a:active, a:hover, a:visited, a:focus{
 /*---------------------- Login page ----------------------------*/
 #login-page{
 	top : 50%;
-	margin-top: -125px;
-	height: 250px;
+	margin-top: -12.5rem;
+	height: 25rem;
 }
 
 /*---------------------- Loading ----------------------------*/
@@ -824,17 +903,17 @@ a, a:active, a:hover, a:visited, a:focus{
 
     & > .icon {
         margin-left: -0.5em;
-        margin-bottom: 15px;
+        margin-bottom: 1.5rem;
     }
 }
 
 #loading-bar{
-	width: 200px;
-	margin-left: -100px;
-	height: 5px;
+	width: 20rem;
+	margin-left: -10rem;
+	height: .5rem;
 	display: block;
 	background: darken(@body-bg, 6.5%);
-	border-radius: 5px;
+	border-radius: .5rem;
 
     &:not(.progressing){
         display:none;
@@ -853,7 +932,7 @@ a, a:active, a:hover, a:visited, a:focus{
 
 /*----------------------- Icons -----------------------------*/
 p .icon{
-	margin-right: 7px;
+	margin-right: .7rem;
 }
 
 
@@ -861,23 +940,23 @@ p .icon{
 .box{
     border-radius: 4px;    
     border : 1px solid @panel-primary-border;  
-    margin-top: 5px;
+    margin-top: .5rem;
     height: 100%;    
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 .5rem 1.5rem rgba(0, 0, 0, 0.5);
 
     .box-header{
         background: @panel-primary-heading-bg;      
         font-size: 1.2em;
         color: @panel-primary-text;    
-        padding-left: 5px;
+        padding-left: .5rem;
 
         .box-icon{
-            margin-right: 10px;
+            margin-right: 1rem;
         }
     }
 
     .box-content{
-        padding: 5px;
+        padding: .5rem;
     }
 
     input[type=text], input[type=pasword], textarea, select{
@@ -888,16 +967,16 @@ p .icon{
 
 
 /*----------------------- Error tooltips -------------------*/
-.tooltip.input-error{
-	.tooltip-inner{
-        background: @state-danger-bg;
-        color: @state-danger-text;
-    }
+// .tooltip.input-error{
+// 	.tooltip-inner{
+//         background: @state-danger-bg;
+//         color: @state-danger-text;
+//     }
 
-    .tooltip-arrow{
-        border-right-color: @state-danger-bg;
-    }
-}
+//     .tooltip-arrow{
+//         border-right-color: @state-danger-bg;
+//     }
+// }
 
 
 /*------------------- Manage themes page -----------------------*/
@@ -906,8 +985,8 @@ p .icon{
 
     .icons{
         position: absolute;
-        top : 5px;
-        right: 5px;
+        top : .5rem;
+        right: .5rem;
         display: none;
     }
 
@@ -918,7 +997,7 @@ p .icon{
 
 /*------------------------------- Profile ----------------------------------*/
 .profile-image{
-    width: 150px;
+    width: 15rem;
     height: auto;
 }
 
@@ -929,9 +1008,9 @@ p .icon{
     background-color: white;
     border-radius: 4px;
     border: 1px solid rgba(0,0,0,.15);
-    padding: 5px 0px;
+    padding: .5rem 0;
     list-style-type: none;
-    min-width: 160px;
+    min-width: 16rem;
 
     &:empty{
         display: none;
@@ -939,7 +1018,7 @@ p .icon{
 
     & > li {
         cursor: pointer;
-        padding: 5px;
+        padding: .5rem;
 
         &:hover{
             .alert-info();            
@@ -966,14 +1045,14 @@ body.dragging, body.dragging * {
         list-style-type: none;
 
         .sortable-item{
-            margin: 5px 0;    
+            margin: .5rem 0;    
             border: 1px solid rgba(0,0,0,0.5);    
             border-radius: 5px;
 
             .drag-handle{
                 cursor: move;
                 background: darken(@body-bg, 6.5%);
-                padding: 10px;
+                padding: 1rem;
                 border-radius: 5px 0 0 5px;
                 height: 100%;
             }
@@ -984,7 +1063,7 @@ body.dragging, body.dragging * {
             background: @state-info-bg;
             border: 1px solid rgba(0,0,0,0.5);  
             border-radius: 5px;
-            min-height: 25px;
+            min-height: 2.5rem;
 
             &:before {
                 position: absolute;
@@ -994,11 +1073,13 @@ body.dragging, body.dragging * {
 }
 
 /*------------------------------ Available updates -----------------------*/
-.available-updates{
-    width: @main-menu-height;
-    height: @main-menu-height;
-    line-height: @main-menu-height;
+.available-updates{    
     border-radius: 100%;
-    text-align: center;
-    font-size: 14px;
+    text-align: center;  
+    font-size: 1.2rem;
+    height: 1.5rem;
+    width: 1.5rem;
+    line-height: 1.5rem;      
+    position: absolute;
+    right: .5rem;
 }
