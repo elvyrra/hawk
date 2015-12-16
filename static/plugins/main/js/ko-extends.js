@@ -153,7 +153,7 @@ define('ko-extends', ['jquery', 'ko'], function($, ko){
                         }
                     }
                 }); 
-                editor.addContentsCss(document.getElementById('less:static-themes-hawk-less-theme').innerText);
+                editor.addContentsCss(document.getElementById('less:theme-base-less').innerText);
             });
         }
     };
