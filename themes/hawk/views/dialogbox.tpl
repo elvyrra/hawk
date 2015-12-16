@@ -1,4 +1,4 @@
-<div class="modal-dialog" style="{{ !empty($width) ? "width:$width;" : ""}}{{!empty($height) ? "height:$height;" : ""}}">
+<div class="modal-dialog center" style="{{ !empty($width) ? "width:$width;" : ""}}{{!empty($height) ? "height:$height;" : ""}}">
 	<div class="modal-content">
 		<div class="modal-header">
 			<button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
