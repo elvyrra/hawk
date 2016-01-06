@@ -5,6 +5,7 @@ window.appConf = {
 	},
 
 	rooturl : "{{ ROOT_URL }}",
+	basePath : "{{ BASE_PATH }}",
 	routes : {{ $routes }},
 
 	tabs : {

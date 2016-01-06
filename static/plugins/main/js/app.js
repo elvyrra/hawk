@@ -13,8 +13,8 @@ require.config({
 		colorpicker : "ext/bootstrap-colorpicker.min",
 		datepicker : "ext/bootstrap-datepicker.min",
 		ko : "ext/knockout-3.3.0",
-		ckeditor : "ext/ckeditor/ckeditor",		
-		ace : "ext/ace/ace"		
+		ckeditor : "ext/ckeditor/ckeditor",
+		ace : "ext/ace/ace"
 	},
 
 	shim : {
@@ -24,7 +24,7 @@ require.config({
 		ko : {
 			exports : 'ko'
 		},
-		
+
 		cookie : {
 			deps : ['jquery'],
 		},
@@ -42,7 +42,7 @@ require.config({
 		},
 		colorpicker: {
 			deps : ['bootstrap']
-		},		
+		},
 		'ko-extends' : {
 			deps : ['ko']
 		},
@@ -56,7 +56,7 @@ require.config({
 });
 
 /**
- * @class App - This class describes the behavior of the application 
+ * @class App - This class describes the behavior of the application
  */
 var App = function(){
 	this.language = ''; // The application language
@@ -65,7 +65,7 @@ var App = function(){
 	this.routes = []; // The application routes
 	this.forms = {}; // The instanciated forms
 	this.lists = {}; // The instanciated lists
-	
+
 	this.isReady = false; // The ready state of the application
 };
 
@@ -73,10 +73,10 @@ var App = function(){
 /**
  * @const {string} INVALID_URI - The URI to return for non existing route
  */
-App.INVALID_URI = '/INVALID_URI';
+App.INVALID_URI = appConf.basePath + '/INVALID_URI';
 
 /**
- * Initialize the application 
+ * Initialize the application
  */
 App.prototype.start = function(){
 	define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 'sortable', 'bootstrap', 'colorpicker' , 'datepicker', 'ko-extends', 'extends' , 'date' ], function($, ko, Tabset, Form, List, Lang) {
@@ -88,7 +88,7 @@ App.prototype.start = function(){
 		window.List = List;
 		window.Lang = Lang;
 
-		// Set the configuration data 
+		// Set the configuration data
 		this.setLanguage(appConf.Lang.language);
 		this.setRoutes(appConf.routes);
 		this.setRootUrl(appConf.rooturl);
@@ -108,12 +108,12 @@ App.prototype.start = function(){
 
 		/**
 		 * Call URIs by AJAX on click on links
-		 */	
+		 */
 		var linkSelector = '[href]:not(.real-link):not([href^="#"]):not([href^="javascript:"])';
 		$("body").on('click', linkSelector, function(event){
 			var node = $(event.currentTarget);
 			var url = $(node).attr('href');
-						
+
 			event.preventDefault();
 			var data = {};
 
@@ -127,16 +127,16 @@ App.prototype.start = function(){
 					data = {newtab : true};
 					this.load(url, data);
 					break;
-				
+
 				case 'dialog' :
 					this.dialog(url);
 					break;
-				
+
 				case '_blank' :
 					// Load the whole page in a new browser tab
 					window.open(url);
-					break;					
-				
+					break;
+
 				case undefined :
 				case '' :
 					// Open the url in the current application tab
@@ -147,12 +147,12 @@ App.prototype.start = function(){
 					// Open the URL in the current web page
 					location = url;
 					break
-				
+
 				default :
 					// Open the url in a given DOM node, represented by it CSS selector
 					this.load(url, {selector : $(node).attr('target')});
 					break;
-			}	
+			}
 		}.bind(this))
 
 		// Open a link in a new tab of the application
@@ -168,20 +168,20 @@ App.prototype.start = function(){
 
 				event.preventDefault();
 				event.stopPropagation();
-				event.stopImmediatePropagation();				
+				event.stopImmediatePropagation();
 				return false;
 			}
 		});
-		
+
 		/**
-		 * Treat back button 
+		 * Treat back button
 		 */
 		window.onpopstate = function(event){
 			event.preventDefault();
 			if(this.tabset.activeTab()){
 				var history = this.tabset.activeTab().history;
 				if(event.state){
-					// call back button					
+					// call back button
 					if(history.length > 1){
 						history.pop();
 						var url = history[history.length - 1];
@@ -189,7 +189,7 @@ App.prototype.start = function(){
 					}
 					else{
 						this.load(this.getUri("new-tab"));
-					}				
+					}
 				}
 				else{
 					// Click on a link with an anchor as href
@@ -217,14 +217,14 @@ App.prototype.start = function(){
 			progress : function(purcentage){
 				this.purcentage(purcentage);
 				this.progressing(purcentage ? true : false);
-			},	
-			
+			},
+
 			/**
-			 * Hide loading 
+			 * Hide loading
 			 */
 			stop : function(){
 				this.display(false);
-				this.progress(0);				
+				this.progress(0);
 			}
 		};
 
@@ -233,13 +233,13 @@ App.prototype.start = function(){
 		var evt = document.createEvent("Event");
 		evt.initEvent("app-ready", true, false);
 		dispatchEvent(evt);
-		
+
 		/**
 		 * Customize app HttpRequestObject
 		 */
 		this.xhr = function(){
 			var xhr = new window.XMLHttpRequest();
-	        
+
 	        this.computeProgession = function(evt){
 	        	if (evt.lengthComputable) {
 	                var percentComplete = parseInt(evt.loaded / evt.total * 100);
@@ -257,9 +257,9 @@ App.prototype.start = function(){
 	         * Compute progression on AJAX requests
 	         */
 	        xhr.addEventListener("progress", this.computeProgession);
-		        
+
 	        return xhr;
-		
+
 		}.bind(this);
 
 
@@ -277,7 +277,7 @@ App.prototype.start = function(){
 		 */
 		this.openLastTabs(appConf.tabs.open);
 
-		
+
 
 	}.bind(this));
 };
@@ -296,7 +296,7 @@ App.prototype.ready = function(callback){
 			this.isReady = true;
 			callback();
 		}.bind(this));
-	}	
+	}
 };
 
 
@@ -310,18 +310,18 @@ App.prototype.ready = function(callback){
  */
 App.prototype.load = function(url, data){
 	/*** Default options ***/
-	var options = {			
+	var options = {
 		newtab : false,
 		onload : null,
 		post : null,
 		selector : null
 	};
-	
+
 	for(var i in data){
 		options[i] = data[i];
 	}
-		
-	if(url){					            
+
+	if(url){
 		/*** we first check that page does not already exist in a tab ***/
 		var route = this.getRouteFromUri(url);
 
@@ -335,31 +335,31 @@ App.prototype.load = function(url, data){
 				break;
 			}
 		}
-		
+
 		this.loading.start();
 
         /*** A new tab has been asked ***/
         if(options.newtab){
             this.tabset.push();
         }
-		
+
 		var element = options.selector ? $(options.selector).get(0) : this.tabset.activeTab();
-		        
-		/*** DETERMINE THE NODE THAT WILL BE LOADED THE PAGE ***/			
+
+		/*** DETERMINE THE NODE THAT WILL BE LOADED THE PAGE ***/
 		if(element){
 			$.ajax({
 				xhr : this.xhr,
-				url : url, 
+				url : url,
 				type : options.post ? 'post' : 'get',
 				data : options.post,
 				dataType : 'text',
 			})
-			.done(function(response){					
+			.done(function(response){
 				this.loading.stop();
-				
+
 				if(element === this.tabset.activeTab()){
 					// The page has been loaded in a whole tab
-					// Register the tab url					
+					// Register the tab url
 					element.url(url);
 					element.route(route);
 
@@ -372,10 +372,10 @@ App.prototype.load = function(url, data){
 					if(this.isConnected) {
 						this.tabset.registerTabs();
 					}
-					
+
 					// register the url in the tab history
 					element.history.push(url);
-					
+
 					history.pushState({}, '', "#!" + url);
 				}
 				else{
@@ -410,22 +410,22 @@ App.prototype.load = function(url, data){
 					else{
 						// Other reason, display the message in a notification
 						var message = response.message;
-						this.notify("danger", message);							
+						this.notify("danger", message);
 					}
 				}
 				else{
 					var message = xhr.responseText;
-					this.notify("danger", message);	
+					this.notify("danger", message);
 				}
-				
-				this.loading.stop();				
+
+				this.loading.stop();
 			}.bind(this));
 		}
 		else{
 	        /*** The selector to home the loaded url doesn't exist ***/
 			this.loading.stop();
 			this.notify("danger", Lang.get('main.loading-page-selector-not-exists'));
-		}			
+		}
 	}
 	else{
 		return false;
@@ -434,7 +434,7 @@ App.prototype.load = function(url, data){
 
 
 /**
- * Open a set of pages 
+ * Open a set of pages
  */
 App.prototype.openLastTabs = function(uris){
 	if(!uris.length){
@@ -446,7 +446,7 @@ App.prototype.openLastTabs = function(uris){
 	this.load(uri, {
 		newtab : true,
 		onload : this.openLastTabs.bind(this, uris)
-	});	
+	});
 };
 
 
@@ -482,12 +482,12 @@ App.prototype.notify = function(level, message, options){
 		this.notification.display(true);
 		this.notification.message(message);
 		this.notification.level(level);
-		
+
 		if(level != "danger"){
 			this.notification.timeout = setTimeout(function(){
 				this.hideNotification();
 			}.bind(this), 5000);
-		}	
+		}
 	}
 };
 
@@ -503,11 +503,11 @@ App.prototype.hideNotification = function(){
  */
 App.prototype.dialog = function(action){
 	$("#dialogbox").empty().modal('hide');
-	
+
 	if(action == "close"){
 		return;
 	}
-	
+
 	// Load the content from an url
 	$.ajax({
 		url : action,
@@ -523,7 +523,7 @@ App.prototype.dialog = function(action){
 		var code = xhr.status;
 		var message = xhr.responseText;
 		this.notify("danger", message);
-	}.bind(this));			
+	}.bind(this));
 };
 
 
@@ -533,7 +533,7 @@ App.prototype.dialog = function(action){
  * @param {object} args - The route parameters
  * @return {string} - the computed URI
  */
-App.prototype.getUri = function(method, args){			
+App.prototype.getUri = function(method, args){
 	var route = null;
 	if(method in this.routes){
 		route = this.routes[method];
@@ -546,7 +546,7 @@ App.prototype.getUri = function(method, args){
 			}
 		}
 	}
-	
+
 	if(route !== null){
 		var url = route.url;
 		if(args){
@@ -554,7 +554,7 @@ App.prototype.getUri = function(method, args){
 				url = url.replace("{" + j + "}", args[j]);
 			}
 		}
-		return url;
+		return appConf.basePath + url;
 	}
 	else{
 		return App.INVALID_URI;
@@ -577,7 +577,7 @@ App.prototype.getRouteFromUri = function(uri){
 
 
 /**
- * Set the existing routes of the application 
+ * Set the existing routes of the application
  * @param {object} routes - The routes to set
  */
 App.prototype.setRoutes = function(routes){
@@ -595,7 +595,7 @@ App.prototype.setLanguage = function(language){
 
 
 /**
- * Set the root url of the application 
+ * Set the root url of the application
  * @param {string} url - The root url to set
  */
 App.prototype.setRootUrl = function(url){
@@ -606,14 +606,14 @@ App.prototype.setRootUrl = function(url){
 App.prototype.refreshMenu = function(){
     $.get(this.getUri('refresh-menu'), function(response){
         $("#main-menu").replaceWith(response);
-		this.notify('warning', Lang.get('admin.plugins-advert-menu-changed'));        
-    }.bind(this));	
+		this.notify('warning', Lang.get('admin.plugins-advert-menu-changed'));
+    }.bind(this));
 };
 
-window.app = new App(); 
+window.app = new App();
 
 app.ready(function(){
-	ko.applyBindings(app);   	
+	ko.applyBindings(app);
 });
 
 app.start();

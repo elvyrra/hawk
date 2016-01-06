@@ -3,23 +3,23 @@
 namespace Hawk\Plugins\Main;
 
 App::router()->setProperties(
-	array('namespace' => __NAMESPACE__), 
+	array('namespace' => __NAMESPACE__),
 	function(){
 		App::router()->get('index', '/', array('action' => 'MainController.main'));
 		App::router()->get('new-tab', '/newtab', array('action' => 'MainController.newTab'));
 		App::router()->get('logout', '/logout', array('action' => 'LoginController.logout'));
-			
+
 		App::router()->auth(App::session()->isConnected(), function(){
 			App::router()->auth(App::request()->isAjax(), function(){
 				App::router()->any('edit-profile', '/profile/edit/{userId}', array('where' => array('userId' => '\d+'), 'default' => array('userId' => App::session()->getUser()->id), 'action' => 'UserProfileController.edit'));
 				App::router()->any('change-password', '/profile/change-password', array('action' => 'UserProfileController.changePassword'));
 			});
-			
+
 		});
 
 		App::router()->auth(!App::session()->isConnected(), function(){
 		    App::router()->any('login', '/login', array('action' => 'LoginController.login'));
-			
+
 			App::router()->auth(Option::get('main.open-register'), function(){
 				App::router()->any('register', '/register', array('action' => 'LoginController.register'));
 

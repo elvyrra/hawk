@@ -13,7 +13,7 @@ namespace Hawk;
  */
 final class Router extends Singleton{
 	/**
-	 * Invalid URL. This URI is displayed when no URI was found for a given route name	 
+	 * Invalid URL. This URI is displayed when no URI was found for a given route name
 	 */
 	const INVALID_URL = '/INVALID_URL';
 
@@ -21,7 +21,7 @@ final class Router extends Singleton{
 	 * The defined routes
 	 * @var array
 	 */
-	private $routes = array(),	
+	private $routes = array(),
 
 	/**
 	 * The routes accessible for the current request method
@@ -44,7 +44,7 @@ final class Router extends Singleton{
      */
     $predefinedData = array();
 
-    
+
     /**
      * The router instance
      */
@@ -60,7 +60,7 @@ final class Router extends Singleton{
 	 *						- 'where' array (optionnal) : An array defining each parameter pattern, where keys are the names of the route parameters, and values are the regular expression to match (without delimiters)
 	 *						- 'default' array (optionnal) : An array defining the default values of parameters. This is useful to generate a URI from a route name (method getUri), without giving all parameters values
 	 */
-	private function add($method, $name, $uri, $param){		
+	private function add($method, $name, $uri, $param){
 		if(isset($param['auth'])){
 			$auth = $param['auth'];
 			$param['auth'] = $this->auth;
@@ -73,16 +73,16 @@ final class Router extends Singleton{
 		foreach($this->predefinedData as $key => $value){
 			$param[$key] = $value;
 		}
-		
+
 
 		if(isset($this->routes[$name])){
 			trigger_error("The route named '$name' already exists", E_USER_WARNING);
 		}
 		else{
 			$route = new Route($name, $uri, $param);
-					
+
 			$this->routes[$name] = &$route;
-			
+
 			if(App::request()->getMethod() == $method || $method == 'any'){
 				$this->activeRoutes[$name] = &$route;
 			}
@@ -104,14 +104,14 @@ final class Router extends Singleton{
 
 		// Exceute the action
 		$action();
-		
+
 		// Remove the authentication for the rest of the scripts
 		array_pop($this->auth);
 	}
 
 
 	/**
-	 * Set properties for all the routes that are defined in the $action callback. 
+	 * Set properties for all the routes that are defined in the $action callback.
 	 * It can be used to set a prefix to a set of routes, a namespace for all routes actions, ...
 	 * @param array $data The properties to set
 	 * @param callable $action The function that defines the routes with these properties
@@ -121,12 +121,12 @@ final class Router extends Singleton{
 		foreach($data as $key => $value){
 			$this->predefinedData[$key] = $value;
 		}
-		
+
 		$action();
 
 		$this->predefinedData = $currentData;
 	}
-	
+
 
 	/**
 	 * Add a route acessible by GET HTTP requests
@@ -140,7 +140,7 @@ final class Router extends Singleton{
 	public function get($name, $url, $param){
 		$this->add('get',$name, $url, $param);
 	}
-	
+
 
 	/**
 	 * Add a route acessible by POST HTTP requests
@@ -168,7 +168,7 @@ final class Router extends Singleton{
 	public function delete($name, $url, $param){
 		$this->add('delete', $name, $url, $param);
 	}
-	
+
 
 	/**
 	 * Add a route acessible by PATCH HTTP requests
@@ -193,27 +193,27 @@ final class Router extends Singleton{
 	 *						- 'default' array (optionnal) : An array defining the default values of parameters. This is useful to generate a URI from a route name (method getUri), without giving all parameters values
 	 */
 	public function any($name, $url, $param){
-		$this->add('any', $name, $url, $param);		
+		$this->add('any', $name, $url, $param);
 	}
-	
+
 
 	/**
-	 * Compute the routing, and execute the controller method associated to the URI	 
+	 * Compute the routing, and execute the controller method associated to the URI
 	 */
 	public function route(){
-		$uri = preg_replace("/\?.*$/", "", App::request()->getUri());
+		$uri = str_replace(BASE_PATH, '', parse_url(App::request()->getUri(), PHP_URL_PATH));
 
 		// Scan each row
 		foreach($this->activeRoutes as $route){
-            if($route->match($uri)){                  	      	
+            if($route->match($uri)){
             	// The URI matches with the route
             	if($route->isAccessible()){
             		// The route authentications are validated
 					$this->currentRoute = &$route;
-					
+
             		// Emit an event, saying the routing action is finished
 					$event = new Event('after-routing', array(
-						'route' => $route,						
+						'route' => $route,
 					));
 					$event->trigger();
 
@@ -222,13 +222,13 @@ final class Router extends Singleton{
 					list($classname, $method) = explode(".", $route->action);
 
 					// call a controller method
-					$controller = new $classname($route->getData());                              
+					$controller = new $classname($route->getData());
 					App::logger()->debug('URI ' . App::request()->getUri() . ' has been routed => ' . $classname . '::' . $method);
-	                
+
 	                // Set the controller result to the HTTP response
 					App::response()->setBody($controller->compute($method));
 				}
-				else{					
+				else{
 
 					// The route is not accessible
 					App::logger()->warning('A user with the IP address ' . App::request()->clientIp() . ' tried to access ' . App::request()->getUri() . ' without the necessary privileges');
@@ -236,7 +236,7 @@ final class Router extends Singleton{
 					$response = array(
 						'message' => Lang::get('main.403-message'),
 						'reason' => !App::session()->isConnected() ? 'login' : 'permission'
-					);			
+					);
 
 					if(App::request()->isAjax()){
 						App::response()->setContentType('json');
@@ -249,24 +249,24 @@ final class Router extends Singleton{
 					throw new AppStopException();
 				}
 				return;
-            }            
+            }
 		}
-		
-		// The route was not found 
+
+		// The route was not found
 		App::logger()->warning('The URI ' . App::request()->getUri() . ' has not been routed');
 		App::response()->setStatus(404);
         App::response()->setBody(Lang::get('main.404-message', array('uri' => $uri)));
 	}
-	
+
 
 	/**
 	 * Get all defined routes
 	 * @return array The defined routes
 	 */
 	public function getRoutes(){
-		return $this->routes;		
+		return $this->routes;
 	}
-    
+
     /**
      * Get the routes accessible for the current HTTP request method
      * @return array The list of the accessible routes
@@ -274,7 +274,7 @@ final class Router extends Singleton{
     public function getActiveRoutes(){
         return $this->activeRoutes;
     }
-	
+
 
 	/**
 	 * Get the route corresponding to the current HTTP request
@@ -283,7 +283,7 @@ final class Router extends Singleton{
 	public function getCurrentRoute(){
 		return isset($this->currentRoute) ? $this->currentRoute : null;
 	}
-	
+
 	/**
 	 * Get the action parameter of the current route
 	 * @return string The action of the current route
@@ -300,21 +300,21 @@ final class Router extends Singleton{
 	public function getCurrentController(){
 		return Controller::$currentController;
 	}
-	
+
 	/**
 	 * Generate an URI from a given controller method (or route name) and its arguments. if $method is not set, then returns the current URI, relative to the site root URL
 	 * @param string $name The route name of the controller method, formatted like this : 'ControllerClass.method'
 	 * @param array $args The route arguments, where keys define the parameters names and values, the values to affect.
 	 * @return string The generated URI, or the current URI (if $method is not set)
 	 */
-	public function getUri($name, $args= array()){	
+	public function getUri($name, $args= array()){
 
 		$route = $this->getRouteByAction($name);
-				
+
 		if(empty($route)){
 			return self::INVALID_URL;
 		}
-		
+
 		$url = $route->url;
 		foreach($route->args as $arg){
 			if(isset($args[$arg])){
@@ -328,20 +328,20 @@ final class Router extends Singleton{
 			}
 			$url = str_replace("{{$arg}}", $replace, $url);
 		}
-		
-		return $url;		
+
+		return BASE_PATH . $url;
 	}
-    
+
 
     /**
 	 * Generate a full URL from a given controller method (or route name) and its arguments. if $method is not set, then returns the current URL
 	 * @param string $name The route name of the controller method, formatted like this : 'ControllerClass.method'
 	 * @param array $args The route arguments, where keys define the parameters names and values, the values to affect.
 	 * @return string The generated URI, or the current URI (if $method is not set)
-	 * @see Router::getUri	 
+	 * @see Router::getUri
 	 */
     public function getUrl($name = '', $args = array()){
-        return preg_replace('#/$#', '',App::conf()->get('rooturl')) . $this->getUri($name, $args);
+        return ROOT_URL . $this->getUri($name, $args);
     }
 
 
@@ -356,7 +356,7 @@ final class Router extends Singleton{
 		if(isset($this->routes[$name])){
 			return $this->routes[$name];
 		}
-		
+
 		return null;
     }
 
@@ -375,5 +375,5 @@ final class Router extends Singleton{
 
     	return null;
     }
-	
+
 }

@@ -40,7 +40,7 @@ define('ENCODING', 'utf-8');
 define('ALLOWED_IMAGE_UPLOAD_TYPES', 'image/png image/jpeg image/jpg image/bpm image/gif image/tif');
 
 // Hawk website URL
-define('HAWK_SITE_URL', 'http://www.hawk-app.com');
+define('HAWK_SITE_URL', 'http://www.hawk-app.fr');
 
 // Default configuration values
 define('DEFAULT_HTML_TITLE', 'Hawk');
