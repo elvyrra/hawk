@@ -16,15 +16,15 @@ try{
 
     /*** Initialize the plugins ***/
     $plugins = App::conf()->has('db') ? array_merge(Plugin::getMainPlugins(), Plugin::getActivePlugins()) : array(Plugin::get('main'), Plugin::get('install'));
-    foreach($plugins as $plugin){	
+    foreach($plugins as $plugin){
     	if(is_file($plugin->getStartFile())){
     		include $plugin->getStartFile();
     	}
     }
 
-    if(!App::conf()->has('db') && (App::router()->getUri() === '/' || App::router()->getUri() === 'index.php')) {
-        App::logger()->debug('Hawk is not installed yet, redirect to install process page');    
-        App::response()->redirectToAction('install');        
+    if(!App::conf()->has('db') && (App::request()->getUri() === '/' || App::request()->getUri() === 'index.php')) {
+        App::logger()->debug('Hawk is not installed yet, redirect to install process page');
+        App::response()->redirectToAction('install');
     }
 
     /*** Initialize the theme ***/
@@ -42,7 +42,7 @@ catch(AppStopException $e){}
 // Finish the script
 App::logger()->debug('end of script');
 $event = new Event('process-end', array(
-	'output' => App::response()->getBody(), 
+	'output' => App::response()->getBody(),
 	'execTime' => microtime(true) - SCRIPT_START_TIME
 ));
 $event->trigger();
