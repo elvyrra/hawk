@@ -207,6 +207,9 @@ class Theme{
         }
 
         if(!is_file($publicFile) || filemtime($publicFile) < filemtime($privateFile)){
+            if(!is_dir(dirname($publicFile))){
+                mkdir(dirname($publicFile), 0755, true);
+            }
             App::fs()->copy($privateFile, $publicFile);
         }
 
