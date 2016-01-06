@@ -69,6 +69,7 @@ final class Logger extends Singleton{
 
     /**
      * Write log
+     * @param string $level The log level : 'debug', 'info', 'notice', 'warning', 'error'
      * @param string $message The message to write
      */
     private function write($level, $message){

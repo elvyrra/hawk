@@ -9,6 +9,7 @@ namespace Hawk;
 
 /**
  * This class describes the general behavior of singleton classes, sucha as Request, Response, ...
+ * @package Core
  */
 class Singleton{
     /**

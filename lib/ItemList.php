@@ -8,7 +8,7 @@ namespace Hawk;
 
 /**
  * This class is used to generate and display smart lists, getting data from the database or a given array
- * @package Core\List
+ * @package List
  */
 class ItemList{
 	use Utils;

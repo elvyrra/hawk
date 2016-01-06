@@ -13,7 +13,7 @@ namespace Hawk;
  *	-	$value The value of the cell
  *	-	$field The field itself
  *	-	$line All the values in the list results line
- * @package Core\List
+ * @package List
  */
 class ItemListField {
 	/**

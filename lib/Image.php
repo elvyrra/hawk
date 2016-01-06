@@ -170,6 +170,7 @@ class Image{
 
 /**
  * This class describes the actions on image specific to PNG images
+ * @package Utils
  */
 class PngImage extends Image{
 	/**
@@ -209,6 +210,7 @@ class PngImage extends Image{
 
 /**
  * This class describes the actions on image specific to JPEG images
+ * @package Utils
  */
 class JpegImage extends Image{
 	/**
@@ -249,6 +251,7 @@ class JpegImage extends Image{
 
 /**
  * This class describes the actions on image specific to GIF images
+ * @package Utils
  */
 class GifImage extends Image{
 	/**
@@ -284,5 +287,6 @@ class GifImage extends Image{
 
 /**
  * This class describes the execptions throwed by Image class
+ * @package Exceptions
  */
 class ImageException extends \Exception{}

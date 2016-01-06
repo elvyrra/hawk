@@ -10,6 +10,7 @@ namespace Hawk;
 
 /**
  * This model describes the user data
+ * @package BaseModels
  */
 class User extends Model{
 	/**

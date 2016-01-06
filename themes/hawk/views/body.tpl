@@ -2,13 +2,13 @@
 
 {if(empty($content))}
 	<div id="main-content" role="tabpanel" ko-with="tabset">
-		<!-- Nav tabs -->
+		<!-- Nav tabs --> 
 		{if($canAccessApplication)}
 			<ul class="nav nav-tabs" role="tablist" id="main-nav-tabs">
 				<!-- ko foreach: tabs -->
 				<li role="presentation" class="main-tab-title corner-top" 
 					ko-click="function(data, event){ $parent.clickTab($index(), event) }" 
-					ko-attr="{ id : 'main-tab-title-' + id(), 'data-tab' : $index, title : title }"
+					ko-attr="{ id : 'main-tab-title-' + id(), 'data-tab' : $index }"
 					ko-class="{active : $parent.activeTab() == $data }"
 					ko-style="{ width: 'calc((100% - 25px )/ ' + $parent.tabs().length + ' - 2px )' }"
 					data-toggle="tooltip" data-placement="bottom" >

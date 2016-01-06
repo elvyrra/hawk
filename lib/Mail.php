@@ -7,7 +7,7 @@ namespace Hawk;
 
 /**
  * This class use PHPMailer library to send mails from Hawk applications
- * @package Utils
+ * @package Network 
  */
 class Mail{
 	use Utils;
@@ -187,7 +187,8 @@ class Mail{
 
 
 	/**
-	 * Send the mail	 
+	 * Send the mail
+	 * @throws MailException	 
 	 */
 	public function send(){
 		if(!$this->mailer->send()){
@@ -200,6 +201,7 @@ class Mail{
 
 /**
  * MailException
+ * @package Exceptions
  */
 class MailException extends \Exception{
 

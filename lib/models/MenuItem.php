@@ -7,6 +7,7 @@ namespace Hawk;
 
 /**
  * This class describes the MenuItem model
+ * @package BaseModels
  */
 class MenuItem extends Model{
 	/**
@@ -14,6 +15,11 @@ class MenuItem extends Model{
 	 */
 	public static $tablename = "MenuItem";
 
+	/**
+	 * The primary column
+	 */
+	protected static $primaryColumn = 'id';
+	
 	/**
 	 * The id of the user menu
 	 */

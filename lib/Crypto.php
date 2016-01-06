@@ -60,7 +60,7 @@ class Crypto{
 	 * @param int $length The length of the generated key
 	 * @return string the generated key
 	 */
-	public function generateKey($length){
+	public static function generateKey($length){
 		$result = '';
 		for ($i=0; $i < $length; $i++) { 
 			$result .= chr(mt_rand(32,127));

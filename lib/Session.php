@@ -94,7 +94,8 @@ class Session extends Singleton{
 
 	/**
 	 * Set data in session
-	 * @param array $data The data to store in the session
+	 * @param array $name The variable name to set in the session. To set a parameter in a sub array, type 'index1.index2'. For example, to set the parameter $data['user']['name'], type 'user.name'
+	 * @param mixed $value The value to set
 	 */
 	public function setData($name, $value){				
 		$fields = explode('.', $name);

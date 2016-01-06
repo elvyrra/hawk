@@ -8,7 +8,7 @@ namespace Hawk;
 
 /**
  * This class describes script events that can be triggers and listened
- * @package Core\Event
+ * @package Core
  */
 class Event{
     /**

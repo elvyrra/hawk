@@ -10,6 +10,7 @@ namespace Hawk;
 
 /**
  * This class is used to generate the application singletons
+ * @package Core
  */
 final class App extends Singleton{
     /**
@@ -51,6 +52,8 @@ final class App extends Singleton{
 
     /**
      * Create an application singleton
+     * @param string $name The singleton name, that will running by App::{$name}(). For example, if $name = 'db', the singleton will be accessible by App::db();
+     * @param object $instance The singleton instance
      */
     public function singleton($name, $instance){
         $this->$name = $instance;
@@ -58,6 +61,8 @@ final class App extends Singleton{
 
     /**
      * Call a singleton
+     * @param string $method The method name, corresponding to the singleton name
+     * @param array $arguments The singleton arguments (not used, but mandatory when overriding __callStatic method)
      */
     public static function __callStatic($method, $arguments){
         if(isset(self::$instance->$method)){
@@ -71,6 +76,7 @@ final class App extends Singleton{
 
 /**
  * Throw this exception to force the script to finish properly
+ * @package Exceptions
  */
 class AppStopException extends \Exception{
 

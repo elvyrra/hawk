@@ -9,6 +9,7 @@ namespace Hawk;
 
 /**
  * This class describes the permission model
+ * @package BaseModels
  */
 class Permission extends Model{
 	/**

@@ -118,13 +118,13 @@ define('ko-extends', ['jquery', 'ko'], function($, ko){
 
                 ace.config.set("modePath", app.baseUrl + "ext/ace/");
                 ace.config.set("workerPath", app.baseUrl + "ext/ace/") ;
-                ace.config.set("themePath", app.baseUrl + "ext/ace/"); 
-                ace.config.set('readOnly', parameters.readonly || false);
+                ace.config.set("themePath", app.baseUrl + "ext/ace/");                 
 
                 var editor = ace.edit(element.id);
-                editor.setTheme("ace/theme/" + (parameters.theme || chrome));
+                editor.setTheme("ace/theme/" + (parameters.theme || 'chrome'));
                 editor.getSession().setMode("ace/mode/" + (parameters.language));
                 editor.setShowPrintMargin(false);
+                editor.setReadOnly( parameters.readonly || false);
 
                 editor.getSession().on("change", function(event){
                     var value = editor.getValue();

@@ -8,7 +8,7 @@ namespace Hawk;
 
 /**
  * This class is used to display a whole tab with a sidebar on right
- * @package TabLayout
+ * @package Layout
  */
 class RightSidebarTab extends View{
 	/**

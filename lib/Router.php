@@ -201,7 +201,7 @@ final class Router extends Singleton{
 	 * Compute the routing, and execute the controller method associated to the URI	 
 	 */
 	public function route(){
-		$uri = preg_replace("/\?.*$/", "", $this->getUri());
+		$uri = preg_replace("/\?.*$/", "", App::request()->getUri());
 
 		// Scan each row
 		foreach($this->activeRoutes as $route){
@@ -223,7 +223,7 @@ final class Router extends Singleton{
 
 					// call a controller method
 					$controller = new $classname($route->getData());                              
-					App::logger()->debug('URI ' . self::getUri() . ' has been routed => ' . $classname . '::' . $method);
+					App::logger()->debug('URI ' . App::request()->getUri() . ' has been routed => ' . $classname . '::' . $method);
 	                
 	                // Set the controller result to the HTTP response
 					App::response()->setBody($controller->compute($method));
@@ -231,7 +231,7 @@ final class Router extends Singleton{
 				else{					
 
 					// The route is not accessible
-					App::logger()->warning('A user with the IP address ' . App::request()->clientIp() . ' tried to access ' . $this->getUri() . ' without the necessary privileges');
+					App::logger()->warning('A user with the IP address ' . App::request()->clientIp() . ' tried to access ' . App::request()->getUri() . ' without the necessary privileges');
 					App::response()->setStatus(403);
 					$response = array(
 						'message' => Lang::get('main.403-message'),
@@ -253,7 +253,7 @@ final class Router extends Singleton{
 		}
 		
 		// The route was not found 
-		App::logger()->warning('The URI ' . $this->getUri() . ' has not been routed');
+		App::logger()->warning('The URI ' . App::request()->getUri() . ' has not been routed');
 		App::response()->setStatus(404);
         App::response()->setBody(Lang::get('main.404-message', array('uri' => $uri)));
 	}
@@ -307,14 +307,7 @@ final class Router extends Singleton{
 	 * @param array $args The route arguments, where keys define the parameters names and values, the values to affect.
 	 * @return string The generated URI, or the current URI (if $method is not set)
 	 */
-	public function getUri($name = '', $args= array()){
-		if(!$name){
-			$fullUrl = getenv('REQUEST_SCHEME') . '://' . getenv('SERVER_NAME') . getenv('REQUEST_URI');
-			
-			$rooturl = App::conf()->has('rooturl') ? App::conf()->get('rooturl') : getenv('REQUEST_SCHEME') . '://' . getenv('SERVER_NAME');
-			
-			return str_replace($rooturl, '', $fullUrl);
-		}
+	public function getUri($name, $args= array()){	
 
 		$route = $this->getRouteByAction($name);
 				

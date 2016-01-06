@@ -7,6 +7,7 @@ namespace Hawk;
 
 /**
  * This class the language model
+ * @package BaseModels
  */
 class Language extends Model{
 	/**

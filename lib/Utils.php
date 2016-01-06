@@ -33,7 +33,15 @@ trait Utils{
 
 
     /**
-     * Serialize a version number as integer. This method can be used to compare two versions
+     * Serialize a version number as integer.
+     * Example : 
+     * <code>
+     * <?php 
+     *      echo Utils::getSerializedVersion('1.15.12'); // Output "01151200"
+     * ?>
+     * </code>    
+     * @param string $version The version number to serialize, in the format gg.rr.cc(.pp)
+     * @return string The serialized version
      */
     public static function getSerializedVersion($version){
         $digits = explode('.', $version);

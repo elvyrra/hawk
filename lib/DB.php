@@ -599,6 +599,7 @@ class DB{
 
 /**
  * This class manages the exceptions throwed by DB class
+ * @package Exceptions
  */
 class DBException extends \Exception{
 	const CONNECTION_ERROR = 1;

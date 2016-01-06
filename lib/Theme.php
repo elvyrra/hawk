@@ -9,7 +9,7 @@ namespace Hawk;
 
 /**
  * This class describes the themes behavior
- * @package Core\Theme
+ * @package Core
  */
 class Theme{ 
     /**
@@ -194,7 +194,9 @@ class Theme{
 
 
     /**
-     * Get the URL of a file in the theme
+     * Copy a file from the theme directory to the static directory (to be accessible by HTTP requests) and returns it URL
+     * @param string $file The source file to get the URL
+     * @return string The public copied file URL
      */
     public function getFileUrl($file){
         $privateFile = $this->getRootDir() . $file;
@@ -294,7 +296,7 @@ class Theme{
                 $lastUpdate = filemtime($dest);
                 foreach($files as $file){
                     if(filemtime($file) > $lastUpdate){
-                        $build = true;
+                        $build = true;                        
                         break;
                     }
                 }
@@ -304,7 +306,7 @@ class Theme{
         if($build){
             // Build the theme => Copy each accessible files in static dir
             foreach(glob($this->getRootDir() . '*' ) as $elt){
-                if(! in_array(basename($elt), array('views'))) {
+                if(! in_array(basename($elt), array('views', 'start.php'))) {
                     App::fs()->copy($elt, $this->getStaticDir());
                 }
             }

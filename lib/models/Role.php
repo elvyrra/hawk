@@ -8,6 +8,7 @@ namespace Hawk;
 
 /**
  * This model describes the roles that can be affected to the users
+ * @package BaseModels
  */
 class Role extends Model{
 	/**
