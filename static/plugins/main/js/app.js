@@ -363,9 +363,6 @@ App.prototype.load = function(url, data){
 					element.url(url);
 					element.route(route);
 
-					// Set the tab title
-					element.title($(".page-name", response).first().val());
-
 					element.content(response);
 
 					// Regiter the tabs in the cookie
@@ -509,6 +506,7 @@ App.prototype.dialog = function(action){
 	}
 
 	// Load the content from an url
+	this.loading.start();
 	$.ajax({
 		url : action,
 		type : 'get',
@@ -517,12 +515,19 @@ App.prototype.dialog = function(action){
 		},
 	})
 	.done(function(content){
+		// Page successfully loaded
 		$("#dialogbox").append(content).modal("show");
 	})
+
 	.fail(function(xhr, status, error){
+		// Page load failed
 		var code = xhr.status;
 		var message = xhr.responseText;
 		this.notify("danger", message);
+	}.bind(this))
+
+	.always(function(){
+		this.loading.stop();
 	}.bind(this));
 };
 

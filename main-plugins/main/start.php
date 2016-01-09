@@ -37,6 +37,5 @@ App::router()->setProperties(
 		App::router()->auth(DEV_MODE, function(){
 			App::router()->get('clear-cache', '/clear-cache', array('action' => 'MainController.clearCache'));
 		});
-
 	}
 );

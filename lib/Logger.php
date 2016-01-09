@@ -30,12 +30,12 @@ final class Logger extends Singleton{
      */
     private $resources = array();
 
-    
+
     /**
      * Open a log file
      * @param string $level The level of the log file
      */
-    private function open($level){        
+    private function open($level){
         $basename = $level . '.log';
         $filename = LOG_DIR . $basename;
 
@@ -62,9 +62,9 @@ final class Logger extends Singleton{
                 $zip->addFile($filename);
                 $zip->close();
 
-            }            
+            }
         }
-        $this->resources[$level] = fopen($filename, 'a+');        
+        $this->resources[$level] = fopen($filename, 'a+');
     }
 
     /**
@@ -81,14 +81,14 @@ final class Logger extends Singleton{
         $trace = (object) $trace[1];
 
         $data = array(
-            'date' => date('Y-m-d H:i:s'),
+            'date' => date('Y-m-d H:i:s.P'),
             'uri' => App::request()->getUri(),
             'ip' => App::request()->clientIp(),
             'trace' => $trace->file . ':' . $trace->line,
             'message' => $message,
         );
 
-        $input =  implode(' - ', $data) . PHP_EOL;        
+        $input =  implode(' - ', $data) . PHP_EOL;
         fwrite($this->resources[$level], $input);
     }
 
@@ -97,7 +97,7 @@ final class Logger extends Singleton{
      * @param string $message The message to write
      */
     public function info($message){
-        $this->write(self::LEVEL_INFO, $message);        
+        $this->write(self::LEVEL_INFO, $message);
     }
 
     /**
@@ -105,7 +105,7 @@ final class Logger extends Singleton{
      * @param string $message The message to write
      */
     public function debug($message){
-        $this->write(self::LEVEL_DEBUG, $message); 
+        $this->write(self::LEVEL_DEBUG, $message);
     }
 
     /**
@@ -113,7 +113,7 @@ final class Logger extends Singleton{
      * @param string $message The message to write
      */
     public function notice($message){
-        $this->write(self::LEVEL_NOTICE, $message); 
+        $this->write(self::LEVEL_NOTICE, $message);
     }
 
     /**
@@ -121,14 +121,14 @@ final class Logger extends Singleton{
      * @param string $message The message to write
      */
     public function warning($message){
-        $this->write(self::LEVEL_WARNING, $message); 
+        $this->write(self::LEVEL_WARNING, $message);
     }
 
     /**
-     * Log error data. This function is used to log actions that didn't work because of a script error 
+     * Log error data. This function is used to log actions that didn't work because of a script error
      * @param string $message The message to write
      */
     public function error($message){
-        $this->write(self::LEVEL_ERROR, $message); 
+        $this->write(self::LEVEL_ERROR, $message);
     }
 }

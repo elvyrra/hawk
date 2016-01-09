@@ -2,11 +2,11 @@
 	{if($input->nl && !$input->hidden ) }
 		<div class="clearfix"></div>
 	{/if}
-	
-	<div class="{{ $input->hidden ? 'no-display' : '' }} form-inline form-input-wrap pull-left">
-	
+
+	<div class="form-inline form-input-wrap form-input-wrap-{{ $input->type }} pull-left{{ $input->hidden ? ' no-display' : '' }}">
+
 		{{ $input->before }}
-		
+
 		{if($input->beforeLabel)}
 			{{ $inputDisplay }}
 			{{ $inputLabel }}
@@ -15,7 +15,7 @@
 			{{ $inputDisplay }}
 		{/if}
 
-		{{ $input->after }}                    
-	
+		{{ $input->after }}
+
 	</div>
 {/if}

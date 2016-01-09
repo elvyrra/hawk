@@ -46,7 +46,6 @@ class AdminController extends Controller{
 		$param = array(
 			'id' => 'settings-form',
 			'upload' => true,
-			'labelWidth' => '250px',
 			'fieldsets' => array(
 				'main' => array(
 					new SelectInput(array(
@@ -259,10 +258,8 @@ class AdminController extends Controller{
 					new IntegerInput(array(
 						'name' => 'main_mailer-port',
 						'default' => Option::get('main.mailer-port'),
-						'label' => ':',
-						'labelWidth' => 'auto',
+						'label' => Lang::get('admin.settings-mailer-port-label'),
 						'size' => 4,
-						'nl' => false
 					)),
 
 					new TextInput(array(

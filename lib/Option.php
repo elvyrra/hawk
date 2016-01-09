@@ -18,7 +18,7 @@ class Option{
 	/**
 	 * The file containing the cache of options
 	 */
-	
+
 	/**
 	 * Get the value of an option
 	 * @param string $name the option to get the value of, formatted like : <plugin>.<key>
@@ -29,7 +29,7 @@ class Option{
 		if(! isset(self::$options[$plugin][$key])){
 			self::getPluginOptions($plugin);
 		}
-		
+
 		return isset(self::$options[$plugin][$key]) ? self::$options[$plugin][$key] : null;
 	}
 
@@ -40,19 +40,23 @@ class Option{
 	 */
 	public static function getPluginOptions($plugin){
 		if(!App::conf()->has('db')){
-			return array();			
+			return array();
 		}
-		
-		$options = App::db()->select(array(
-			'from' => DB::getFullTablename('Option'),
-			'where' => new DBExample(array('plugin' => $plugin))			
-		));
-		foreach($options as $option){
-			self::$options[$plugin][$option['key']] = $option['value'];
+
+		if(!isset(self::$options[$plugin])){
+			$options = App::db()->select(array(
+				'from' => DB::getFullTablename('Option'),
+				'where' => new DBExample(array('plugin' => $plugin))
+			));
+
+			self::$options[$plugin] = array();
+			foreach($options as $option){
+				self::$options[$plugin][$option['key']] = $option['value'];
+			}
 		}
-		return isset(self::$options[$plugin]) ? self::$options[$plugin] : array();
+		return self::$options[$plugin];
 	}
-	
+
 
 	/**
 	 * Add an option or update an existing option value
@@ -62,7 +66,7 @@ class Option{
 	public static function set($name, $value){
 		list($plugin, $key) = explode('.', $name);
 		self::$options[$plugin][$key] = $value;
-		
+
 		App::db()->replace(DB::getFullTablename('Option'), array(
 			'plugin' => $plugin,
 			'key' => $key,
@@ -78,7 +82,7 @@ class Option{
 	public static function delete($name){
 		list($plugin, $key) = explode('.', $name);
 		App::db()->delete(DB::getFullTablename('Option'), new DBExample(array(
-			'plugin' => $plugin, 
+			'plugin' => $plugin,
 			'key' => $key
 		)));
 	}

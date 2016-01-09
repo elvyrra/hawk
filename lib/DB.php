@@ -22,26 +22,26 @@ class DB{
 	 * List of connections instances
 	 */
 	public static $instances = array();
-	
+
 	/**
-	 * PDO Object representing the connection to the server    
+	 * PDO Object representing the connection to the server
 	 */
 	private $connection;
 
 	/**
 	 * The hosname of the connection
 	 */
-	private $host, 
+	private $host,
 
 	/**
 	 * the user connected to the database
 	 */
-	$username, 
+	$username,
 
 	/**
 	 * The password of the user
 	 */
-	$password, 
+	$password,
 
 	/**
 	 * The selected database
@@ -68,20 +68,20 @@ class DB{
 	const RETURN_AFFECTED_ROWS = 6; // Return the rows affected by the query
 	const RETURN_QUERY = 7; // Return the query it self
 	const RETURN_CURSOR = 8; // Return a cursor
-	
+
 	// Sort constants
-	const SORT_ASC = 'ASC'; // Sort ascending 
+	const SORT_ASC = 'ASC'; // Sort ascending
 	const SORT_DESC = 'DESC'; // Sort descending
 
 
-	
+
 	/**
 	 * Constructor
 	 * @param array $data - the connection properties, with keys host, dbname, username, password
 	 */
-	public function __construct($data) {        
+	public function __construct($data) {
 		$this->map($data);
-		
+
 		if(strpos($this->host, ':') !== false){
 			list($this->host, $this->port) = explode(':', $this->host, 2);
 		}
@@ -93,19 +93,19 @@ class DB{
 			if(!empty($this->port)){
 				$dns .= ";port=$this->port";
 			}
-			
-			$this->connection = new \PDO($dns, $this->username, $this->password);			
-            $this->connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);	
+
+			$this->connection = new \PDO($dns, $this->username, $this->password);
+            $this->connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
             $this->connection->setAttribute(\PDO::ATTR_EMULATE_PREPARES, 1);
-            
+
 			$this->connection->query('SET NAMES "'.$this->charset.'"');
         }
         catch(\PDOException $e) {
             throw new DBException($e->getMessage(), DBException::CONNECTION_ERROR, $this->host);
         }
     }
-	
-	
+
+
 	/**
 	 * Add a configuration for a database connection
 	 * @param string $name The instance name
@@ -115,7 +115,7 @@ class DB{
 	public static function add($name, $params){
 		self::$servers[$name] = $params;
 	}
-	
+
 	/**
 	 * Get the open connection, or open it if not already open.
      * This method manages master / slaves connections
@@ -126,7 +126,7 @@ class DB{
 		if(isset(self::$instances[$name])){
 			return self::$instances[$name];
 		}
-		
+
 		$servers = self::$servers[$name];
 		foreach($servers as $i => $server){
             try{
@@ -143,12 +143,12 @@ class DB{
                     App::logger()->error('Impossible to connect to db ' . $name . ' : ' . $e->getMessage());
                     throw $e;
                 }
-            }            
+            }
         }
-		
+
 		return self::$instances[$name];
 	}
-	
+
 	/**
 	 * Execute a SQL query on the SQL server, and get the result of execution
 	 * @param $sql The query to execute,
@@ -175,17 +175,17 @@ class DB{
 			'index' => null,
 			'args' => array()
 		);
-		
+
 		foreach($default as $name => $value){
 			if(!isset($options[$name])){
 				$options[$name] = $value;
 			}
 		}
-		
+
         try {
 			// Prepare the query
-			$stmt = $this->connection->prepare($sql);			
-			
+			$stmt = $this->connection->prepare($sql);
+
 			// Prepare query logging
 			$log = $sql;
 
@@ -194,7 +194,7 @@ class DB{
 				$stmt->bindValue(":$key", $bind);
 				$log = str_replace(":$key", $this->connection->quote($bind), $log);
 			}
-			
+
 			// Execute the query
 			$start = microtime(true);
 			$stmt->execute();
@@ -208,7 +208,7 @@ class DB{
 					case self::RETURN_STATUS:
 						$result =  true;
 					break;
-				
+
 					case self::RETURN_ARRAY:
 						if($options['onerow']){
 							// Return the first row as associative array
@@ -228,7 +228,7 @@ class DB{
 							$result = $data;
 						}
 					break;
-				
+
 					case self::RETURN_OBJECT :
 						if($options['onerow']){
 							// Return the first row as an StdClass instance
@@ -236,7 +236,7 @@ class DB{
 						}
 						else{
 							// Return an array of StdClass instances
-							$data = array();							
+							$data = array();
 							while($row = $stmt->fetch(\PDO::FETCH_OBJ)){
 								if($options['index']){
 									$index = $options['index'];
@@ -249,21 +249,21 @@ class DB{
 							$result = $data;
 						}
 					break;
-				
+
 					case self::RETURN_LAST_INSERT_ID :
 						// Return the last inserted array
 						$result = $this->connection->lastInsertId();
 					break;
-				
+
 					case self::RETURN_AFFECTED_ROWS :
 						// Return the number of affected rows
 						$result = $stmt->rowCount();
 					break;
-				
+
 					case self::RETURN_CURSOR :
 						// Return a cursor to fetch the results
 						$result = $stmt;
-					break;				
+					break;
 				}
 			}
 			else{
@@ -294,12 +294,12 @@ class DB{
 			return $result;
         }
         catch(\PDOException $e) {
-        	$this->addLog($log, 'query failed', $start, microtime(true));        	
+        	$this->addLog($log, 'query failed', $start, microtime(true));
             throw new DBException($e->getMessage(), DBException::QUERY_ERROR, $sql);
-        }  	
+        }
 	}
-	
-	
+
+
 	/**
 	 * Select a database
 	 * @param string $dbname The database to select
@@ -308,7 +308,7 @@ class DB{
     public function selectDb($dbname){
         return $this->query('use ' . $dbname);
     }
-	
+
 	/**
 	 * Build and execute a SELECT query on the selected database, and return the result
 	 * @param array $query The parameters of the query. This parameter can have the following data :
@@ -319,7 +319,7 @@ class DB{
 	 *						- 'having' string (optinnal) : The 'HAVING' expression, formatted as a SQL expression
 	 *						- 'orderby' array (optionnal) : The result sort, where each key is a column name, and the values define the order (ASC, DESC)
 	 *						- 'start' int (optionnal) : The first row number to get the results
-	 *						- 'limit' int (optionnal) : The maximum number of rows to return 
+	 *						- 'limit' int (optionnal) : The maximum number of rows to return
 	 *						- 'one' bool (optionnal) : If set to true, then the first row will be returned
 	 *						- 'binds' array (optionnal) : The binded values
 	 *						- 'index' string (optionnal) : If set, the result arrar will be indexed by the value of the column set by this property
@@ -328,16 +328,16 @@ class DB{
 	 */
     public function select($query) {
 		$query = (object) $query;
-		
+
 		if(!isset($query->from)){
 			throw new DBException("'from' parameter is mandatory in select method", DBException::QUERY_ERROR, '' );
 		}
-					
+
 		/*** Treat the paramters ***/
-		if(empty($query->fields)){                
+		if(empty($query->fields)){
 			$query->fields = "*";
 		}
-		elseif(is_array($query->fields)){				
+		elseif(is_array($query->fields)){
 			$tmp = array();
 			foreach($query->fields as $name => $alias){
 				if(is_numeric($name)){
@@ -349,18 +349,18 @@ class DB{
 			}
 			$query->fields = implode(",", $tmp);
 		}
-		
+
 		if(isset($query->where) && $query->where instanceof DBExample){
 			$query->where = $query->where->parse($query->binds);
 		}
 		$where = !empty($query->where) ? "WHERE $query->where" : '';
-		
+
 		$group = !empty($query->group) ? "GROUP BY ".implode(",", array_map(array(self, 'formatField'), $query->group)) : "";
 
 		$having = !empty($query->having) ? "HAVING $query->having" : '';
 
 		if(!empty($query->orderby)){
-			$orders = array();			
+			$orders = array();
 			foreach($query->orderby as $field => $value){
 				$orders[] = self::formatField($field) . " " . $value;
 			}
@@ -369,33 +369,33 @@ class DB{
 		else{
 		    $orderby = "";
 		}
-		
+
 		$limit = "";
 		if(!empty($query->one)){
 			$limit = "LIMIT 1";
 		}
 		elseif(!empty($query->limit)){
-			$limit = " LIMIT ".(!empty($query->start) ? "$query->start, " : ""). "$query->limit";       
+			$limit = " LIMIT ".(!empty($query->start) ? "$query->start, " : ""). "$query->limit";
 		}
-		
+
         $sql = "SELECT $query->fields FROM $query->from $where $group $having $orderby $limit";
-		
+
 		if(empty($query->binds)){
 		   $query->binds = array();
 		}
-		   
+
 		if(empty($query->return)){
 			$query->return = self::RETURN_ARRAY;
 		}
-		
+
 		return $this->query($sql, $query->binds, array(
 			'return' => $query->return,
 			'onerow' => !empty($query->one),
 			'index' => empty($query->index) ? '' : $query->index
-		));		
+		));
     }
-	
-	
+
+
 	/**
 	 * Insert a row in a table
 	 * @param string $table The table where to insert data
@@ -408,22 +408,22 @@ class DB{
 		$keys = array();
 		$values = array();
 		$binds = array();
-		
+
 		foreach($insert as $key => $value){
 			$uniq = uniqid();
 			$values[] = ':'.$uniq;
 			$keys[] = self::formatField($key);
-			$binds[$uniq] = $value;	
+			$binds[$uniq] = $value;
 		}
-		
+
 		$keys = implode(',', $keys);
 		$values = implode(',', $values);
-				
+
 		$sql="INSERT $flag INTO ".$table." (".$keys.") VALUES (".$values.") " . ($onduplicatekey ? "ON DUPLICATE KEY UPDATE $onduplicatekey" : "");
-		
+
 		return $this->query($sql, $binds, array('return' => self::RETURN_LAST_INSERT_ID));
 	}
-	
+
 	/**
 	 * Replace data in a table
 	 * @param string $table the table where to replace data
@@ -434,21 +434,21 @@ class DB{
 		$keys = array();
 		$values = array();
 		$binds = array();
-		
+
 		foreach($insert as $key => $value){
 			$uniq = uniqid();
 			$values[] = ':' . $uniq;
 			$keys[] = self::formatField($key);
-			$binds[$uniq] = $value;	
+			$binds[$uniq] = $value;
 		}
-		
+
 		$keys = implode(',',$keys);
 		$values = implode(' , ',$values);
-						
+
 		$sql="REPLACE INTO ".$table." (".$keys.") VALUES (".$values.")";
 		return $this->query($sql, $binds, array('return' => self::RETURN_LAST_INSERT_ID));
 	}
-	
+
 	/**
 	 * Update records in a table
 	 * @param string $table The table to update
@@ -464,19 +464,19 @@ class DB{
 			}
 			$where = ' WHERE ' . $where;
 		}
-       
-        $updates = array();		
+
+        $updates = array();
         foreach($update as $key => $value ){
             $bind = uniqid();
 			$updates[] = self::formatField($key) . " = :$bind";
 			$binds[$bind] = $value;
         }
-        
+
 		$sql = "UPDATE $table SET ". implode(',',$updates) . $where;
-        
+
 		return $this->query($sql, $binds, array('return' => self::RETURN_AFFECTED_ROWS));
 	}
-	
+
 	/**
 	 * Delete records in a table
 	 * @param string $table The table to update
@@ -491,12 +491,12 @@ class DB{
 			}
 			$where = 'WHERE ' . $where;
 		}
-		
+
         $sql = "DELETE FROM $table $where";
-        
+
 		return $this->query($sql, $binds, array('return' => self::RETURN_AFFECTED_ROWS));
     }
-	
+
 	/**
 	 * Count elements in a table
 	 * @param string $table The table to count elements
@@ -505,30 +505,30 @@ class DB{
 	 * @param string $field To count a specific field
 	 * @param array $group Groups rows before counting them
 	 */
-    public function count($table , $condition = null, $binds = array(), $field = null, $group = array()) {		
+    public function count($table , $condition = null, $binds = array(), $field = null, $group = array()) {
         if($condition instanceof DBExample){
 			$condition = $condition->parse($binds);
 		}
 		if (!empty ($condition)) {
 			$condition = "WHERE $condition";
         }
-		
+
 		if(!empty($group)){
 			$group = "GROUP BY ".implode(",", array_map(array(self, 'formatField'), $group));
 		}
-			
+
         if(empty($field)) {
-			$field = '*'; 
+			$field = '*';
 		}
 		else{
 			$field = $field;
 		}
-			
+
         $sql = "SELECT COUNT($field) as counter FROM $table $condition";
-		
+
 		return $this->query($sql, $binds, array('return' => self::RETURN_OBJECT, 'onerow' => true))->counter;
     }
-	
+
 
 	/**
 	 * Format a string to a SQL field format : [`table`.]`field`
@@ -536,11 +536,11 @@ class DB{
 	 * @return string The formatted string
 	 */
 	public static function formatField($str){
-		return preg_replace_callback('/^(\w+)(\.(\w+))?$/', function($m){ 
+		return preg_replace_callback('/^(\w+)(\.(\w+))?$/', function($m){
 			return '`' . $m[1] . '`' . (isset($m[2]) && isset($m[3]) ? '.`' . $m[3] . '`' : '');
 		}, $str);
 	}
-	
+
 
 	/**
 	 * Log a query in the internal log system of this class. This method can be used to get all the executed queries to optimize your scripts
@@ -551,8 +551,7 @@ class DB{
 	 */
 	private function addLog($query, $result, $start, $end){
 		$this->logs[] = array(
-			'query' => $query, 
-			'result' => $result,
+			'query' => $query,
 			'start' => $start - SCRIPT_START_TIME,
 			'end' => $end - SCRIPT_START_TIME,
 			'time' => $end - $start
@@ -588,7 +587,7 @@ class DB{
 	 */
 	public static function getFullTablename($table, $prefix = null){
 		if($prefix === null){
-			$prefix = App::conf()->get('db.prefix');			
+			$prefix = App::conf()->get('db.prefix');
 		}
 
 		return $prefix . $table;
@@ -603,10 +602,10 @@ class DB{
  */
 class DBException extends \Exception{
 	const CONNECTION_ERROR = 1;
-	const QUERY_ERROR = 2;	
+	const QUERY_ERROR = 2;
 
 	/**
-	 * Constructor	
+	 * Constructor
 	 * @param string $message The exception message
 	 * @param int $code The exception $code
 	 * @param string $value The exception content
@@ -617,14 +616,14 @@ class DBException extends \Exception{
 			case self::CONNECTION_ERROR :
 				$message = "Impossible to connect to Database Server : $value, $message";
 			break;
-			
+
 			case self::QUERY_ERROR:
 				$message = "An error was detected : $message in the Database Query : $value";
 				App::logger()->error($message);
 			break;
-			
+
 		}
-		
+
 		parent::__construct($message,$code, $previous);
 	}
 }

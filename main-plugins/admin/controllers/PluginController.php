@@ -8,12 +8,12 @@ class PluginController extends Controller{
      */
     public function index($content = '', $title = ''){
         if(!$content){
-            $content = $this->compute('availablePlugins');            
+            $content = $this->compute('availablePlugins');
         }
         if(!$title){
             $title = Lang::get('admin.available-plugins-title');
         }
-        $widgets = array(new SearchPluginWidget());        
+        $widgets = array(new SearchPluginWidget());
 
         $this->addCss(Plugin::current()->getCssUrl('plugins.less'));
 
@@ -33,7 +33,7 @@ class PluginController extends Controller{
                 'content' => $content
             )
         ));
-    }    
+    }
 
 
 
@@ -42,8 +42,6 @@ class PluginController extends Controller{
      */
     public function availablePlugins(){
         $plugins = Plugin::getAll(true);
-
-        
 
         $api = new HawkApi;
         try{
@@ -61,6 +59,7 @@ class PluginController extends Controller{
         $param = array(
             'id' => 'available-plugins-list',
             'reference' => 'name',
+            'action' => App::router()->getUri('plugins-list'),
             'data' => $plugins,
             'controls' => array(
                 array(
@@ -74,30 +73,30 @@ class PluginController extends Controller{
             'fields' => array(
                 'controls' => array(
                     'display' => function($value, $field, $plugin) use($updates){
-                        $actionsTarget = '#' . self::TABID . ' .page-content';
                         $buttons = array();
-                        
+
                         $installer = $plugin->getInstallerInstance();
                         if(!$plugin->isInstalled()){
                             // the plugin is not installed
                             $buttons = array(
                                 // Install button
                                 ButtonInput::create(array(
-                                    'label' => Lang::get('admin.install-plugin-button'),
+                                    'title' => Lang::get('admin.install-plugin-button'),
                                     'icon' => 'upload',
+                                    'class' => 'install-plugin',
                                     'href' => App::router()->getUri('install-plugin', array('plugin' => $plugin->getName())),
-                                    'target' => $actionsTarget,                                    
                                 )),
 
                                 // Delete button
                                 ButtonInput::create(array(
-                                    'label' => Lang::get('admin.delete-plugin-button'),
-                                    'icon' => 'close',
+                                    'title' => Lang::get('admin.delete-plugin-button'),
+                                    'icon' => 'trash',
                                     'class' => 'btn-danger delete-plugin',
                                     'href' => App::router()->getUri('delete-plugin', array('plugin' => $plugin->getName())),
-                                    'target' => $actionsTarget,
                                 ))
                             );
+
+                            $status = Lang::get('admin.plugin-uninstalled-status');
                         }
                         else{
                             if(! $plugin->isActive()){
@@ -105,18 +104,17 @@ class PluginController extends Controller{
                                 $buttons = array(
                                     // Activate button
                                     ButtonInput::create(array(
-                                        'label' => Lang::get('admin.activate-plugin-button'),
-                                        'class' => 'btn-success',
+                                        'title' => Lang::get('admin.activate-plugin-button'),
+                                        'class' => 'btn-success activate-plugin',
                                         'icon' => 'check',
                                         'href' => App::router()->getUri('activate-plugin', array('plugin' => $plugin->getName())),
-                                        'target' => $actionsTarget,                                              
                                     )),
-                                    
+
                                     // Settings button
-                                    method_exists($installer, 'settings') ? 
+                                    method_exists($installer, 'settings') ?
                                         ButtonInput::create(array(
                                             'icon' => 'cogs',
-                                            'label' => Lang::get('admin.plugin-settings-button'),
+                                            'title' => Lang::get('admin.plugin-settings-button'),
                                             'href' => App::router()->getUri('plugin-settings', array('plugin' => $plugin->getName())),
                                             'target' => 'dialog',
                                             'class' => 'btn-info'
@@ -124,48 +122,54 @@ class PluginController extends Controller{
 
                                     // Uninstall button
                                     ButtonInput::create(array(
-                                        'label' => Lang::get('admin.uninstall-plugin-button'),
+                                        'title' => Lang::get('admin.uninstall-plugin-button'),
                                         'class' => 'btn-danger uninstall-plugin',
-                                        'icon' => 'close',
+                                        'icon' => 'chain-broken',
                                         'href' => App::router()->getUri('uninstall-plugin', array('plugin' => $plugin->getName())),
-                                        'target' => $actionsTarget
                                     ))
                                 );
+
+                                $status = Lang::get('admin.plugin-inactive-status');
                             }
                             else{
                                 // The plugin is installed and active
                                 $buttons = array(
                                     // Settings button
-                                    method_exists($installer, 'settings') ? 
+                                    method_exists($installer, 'settings') ?
                                         ButtonInput::create(array(
                                             'icon' => 'cogs',
-                                            'label' => Lang::get('admin.plugin-settings-button'),
+                                            'title' => Lang::get('admin.plugin-settings-button'),
                                             'href' => App::router()->getUri('plugin-settings', array('plugin' => $plugin->getName())),
-                                            'target' => 'dialog'
+                                            'target' => 'dialog',
+                                            'class' => 'btn-info',
                                         )) : '',
 
                                     ButtonInput::create(array(
-                                        'label' => Lang::get('admin.deactivate-plugin-button'),
-                                        'class' => 'btn-warning',
+                                        'title' => Lang::get('admin.deactivate-plugin-button'),
+                                        'class' => 'btn-warning deactivate-plugin',
                                         'icon' => 'ban',
                                         'href' => App::router()->getUri('deactivate-plugin', array('plugin' => $plugin->getName())),
-                                        'target' => $actionsTarget
-                                    ))                              
+                                    ))
                                 );
-                            }                            
-                        } 
+
+                                $status = Lang::get('admin.plugin-active-status');
+                            }
+                        }
 
                         if(isset($updates[$plugin->getName()])){
                             array_unshift($buttons, ButtonInput::create(array(
                                 'icon' => 'refresh',
                                 'class' => 'btn-info',
-                                'label' => Lang::get('admin.update-plugin-button'),
+                                'title' => Lang::get('admin.update-plugin-button'),
                                 'href' => App::router()->getUri('update-plugin', array('plugin' => $plugin->getName())),
-                                'target' => $actionsTarget
                             )));
-                        }                       
+                        }
 
-                        return  "<h4>" . $plugin->getDefinition("title") . "</h4><br />" . implode("", $buttons);
+                        return View::make(Plugin::current()->getView('plugin-list-controls.tpl'), array(
+                            'plugin' => $plugin,
+                            'status' => $status,
+                            'buttons' => $buttons
+                        ));
                     },
                     'label' => Lang::get('admin.plugins-list-controls-label'),
                     'search' => false,
@@ -177,31 +181,45 @@ class PluginController extends Controller{
                     'sort' => false,
                     'label' => Lang::get('admin.plugins-list-description-label'),
                     'display' => function($value, $field, $plugin){
-                        return View::make(Plugin::current()->getView("plugin-list-description.tpl"), $plugin->getDefinition());                        
+                        return View::make(Plugin::current()->getView("plugin-list-description.tpl"), $plugin->getDefinition());
                     }
                 )
             )
         );
-        
+
         $list = new ItemList($param);
-        
-        return $list;        
+
+        return $list;
     }
 
+
+    /**
+     * Compute an action on a plugin (install, uninstal, activate, deactivate)
+     */
+    private function computeAction($action){
+        App::response()->setContentType('json');
+
+        $response = array();
+        Event::on('menuitem.added menuitem.deleted', function() use(&$response){
+            $response['menuUpdated'] = true;
+        });
+
+        try{
+            Plugin::get($this->plugin)->$action();
+        }
+        catch(\Exception $e){
+            $response['message'] = Lang::get('admin.plugin-' . $action . '-error', array('plugin' => $this->plugin)) . ( DEBUG_MODE ? preg_replace('/\s/', ' ', $e->getMessage()) : '');
+            App::response()->setStatus(500);
+        }
+
+        return $response;
+    }
 
     /**
      * Install a plugin
      */
     public function install(){
-        try{
-            Plugin::get($this->plugin)->install();
-        }
-        catch(Exception $e){
-            $message = Lang::get('admin.plugin-install-error', array('plugin' => $this->plugin)) . ( DEBUG_MODE ? preg_replace('/\s/', ' ', $e->getMessage()) : '');
-            $this->addJavaScriptInline("app.notify('danger', '" . addcslashes($message, "'") . "');");
-        }
-
-        App::response()->redirectToAction('plugins-list');
+        return $this->computeAction('install');
     }
 
 
@@ -210,15 +228,7 @@ class PluginController extends Controller{
      * Uninstall a plugin
      */
     public function uninstall(){
-        try{
-            Plugin::get($this->plugin)->uninstall();
-        }
-        catch(Exception $e){
-            $message = Lang::get('admin.plugin-uninstall-error', array('plugin' => $this->plugin)) . ( DEBUG_MODE ? preg_replace('/\s/', ' ', $e->getMessage()) : '');
-            $this->addJavaScriptInline("app.notify('danger', '" . addcslashes($message, "'") . "');");
-        }
-
-        App::response()->redirectToAction('plugins-list');
+        return $this->computeAction('uninstall');
     }
 
 
@@ -227,15 +237,7 @@ class PluginController extends Controller{
      * Activate a plugin
      */
     public function activate(){
-        try{
-            Plugin::get($this->plugin)->activate();
-        }
-        catch(Exception $e){
-            $message = Lang::get('admin.plugin-activate-error', array('plugin' => $this->plugin)) . ( DEBUG_MODE ? preg_replace('/\s/', ' ', $e->getMessage()) : '');
-            $this->addJavaScriptInline("app.notify('danger', '" . addcslashes($message, "'") . "');");
-        }
-
-        App::response()->redirectToAction('plugins-list');
+        return $this->computeAction('activate');
     }
 
 
@@ -244,15 +246,7 @@ class PluginController extends Controller{
      * Deactivate a plugin
      */
     public function deactivate(){
-        try{
-            Plugin::get($this->plugin)->deactivate();
-        }
-        catch(Exception $e){
-            $message = Lang::get('admin.plugin-deactivate-error', array('plugin' => $this->plugin)) . ( DEBUG_MODE ? preg_replace('/\s/', ' ', $e->getMessage()) : '');
-            $this->addJavaScriptInline("app.notify('danger', '" . addcslashes($message, "'") . "');");
-        }
-
-        App::response()->redirectToAction('plugins-list');
+        return $this->computeAction('deactivate');
     }
 
 
@@ -281,7 +275,7 @@ class PluginController extends Controller{
         $api = new HawkApi;
 
         $search = App::request()->getParams('search');
-        
+
         // Search plugins on the API
         try{
             $plugins = $api->searchPlugins($search);
@@ -291,7 +285,7 @@ class PluginController extends Controller{
         }
 
         // Remove the plugins already downloaded on the application
-        foreach($plugins as &$plugin){            
+        foreach($plugins as &$plugin){
             $installed = Plugin::get($plugin['name']);
             $plugin['installed'] = $installed !== null;
             if($installed){
@@ -301,8 +295,8 @@ class PluginController extends Controller{
 
         $list = new ItemList(array(
             'id' => 'search-plugins-list',
-            'data' => $plugins,       
-            'resultTpl' => Plugin::current()->getView('plugin-search-list.tpl'),     
+            'data' => $plugins,
+            'resultTpl' => Plugin::current()->getView('plugin-search-list.tpl'),
             'fields' => array()
         ));
 
@@ -333,7 +327,7 @@ class PluginController extends Controller{
 
             $zip->extractTo(PLUGINS_DIR);
 
-            $plugin = Plugin::get($this->plugin);            
+            $plugin = Plugin::get($this->plugin);
             if(!$plugin){
                 throw new \Exception('An error occured while downloading the plugin');
             }
@@ -404,7 +398,7 @@ class PluginController extends Controller{
 
                     new TextInput(array(
                         'name' => 'author',
-                        'label' => Lang::get('admin.new-plugin-author-label'),                    
+                        'label' => Lang::get('admin.new-plugin-author-label'),
                     )),
                 ),
 
@@ -432,19 +426,19 @@ class PluginController extends Controller{
                 'page' => $form
             ));
         }
-        else{            
+        else{
             // Create the plugin
             if($form->check()){
                 if(in_array($form->getData('name'), Plugin::$forbiddenNames)){
                     $message = Lang::get('admin.new-plugin-forbidden-name', array('forbidden' =>  implode(', ', Plugin::$forbiddenNames)));
                     $form->error('name', $message);
                     return $form->response(Form::STATUS_CHECK_ERROR, $message);
-                }                
+                }
 
                 $namespace = Plugin::getNamespaceByName($form->getData('name'));
-                                
+
                 // Check the plugin does not exists
-                foreach(Plugin::getAll(true) as $plugin){                    
+                foreach(Plugin::getAll(true) as $plugin){
                     if($namespace === $plugin->getNamespace()){
                         // A plugin with the same name already exists
                         $form->error('name', Lang::get('admin.new-plugin-already-exists-error'));
@@ -492,7 +486,7 @@ class PluginController extends Controller{
                     $installer = str_replace(array('{{ $namespace }}', '{{ $name }}'), array($namespace, $plugin->getName()), file_get_contents(Plugin::current()->getRootDir() . 'templates/installer.tpl'));
                     if(file_put_contents($dir . 'classes/Installer.php', $installer) === false){
                         throw new \Exception('Impossible to create the file classes/Installer.php');
-                    }                   
+                    }
 
                     // Create the language file
                     if(!touch($dir . 'lang/' . $plugin->getName() . '.en.lang')){
@@ -515,7 +509,7 @@ class PluginController extends Controller{
     /**
      * Update a plugin from the API
      */
-    public function update(){      
+    public function update(){
         try{
             $plugin = Plugin::get($this->plugin);
             if(!$plugin){
@@ -543,10 +537,10 @@ class PluginController extends Controller{
                 try{
                     $zip->extractTo(PLUGINS_DIR);
 
-                    $plugin = Plugin::get($this->plugin);            
+                    $plugin = Plugin::get($this->plugin);
                     if(!$plugin){
                         throw new \Exception('An error occured while downloading the plugin');
-                    } 
+                    }
 
                     $installer = $plugin->getInstallerInstance();
                     foreach($updates[$plugin->getName()] as $version){
@@ -566,13 +560,13 @@ class PluginController extends Controller{
                 }
 
                 App::fs()->remove($file);
-            }                
-            
+            }
+
             App::response()->redirectToAction('plugins-list');
         }
-        catch(\Exception $e){        
+        catch(\Exception $e){
             $this->addJavaScriptInline('app.notify("error", "' . addcslashes($e->getMessage(), '"') . '");');
-            return $this->compute('availablePlugins');            
+            return $this->compute('availablePlugins');
         }
 
 

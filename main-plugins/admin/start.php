@@ -119,9 +119,9 @@ App::router()->setProperties(
 				// Update a plugin
 				App::router()->get('update-plugin', 'plugins/{plugin}/update', array('where' => array('plugin' => Plugin::NAME_PATTERN), 'action' => 'PluginController.update'));
 
-				Event::on('menuitem.added menuitem.deleted', function($event){
-		            App::router()->getCurrentController()->addJavaScriptInline('app.refreshMenu()');
-		        });
+				// Event::on('menuitem.added menuitem.deleted', function($event){
+		  //           App::router()->getCurrentController()->addJavaScriptInline('app.refreshMenu()');
+		  //       });
 
 
 				// Display number of updates in menu

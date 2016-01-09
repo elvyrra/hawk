@@ -36,6 +36,11 @@ class MenuItem extends Model{
 	private static $instances = array();
 
 	/**
+	 * The menu item label
+	 */
+	public $label = '';
+
+	/**
 	 * Constructor
 	 * @param array $data The data to set on the instance properties	 
 	 */
@@ -44,7 +49,7 @@ class MenuItem extends Model{
 
 		$this->visibleItems = array();
 
-		if(!empty($this->labelKey)){
+		if(empty($this->label) && !empty($this->labelKey)){
 			$this->label = Lang::get($this->labelKey);
 		}
 

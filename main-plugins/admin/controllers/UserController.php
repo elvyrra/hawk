@@ -2,10 +2,10 @@
 namespace Hawk\Plugins\Admin;
 
 class UserController extends Controller{
-	
+
 
 	/**
-	 * Display the tabs of the users page 
+	 * Display the tabs of the users page
 	 */
 	public function index(){
 		$tabs = array(
@@ -16,23 +16,23 @@ class UserController extends Controller{
 
 		$this->addCss(Plugin::current()->getCssUrl('users.less') );
 		$this->addJavaScript(Plugin::current()->getJsUrl('users.js'));
-		
+
 		$page = View::make(Plugin::current()->getViewsDir() . 'users.tpl', array(
 			'tabs' => $tabs,
 		));
-		
+
 		return NoSidebarTab::make(array(
 			'page' => $page,
 			'icon' => 'users',
-			'title' => 'Utilisateurs'			
+			'title' => 'Utilisateurs'
 		));
 	}
-	
 
 
 
-	/** 
-	 * Display the list of the users 
+
+	/**
+	 * Display the list of the users
 	 */
 	public function listUsers(){
 		$example = array('id' => array('$ne' => User::GUEST_USER_ID));
@@ -55,7 +55,7 @@ class UserController extends Controller{
 			'model' => 'User',
 			'action' => App::router()->getUri('list-users'),
 			'reference' => 'id',
-			'filter' => new DBExample($example),			
+			'filter' => new DBExample($example),
 			'controls' => array(
 				array(
 					'icon' => 'plus',
@@ -73,7 +73,7 @@ class UserController extends Controller{
 						if($user->isRemovable()){
 							$return .= "<i class='icon icon-close text-danger delete-user' data-user='{$user->username}'></i>";
 
-							$return .= $user->active ? 
+							$return .= $user->active ?
 									"<i class='icon icon-lock text-warning lock-user' data-user='{$user->username}'></i>":
 									"<i class='icon icon-unlock text-success unlock-user' data-user='{$user->username}'></i>";
 						}
@@ -84,7 +84,7 @@ class UserController extends Controller{
 					'sort' => false,
 				),
 				'username' => array(
-					'label' => Lang::get('admin.users-list-username-label'),					
+					'label' => Lang::get('admin.users-list-username-label'),
 				),
 
 				'email' => array(
@@ -120,9 +120,12 @@ class UserController extends Controller{
 					'display' => function($value){
 						return $value ? Lang::get('admin.users-list-active') : Lang::get('admin.users-list-inactive');
 					},
+					'search' => array(
+						'type' => 'checkbox'
+					),
 				),
 
-				'createTime' => array(	
+				'createTime' => array(
 					'label' => Lang::get('admin.users-list-createTime-label'),
 					'search' => false,
 					'display' => function($value){
@@ -131,11 +134,11 @@ class UserController extends Controller{
 				),
 			)
 		);
-		
+
 		$list = new ItemList($param);
 
 		if(App::request()->getParams('refresh')) {
-			return $list->__toString();	
+			return $list->__toString();
 		}
 		else{
 			Lang::addKeysToJavaScript("admin.user-delete-confirmation");
@@ -143,9 +146,9 @@ class UserController extends Controller{
 				'list' => $list,
 			));
 		}
-		
+
 	}
-	
+
 
 
 
@@ -159,13 +162,13 @@ class UserController extends Controller{
 
 		$param = array(
 			'id' => 'user-form',
-			'upload' => true,			
+			'upload' => true,
 			'model' => 'User',
 			'reference' => array('username' => $this->username),
 			'fieldsets' => array(
 				'general' => array(
 					'nofieldset' => true,
-					
+
 					new TextInput(array(
 						'name' => 'username',
 						'required' => true,
@@ -174,7 +177,7 @@ class UserController extends Controller{
 						'insert' => ! $user || $user->id === App::session()->getUser()->id,
 						'label' => Lang::get('admin.user-form-username-label'),
 					)),
-					
+
 					new EmailInput(array(
 						'name' => 'email',
 						'required' => true,
@@ -183,19 +186,19 @@ class UserController extends Controller{
 						'insert' => ! $user || $user->id !== App::session()->getUser()->id,
 						'label' => Lang::get('admin.user-form-email-label'),
 					)),
-					
+
 					new CheckboxInput(array(
 						'name' => 'active',
 						'label' => Lang::get('admin.user-form-active-label'),
 					)),
-					
+
 					new SelectInput(array(
 						'name' => 'roleId',
 						'options' => $roles,
 						'label' => Lang::get('admin.user-form-roleId-label')
 					)),
 
-					$user ? null : 
+					$user ? null :
 					new PasswordInput(array(
 						'name' => 'password',
 						'required' => true,
@@ -203,7 +206,7 @@ class UserController extends Controller{
 						'encrypt' => array('Hawk\\Crypto', 'saltHash')
 					)),
 
-					$user ? null : 
+					$user ? null :
 					new PasswordInput(array(
 						'name' => 'passagain',
 						'label' => Lang::get('admin.user-form-passagain-label'),
@@ -216,15 +219,15 @@ class UserController extends Controller{
 						'name' => 'createTime',
 						'default' => time(),
 					))
-				),			
-				
+				),
+
 
 				'_submits' => array(
 					new SubmitInput(array(
 						'name' => 'valid',
 						'value' => Lang::get('main.valid-button')
 					)),
-					
+
 					new DeleteInput(array(
 						'name' => 'delete',
 						'value' => Lang::get('main.delete-button'),
@@ -242,7 +245,7 @@ class UserController extends Controller{
 		);
 
 		$form = new Form($param);
-		
+
 		if(!$form->submitted()){
 			return View::make(Theme::getSelected()->getView("dialogbox.tpl"), array(
 				'page' => $form,
@@ -260,15 +263,15 @@ class UserController extends Controller{
 				}
 			}
 		}
-		
-	}	
+
+	}
 
 	public function remove(){
 		$user = User::getByUsername($this->username);
 		if($user && $user->isRemovable()){
 			$user->delete();
 		}
-	}	
+	}
 
 
 	public function activate(){

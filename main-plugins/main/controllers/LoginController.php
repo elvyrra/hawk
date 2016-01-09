@@ -1,9 +1,9 @@
 <?php
 
 namespace Hawk\Plugins\Main;
-	
+
 class LoginController extends Controller{
-	
+
 	/**
 	 * Generate the login form
 	 */
@@ -15,17 +15,17 @@ class LoginController extends Controller{
 			"autocomplete" => false,
 			"fieldsets" => array(
 				"form" => array(
-									
+
 					new TextInput(array(
 						"field" => "login",
 						"required" => true,
-						"label" => Lang::get('main.login-label'),						
+						"label" => Lang::get('main.login-label'),
 					)),
-					
+
 					new PasswordInput(array(
 						"field" => "password",
-						"required" => true,						
-						"get" => true,						
+						"required" => true,
+						"get" => true,
 						"label" => Lang::get('main.login-password-label'),
 					)),
 				),
@@ -34,32 +34,32 @@ class LoginController extends Controller{
 					new SubmitInput(array(
 						"name" => "connect",
 						"value" => Lang::get('main.connect-button'),
-						'icon' => 'sign-in'						
+						'icon' => 'sign-in'
 					)),
-					
-					Option::get('main.open-register') ? 
+
+					Option::get('main.open-register') ?
 						new ButtonInput(array(
 							'name' => 'register',
 							'value' => Lang::get('main.register-button'),
 							'href' => App::router()->getUri('register'),
 							'target' => 'dialog',
 							'class' => 'btn-success'
-						)) : 
+						)) :
 						null
 				),
 			),
 			'onsuccess' => '$.cookie("redirect", data.redirect); location = app.getUri("index");',
-		);	
+		);
 
 		return new Form($param);
 	}
-	
+
 	/**
 	 * Display the login page
 	 */
 	public function login(){
 		$form = $this->form();
-		if(!$form->submitted()){	
+		if(!$form->submitted()){
 			if(App::request()->getParams('code') == 403){
 				$form->status = Form::STATUS_ERROR;
 				$form->addReturn('message', Lang::get('main.403-message'));
@@ -69,52 +69,52 @@ class LoginController extends Controller{
 				'page' => $form->__toString(),
 				'icon' => 'sign-in',
 				'title' => Lang::get('main.login-form-title'),
-				'width' => '400px',
+				// 'width' => '40rem',
 			));
 		}
 		else{
 			if($form->check()){
 				$hash = Crypto::saltHash($form->getData('password'));
-				
+
 				$example = new DBExample(array(
 					'$and' => array(
 						'$or' => array(
 							array('email' => $form->getData('login')),
 							array('username' => $form->getData('login'))
-						),						
-						array('password' => $hash),						
-					)					
+						),
+						array('password' => $hash),
+					)
 				));
 
 				$user = User::getByExample($example);
-					
-				if($user){					
+
+				if($user){
 					if(!$user->active){
-						// The user is not active					
+						// The user is not active
 						return $form->response(Form::STATUS_ERROR, Lang::get('main.login-error-inactive-user'));
 					}
-					
-					// The user can be connected 
-					App::session()->setData('user', array(						
-						'id' => $user->id,						
+
+					// The user can be connected
+					App::session()->setData('user', array(
+						'id' => $user->id,
 						'email' => $user->email,
 						'username' => $user->getUsername(),
-						'ip' => App::request()->clientIp()						
+						'ip' => App::request()->clientIp()
 					));
 
 					if(App::request()->getParams('redirect')){
 						$form->addReturn('redirect',App::request()->getParams('redirect'));
 					}
-					
+
 					return $form->response(Form::STATUS_SUCCESS, Lang::get('main.login-success'));
 				}
-				else{					
+				else{
 					return $form->response(Form::STATUS_ERROR, Lang::get('main.login-error-authentication'));
-				}			
-			}			
+				}
+			}
 		}
-	}	
-	
+	}
+
 
 	/**
 	 * Register a new user
@@ -129,7 +129,7 @@ class LoginController extends Controller{
 					'legend' => Lang::get('main.register-connection-legend'),
 
 					new TextInput(array(
-						'name' => 'username',						
+						'name' => 'username',
 						'required' => true,
 						'unique' => true,
 						'pattern' => '/^\w+$/',
@@ -164,7 +164,7 @@ class LoginController extends Controller{
 				),
 
 				'terms' => array(
-					Option::get('main.confirm-register-terms') ? 
+					Option::get('main.confirm-register-terms') ?
 						new CheckboxInput(array(
 							'name' => 'terms',
 							'required' => true,
@@ -175,7 +175,7 @@ class LoginController extends Controller{
 						null
 				),
 
-				'_submits' => array(					
+				'_submits' => array(
 					new SubmitInput(array(
 						'name' => 'valid',
 						'value' => Lang::get('main.register-button')
@@ -189,7 +189,7 @@ class LoginController extends Controller{
 					))
 				)
 			),
-			
+
 			'onsuccess' => 'app.dialog(app.getUri("login"))',
 		);
 
@@ -200,24 +200,24 @@ class LoginController extends Controller{
             $field['name'] = $question->name;
             $field['independant'] = true;
             $field['label'] = Lang::get('admin.profile-question-' . $question->name . '-label');
-            
+
             $param['fieldsets']['profile'][] = new $classname($field);
 
             if($question->type === 'file'){
             	$param['upload'] = true;
             }
        	}
-		
+
 		$form = new Form($param);
 		if(!$form->submitted()){
-			return View::make(Theme::getSelected()->getView('dialogbox.tpl'), array(
+			return Dialogbox::make(array(
 				'page' => $form->__toString(),
 				'icon' => 'sign-in',
 				'title' => Lang::get('main.login-form-title'),
 				'width' => '50rem',
 			));
 		}
-		else{	
+		else{
 			if($form->check()){
 				try{
 					$user = new User(array(
@@ -243,7 +243,7 @@ class LoginController extends Controller{
 	                            if(!is_dir($dir)){
 	                                mkdir($dir, 0755, true);
 	                            }
-	                            
+
 	                            $upload->move($file, $dir);
 	                            $user->setProfileData($question->name, $url . $file->basename);
 	                        }
@@ -251,7 +251,7 @@ class LoginController extends Controller{
 	                    else{
 	                        $user->setProfileData($question->name, $form->inputs[$question->name]->dbvalue());
 	                    }
-	                }            
+	                }
 
                 	$user->saveProfile();
 
@@ -289,7 +289,7 @@ class LoginController extends Controller{
 							 ->html($mailContent)
 							 ->subject(Lang::get('main.register-email-title', array('sitename' => Option::get('main.title'))))
 							 ->send();
-						
+
 						return $form->response(Form::STATUS_SUCCESS, Lang::get('main.register-send-email-success'));
 					}
 					else{
@@ -300,7 +300,7 @@ class LoginController extends Controller{
 				catch(Exception $e){
 					return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get('main.register-error') );
 				}
-			}		
+			}
 		}
 	}
 
@@ -337,7 +337,7 @@ class LoginController extends Controller{
 		return MainController::getInstance()->compute('main');
 
 	}
-	
+
 	/**
 	 * Sign-out
 	 */
