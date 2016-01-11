@@ -48,6 +48,13 @@ class AdminController extends Controller{
 			'upload' => true,
 			'fieldsets' => array(
 				'main' => array(
+					new TextInput(array(
+						'name' => 'main_sitename',
+						'required' => true,
+						'default' => Option::get('main.sitename'),
+						'label' => Lang::get('admin.settings-sitename-label')
+					)),
+
 					new SelectInput(array(
 						'name' => 'main_language',
 						'required' => true,

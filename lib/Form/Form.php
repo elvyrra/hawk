@@ -407,13 +407,13 @@ class Form{
 		// Generate the script to include the form in the application, client side
 		$script = '(function(){
 				function init(){
-					var form = new Form("' . $this->id . '", ' . json_encode($clientInputs, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_NUMERIC_CHECK) . ');';
+					var form = new Form("' . $this->id . '", ' . json_encode($clientInputs, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_NUMERIC_CHECK | JSON_PRETTY_PRINT) . ');' . PHP_EOL;
 					if(!empty($this->onsuccess)){
-						$script .= 'form.onsuccess = function(data){ ' . $this->onsuccess . ' };';
+						$script .= 'form.onsuccess = function(data){ ' . $this->onsuccess . ' };' . PHP_EOL;
 					}
 
 					if($this->status == self::STATUS_ERROR || $this->status == self::STATUS_CHECK_ERROR){
-						$script .= 'form.displayErrors(' . json_encode($this->errors, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_NUMERIC_CHECK) . ');';
+						$script .= 'form.displayErrors(' . json_encode($this->errors, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_NUMERIC_CHECK) . ');' . PHP_EOL;
 					}
 
 					$script .= 'app.forms["' . $this->id . '"] = form;

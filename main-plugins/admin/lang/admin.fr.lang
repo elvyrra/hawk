@@ -59,6 +59,8 @@ profile-question-form-type-text = "Champ texte"
 profile-question-form-type-textarea = "Texte libre"
 profile-question-realname-label = "Nom complet"
 search-plugins-title = "Résultats : {search}"
+
+settings-sitename-label = "Nom de l'application"
 settings-allow-guest-label = "Ouvrir l'application au invités"
 settings-confirm-email-label = "Demander la confirmation de l'email"
 settings-confirm-terms-label = "Obliger les utilisateurs à valider les conditions générales d'utilisation"

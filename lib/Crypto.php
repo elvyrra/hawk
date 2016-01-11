@@ -63,7 +63,7 @@ class Crypto{
 	public static function generateKey($length){
 		$result = '';
 		for ($i=0; $i < $length; $i++) { 
-			$result .= chr(mt_rand(32,127));
+			$result .= chr(mt_rand(33,126));
 		}
 
 		return $result;

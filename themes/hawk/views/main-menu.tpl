@@ -1,8 +1,8 @@
 <nav id="main-menu" class="navbar navbar-inverse">
 	<div class="container-fluid">
 		<div class="navbar-header">
-			<img class="application-logo pull-left vertical-center" src="{{ $logo ? $logo : Plugin::get('main')->getStaticUrl('img/hawk-logo.png') }}" alt="Application logo"/>
-			<h1 class="hidden-md hidden-lg app-title vertical-center text-center">{{ App::conf()->has('db') ? Option::get('main.page-title-' . LANGUAGE) : DEFAULT_HTML_TITLE }}</h1>
+			<img class="application-logo" src="{{ $logo ? $logo : Plugin::get('main')->getStaticUrl('img/hawk-logo.png') }}" alt="Application logo"/>
+			<h1 class="visible-xs app-title vertical-center text-center">{{ App::conf()->has('db') ? Option::get('main.page-title-' . LANGUAGE) : DEFAULT_HTML_TITLE }}</h1>
 			<div class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-menu-collapse" >
 		        <span class="sr-only">Toggle navigation</span>
 		        <span class="icon icon-bars"></span>

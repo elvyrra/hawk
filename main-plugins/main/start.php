@@ -18,13 +18,21 @@ App::router()->setProperties(
 		});
 
 		App::router()->auth(!App::session()->isConnected(), function(){
+		    //Login
 		    App::router()->any('login', '/login', array('action' => 'LoginController.login'));
 
+		    // Register
 			App::router()->auth(Option::get('main.open-register'), function(){
 				App::router()->any('register', '/register', array('action' => 'LoginController.register'));
 
 				App::router()->get('validate-registration', '/register/{token}', array('where' => array('token' => '[^\s]+'), 'action' => 'LoginController.validateRegister'));
 			});
+
+			// Ask for a new password
+			App::router()->any('forgotten-password', '/forgotten-password', array('action' => 'LoginController.forgottenPassword'));
+
+			// Reset the forgotten password
+			App::router()->any('reset-password', '/reset-password', array('action' => 'LoginController.resetPassword'));
 		});
 
 		App::router()->get('terms', '/terms-of-application', array('action' => 'MainController.terms'));

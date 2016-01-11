@@ -1,6 +1,5 @@
 <html>
-	<head>
-		<link rel="stylesheet" href="{{ $mainCssUrl }}bootstrap.min.css" />
+	<head>		
 		<link rel="stylesheet" id="theme-base-stylesheet" href="{{ $themeBaseCss }}" />
 		<link rel="stylesheet" id="theme-custom-stylesheet" href="{{ $themeCustomCss }}" />
 	</head>
@@ -11,8 +10,8 @@
 		</div>
 		<h1>{text key="main.register-email-title" sitename="{$sitename}"}</h1>
 
-		<div class="content">
-			{text key="main.register-email-content" url="{$url}" sitename="{$sitename}"}
+		<div class="container">
+			<p>{text key="main.register-email-content" url="{$url}" sitename="{$sitename}"}</p>
 		</div>
 	</body>
 </html>

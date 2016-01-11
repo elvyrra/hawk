@@ -79,6 +79,14 @@ class User extends Model{
 		return self::getByExample(new DBExample(array('username' => $username)));
 	}
 
+
+	/**
+	 * Get a user by it email address
+	 */
+	public static function getByEmail($email){
+		return self::getByExample(new DBExample(array('email' => $email)));
+	}
+
 	/**
 	 * Set all the permissions on the user
 	 */

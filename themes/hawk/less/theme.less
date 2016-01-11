@@ -31,6 +31,9 @@
 @import url(https://fonts.googleapis.com/css?family=Ubuntu);
 
 @import "bootstrap.less";
+@import "bootstrap-colorpicker.less";
+@import "bootstrap-datepicker.less";
+
 @import "font-awesome.less";
 
 html{
@@ -169,8 +172,10 @@ code {
 }
 
 .center{
-    .vertical-center();
-    .horizontal-center();
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -347,9 +352,10 @@ input[type="file"] {
     }
 }
 
+
 input[type="radio"]{
     position: relative;
-    // margin-left: 1rem;
+    visibility: hidden;
 
     &:before{
         position: absolute;
@@ -359,6 +365,7 @@ input[type="radio"]{
         line-height: 2rem;
         content: @fa-var-circle-o;
         background: @body-bg;
+        visibility: visible;
     }
 
     &:checked:before{
@@ -374,7 +381,7 @@ input[type="radio"]{
 /*------------------------ Checkboxes --------------------------*/
 input[type="checkbox"]{
     position: relative;
-    // margin-left: 1rem;
+    visibility: hidden;
 
     &:before{
         position: absolute;
@@ -385,6 +392,7 @@ input[type="checkbox"]{
         content: @fa-var-square-o;
         background: @body-bg;
         padding-top: .45rem;
+        visibility: visible;
     }
 
     &:hover, &:focus, &:checked{
@@ -433,12 +441,12 @@ form{
             padding-top: .9rem;
 
             &.required:after{
-                content: "*";
+                content: " *";
                 color: @state-info-text;
             }
         }
 
-        @media(max-width: @screen-sm){
+        @media(max-width: @screen-xs-max){
             width: 100%;
 
             & > input:not([type="radio"]):not([type="checkbox"]), & > select, & > textarea, & >.input-inline, & > .input-radio-wrapper{
@@ -631,7 +639,7 @@ form{
     }
 
     .btn{
-        @media(max-width: @screen-sm){
+        @media(max-width: @screen-xs-max){
             .btn-label{
                 display: none;
             }
@@ -816,8 +824,11 @@ table {
     }
 
     .application-logo{
-        width: @main-menu-height;
-        height: @main-menu-height;
+        max-width: @main-menu-height;
+        max-height:@main-menu-height;
+        display: inline-block;
+        width: 100%;
+        height: 100%;
     }
 
     .main-menu{
@@ -838,7 +849,7 @@ table {
         }
     }
 
-    @media (max-width: @screen-sm) {
+    @media (max-width: @screen-xs-max) {
         .main-menu{
             height: auto;
         }
@@ -850,9 +861,15 @@ table {
             z-index: 1000;
             min-width: 50%;
         }
+
+        .application-logo{
+            float: left;
+
+            .vertical-center();
+        }
     }
 
-    @media(min-width: @screen-sm){
+    @media(min-width: @screen-sm-min){
         #main-menu-collapse{
             padding-left: 3.5rem;
         }
@@ -1017,7 +1034,7 @@ a, a:active, a:hover, a:visited, a:focus{
         margin: 0;
     }
 
-    @media(max-width: @screen-xs){
+    @media(max-width: @screen-xs-max){
         width: 100%;
     }
 }

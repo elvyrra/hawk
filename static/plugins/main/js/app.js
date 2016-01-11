@@ -499,7 +499,8 @@ App.prototype.hideNotification = function(){
  * @param {string} action - The action to perform. If "close", it will wlose the current dialog box, else it will load the action in the dialog box and open it
  */
 App.prototype.dialog = function(action){
-	$("#dialogbox").empty().modal('hide');
+	var container = $("#dialogbox");
+	container.modal('hide');
 
 	if(action == "close"){
 		return;
@@ -516,7 +517,7 @@ App.prototype.dialog = function(action){
 	})
 	.done(function(content){
 		// Page successfully loaded
-		$("#dialogbox").append(content).modal("show");
+		container.html(content).modal("show");
 	})
 
 	.fail(function(xhr, status, error){

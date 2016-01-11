@@ -45,7 +45,14 @@ class LoginController extends Controller{
 							'target' => 'dialog',
 							'class' => 'btn-success'
 						)) :
-						null
+						null,
+
+					new ButtonInput(array(
+						'name' => 'forgottenPassword',
+						'label' => Lang::get('main.login-forgotten-password-label'),
+						'href' => App::router()->getUri('forgotten-password'),
+						'target' => 'dialog'
+					))
 				),
 			),
 			'onsuccess' => '$.cookie("redirect", data.redirect); location = app.getUri("index");',
@@ -270,9 +277,8 @@ class LoginController extends Controller{
 						$data = array(
 							'themeBaseCss' => Theme::getSelected()->getBaseLessUrl(),
 							'themeCustomCss' => Theme::getSelected()->getCustomCssUrl(),
-							'mainCssUrl' => Plugin::current()->getCssUrl(),
 							'logoUrl' =>  Option::get('main.logo') ? Plugin::current()->getUserfilesUrl(Option::get('main.logo')) : Plugin::current()->getStaticUrl('img/hawk-logo.png'),
-							'sitename' => Option::get('main.title'),
+							'sitename' => Option::get('main.sitename'),
 							'url' => $url
 						);
 						if(Option::get('main.confirm-email-content')){
@@ -287,7 +293,7 @@ class LoginController extends Controller{
 							 ->fromName(Option::get('main.mailer-from-name'))
 							 ->to($user->email)
 							 ->html($mailContent)
-							 ->subject(Lang::get('main.register-email-title', array('sitename' => Option::get('main.title'))))
+							 ->subject(Lang::get('main.register-email-title', array('sitename' => Option::get('main.sitename'))))
 							 ->send();
 
 						return $form->response(Form::STATUS_SUCCESS, Lang::get('main.register-send-email-success'));
@@ -345,6 +351,177 @@ class LoginController extends Controller{
 		session_destroy();
 
 		App::response()->redirectToAction('index');
+	}
+
+
+	/**
+	 * Display and treat the form when the user forgot his password
+	 */
+	public function forgottenPassword(){
+		$form = new Form(array(
+			'id' => 'forgotten-password-form',
+			'fieldsets' => array(
+				'form' => array(
+					new EmailInput(array(
+						'name' => 'email',
+						'required' => true,
+						'label' => Lang::get('main.forgotten-pwd-form-email-label')
+					))
+				),
+
+				'submits' => array(
+					new SubmitInput(array(
+						'name' => 'valid',
+						'label' => Lang::get('main.valid-button')
+					)),
+
+					new ButtonInput(array(
+						'name' => 'cancel',
+						'label' => Lang::get('main.cancel-button'),
+						'href' => App::router()->getUri('login'),
+						'target' => 'dialog'
+					))
+
+				)
+			),
+			'onsuccess' => 'app.dialog(app.getUri("reset-password")); app.notify("warning", Lang.get("main.forgotten-pwd-sent-email-message"));',
+		));
+
+		if(!$form->submitted()){
+			Lang::addKeysToJavascript('main.forgotten-pwd-sent-email-message');
+
+			return Dialogbox::make(array(
+				'title' => Lang::get('main.forgotten-pwd-form-title'),
+				'icon' => 'lock-alt',
+				'page' => $form
+			));
+		}
+		else{
+			if($form->check()){
+				$user = User::getByEmail($form->getData('email'));
+
+				if(!$user){
+					// The user does not exists. For security reasons, reply the email was successfully sent, after a random delay to work around robots
+					usleep(mt_rand(0,500) * 100);
+					return $form->response(Form::STATUS_SUCCESS, Lang::get('main.forgotten-pwd-sent-email-message'));
+				}
+
+				try {
+					// The user exists, send an email with a 6 chars random verification code
+					$code = Crypto::generateKey(6);
+
+					// Register the verification code in the session
+					App::session()->setData('forgottenPassword', array(
+						'email' => $form->getData('email'),
+						'code' => Crypto::aes256Encode($code)
+					));
+
+					$mail = new Mail();
+					$mail
+						->from(Option::get('main.mailer-from'), Option::get('main.mailer-from-name'))
+						->to($form->getData('email'))
+						->subject(Lang::get('main.reset-pwd-email-title', array('sitename' => Option::get('main.sitename'))))
+						->html(View::make(
+							Plugin::current()->getView('reset-password-email.tpl'),
+							array(
+								'themeBaseCss' => Theme::getSelected()->getBaseLessUrl(),
+								'themeCustomCss' => Theme::getSelected()->getCustomCssUrl(),
+								'logoUrl' =>  Option::get('main.logo') ? Plugin::current()->getUserfilesUrl(Option::get('main.logo')) : Plugin::current()->getStaticUrl('img/hawk-logo.png'),
+								'sitename' => Option::get('main.sitename'),
+								'code' => $code
+							)
+						))
+						->send();
+
+					return $form->response(Form::STATUS_SUCCESS, Lang::get('main.forgotten-pwd-sent-email-message'));
+
+				}
+				catch(\Exception $e){
+					return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get('main.forgotten-pwd-form-error'));
+				}
+
+			}
+		}
+	}
+
+	/**
+	 * Display and treat the form to reset the user's password
+	 */
+	public function resetPassword(){
+		$form = new Form(array(
+			'id' => 'reset-password-form',
+			'fieldsets' => array(
+				'form' => array(
+					new TextInput(array(
+						'name' => 'code',
+						'required' => true,
+						'label' => Lang::get('main.reset-pwd-form-code-label')
+					)),
+
+					new PasswordInput(array(
+						'name' => 'password',
+						'required' => true,
+						'label' => Lang::get('main.reset-pwd-form-password-label'),
+						'encrypt' => array('\Hawk\Crypto', 'saltHash')
+					)),
+
+					new PasswordInput(array(
+						'name' => 'confirmation',
+						'required' => true,
+						'compare' => 'password',
+						'label' => Lang::get('main.reset-pwd-form-confirmation-label')
+					))
+				),
+
+				'submits' => array(
+					new SubmitInput(array(
+						'name' => 'valid',
+						'label' => Lang::get('main.valid-button')
+					)),
+
+					new ButtonInput(array(
+						'name' => 'cancel',
+						'label' => Lang::get('main.cancel-button'),
+						'href' => App::router()->getUri('login'),
+						'target' => 'dialog'
+					))
+				)
+			),
+			'onsuccess' => 'app.dialog(app.getUri("login"));'
+		));
+
+		if(!$form->submitted()){
+			return Dialogbox::make(array(
+				'title' => Lang::get('main.reset-pwd-form-title'),
+				'icon' => 'lock-alt',
+				'page' => $form
+			));
+		}
+		else{
+			if($form->check()){
+				// Check the verficiation code
+				if($form->getData('code') !== Crypto::aes256Decode(App::session()->getData('forgottenPassword.code'))){
+					$form->error('code', Lang::get('main.reset-pwd-form-bad-verification-code'));
+					return $form->response(Form::STATUS_CHECK_ERROR);
+				}
+
+				try{
+					$user = User::getByEmail(App::session()->getData('forgottenPassword.email'));
+					if($user){
+						$user->set('password', $form->inputs['password']->dbvalue());
+						$user->save();
+					}
+					else{
+						return $form->response(Form::STATUS_ERROR, App::session()->getData('forgottenPassword.email'));
+					}
+
+					return $form->response(Form::STATUS_SUCCESS, Lang::get('main.reset-pwd-form-success'));
+				}
+				catch(\Exception $e){
+					return $form->response(Form::STATUS_ERROR, Lang::get('main.reset-pwd-form-error'));
+				}
+			}
+		}
 	}
 
 }
