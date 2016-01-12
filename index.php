@@ -22,10 +22,24 @@ try{
     	}
     }
 
-    if(!App::conf()->has('db') && (App::request()->getUri() === '/' || App::request()->getUri() === 'index.php')) {
-        App::logger()->debug('Hawk is not installed yet, redirect to install process page');
-        App::response()->redirectToAction('install');
-    }
+    Event::on('after-routing', function($event){
+        $route = $event->getData('route');
+        $controllerClass = $route->getActionClassname();
+        $controller = $controllerClass::getInstance();
+
+
+        if(!App::conf()->has('db') && App::request()->getUri() == App::router()->getUri('index')) {
+            App::logger()->debug('Hawk is not installed yet, redirect to install process page');
+            App::response()->redirectToAction('install');
+            return;
+        }
+
+        if(!App::request()->isAjax() && App::request()->getMethod() == 'get' && ! in_array($controller->getPlugin()->getName(), array('main', 'install'))) {
+
+            $event->setData('route', App::router()->getRouteByName('index'));
+        }
+    });
+
 
     /*** Initialize the theme ***/
     if(is_file(Theme::getSelected()->getStartFile())){

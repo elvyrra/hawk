@@ -59,6 +59,8 @@ require.config({
  * @class App - This class describes the behavior of the application
  */
 var App = function(){
+	this.conf = window.appConf;
+
 	this.language = ''; // The application language
 	this.rootUrl = ''; // The application root url
 	this.isConnected = false; // The user is connected or not ?
@@ -73,7 +75,7 @@ var App = function(){
 /**
  * @const {string} INVALID_URI - The URI to return for non existing route
  */
-App.INVALID_URI = appConf.basePath + '/INVALID_URI';
+App.INVALID_URI = window.appConf.basePath + '/INVALID_URI';
 
 /**
  * Initialize the application
@@ -89,12 +91,12 @@ App.prototype.start = function(){
 		window.Lang = Lang;
 
 		// Set the configuration data
-		this.setLanguage(appConf.Lang.language);
-		this.setRoutes(appConf.routes);
-		this.setRootUrl(appConf.rooturl);
-		Lang.init(appConf.Lang.keys);
+		this.setLanguage(this.conf.Lang.language);
+		this.setRoutes(this.conf.routes);
+		this.setRootUrl(this.conf.rooturl);
+		Lang.init(this.conf.Lang.keys);
 		this.baseUrl = require.toUrl('');
-		this.isConnected = appConf.user.connected;
+		this.isConnected = this.conf.user.connected;
 
 
 		// Manage the notification area
@@ -265,17 +267,27 @@ App.prototype.start = function(){
 
 
 		/**
-		 * Open the tab asked by the user when it was not connected
-		 */
-		if(this.isConnected && $.cookie('redirect')){
-			appConf.tabs.open.push($.cookie('redirect'));
-			$.cookie('redirect', '', {expires : new Date()});
-		}
-
-		/**
 		 * Open the last tabs
 		 */
-		this.openLastTabs(appConf.tabs.open);
+		var onload = null;
+		if(location.pathname !== this.getUri('index')){
+			var index = this.conf.tabs.open.indexOf(location.pathname);
+			if(index === -1){
+				if(this.conf.tabs.open.length === 1){
+					this.conf.tabs.open = [location.pathname];
+				}
+				else{
+					this.conf.tabs.open.push(location.pathname);
+				}
+			}
+
+			index = this.conf.tabs.open.indexOf(location.pathname);
+			onload = function(){
+				this.tabset.activeTab(this.tabset.tabs()[index]);
+			}.bind(this);
+		}
+
+		this.openLastTabs(this.conf.tabs.open, onload);
 
 
 
@@ -327,7 +339,7 @@ App.prototype.load = function(url, data){
 
 		for(var i= 0; i < this.tabset.tabs().length; i++){
 			var tab = this.tabset.tabs()[i];
-			if (tab.url() == url || tab.route() == route) {
+			if (tab.uri() == url || tab.route() == route) {
 				if (tab !== this.tabset.activeTab()) {
 					this.tabset.activeTab(tab);
 				}
@@ -360,7 +372,7 @@ App.prototype.load = function(url, data){
 				if(element === this.tabset.activeTab()){
 					// The page has been loaded in a whole tab
 					// Register the tab url
-					element.url(url);
+					element.uri(url);
 					element.route(route);
 
 					element.content(response);
@@ -373,7 +385,7 @@ App.prototype.load = function(url, data){
 					// register the url in the tab history
 					element.history.push(url);
 
-					history.pushState({}, '', "#!" + url);
+					history.pushState({}, '', url);
 				}
 				else{
 					$(element).html(response);
@@ -432,9 +444,14 @@ App.prototype.load = function(url, data){
 
 /**
  * Open a set of pages
+ * @param {array} uris The uris to open, each one in a tab
+ * @param {function} onload The callback to execute when all the tabs are loaded
  */
-App.prototype.openLastTabs = function(uris){
+App.prototype.openLastTabs = function(uris, onload){
 	if(!uris.length){
+		if(onload){
+			onload(uris);
+		}
 		// No more tab has to be open
 		return;
 	}
@@ -442,7 +459,7 @@ App.prototype.openLastTabs = function(uris){
 	var uri = uris.shift();
 	this.load(uri, {
 		newtab : true,
-		onload : this.openLastTabs.bind(this, uris)
+		onload : this.openLastTabs.bind(this, uris, onload)
 	});
 };
 
@@ -560,7 +577,7 @@ App.prototype.getUri = function(method, args){
 				url = url.replace("{" + j + "}", args[j]);
 			}
 		}
-		return appConf.basePath + url;
+		return this.conf.basePath + url;
 	}
 	else{
 		return App.INVALID_URI;

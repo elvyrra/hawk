@@ -3,36 +3,36 @@
  * Controller.php
  * @author Elvyrra SAS
  */
-	
+
 namespace Hawk;
 
 /**
- * This class describes the behavior of a controller. All controllers defined in application plugins 
+ * This class describes the behavior of a controller. All controllers defined in application plugins
  * must extend this class for the application routes work.
  * @package Core
  */
-class Controller{	
+class Controller{
 	use Utils;
 
 	/**
 	 * The current used controller. This static property is used to know which is the current controller associated to the current route
 	 */
 	public static $currentController = null;
-	
+
 	const BEFORE_ACTION = 'before';
-    
+
     const AFTER_ACTION = 'after';
-	
+
 	/**
 	 * Constructor
 	 * @param array $param The parameters of the controller. This parameter is set by the router with the parameters defined in the routes as '{paramName}'
 	 */
-	public function __construct($param = array()){		
+	public function __construct($param = array()){
 		$this->map($param);
-			
+
 		self::$currentController = $this;
 	}
-	
+
 
 	/**
 	 * Get a controller instance
@@ -40,12 +40,12 @@ class Controller{
 	 * @return Controller The controller instance
 	 */
 	public static function getInstance($param = array()){
-		return new static($param);		
+		return new static($param);
 	}
-	
+
 
 	/**
-	 * Execute a controller method. This method is called by the router. 
+	 * Execute a controller method. This method is called by the router.
 	 * It execute the controller method, and triggers events before and after the method has been executed, to add widgets or other functionnalities
 	 * from another plugin than the controller's one.
 	 * @param string $method The method to execute
@@ -54,7 +54,7 @@ class Controller{
 	public function compute($method){
 		/*** Load widgets before calling the controller method ***/
 		(new Event(get_called_class() . '.' . $method . '.' . self::BEFORE_ACTION, array('controller' => $this)))->trigger();
-		
+
 		/*** Call the controller method ***/
 		$args = array_splice(func_get_args(), 1);
 		$result = call_user_func_array(array($this, $method), $args);
@@ -62,13 +62,13 @@ class Controller{
 			// Create a phpQuery object to be modified by event listeners (widgets)
 			$result = \phpQuery::newDocument($result);
 		}
-				
-		/*** Load the widgets after calling the controller method ***/		
+
+		/*** Load the widgets after calling the controller method ***/
 		$event = new Event(get_called_class() . '.' . $method . '.' . self::AFTER_ACTION, array('controller' => $this, 'result' => $result));
 		$event->trigger();
-		
+
 		$result = $event->getData('result');
-		if( $result instanceof \phpQuery){			
+		if( $result instanceof \phpQuery){
 			return $result->htmlOuter();
 		}
 		else{
@@ -81,15 +81,15 @@ class Controller{
 	 * Add static content at the end of the DOM
 	 * @param string $content The content to add
 	 */
-	private function addContentAtEnd($content){	
-		Event::on(App::router()->getCurrentAction() . '.' . self::AFTER_ACTION, function($event) use($content){			
-			if(App::response()->getContentType() === 'html'){	
+	private function addContentAtEnd($content){
+		Event::on(App::router()->getCurrentAction() . '.' . self::AFTER_ACTION, function($event) use($content){
+			if(App::response()->getContentType() === 'html'){
 				$dom = $event->getData('result');
 				if($dom->find('body')->length){
 					$dom->find('body')->append($content);
 				}
 				else{
-					$dom->find("*:first")->parent()->children()->slice(-1)->after($content);					
+					$dom->find("*:first")->parent()->children()->slice(-1)->after($content);
 				}
 			}
 		});
@@ -126,5 +126,28 @@ class Controller{
 	 */
 	public function addJavaScriptInline($script){
 		$this->addContentAtEnd("<script type='text/javascript'>$script</script>");
+	}
+
+
+	/**
+	 * get the controller namespace
+	 */
+	public function getNamespace(){
+		$reflection = new \ReflectionClass(get_called_class());
+
+		return $reflection->getNamespaceName();
+	}
+
+	/**
+	 * Get the controller plugin
+	 */
+	public function getPlugin(){
+		foreach (Plugin::getAll() as $plugin) {
+			if($plugin->getNamespace() == $this->getNamespace()){
+				return $plugin;
+			}
+		}
+
+		return null;
 	}
 }

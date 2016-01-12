@@ -141,19 +141,21 @@ define('ko-extends', ['jquery', 'ko'], function($, ko){
      * Custom binding for CKEditor
      */
     ko.bindingHandlers.wysiwyg = {
-        update : function(element, valueAccessor, allBindings, viewModel, bindingContext) { 
+        update : function(element, valueAccessor, allBindings, viewModel, bindingContext) {             
             require(['ckeditor'], function(CKEDITOR){
-                var editor = CKEDITOR.replace(element.id, {
-                    language : app.language,
-                    removeButtons : 'Save,Scayt,Rtl,Ltr,Language,Flash',
-                    entities : false,       
-                    on : {              
-                        change : function(event){ 
-                            $("#" + element.id).val(event.editor.getData()).trigger('change');
+                if(!CKEDITOR.dom.element.get(element.id).getEditor()){
+                    var editor = CKEDITOR.replace(element.id, {
+                        language : app.language,
+                        removeButtons : 'Save,Scayt,Rtl,Ltr,Language,Flash',
+                        entities : false,       
+                        on : {              
+                            change : function(event){ 
+                                $("#" + element.id).val(event.editor.getData()).trigger('change');
+                            }
                         }
-                    }
-                }); 
-                editor.addContentsCss(document.getElementById('less:theme-base-less').innerText);
+                    }); 
+                    editor.addContentsCss(document.getElementById('less:theme-base-less').innerText);
+                }
             });
         }
     };

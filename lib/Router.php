@@ -207,17 +207,19 @@ final class Router extends Singleton{
 		foreach($this->activeRoutes as $route){
             if($route->match($uri)){
             	// The URI matches with the route
+				$this->currentRoute = &$route;
+
+        		// Emit an event, saying the routing action is finished
+				$event = new Event('after-routing', array(
+					'route' => $route,
+				));
+				$event->trigger();
+
+				$route = $event->getData('route');
+
             	if($route->isAccessible()){
             		// The route authentications are validated
-					$this->currentRoute = &$route;
 
-            		// Emit an event, saying the routing action is finished
-					$event = new Event('after-routing', array(
-						'route' => $route,
-					));
-					$event->trigger();
-
-					$route = $event->getData('route');
 
 					list($classname, $method) = explode(".", $route->action);
 
@@ -374,6 +376,15 @@ final class Router extends Singleton{
     	}
 
     	return null;
+    }
+
+
+    /**
+     * Get a route by it name
+     * @param string $name The route name
+     */
+    public function getRouteByName($name){
+    	return isset($this->routes[$name]) ? $this->routes[$name] : null;
     }
 
 }

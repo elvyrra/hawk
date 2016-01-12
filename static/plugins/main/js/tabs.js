@@ -6,7 +6,7 @@ define('tabs', ['jquery', 'ko'], function($, ko){
 	 */
 	window.Tab = function(id){
 		this.id = ko.observable(id);
-		this.url = ko.observable("");
+		this.uri = ko.observable("");
 		this.content = ko.observable('');
 		this.route = ko.observable("");
 
@@ -20,7 +20,7 @@ define('tabs', ['jquery', 'ko'], function($, ko){
 
 		var self = this;
 	};
-	
+
 
 	var Tabset = function(){
 		this.tabs = ko.observableArray([]);
@@ -41,7 +41,7 @@ define('tabs', ['jquery', 'ko'], function($, ko){
 		});
 
 		this.activeTab.subscribe(function(tab){
-			history.replaceState({}, "", "#!" + tab.history[tab.history.length - 1]);
+			history.replaceState({}, "", tab.history[tab.history.length - 1]);
 		}.bind(this));
 	};
 
@@ -93,7 +93,7 @@ define('tabs', ['jquery', 'ko'], function($, ko){
 	Tabset.prototype.registerTabs = function(){
 		var data = [];
 		for(var i = 0; i < this.tabs().length; i++){
-			data.push(this.tabs()[i].url());
+			data.push(this.tabs()[i].uri());
 		}
 		$.cookie('open-tabs', JSON.stringify(data), {expire : 365, path : '/'});
 	};

@@ -45,5 +45,14 @@ App::router()->setProperties(
 		App::router()->auth(DEV_MODE, function(){
 			App::router()->get('clear-cache', '/clear-cache', array('action' => 'MainController.clearCache'));
 		});
+
+		// Event::on('process-end', function($event){
+		//     if(!App::request()->isAjax() && App::request()->getUri() !== App::router()->getUri('index') && App::response()->getContentType() == 'html' && App::request()->getMethod() == 'get'){
+
+		//         $output = \Hawk\Plugins\Main\MainController::getInstance()->compute('main');
+
+		//         $event->setData('output', $output);
+		//     }
+		// });
 	}
 );

@@ -55,7 +55,7 @@ class LoginController extends Controller{
 					))
 				),
 			),
-			'onsuccess' => '$.cookie("redirect", data.redirect); location = app.getUri("index");',
+			'onsuccess' => 'location = location.pathname;',
 		);
 
 		return new Form($param);
