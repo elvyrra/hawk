@@ -48,7 +48,7 @@ class DatetimeInput extends TextInput{
 	 * Display the input
 	 * @return string The HTML result of displaying
 	 */
-	public function __toString(){
+	public function display(){
 		
 		if(is_numeric($this->value)){
 			$this->timestamp = $this->value;
@@ -61,14 +61,19 @@ class DatetimeInput extends TextInput{
 		$this->class .= " datetime";
 		
 		/*** Format the value ***/	
-		$picker = array('format' => Lang::get('main.date-mask'));
+		$picker = array(
+			'format' => Lang::get('main.date-mask'),
+			'orientation' => 'right'			
+		);
 		if($this->max){
 			$picker['endDate'] = $this->max;
 		}
 		if($this->min){
 			$picker['startDate'] = $this->min;
 		}
-		return parent::__toString() . "<script>$('#$this->id').datepicker(" . json_encode($picker) . ");</script>";
+
+		Controller::current()->addJavaScriptInline('$("#' . $this->id . '").datepicker(' . json_encode($picker) . ');');
+		return parent::display();
 	}
 	
 

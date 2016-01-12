@@ -300,7 +300,7 @@ final class Router extends Singleton{
 	 * @return Controller The last instanciated controller
 	 */
 	public function getCurrentController(){
-		return Controller::$currentController;
+		return Controller::current();
 	}
 
 	/**

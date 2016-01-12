@@ -17,7 +17,7 @@ class Controller{
 	/**
 	 * The current used controller. This static property is used to know which is the current controller associated to the current route
 	 */
-	public static $currentController = null;
+	public static $currentInstance = null;
 
 	const BEFORE_ACTION = 'before';
 
@@ -30,7 +30,7 @@ class Controller{
 	public function __construct($param = array()){
 		$this->map($param);
 
-		self::$currentController = $this;
+		self::$currentInstance = $this;
 	}
 
 
@@ -41,6 +41,15 @@ class Controller{
 	 */
 	public static function getInstance($param = array()){
 		return new static($param);
+	}
+
+
+	/**
+	 * Get the current controller instance
+	 * @return  Controller The current controller
+	 */
+	public static function current(){
+		return self::$currentInstance;
 	}
 
 

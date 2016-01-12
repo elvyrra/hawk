@@ -43,7 +43,7 @@ class ButtonInput extends FormInput{
 	 * Display the input
 	 * @return string The dislayed HTML
 	 */
-	public function __toString(){
+	public function display(){
 		if(!empty($this->notDisplayed)){
 			return '';
 		}

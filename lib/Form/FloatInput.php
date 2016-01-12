@@ -28,9 +28,9 @@ class FloatInput extends NumberInput{
 	 * Display the input
 	 * @return string The displayed HTML
 	 */
-	public function __toString(){
+	public function display(){
 		$this->value = number_format(floatval($this->value), $this->decimals, ".", "");
-		return parent::__toString();
+		return parent::display();
 	}
 	
 

@@ -18,11 +18,11 @@ class DeleteInput extends ButtonInput{
 	 * Display the input
 	 * @return string The HTML result of the input displaying
 	 */
-	public function __toString(){		
+	public function display(){		
 		$this->class .= " btn-danger input-delete ";
 		$this->icon = "times";
 		$this->type = "submit";
 		
-		return parent::__toString();
+		return parent::display();
 	}
 }
