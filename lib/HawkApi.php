@@ -38,9 +38,9 @@ class HawkApi{
                         'required' => true,
                     )
                 )
-            )            
+            )
         ),
-        
+
         // Install a plugin
         'api-install-plugin' => array(
             'method' => 'get',
@@ -60,7 +60,7 @@ class HawkApi{
             'where' => array(
                 'params' => array(
                     'plugins' => array(
-                        'required' => true, 
+                        'required' => true,
                     )
                 )
             )
@@ -78,7 +78,7 @@ class HawkApi{
                 )
             )
         ),
-        
+
         // Install a theme
         'api-install-theme' => array(
             'method' => 'get',
@@ -98,7 +98,7 @@ class HawkApi{
             'where' => array(
                 'params' => array(
                     'themes' => array(
-                        'required' => true,                    
+                        'required' => true,
                     )
                 )
             )
@@ -130,7 +130,7 @@ class HawkApi{
         )
     );
 
-    
+
     /**
      * Call the API
      * @param string $routeName The route name to call
@@ -160,6 +160,9 @@ class HawkApi{
 
         $request = new HTTPRequest(array(
             'url' => HAWK_SITE_URL . '/api' . $uri,
+            'headers' => array(
+                'X-Requested-With' => 'XMLHttpRequest'
+            ),
             'method' => $route['method'],
             'contentType' => 'json',
             'dataType' => isset($route['dataType']) ? $route['dataType'] : 'json',
@@ -172,7 +175,7 @@ class HawkApi{
         if($request->getStatusCode() === 200){
             $result = $request->getResponse();
             $contentType = $request->getResponseHeaders('Content-Type');
-            
+
             if($contentType == 'application/octet-stream'){
 
                 $tmpName = TMP_DIR . uniqid() . '.zip' ;
@@ -197,8 +200,8 @@ class HawkApi{
      */
     public function getCoreAvailableUpdates(){
         return $this->callApi(
-            'api-core-available-updates', 
-            array(), 
+            'api-core-available-updates',
+            array(),
             array(
                 'params' => array(
                     'version' => HAWK_VERSION
@@ -215,9 +218,9 @@ class HawkApi{
      */
     public function getCoreUpdateArchive($version){
         return $this->callApi(
-            'api-core-update', 
+            'api-core-update',
             array('to' => $version)
-        );        
+        );
     }
 
 
@@ -228,8 +231,8 @@ class HawkApi{
      */
     public function searchPlugins($search){
         return $this->callApi(
-            'api-search-plugins', 
-            array(), 
+            'api-search-plugins',
+            array(),
             array(
                 'params' => array(
                     'search' => $search
@@ -242,11 +245,11 @@ class HawkApi{
     /**
      * Download a plugin file
      * @param string $name The plugin name to download
-     * @return string The filename of the temporary file created by the downloaded content 
+     * @return string The filename of the temporary file created by the downloaded content
      */
     public function downloadPlugin($name){
         return $this->callApi(
-            'api-install-plugin', 
+            'api-install-plugin',
             array('name' => $name)
         );
     }
@@ -258,8 +261,8 @@ class HawkApi{
      */
     public function getPluginsAvailableUpdates($plugins){
         return $this->callApi(
-            'api-plugins-available-updates', 
-            array(), 
+            'api-plugins-available-updates',
+            array(),
             array(
                 'params' => array(
                     'plugins' => json_encode($plugins)
@@ -276,8 +279,8 @@ class HawkApi{
      */
     public function searchThemes($search){
         return $this->callApi(
-            'api-search-themes', 
-            array(), 
+            'api-search-themes',
+            array(),
             array(
                 'params' => array(
                     'search' => $search
@@ -290,11 +293,11 @@ class HawkApi{
     /**
      * Download a theme file
      * @param string $name The theme name to download
-     * @return string The filename of the temporary file created by the downloaded content 
+     * @return string The filename of the temporary file created by the downloaded content
      */
     public function downloadTheme($name){
         return $this->callApi(
-            'api-install-theme', 
+            'api-install-theme',
             array(
                 'name' => $name
             )
@@ -308,15 +311,15 @@ class HawkApi{
      */
     public function getThemesAvailableUpdates($themes){
         return $this->callApi(
-            'api-themes-available-updates', 
-            array(), 
+            'api-themes-available-updates',
+            array(),
             array(
                 'params' => array(
                     'themes' => json_encode($themes)
                 )
             )
         );
-    }    
+    }
 }
 
 /**

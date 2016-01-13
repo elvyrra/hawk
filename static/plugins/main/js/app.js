@@ -270,18 +270,19 @@ App.prototype.start = function(){
 		 * Open the last tabs
 		 */
 		var onload = null;
-		if(location.pathname !== this.getUri('index')){
-			var index = this.conf.tabs.open.indexOf(location.pathname);
+		var hash = location.hash.replace(/^#\!/, '');
+		if(hash){
+			var index = this.conf.tabs.open.indexOf(hash);
 			if(index === -1){
 				if(this.conf.tabs.open.length === 1){
-					this.conf.tabs.open = [location.pathname];
+					this.conf.tabs.open = [hash];
 				}
 				else{
-					this.conf.tabs.open.push(location.pathname);
+					this.conf.tabs.open.push(hash);
 				}
 			}
 
-			index = this.conf.tabs.open.indexOf(location.pathname);
+			index = this.conf.tabs.open.indexOf(hash);
 			onload = function(){
 				this.tabset.activeTab(this.tabset.tabs()[index]);
 			}.bind(this);
@@ -385,7 +386,7 @@ App.prototype.load = function(url, data){
 					// register the url in the tab history
 					element.history.push(url);
 
-					history.pushState({}, '', url);
+					history.pushState({}, '', '#!' + url);
 				}
 				else{
 					$(element).html(response);

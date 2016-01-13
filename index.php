@@ -42,13 +42,6 @@ try{
             App::response()->redirectToAction('install');
             return;
         }
-
-        if( !App::request()->isAjax() &&
-            App::request()->getMethod() == 'get' &&
-            (!in_array($controller->getPlugin()->getName(), array('main', 'install')) || App::request()->getUri() == App::router()->getUri('new-tab'))) {
-            // a plugin page has been called with no AJAX request, redirec to index that will load it with an AJAX request
-            $event->setData('route', App::router()->getRouteByName('index'));
-        }
     });
 
     /*** Compute the routage ***/
