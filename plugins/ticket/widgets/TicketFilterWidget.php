@@ -16,41 +16,31 @@ class TicketFilterWidget extends Widget{
 
 	public function getFilters(){
 
-		//$result = !empty($_COOKIE['ticket-filter']) ? json_decode($_COOKIE['ticket-filter'], true) : array();
-
-		foreach(self::$filters as $name){
-			if(isset($_GET[$name])){
-				$result[$name] = $_GET[$name];
-			}
-
-			if(empty($result[$name])){
-				$result[$name] = 0;
-			}
+		$result = App::request()->getCookies('ticket-filter') ? json_decode(App::request()->getCookies('ticket-filter'), true) : array();
+		foreach($result as $name => $values){
+			$result[$name] = array_filter($result[$name]);
 		}
-		//setcookie('ticket-filter', json_encode($result));
 		
-		return $result;
+		return($result);
 	}
 
 
 	public function display(){
-
-		$result = TicketOption::getByExample(new DBExample(array('plugin' => 'ticket')));
+		$filters = $this->getFilters();
 
 		$form = new Form(array(
-			'id' => 'ticket-filter-form',
-			'model' => '\Hawk\Plugins\Ticket\Ticket',
+			'id' => 'ticket-filter-form',			
 			'fieldsets' => array(
-				'form' => array(
-					new SelectInput(array(
-						'name' => 'status',
-						'options' => $options,
-						'value' => $filters['status'],
-						'label' => Lang::get('ticket.filter-status-label')
-					)),		
-				)
+				'form' => array_map(function($status) use($filters){
+					return new CheckboxInput(array(
+						'name' => 'status[' . $status . ']',
+						'value' => isset($filters['status'][$status]),
+						'label' => $status,
+						'beforeLabel' => true,
+						'labelWidth' => 'auto',
+					));
+				}, json_decode(Option::get('ticket.status'), true))
 			)
-
 		));
 
 		return View::make(Theme::getSelected()->getView("box.tpl"), array(

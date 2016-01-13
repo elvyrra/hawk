@@ -19,11 +19,19 @@ class TicketController extends Controller{
         // Add javascript file
         $this->addJavaScript(Plugin::current()->getJsUrl('ticket.js'));
 
-		return NoSidebarTab::make(array(
-			'page' => $list,
+		return LeftSidebarTab::make(array(
+			'page' => array(
+				'content' => $list
+			),
+			'sidebar' => array(
+				'widgets' => array(new TicketFilterWidget())
+			),
 			'title' => Lang::get('ticket.page-title'),
-			'icon' => 'book'			
+			'icon' => 'book',
+			'tabId' => 'tickets-page'			
 		));
+
+
     }  
 
     /**
@@ -31,34 +39,46 @@ class TicketController extends Controller{
      */
     public function getlistTicket(){
     	$users = array_map(function($a){ return $a->username; }, User::getAll('id'));
+    	$projects = array_map(function($a){ return $a->name; }, TicketProject::getAll('id'));
+
+    	$filters = TicketFilterWidget::getInstance()->getFilters();
+    	$filter = null;
+    	if(!empty($filters['status'])){
+    		$filter = new DBExample(array(
+    			'status' => array('$in' => array_keys($filters['status']))
+    		));
+    	}
 
     	$param = array(
 			'id' => 'ticket-list',
 			'model' => 'Ticket',
-			'action' => Router::getUri('ticket-list'),
+			'action' => App::router()->getUri('ticket-list'),			
+			'filter' => $filter,
 			'reference' => 'id',
+			"lineClass" => function($line){
+				return "danger";
+			},
 			'controls' => array(
 				array(
 					'icon' => 'plus',
 					'label' => Lang::get('ticket.new-ticket-btn'),
 					'class' => 'btn-success',
-					'href' => Router::getUri("ticket-editTicket", array('ticketId' => 0)),
+					'href' => App::router()->getUri("ticket-editTicket", array('ticketId' => 0)),
 				),
 
 				array(
 					'icon' => 'cubes',
 					'label' => Lang::get('ticket.new-project-btn'),
 					'class' => 'btn-primary',
-					'href' => Router::getUri("ticket-editProject", array('projectId' => 0)),
+					'href' => App::router()->getUri("ticket-editProject", array('projectId' => 0)),
 					'target' => 'dialog',
 				),			
 			),
 			'fields' => array(
-
 				'actions' => array(
 					'independant' => true,
 					'display' => function($value, $field, $ticket){
-						return "<i class='icon icon-pencil text-primary' href='". Router::getUri('ticket-editTicket', array('ticketId' => $ticket->id)) . "'></i>" .
+						return "<i class='icon icon-pencil text-primary' href='". App::router()->getUri('ticket-editTicket', array('ticketId' => $ticket->id)) . "'></i>" .
 							   "<i class='icon icon-close text-danger delete-ticket' data-ticket='{$ticket->id}'></i>";
 					},
 					'search' => false,
@@ -71,6 +91,11 @@ class TicketController extends Controller{
 					'display' => function($value, $field, $ticket){
 						return TicketProject::getById($value)->name;
 					},
+					'search' => array(
+						'type' => 'select',
+						'options' => $projects,
+						'invitation' => ' - '
+					),
 				),
 
 				'title' => array(
@@ -93,19 +118,7 @@ class TicketController extends Controller{
 
 				'status' => array(
 					'label' => Lang::get('ticket.status-label'),
-					'search' => array(
-						'type' => 'select',
-						'options' => call_user_func(function(){
-							$status = json_decode(Option::get('ticket.status'));
-							$options = array();
-
-							foreach($status as $stat){
-								$options[$stat] = $stat;
-							}
-							return $options;
-						}),	
-						'invitation' => Lang::get('ticket.project-status-all')
-					),
+					'search' => false
 				),
 
 				'target' => array(
@@ -129,12 +142,15 @@ class TicketController extends Controller{
        					}
 
        					if(strtotime($value) < strtotime(date('Y-m-d'))){
-       						return '<span class="text-danger">' . strftime(Lang::get('ticket.format-date-label') ,strtotime($value)) . '</span>';
+       						return '<span class="text-danger">' . date(Lang::get('main.date-format'), strtotime($value)) . '</span>';
        					}
        					else{
-							return '<span class="text-success">' . strftime(Lang::get('ticket.format-date-label') ,strtotime($value)) . '</span>';
+							return '<span class="text-success">' . date(Lang::get('main.date-format'), strtotime($value)) . '</span>';
        					}
-					},			
+					},	
+					'search' => array(
+						'type' => 'date'
+					)		
 				),
 
 				'mtime' => array(
@@ -149,14 +165,9 @@ class TicketController extends Controller{
 
 		$list = new ItemList($param);
 
-		if(Request::getParams('refresh') ){
-			return $list->display();	
-		}
-		else{
-			return View::make(Plugin::current()->getView("ticket-list.tpl"), array(
-				'list' => $list,
-			));
-		}
+		Lang::addKeysToJavaScript('ticket.delete-ticket-confirmation');
+
+		return $list->display();	
     }
 
     /**
@@ -168,12 +179,7 @@ class TicketController extends Controller{
 		$projects = array_map(function($a){ return $a->name; }, TicketProject::getAll('id'));
 		$users = array_map(function($a){ return $a->username; }, User::getAll('id'));
 
-		$status = json_decode(Option::get('ticket.status'));
-		$options = array();
-
-		foreach($status as $stat){
-			$options[$stat] = $stat;
-		}
+		$options = json_decode(Option::get('ticket.status'));
 
 		$param = array(
 			'id' => 'ticket-form',		
@@ -215,12 +221,12 @@ class TicketController extends Controller{
 					new DatetimeInput(array(
 						'name' => 'deadLine',
 						'label' => Lang::get('ticket.deadLine-label'),
-						'value' => date('Y-m-d'),
+						'value' => date('Y-m-d'),						
 					)),
 
 					new HiddenInput(array(
 						'name' => 'author',
-						'value' => Session::getUser()->id,
+						'value' => App::session()->getUser()->id,
 					)),
 					
 					new HiddenInput(array(
@@ -276,15 +282,27 @@ class TicketController extends Controller{
 
 				if($oldValues){
 					$comments = array();
-					foreach(array('title', 'status', 'description', 'target', 'deadLine') as $key){
-						if($oldValues->$key !== $form->fields[$key]->dbvalue()){
+					foreach(array('title', 'description', 'deadLine') as $key){
+						if($oldValues->$key !== $form->getData($key)){  //$form->fields['status']->dbvalue()
 							$comments[] = Lang::get('ticket.' . $key . '-change-comment', array('oldValue' => $oldValues->$key, 'newValue' => $form->getData($key)));
 						}
 					}
 
+					if($oldValues->status !== $form->getData('status')){
+						$oldValue = $oldValues->status;
+						$newValue = $form->getData('status');
+						$comments[] = Lang::get('ticket.status-change-comment', array('oldValue' => $options->$oldValue, 'newValue' => $options->$newValue));
+					}
+
+					if($oldValues->target !== $form->getData('target')){
+						$oldValue = $oldValues->target;
+						$newValue = $form->getData('target');
+						$comments[] = Lang::get('ticket.target-change-comment', array('oldValue' => $users[$oldValue], 'newValue' => $users[$newValue]));
+					}
+
 					if(!empty($comments)){
 						TicketComment::add(array(
-							'author' => Session::getUser()->id,
+							'author' => App::session()->getUser()->id,
 							'ticketId' => $this->ticketId,
 							'mtime' => time(),
 							'description' => implode('<br />', $comments)
@@ -303,7 +321,7 @@ class TicketController extends Controller{
 	 * Remove a ticket
 	 */
 	public function removeTicket(){
-		$ticket = Ticket::getById($this->id);		
+		$ticket = Ticket::getById($this->ticketId);		
 		$ticket->delete();
 	}
 
@@ -315,14 +333,14 @@ class TicketController extends Controller{
 		$paramList = array(
 			'id' => 'ticket-history',
 			'model' => 'TicketComment',
-			'action' => Router::getUri('ticket-history', array('ticketId' => $this->ticketId)),
+			'action' => App::router()->getUri('ticket-history', array('ticketId' => $this->ticketId)),
 		    'filter' => new DBExample(array('ticketId' => $this->ticketId)),
 		    'controls' => $this->ticketId ? array(
 				array(
 					'icon' => 'plus',
 					'label' => Lang::get('ticket.new-comment-btn'),
 					'class' => 'btn-success',
-					'href' => Router::getUri("ticket-editComment", array('ticketId' => $this->ticketId, 'commentId' => 0)),
+					'href' => App::router()->getUri("ticket-editComment", array('ticketId' => $this->ticketId, 'commentId' => 0)),
 					'target' => 'dialog',
 				) ,
 			) : array(),
@@ -380,7 +398,7 @@ class TicketController extends Controller{
 
 					new HiddenInput(array(
 						'name' => 'author',
-						'value' => Session::getUser()->id,
+						'value' => App::session()->getUser()->id,
 					)),
 					
 					new HiddenInput(array(
@@ -479,12 +497,10 @@ class TicketController extends Controller{
 					foreach(explode(PHP_EOL, $form->getData("options")) as $i => $option){
 						if(!empty($option)){
 							$keys[$option] = trim($option);
-							//Log::debug(trim($option));
 						}
 					}	
 
-					//Log::debug(var_dump($keys));
-					Log::debug(json_encode($keys));
+					App::logger()->debug(json_encode($keys));
 					Option::set('ticket.status', json_encode($keys));
 
 					return $form->response(Form::STATUS_SUCCESS);		

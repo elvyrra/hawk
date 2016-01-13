@@ -17,6 +17,8 @@ class ProjetController extends Controller{
         // Add javascript file
         $this->addJavaScript(Plugin::current()->getJsUrl('ticket.js'));
 
+        Lang::addKeysToJavaScript('ticket.delete-project-confirmation');
+
 		return NoSidebarTab::make(array(
 			'page' => $list,
 			'title' => Lang::get('ticket.project-page-title'),
@@ -30,20 +32,20 @@ class ProjetController extends Controller{
     	$param = array(
 			'id' => 'ticket-project-list',
 			'model' => 'TicketProject',
-			'action' => Router::getUri('ticket-project-list'),			
+			'action' => App::router()->getUri('ticket-project-list'),			
 			'controls' => array(
 				array(
 					'icon' => 'plus',
 					'label' => Lang::get('ticket.new-project-btn'),
 					'class' => 'btn-success',
-					'href' => Router::getUri("ticket-editProject", array('projectId' => 0)),
+					'href' => App::router()->getUri("ticket-editProject", array('projectId' => 0)),
 					'target' => 'dialog',
 				),
 				array(
 					'icon' => 'eye',
 					'label' => Lang::get('ticket.view-ticket-btn'),
-					'class' => 'btn-success',
-					'href' => Router::getUri("ticket-index"),
+					'class' => 'btn-primary',
+					'href' => App::router()->getUri("ticket-index"),
 					'target' => 'newtab',
 				),
 			),
@@ -51,7 +53,7 @@ class ProjetController extends Controller{
 				'actions' => array(
 					'independant' => true,
 					'display' => function($value, $field, $project){
-						return "<i class='icon icon-pencil text-primary' href='". Router::getUri('ticket-editProject', array('projectId' => $project->id)) . "' target='dialog'></i>" .
+						return "<i class='icon icon-pencil text-primary' href='". App::router()->getUri('ticket-editProject', array('projectId' => $project->id)) . "' target='dialog'></i>" .
 							   "<i class='icon icon-close text-danger delete-project' data-project='{$project->id}'></i>";
 					},
 					'search' => false,
@@ -93,7 +95,7 @@ class ProjetController extends Controller{
 				'mtime' => array(
 					'label' => Lang::get('ticket.project-mtime-label'),
 					'display' => function($value, $field){
-						return strftime(Lang::get('ticket.format-date-label') ,strtotime($value));
+						return date(Lang::get('main.date-format'), $value);
 					},
 					'search' => false,
 				),
@@ -102,7 +104,7 @@ class ProjetController extends Controller{
 
 		$list = new ItemList($param);
 
-		if(Request::getParams('refresh') ){
+		if(App::request()->getParams('refresh') ){
 			return $list->display();	
 		}
 		else{
@@ -154,7 +156,7 @@ class ProjetController extends Controller{
 
 					new HiddenInput(array(
 						'name' => 'author',
-						'value' => Session::getUser()->id,
+						'value' => App::session()->getUser()->id,
 					)),
 
 				),			
@@ -172,7 +174,7 @@ class ProjetController extends Controller{
 					))
 				),
 			),
-			'onsuccess' => 'app.dialog("close");app.lists["ticket-project-list"].refresh();'
+			'onsuccess' => 'app.dialog("close");if(app.lists["ticket-project-list"]){app.lists["ticket-project-list"].refresh();}'
 		);
 
 		$form = new Form($param);

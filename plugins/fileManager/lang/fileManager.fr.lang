@@ -1,0 +1,21 @@
+menu-title = "Gestionnaire de fichier"
+page-title = "Gestionnaire de fichier"
+
+editFolder-title = "Editer un répertoire"
+editFile-title = "Editer un fichier"
+add-type-action = "Que voulez-vous faire?"
+removeFolder-label = "Supprimer le répertoire"
+addFolder-label = "Créer un répertoire"
+editNameFolder-label = "Modifier le nom du répertoire"
+addFile-label = "Créer un fichier"
+importFile-label = "Importer un fichier"
+file-label = "Fichier"
+removeFile-label = "Supprimer le fichier"
+editNameFile-label = "Modifier le nom du fichier"
+alert-remove-text = "Attention: lors de la suppression du répertoire tout son contenu sera également supprimé"
+
+old-name-folder-label = "Nom actuel"
+new-name-folder-label = "Nouveau nom"
+new-name-label = "Nouveau nom"
+edit-submit-value = "Valider"
+
