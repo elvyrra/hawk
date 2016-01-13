@@ -22,14 +22,14 @@ class Plugin{
 	const MANIFEST_BASENAME = 'manifest.json';
 
 	/**
-	 * The pattern for a plugin name	 
+	 * The pattern for a plugin name
 	 */
 	const NAME_PATTERN = '[a-zA-Z0-9\-_.]+';
 
 	/**
 	 * The plugin name
 	 */
-	private $name, 
+	private $name,
 
 	/**
 	 * The plugin definition, described in the file manifest.json, at the root directory of the plugin
@@ -50,13 +50,13 @@ class Plugin{
 	/**
 	 * Defines if the plugin can be removed or uninstalled
 	 */
-	$removable,
+	$removable = true,
 
 	/**
 	 * Defines the active/inactive state of the plugin
 	 */
 	$active;
-	
+
 	/**
 	 * The application main plugins, not removable or editable, used for the application core
 	 */
@@ -71,20 +71,20 @@ class Plugin{
 	 * Forbidden plugin names
 	 */
 	public static $forbiddenNames = array('custom');
-	
-	/**	 
+
+	/**
 	 * Constructor
 	 * @param string $name The plugin name, corresponding to the directory name
 	 * @param array $config The plugin configuration
 	 */
 	private function __construct($name){
-		$this->name = $name;		
+		$this->name = $name;
 		$this->rootDir = ($this->isMainPlugin() ? MAIN_PLUGINS_DIR : PLUGINS_DIR) . $this->name . '/';
 
 		if(!is_dir($this->rootDir)){
 			throw new \Exception('The plugin does not exists');
 		}
-		
+
 		if(!$this->isMainPlugin()){
 			if(!is_file($this->rootDir . self::MANIFEST_BASENAME)){
 				throw new \Exception('The plugin must have a file manifest.json');
@@ -92,22 +92,22 @@ class Plugin{
 			$this->definition = json_decode(file_get_contents($this->rootDir . self::MANIFEST_BASENAME), true);
 		}
 		else{
-			$this->active = 1;
+			$this->active = true;
 			$this->removable = false;
 			$this->definition = array(
 				'title' => Lang::get($this->name . '.plugin-name'),
 			);
 		}
 	}
-	
+
 	/**
 	 * Get a plugin instance from it name
 	 * @param string $name The plugin name to instance
 	 * @return Plugin The instance of the wanted plugin
 	 */
 	public static function get($name){
-		try{			
-			if(!isset(self::$instances[$name])){				
+		try{
+			if(!isset(self::$instances[$name])){
 				self::$instances[$name] = new self($name);
 			}
 
@@ -117,9 +117,9 @@ class Plugin{
 			return null;
 		}
 	}
-	
 
-	/** 
+
+	/**
 	 * Get the plugin containing the file where this function is called
 	 * @return Plugin - The current plugin
 	 */
@@ -134,25 +134,26 @@ class Plugin{
 		else{
 			return null;
 		}
-		list($name) = explode(DIRECTORY_SEPARATOR, $dir);		
-		
+		list($name) = explode(DIRECTORY_SEPARATOR, $dir);
+
 		return self::get($name);
 	}
-	
 
-	/** 
+
+	/**
 	  * get all the plugins
-	  * @param bool $noMain If true, no get the main plugins
+	  * @param bool $includeMain If true, include main plugins to the returned list
+	  * @param bool $loadConf If set to true, load the plugins conf in the database
 	  * @return array The list of plugin instances
 	  */
-	public static function getAll($noMain = false){
+	public static function getAll($includeMain = true, $loadConf = false){
 		$plugins = array();
-		$dirs = $noMain ? array(PLUGINS_DIR) : array(MAIN_PLUGINS_DIR, PLUGINS_DIR);
+		$dirs = $includeMain ? array(MAIN_PLUGINS_DIR, PLUGINS_DIR) : array(PLUGINS_DIR);
 
-		if(App::conf()->has('db')){
+		if($loadConf && App::conf()->has('db')){
 			$configs = App::db()->select(array(
 				'from' => DB::getFullTablename(self::TABLE),
-				'index' => 'name',			
+				'index' => 'name',
 				'return' => DB::RETURN_OBJECT
 			));
 		}
@@ -164,50 +165,46 @@ class Plugin{
 			foreach(glob($dir . '*', GLOB_ONLYDIR) as $dir){
 				$name = basename($dir);
 				$config = isset($configs[$name]) ? $configs[$name] : null;
-				
+
 				$plugin = self::get($name);
-				$plugin->active = isset($config->active) ? $config->active : false;
-				$plugin->removable = isset($config->removable) ? $config->removable : false;
+				if(!$plugin->isMainPlugin()){
+					$plugin->active = isset($config->active) ? $config->active : false;
+				}
 				$plugins[$name] = $plugin;
 			}
 		}
-		
+
 		return $plugins;
 	}
 
 
 	/**
 	 * Get all the active plugins
+	 * @param bool $includeMain If set to true, include main plugins in the returned array
 	 * @return array The list of plugin instances
 	 */
-	public static function getActivePlugins(){
-		$configs = App::db()->select(array(
-			'from' => DB::getFullTablename(self::TABLE),
-			'where' => 'active = 1',						
-		));
+	public static function getActivePlugins($includeMain = true){
+		$plugins = self::getAll($includeMain, true);
 
-		$plugins = array();
-		foreach($configs as $config){
-			$plugins[$config['name']] = self::get($config['name'], $config);
-		}
-
-		return $plugins;
+		return array_filter($plugins, function($plugin){
+			return $plugin->active;
+		});
 	}
-	
+
 
 	/**
 	 * Get the main plugins
 	 * @return array - The list of plugin instances
 	 */
 	public static function getMainPlugins(){
-		return array_map(function($name){ 
-			return new self($name); 
+		return array_map(function($name){
+			return new self($name);
 		}, self::$mainPlugins);
 	}
-	
-	
-	
-	/** 
+
+
+
+	/**
 	 * Get the plugin name
 	 * @return string The plugin name
 	 */
@@ -229,10 +226,10 @@ class Plugin{
 	 * @return array The plugin options, where keys are the options names, and values, the values for each option
 	 */
 	public function getOptions(){
-		if(!isset($this->options)){			
-			$this->options = Option::getPluginOptions($this->name);			
+		if(!isset($this->options)){
+			$this->options = Option::getPluginOptions($this->name);
 		}
-		
+
 		return $this->options;
 	}
 
@@ -257,17 +254,17 @@ class Plugin{
 	public function getRootDir(){
 		return $this->rootDir;
 	}
-	
 
-	/** 
-	 * Returns the start file of the plugin. 
+
+	/**
+	 * Returns the start file of the plugin.
 	 * The start file is the file start.php, at the root of the plugin directory, that defines the routes, widgets, and event listenter of the plugin.
 	 * @return string The file path of the plugin start file
 	 */
 	public function getStartFile(){
 		return $this->getRootDir() . 'start.php';
 	}
-	
+
 
 	/**
 	 * Returns the directory of the plugin containing the controllers
@@ -276,7 +273,7 @@ class Plugin{
 	public function getControllersDir(){
 		return $this->getRootDir() . 'controllers/';
 	}
-	
+
 
 	/**
 	 * Return the directory containing the plugin language files
@@ -302,16 +299,16 @@ class Plugin{
 	public function getWidgetsDir(){
 		return $this->getRootDir() . 'widgets/';
 	}
-	
+
 
 	/**
 	 * Return the directory containing the plugin views
 	 * @return string The directory contaning the plugin views
 	 */
 	public function getViewsDir(){
-		return $this->getRootDir() . 'views/';	
+		return $this->getRootDir() . 'views/';
 	}
-	
+
 
 	/**
 	 * Return the full path of a view in the plugin
@@ -329,7 +326,7 @@ class Plugin{
 		// The view is not overriden in the view
 		return $this->getViewsDir() . $view;
 	}
-	
+
 
 	/**
 	 * Return the directory containing the plugin static files (js, css, images)
@@ -366,13 +363,13 @@ class Plugin{
 				if(!is_dir(dirname($publicFilename))){
 					mkdir(dirname($publicFilename), 0755, true);
 				}
-				
-				copy($privateFilename, $publicFilename);				
+
+				copy($privateFilename, $publicFilename);
 			}
-			
+
 			return $baseUrl . $basename;
 		}
-	}	
+	}
 
 
 
@@ -421,7 +418,7 @@ class Plugin{
 	public function getLessDir(){
 		return $this->getStaticDir() . 'less/';
 	}
-	
+
 
 	/**
 	 * Return the directory containing the plugin public CSS files (accessible by HTTP requests)
@@ -444,9 +441,9 @@ class Plugin{
 		}
 		else{
 			$privateFilename = $this->getLessDir() . $basename;
-			$cssBasename = preg_replace('/\.less$/', '.css', $basename);						
+			$cssBasename = preg_replace('/\.less$/', '.css', $basename);
 			$publicFilename = $this->getPublicCssDir() . $cssBasename;
-			
+
 			if(is_file($privateFilename)){
 
 				Event::on('built-less', function(Event $event) use($privateFilename){
@@ -487,7 +484,7 @@ class Plugin{
 		return $this->getPublicStaticDir() . 'userfiles/';
 	}
 
-	
+
 	/**
 	 * Return the URL of a static userfile, or the URL of the directory contaning the userfiles, if $basename is empty
 	 * @param string $basename The basename of the file to get the access URL
@@ -502,7 +499,7 @@ class Plugin{
 			return $baseUrl . $basename;
 		}
 	}
-	
+
 
 	/**
 	 * Check if the plugin is installed. The plugin is installed if it appears in the database
@@ -511,7 +508,7 @@ class Plugin{
 	public function isInstalled(){
 		return (bool) App::db()->count(DB::getFullTablename(self::TABLE), 'name = :name', array('name' => $this->name));
 	}
-	
+
 
 	/**
 	 * Get a plugin namespace by it name
@@ -519,8 +516,8 @@ class Plugin{
 	 */
 	public static function getNamespaceByName($name){
 		$namespace = preg_replace_callback('/(^|\W|_)(\w?)/', function($m){
-            return strtoupper($m[2]);                    
-		}, $name);  
+            return strtoupper($m[2]);
+		}, $name);
 
 		return 'Hawk\\Plugins\\' . $namespace;
 	}
@@ -558,12 +555,12 @@ class Plugin{
 	 */
 	public function install(){
 		App::db()->insert(DB::getFullTablename(self::TABLE), array(
-			'name' => $this->name,			
+			'name' => $this->name,
 			'active' => 0
 		), 'IGNORE');
 
 		try{
-			$this->getInstallerInstance()->install();		
+			$this->getInstallerInstance()->install();
 			App::logger()->notice('The plugin ' . $this->name . ' has been installed');
 		}
 		catch(\Exception $e){
@@ -573,7 +570,7 @@ class Plugin{
 			throw $e;
 		}
 	}
-	
+
 
 	/**
 	 * Uninstall the plugin
@@ -587,7 +584,7 @@ class Plugin{
 		}
 		catch(\Exception $e){
 			App::db()->insert(DB::getFullTablename(self::TABLE), array(
-				'name' => $this->name,			
+				'name' => $this->name,
 				'active' => 0
 			), 'IGNORE');
 
@@ -603,7 +600,7 @@ class Plugin{
 	public function isActive(){
 		return $this->active;
 	}
-	
+
 
 	/**
 	 * Activate the plugin in the database
@@ -611,7 +608,7 @@ class Plugin{
 	public function activate(){
 		// Activate the plugin
 		$this->active = 1;
-		App::db()->update(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)), array('active' => 1));	
+		App::db()->update(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)), array('active' => 1));
 
 		try{
 			$this->getInstallerInstance()->activate();
@@ -619,12 +616,12 @@ class Plugin{
 		}
 		catch(\Exception $e){
 			App::db()->update(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)), array('active' => 0));
-			
+
 			App::logger()->error('En error occured while activating plugin ' . $this->name . ' : ' . $e->getMessage());
 			throw $e;
 		}
 	}
-	
+
 
 	/**
 	 * Deactive the plugin
@@ -632,7 +629,7 @@ class Plugin{
 	public function deactivate(){
 		// Deactivate the plugin
 		$this->active = 0;
-		App::db()->update(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)), array('active' => 0));	
+		App::db()->update(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)), array('active' => 0));
 
 		try{
 			$this->getInstallerInstance()->deactivate();
@@ -640,7 +637,7 @@ class Plugin{
 		}
 		catch(\Exception $e){
 			App::db()->update(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)), array('active' => 1));
-			
+
 			App::logger()->error('En error occured while deactivating plugin ' . $this->name . ' : ' . $e->getMessage());
 			throw $e;
 		}
@@ -657,6 +654,17 @@ class Plugin{
 		$method = 'v' . str_replace('.', '_', $version);
         if(method_exists($updater, $method)){
             $updater->$method();
-        }		
+        }
+	}
+
+	/**
+	 * Compelete deletion of plugin
+	 */
+	public function delete(){
+		if($this->removable){
+			$directory = $this->getRootDir();
+
+	        App::fs()->remove($directory);
+	    }
 	}
 }
