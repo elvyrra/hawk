@@ -16,16 +16,30 @@ try{
 
     /*** Initialize the plugins ***/
     $plugins = App::conf()->has('db') ? array_merge(Plugin::getMainPlugins(), Plugin::getActivePlugins()) : array(Plugin::get('main'), Plugin::get('install'));
-    foreach($plugins as $plugin){	
+    foreach($plugins as $plugin){
     	if(is_file($plugin->getStartFile())){
     		include $plugin->getStartFile();
     	}
     }
 
-    if(!App::conf()->has('db') && (App::router()->getUri() === '/' || App::router()->getUri() === 'index.php')) {
-        App::logger()->debug('Hawk is not installed yet, redirect to install process page');    
-        App::response()->redirectToAction('install');        
-    }
+    Event::on('after-routing', function($event){
+        $route = $event->getData('route');
+        $controllerClass = $route->getActionClassname();
+        $controller = $controllerClass::getInstance();
+
+
+        if(!App::conf()->has('db') && App::request()->getUri() == App::router()->getUri('index')) {
+            App::logger()->debug('Hawk is not installed yet, redirect to install process page');
+            App::response()->redirectToAction('install');
+            return;
+        }
+
+        if(!App::request()->isAjax() && App::request()->getMethod() == 'get' && ! in_array($controller->getPlugin()->getName(), array('main', 'install'))) {
+
+            $event->setData('route', App::router()->getRouteByName('index'));
+        }
+    });
+
 
     /*** Initialize the theme ***/
     if(is_file(Theme::getSelected()->getStartFile())){
@@ -42,7 +56,7 @@ catch(AppStopException $e){}
 // Finish the script
 App::logger()->debug('end of script');
 $event = new Event('process-end', array(
-	'output' => App::response()->getBody(), 
+	'output' => App::response()->getBody(),
 	'execTime' => microtime(true) - SCRIPT_START_TIME
 ));
 $event->trigger();

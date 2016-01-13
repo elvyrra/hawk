@@ -9,6 +9,7 @@ namespace Hawk;
 
 /**
  * This class treats the interface with the Hawk site, to get the informations from the site database via an Restful API
+ * @package Network
  */
 class HawkApi{
     /**
@@ -320,5 +321,6 @@ class HawkApi{
 
 /**
  * This class describes Exceptions throwed by a request to the A.P.I
+ * @package Exceptions
  */
 class HawkApiException extends \Exception{}

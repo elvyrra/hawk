@@ -24,12 +24,12 @@ class HtmlInput extends FormInput{
      * Display the value of the input
      * @return string The displayed HTML or text
      */
-    public function __toString(){
+    public function display(){
     	if($this->plainText){
     		$this->value = nl2br($this->value);
     	}
 
-    	return parent::__toString();
+    	return parent::display();
     }
 
     /**

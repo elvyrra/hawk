@@ -9,6 +9,7 @@ namespace Hawk;
 
 /**
  * This model describes the customized profile data types
+ * @package BaseModels
  */
 class ProfileQuestion extends Model{
 	/**

@@ -41,10 +41,10 @@ class PasswordInput extends FormInput{
 	 * Display the input
 	 * @return string The HTML result to display
 	 */
-	public function __toString(){
+	public function display(){
 		$decrypt = $this->decrypt;
 		$this->value = ($this->get && $decrypt && is_callable($decrypt)) ? $decrypt($this->value) : "";    
-	    return parent::__toString();
+	    return parent::display();
 	}
 	
 	/**

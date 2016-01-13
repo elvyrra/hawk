@@ -12,6 +12,7 @@ namespace Hawk;
  * This can be useful to build simple conditions without writing SQL query and manage binding values
  * This class is used in classes Model, Form, ItemList to get data from the database.
  * Example : To make the expression 'field1 = "value1" AND (field2 IS NOT NULL OR field3 < 12)', create an DBExample like :
+ * <code>
  * new DBExample(array(
  *		array('field1' => "value1"),
  *		array('$or' => array(
@@ -19,6 +20,7 @@ namespace Hawk;
  *			'field3' => array('$lt' => 12)
  *		))
  * ))
+ * </code>
  * @package Core
  */
 class DBExample{
@@ -184,6 +186,7 @@ class DBExample{
 
 /**
  * This class describes the behavior of the exceptions throwed by DBExample class
+ * @package Exceptions
  */
 class DBExampleException extends \Exception{	
 }

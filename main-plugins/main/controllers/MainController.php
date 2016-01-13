@@ -28,16 +28,12 @@ class MainController extends Controller{
 		
 		App::fs()->copy(Plugin::current()->getJsDir() . '/*', Plugin::current()->getPublicJsDir());
 
-		return View::make(Theme::getSelected()->getView('html-document.tpl'), array(
+		return View::make(Plugin::current()->getView('html-document.tpl'), array(
 			'title' => $title,
 			'description' => $description,
 			'keywords' => $keywords,
-			'themeBaseLess' => Theme::getSelected()->getBaseLessUrl(),
-			'themeCustomCss' => Theme::getSelected()->getCustomCssUrl(),			
 			'body' => $body,
-			'langLabels' => $labelsJSON,
 			'favicon' => $this->getFaviconUrl(),
-			'routes' => $routes
 		));
 	}
 

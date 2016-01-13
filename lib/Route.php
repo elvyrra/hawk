@@ -73,7 +73,7 @@ class Route{
 	$pattern = '';
 
 
-	
+
 	/**
 	 * Constructor
 	 * @param string $name The route name
@@ -84,10 +84,10 @@ class Route{
 		$this->name = $name;
 
 		$this->map($param);
-		
+
 		$this->args = array();
-		$this->url = $this->prefix . $url;				
-		$this->pattern = preg_replace_callback("/\{(\w+)\}/", function($match){			
+		$this->url = $this->prefix . $url;
+		$this->pattern = preg_replace_callback("/\{(\w+)\}/", function($match){
 			$this->args[] = $match[1];
 			$where = $this->where[$match[1]] ? $this->where[$match[1]] : '.*?';
 			return "(" . $where . ")";
@@ -106,7 +106,7 @@ class Route{
 	public function getName(){
 		return $this->name;
 	}
-	
+
 
 	/**
 	 * Check if the route pattern match with a given URI, and if it matches, set the route data
@@ -115,16 +115,16 @@ class Route{
 	 */
 	public function match($uri){
 		if(preg_match('~^' . $this->pattern . '/?$~i', $uri, $m)){
-			// The URL match, let's test the filters to access this URL are OK					
+			// The URL match, let's test the filters to access this URL are OK
 			foreach(array_slice($m, 1) as $i => $var){
 				$this->setData($this->args[$i], $var);
-			}				
+			}
 			return true;
-				
+
 		}
 		return false;
 	}
-	
+
 
 	/**
 	 * Get the route data
@@ -139,7 +139,7 @@ class Route{
 			return $this->data[$prop];
 		}
 	}
-	
+
 
 	/**
 	 * Set the route data
@@ -149,7 +149,7 @@ class Route{
 	public function setData($key, $value){
 		$this->data[$key] = $value;
 	}
-	
+
 
 	/**
 	 * Get the route action
@@ -158,7 +158,25 @@ class Route{
 	public function getAction(){
 		return $this->action;
 	}
-	
+
+
+	/**
+	 * Get the route action controller class
+	 */
+	public function getActionClassname(){
+		list($controller, $method) = explode('.', $this->action);
+
+		return $controller;
+	}
+
+	/**
+	 * Get the route action method name
+	 */
+	public function getActionMethodName(){
+		list($controller, $method) = explode('.', $this->action);
+
+		return $method;
+	}
 
 	/**
 	 * Check of the route is accessible by the web client
@@ -168,8 +186,8 @@ class Route{
 		foreach($this->auth as $auth){
 			if(!$auth){
 				return false;
-			}				
-		}	
+			}
+		}
 		return true;
 	}
 }

@@ -104,5 +104,6 @@ class Upload{
 
 /**
  * This class describes the exceptions throwed by Upload class
+ * @package Exceptions
  */
 class UploadException extends \Exception{}

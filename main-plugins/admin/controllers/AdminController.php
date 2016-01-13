@@ -4,11 +4,11 @@ namespace Hawk\Plugins\Admin;
 
 class AdminController extends Controller{
 	const MAX_LOGO_SIZE = 200000; // 200 Ko
-	
+
 	/**
 	 * Display and treat application settings
 	 */
-	public function settings(){		
+	public function settings(){
 		$languages = array_map(function($language){ return $language->label; }, Language::getAll('tag'));
 
 		$roleObjects = Role::getListByExample(new DBExample(array(
@@ -46,17 +46,23 @@ class AdminController extends Controller{
 		$param = array(
 			'id' => 'settings-form',
 			'upload' => true,
-			'labelWidth' => '250px',
 			'fieldsets' => array(
 				'main' => array(
+					new TextInput(array(
+						'name' => 'main_sitename',
+						'required' => true,
+						'default' => Option::get('main.sitename'),
+						'label' => Lang::get('admin.settings-sitename-label')
+					)),
+
 					new SelectInput(array(
 						'name' => 'main_language',
 						'required' => true,
 						'options' => $languages,
-						'default' => Option::get('main.language'),						
+						'default' => Option::get('main.language'),
 						'label' => Lang::get('admin.settings-language-label'),
 					)),
-					
+
 					new SelectInput(array(
 						'name' => 'main_timezone',
 						'required' => true,
@@ -64,7 +70,7 @@ class AdminController extends Controller{
 						'default' => Option::get('main.timezone'),
 						'label' => Lang::get('admin.settings-timezone-label')
 					)),
-					
+
 					new SelectInput(array(
 						'name' => 'main_currency',
 						'required' => true,
@@ -74,7 +80,7 @@ class AdminController extends Controller{
 						),
 						'default' => Option::get('main.currency'),
 						'label' => Lang::get('admin.settings-currency-label')
-					)),	
+					)),
 
 					new FileInput(array(
 						'name' => 'logo',
@@ -83,7 +89,7 @@ class AdminController extends Controller{
 						'maxSize' => 200000,
 						'extensions' => array('gif', 'png', 'jpg', 'jpeg')
 					)),
-					
+
 					new FileInput(array(
 						'name' => 'favicon',
 						'label' => Lang::get('admin.settings-favicon-label'),
@@ -95,7 +101,7 @@ class AdminController extends Controller{
 
 				'referencing' => call_user_func(function() use($languages){
 					$inputs = array();
-					foreach($languages as $tag => $language){	
+					foreach($languages as $tag => $language){
 						$inputs[] = new TextInput(array(
 							'name' => 'main_page-title-' . $tag,
 							'default' => Option::get('main.page-title-' . $tag),
@@ -113,7 +119,7 @@ class AdminController extends Controller{
 					}
 					return $inputs;
 				}),
-				
+
 				'home' => array(
 					new RadioInput(array(
 						'name' => 'main_home-page-type',
@@ -129,7 +135,7 @@ class AdminController extends Controller{
 							'ko-checked' => 'homePage.type'
 						)
 					)),
-					
+
 					new WysiwygInput(array(
 						'name' => 'main_home-page-html',
 						'id' => 'home-page-html',
@@ -144,15 +150,15 @@ class AdminController extends Controller{
 						'options' => $menuItems,
 						'value' => Option::get('main.home-page-item')
 					)),
-					
+
 					new CheckboxInput(array(
 						'name' => 'main_open-last-tabs',
 						'label' => Lang::get('admin.settings-open-last-tabs'),
 						'default' => Option::get('main.open-last-tabs'),
 						'dataType' => 'int'
-					)),					
+					)),
 				),
-				
+
 				'users' => array(
 					new RadioInput(array(
 						'name' => 'main_allow-guest',
@@ -163,7 +169,7 @@ class AdminController extends Controller{
 						'default' => Option::get('main.allow-guest') ? Option::get('main.allow-guest') : 0,
 						'label' => Lang::get('admin.settings-allow-guest-label')
 					)),
-					
+
 					new RadioInput(array(
 						'name' => 'main_open-register',
 						'options' => array(
@@ -177,7 +183,7 @@ class AdminController extends Controller{
 							'ko-checked' => 'register.open'
 						)
 					)),
-					
+
 					new CheckboxInput(array(
 						'name' => 'main_confirm-register-email',
 						'label' => Lang::get('admin.settings-confirm-email-label'),
@@ -195,7 +201,7 @@ class AdminController extends Controller{
 						'label' => Lang::get('admin.settings-confirm-email-content-label'),
 						'labelWidth' => 'auto',
 					)),
-					
+
 					new CheckboxInput(array(
 						'name' => 'main_confirm-register-terms',
 						'label' => Lang::get('admin.settings-confirm-terms-label'),
@@ -222,13 +228,13 @@ class AdminController extends Controller{
 						'default' => Option::get('roles.default-role')
 					)),
 				),
-				
+
 				'email' => array(
 					new EmailInput(array(
 						'name' => 'main_mailer-from',
 						'default' => Option::get('main.mailer-from') ? Option::get('main.mailer-from') : App::session()->getUser()->email,
 						'label' => Lang::get('admin.settings-mailer-from-label')
-					)),					
+					)),
 
 					new TextInput(array(
 						'name' => 'main_mailer-from-name',
@@ -249,36 +255,34 @@ class AdminController extends Controller{
 							'ko-value' => 'mail.type'
 						)
 					)),
-					
+
 					new TextInput(array(
 						'name' => 'main_mailer-host',
 						'default' => Option::get('main.mailer-host'),
-						'label' => Lang::get('admin.settings-mailer-host-label'),						
+						'label' => Lang::get('admin.settings-mailer-host-label'),
 					)),
-					
+
 					new IntegerInput(array(
 						'name' => 'main_mailer-port',
 						'default' => Option::get('main.mailer-port'),
-						'label' => ':',
-						'labelWidth' => 'auto',
+						'label' => Lang::get('admin.settings-mailer-port-label'),
 						'size' => 4,
-						'nl' => false
 					)),
-					
+
 					new TextInput(array(
 						'name' => 'main_mailer-username',
 						'default' => Option::get('main.mailer-username'),
-						'label' => Lang::get('admin.settings-mailer-username-label'),						
+						'label' => Lang::get('admin.settings-mailer-username-label'),
 					)),
-					
+
 					new PasswordInput(array(
 						'name' => 'main_mailer-password',
 						'encrypt' => 'Crypto::aes256Encode',
 						'decrypt' => 'Crypto::aes256Decode',
 						'default' => Option::get('main.mailer-password'),
-						'label' => Lang::get('admin.settings-mailer-password-label'),						
+						'label' => Lang::get('admin.settings-mailer-password-label'),
 					)),
-					
+
 					new SelectInput(array(
 						'name' => 'main_smtp-secured',
 						'options' => array(
@@ -289,8 +293,8 @@ class AdminController extends Controller{
 						'label' => Lang::get('admin.settings-smtp-secured-label')
 					))
 				),
-				
-				'_submits' => array(	
+
+				'_submits' => array(
 					empty($updates) ? null : new ButtonInput(array(
 						'name' => 'update-hawk',
 						'value' => Lang::get('admin.update-page-update-hawk-btn', array('version' => end($updates)['version'])),
@@ -306,21 +310,21 @@ class AdminController extends Controller{
 						'name' => 'save',
 						'value' => Lang::get('main.valid-button'),
 						'class' => 'pull-right'
-					)),				
+					)),
 				),
 			),
 		);
-		
+
 		$form = new Form($param);
 		if(!$form->submitted()){
 			// Display the form
 			$this->addCss(Plugin::current()->getCssUrl('settings.less'));
 
 			$page = View::make(Plugin::current()->getView('settings.tpl'), array(
-				'form' => $form,	
+				'form' => $form,
 				'languages' => $languages
 			));
-			
+
 			Lang::addKeysToJavascript('admin.update-page-confirm-update-hawk');
 			$this->addJavaScript(Plugin::current()->getJsUrl('settings.js'));
 
@@ -328,35 +332,35 @@ class AdminController extends Controller{
 				'icon' => 'cogs',
 				'title' => Lang::get('admin.settings-page-name'),
 				'description' => Lang::get('admin.settings-page-description'),
-				'page' => $page				
+				'page' => $page
 			));
 		}
-		else{	
-			// treat the form		
-			try{			
-				if($form->check()){					
+		else{
+			// treat the form
+			try{
+				if($form->check()){
 					// register scalar values
-					foreach($form->inputs as $name => $field){						
+					foreach($form->inputs as $name => $field){
 						if(!$field instanceof \Hawk\FileInput && !$field instanceof \Hawk\ButtonInput){
 							$value = $field->dbvalue();
 							if($value === null){
 								$value = '0';
 							}
 							$optionName = str_replace('_', '.', $name);
-							Option::set($optionName, $value);					
+							Option::set($optionName, $value);
 						}
-						elseif($field instanceof \Hawk\FileInput){			
-							$upload = Upload::getInstance($name);						
-							if($upload){							
-								try{									
+						elseif($field instanceof \Hawk\FileInput){
+							$upload = Upload::getInstance($name);
+							if($upload){
+								try{
 									$file = $upload->getFile();
 
-									
+
 									$dir = Plugin::get('main')->getPublicUserfilesDir();
-									
+
 									if(!is_dir($dir)){
 										mkdir($dir, 0755);
-									}									
+									}
 
 									if($name == 'favicon'){
 										$basename = uniqid() . '.ico';
@@ -370,22 +374,22 @@ class AdminController extends Controller{
 									}
 									else{
 										$basename = uniqid() . '.' . $file->extension;
-										$upload->move($file, $dir, $basename);	
+										$upload->move($file, $dir, $basename);
 									}
 
 									// remove the old image
 									@unlink($dir . Option::get("main.$name"));
-									
+
 									Option::set("main.$name", $basename);
 								}
 								catch(ImageException $e){
 									$form->error($name, Lang::get('form.image-format'));
 									throw $e;
 								}
-							}						
+							}
 						}
-					}					
-					
+					}
+
 					// Register the favicon
 					App::logger()->info('The options of the application has been updated by ' . App::session()->getUser()->username);
 					return $form->response(Form::STATUS_SUCCESS, Lang::get('admin.settings-save-success'));
@@ -407,15 +411,15 @@ class AdminController extends Controller{
             $api = new HawkApi;
 
             $nextVersions = $api->getCoreAvailableUpdates();
-            
+
             if(empty($nextVersions)){
-                throw new \Exception("No newer version is available for Hawk");                
+                throw new \Exception("No newer version is available for Hawk");
             }
 
             // Update incrementally all newer versions
             foreach($nextVersions as $version){
                 // Download the update archive
-                $archive = $api->getCoreUpdateArchive($version['version']);            
+                $archive = $api->getCoreUpdateArchive($version['version']);
 
                 // Extract the downloaded file
                 $zip = new \ZipArchive;
@@ -449,7 +453,7 @@ class AdminController extends Controller{
                 // Remove temporary files and folders
                 App::fs()->remove($folder);
                 App::fs()->remove($archive);
-            } 
+            }
 
             $response = array('status' => true);
         }
@@ -458,7 +462,7 @@ class AdminController extends Controller{
         }
 
         App::response()->setContentType('json');
-        App::response()->setBody($response);
+        return $response;
     }
-	
+
 }

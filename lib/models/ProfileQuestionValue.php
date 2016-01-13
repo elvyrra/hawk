@@ -8,6 +8,7 @@ namespace Hawk;
 
 /**
  * This model describes the profile data value
+ * @package BaseModels
  */
 class ProfileQuestionValue extends Model{
 	/**

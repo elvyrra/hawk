@@ -8,7 +8,7 @@
 namespace Hawk;
 
 /**
- * This class defines static methods to prepare and send the HTTP response to the client 
+ * This class defines static methods to prepare and send the HTTP response to the client
  * @package Core
  */
 final class Response extends Singleton{
@@ -57,23 +57,23 @@ final class Response extends Singleton{
         'xml' => 'application/xml',
         'stream' => 'application/octet-stream'
     );
-    
+
     /**
      * Constructor
      */
     protected function __construct(){
-        $this->setContentType('html');        
+        $this->setContentType('html');
     }
 
 
     /**
-     * Get the content to return 
+     * Get the content to return
      * @return string
      */
     public function getBody(){
         return $this->body;
     }
-    
+
 
     /**
      * Set the content to return to the client
@@ -88,7 +88,7 @@ final class Response extends Singleton{
      * @param string $name The header name
      * @param string $value The header value
      */
-    public function header($name, $value){        
+    public function header($name, $value){
         $this->headers[$name] = $value;
     }
 
@@ -100,7 +100,7 @@ final class Response extends Singleton{
     public function setCookie($name, $data){
         if(is_string($data)){
             $data = array(
-                'value' => $data,                         
+                'value' => $data,
             );
         }
 
@@ -125,26 +125,26 @@ final class Response extends Singleton{
         $this->header('Content-type' , $type);
     }
 
-    
+
     /**
      * set the response as HTML
      */
     public function setHtml(){
-        $this->setContentType('html');        
+        $this->setContentType('html');
     }
 
     /**
      * Set the response as JSON
      */
-    public function setJson(){        
+    public function setJson(){
         $this->setContentType('json');
     }
-    
+
     /**
      * Set the response as JavaScript
      */
     public function setScript(){
-        $this->setContentType('javascript');        
+        $this->setContentType('javascript');
     }
 
     /**
@@ -153,14 +153,14 @@ final class Response extends Singleton{
     public function getContentType(){
         return $this->contentType;
     }
-	
+
 
     /**
      * Set the response HTTP code
      * @param int $code The HTTP code to set
      */
 	public function setStatus($code){
-		$this->status = $code;              
+		$this->status = $code;
 	}
 
     /**
@@ -171,7 +171,7 @@ final class Response extends Singleton{
         return $this->status;
     }
 
-    
+
 
     /**
      * Return the HTTP response to the client, add exit the script
@@ -211,14 +211,14 @@ final class Response extends Singleton{
         foreach($this->headers as $name => $value){
             header($name .': ' . $value);
         }
-        
+
 
         // Set the response body
         if($content !== null){
             $this->setBody($content);
         }
 
-        
+
         switch($this->contentType){
             case 'json' :
                 echo json_encode($this->body, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_NUMERIC_CHECK);
@@ -227,9 +227,11 @@ final class Response extends Singleton{
                 echo $this->body;
             break;
         }
+
+        App::logger()->debug('script execution time : ' . ((microtime(true) - SCRIPT_START_TIME) * 1000) . ' ms' );
         exit();
     }
-	
+
 
     /**
      * Redirect to another URL
@@ -240,7 +242,7 @@ final class Response extends Singleton{
         $this->header('Location', $url);
         $this->end();
 	}
-	
+
     /**
      * Redirect to a route
      * @param string $route The route name to redirect to

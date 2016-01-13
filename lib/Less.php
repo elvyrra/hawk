@@ -7,6 +7,7 @@ namespace Hawk;
 
 /**
  * This class use the library lessc to compile less files into CSS, using cache system to build only if necessary
+ * @package Utils
  */
 class Less{
 	const CACHE_DIR = 'less/';

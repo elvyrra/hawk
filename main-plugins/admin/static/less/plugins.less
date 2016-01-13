@@ -1,5 +1,21 @@
 @logo-size : 12rem;
 
+#available-plugins-list{
+    .list-cell-available-plugins-list-controls {
+        button{
+            opacity: 0;
+            transition: opacity .6s ease;
+        }
+
+        &:hover{
+            button{
+                opacity: 1;
+            }
+        }
+    }
+
+}
+
 #search-plugins-list{
     .plugin-item-wrapper{
         padding: 1rem;
@@ -9,7 +25,7 @@
             box-shadow: 0 .5rem 1.5rem rgba(0, 0, 0, 0.5);
             border-radius: .4rem;
 
-            .plugin-item-header{                
+            .plugin-item-header{
                 padding: .4rem;
                 display: block;
 
@@ -34,7 +50,7 @@
                 .plugin-description-container{
                     width: calc(~"98% - " @logo-size);
                     height: @logo-size;
-                    overflow: hidden;            
+                    overflow: hidden;
 
                     .plugin-title{
                         font-size: 2em;
@@ -48,7 +64,7 @@
                         overflow: hidden;
                         width: 100%;
                         padding-right: .5rem;
-                        
+
                         &:after {
                             content: "...";
                             position: absolute;
@@ -69,7 +85,7 @@
                 border-top: .1rem solid #555;
             }
         }
-    }    
+    }
 }
 
 #store-plugin-search-form, #store-theme-search-form{
@@ -80,17 +96,17 @@
         transition: width .4s;
         margin-left: .5rem;
 
-        
+
         &:focus{
-            width: 20rem;            
+            width: 20rem;
         }
 
         & + .icon{
-            margin-left: -1.8rem;   
-            font-size: 1.5rem;         
+            margin-left: -1.8rem;
+            font-size: 1.5rem;
         }
 
-        
+
     }
 }
 
@@ -100,9 +116,9 @@
         font-size: 2em;
     }
     .plugin-title{
-        height: 15rem;        
+        height: 15rem;
         margin: -1rem -1rem 1rem -1rem;
-        padding-top: 1.5rem;        
+        padding-top: 1.5rem;
         text-align: center;
     }
     .plugin-description{
@@ -151,11 +167,11 @@
 }
 
 
-.plugin-rate, .theme-rate{   
+.plugin-rate, .theme-rate{
     &:hover {
         .rate-star{
             cursor: pointer;
-            
+
             &:before{
                 content: "\f005";
                 color: gold;
@@ -164,7 +180,7 @@
             &:hover ~ .rate-star:before{
                 color: inherit;
                 content: "\f006";
-            }               
+            }
         }
     }
 }

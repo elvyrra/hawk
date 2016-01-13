@@ -33,9 +33,10 @@ class FileInput extends FormInput{
 	 * Display the file input
 	 * @return string The displayed HTML 
 	 */
-	public function __toString(){
+	public function display(){
 		$this->value = '';
-		return parent::__toString();
+
+		return parent::display();
 	}
 
 	/**

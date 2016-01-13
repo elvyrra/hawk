@@ -1,20 +1,34 @@
+; Generic error messages
 403-message = "You don't have necessary privileges to access this feature"
 404-message = "The page you're expected : {uri} does not exists"
+db-connection-error = "An error occured while connecting to the database"
+error-permissions = "You don't have necessary privileges to access this feature. Please contact your administrator"
+
+; Main buttons labels
 back-button = "Back"
 cancel-button = "Cancel"
 close-button = "Close"
 connect-button = "Connect"
+delete-button = "Delete"
+import-button = "Import"
+input-file-invitation = "Choose a file ..."
+save-button = "Save"
+valid-button = "Save"
+
+; Date formats
 date-format = "m/d/Y"
 date-mask = "mm/dd/yyyy"
 mysql-date-format = "%m/%d/%Y"
-db-connection-error = "An error occured while connecting to the database"
-delete-button = "Delete"
-error-permissions = "You don't have necessary privileges to access this feature. Please contact your administrator"
+time-format = "m/d/Y H:i:s"
+time-mask = "99/99/9999 99:99:99"
+mysql-time-format = "%m/%d/%Y %H:%i:%s"
+
+; Guest username
 guest-username = "Quest"
-import-button = "Import"
-input-file-invitation = "Choose a file ..."
+
+; Lists
 list-error = "An error occured while displaying the list"
-list-line-per-page = "results per page"
+list-line-per-page = "/ page"
 list-max-pages = "/ <span class=\"list-max-pages\">{max}</span>"
 list-next-page = "Next page"
 list-page-label = "Page"
@@ -25,14 +39,18 @@ list-sort-desc = "Z > A"
 list-results-number[0] = "No result"
 list-results-number[1] = "1 result"
 list-results-number[p] = "{number} results"
+
+; Login form
 login-menu-title = "<i class=\"icon icon-sign-in\"></i> Connect"
 login-error-authentication = "The login or the password is not correct"
 login-error-inactive-user = "This account is not active on this application"
 login-form-title = "Connection"
 login-label = "Email / Login"
 login-password-label = "Password"
-login-remember-label = "Remember me ?"
+login-forgotten-password-label = "I forgot my password"
 login-success = "Connection succeeded"
+
+; Admin menu
 menu-admin-display-title = "Displaying management"
 menu-admin-language-title = "Translations management"
 menu-admin-plugins-title = "Plugins management"
@@ -40,16 +58,28 @@ menu-admin-roles-title = "Permissions management"
 menu-admin-settings-title = "Application parameters"
 menu-admin-title = "Admin"
 menu-admin-users-title = "Users management"
+
+; User's menu
 menu-change-password = "Change your password"
 menu-edit-profile = "Edit my profile"
 menu-logout = "Logout"
 menu-my-profile = "My profile"
+
+; Footer
 hawk-powered = "Powered by Hawk ©"
+clear-cache = "Clear cache"
+
+; New tab
 new-tab-page-name = "New tab ..."
+open-new-tab = "Open a new tab"
+
+; Generic texts
 no-txt = "No"
 ok-button = "OK"
-open-new-tab = "Open a new tab"
 plugin-name = "Application"
+yes-txt = "Yes"
+
+; Register form
 register-button = "Register"
 register-connection-legend = "Connection data"
 register-username-label = "Username"
@@ -63,12 +93,10 @@ register-error = "An error occured during your registration. Please try again la
 validate-registration-unknown-error = "The information of this page dont't permit us to find your account to activate it"
 validate-registration-error = "An error occured while activating your account"
 register-terms-label = "I read and accept the <a href=\"{uri}\" target="_blank">terms and conditions</a> of the application"
-save-button = "Save"
-time-format = "m/d/Y H:i:s"
-time-mask = "99/99/9999 99:99:99"
-mysql-time-format = "%m/%d/%Y %H:%i:%s"
-valid-button = "Save"
-yes-txt = "Yes"
+register-email-title = "Validate your registration on {sitename}"
+register-email-content = "<p>You have just registered on {sitename}, and we thank you for that. </p><p>To validate your registration, please click on the link below :</p><a href=\"{url}\">{url}</a><p> We hope to see you soon on {sitename} </p><p> The {sitename} team. </p>"
+
+; Update password form
 update-password-title = "Change my password"
 update-password-current-password-label = "Current password"
 update-password-new-password-label = "New password"
@@ -76,11 +104,31 @@ update-password-new-password-confirm-label = "Confirm your new password"
 update-password-bad-current-password = "The current password you filled is wrong."
 update-password-error = "An error occured while updating your password."
 update-password-success = "Your password has been successfully updated."
+
+; User profile form
 user-profile-update-success = "Your profile was successfully updated"
 user-profile-update-error = "An error occured while updating your profile"
-register-email-title = "Validate your registration on {sitename}"
-register-email-content = "<p>You have just registered on {sitename}, and we thank you for that. </p><p>To validate your registration, please click on the link below :</p><a href=\"{url}\">{url}</a><p> We hope to see you soon on {sitename} </p><p> The {sitename} team. </p>"
+
+; Permissions
 permission-name-user-actions = "Action on his own account"
-clear-cache = "Clear cache"
+
+; Forgotten password
+forgotten-pwd-form-email-label = "Fill your email address"
+forgotten-pwd-form-title = "I forgot my password"
+forgotten-pwd-sent-email-message = "An email was sent to the address you filed with a verification code. Fill this code in the following form to reset your password"
+forgotten-pwd-form-error = "An error occured while sending the verification code on your email address"
+reset-pwd-email-title = "Reset your password - {sitename}"
+reset-pwd-email-content-into = "You just asked a reset of your password on the site {sitename}"
+reset-pwd-email-content-fill-code = "To be able to reset it, return on the webpage of the application, and fill the code below in the form :"
+reset-pwd-email-thanks = "We hope to see you soon ! <br /> {sitename}"
+
+; Reset password
+reset-pwd-form-title = "I reset my password"
+reset-pwd-form-code-label = "Your verification code"
+reset-pwd-form-password-label = "Your new password"
+reset-pwd-form-confirmation-label = "Type it again"
+reset-pwd-form-success = "Your password was successfully reset. You can now connect with this new password"
+reset-pwd-form-error = "An error occured while reseting your password. Please try again later."
+reset-pwd-form-bad-verification-code = "This code is incorrect"
 
 

@@ -19,11 +19,11 @@ class CheckboxInput extends FormInput{
 	 * display the checkbox
 	 * @return string The displayed HTML
 	 */
-	public function __toString(){	
+	public function display(){	
 		if($this->value){
 			$this->checked = true;
 		}
-	    return parent::__toString();
+	    return parent::display();
 	}
 	
 

@@ -369,8 +369,9 @@ class Plugin{
 				
 				copy($privateFilename, $publicFilename);				
 			}
+			
+			return $baseUrl . $basename;
 		}
-		return $baseUrl . $basename;
 	}	
 
 
@@ -444,9 +445,9 @@ class Plugin{
 		else{
 			$privateFilename = $this->getLessDir() . $basename;
 			$cssBasename = preg_replace('/\.less$/', '.css', $basename);						
+			$publicFilename = $this->getPublicCssDir() . $cssBasename;
 			
 			if(is_file($privateFilename)){
-				$publicFilename = $this->getPublicCssDir() . $cssBasename;
 
 				Event::on('built-less', function(Event $event) use($privateFilename){
 					if($event->getData('source') === $privateFilename){
@@ -462,7 +463,7 @@ class Plugin{
 				Less::compile($privateFilename, $publicFilename);
 			}
 
-			return $cssUrl . $cssBasename;
+			return $cssUrl . $cssBasename . '?' . filemtime($publicFilename);
 		}
 	}
 

@@ -8,7 +8,6 @@ namespace Hawk;
 
 // Autoload class needs at least FileSystem class and Plugin Class
 require LIB_DIR . 'Singleton.php';
-require LIB_DIR . 'App.php';
 require LIB_DIR . 'FileSystem.php';
 require LIB_DIR . 'Plugin.php';
 
@@ -21,7 +20,7 @@ class Autoload{
      * Array containing the autoload cache
      */
     private static $cache = array();
-	
+
 	// Autoload cache file
     const CACHE_FILE = CACHE_DIR . 'autoload-cache.php';
 
@@ -37,8 +36,8 @@ class Autoload{
 	 */
 	public static function load($classname){
         // Load the cache file for the first time the autload is called
-		if(is_file(self::CACHE_FILE) && empty(self::$cache)){
-            self::$cache = include self::CACHE_FILE;            
+		if(empty(self::$cache) && is_file(self::CACHE_FILE)){
+            self::$cache = include self::CACHE_FILE;
         }
 
         // Check the class file is registered in cache
@@ -70,9 +69,11 @@ class Autoload{
         if(isset($searchDirectories[$namespace])){
             $dirs = $searchDirectories[$namespace];
         }
-        elseif(strpos($namespace, 'Hawk\\Plugins\\') === 0 || strpos($namespace, '\\Hawk\\Plugins\\') === 0){
-            if(class_exists("\\Hawk\\$class") || trait_exists("\\Hawk\\$class")){
-                class_alias("\\Hawk\\$class", $classname);                
+        elseif(strpos($namespace, 'Hawk\\Plugins\\') === 0){
+            $alias = '\\Hawk\\' . $class;
+            if(class_exists($alias) || trait_exists($alias)){
+                class_alias($alias, $classname);
+
                 return true;
             }
             else{
@@ -83,14 +84,14 @@ class Autoload{
                         $dirs = array($plugin->getRootDir());
                         break;
                     }
-                }                
+                }
             }
         }
         else{
             // If the class exists, it is in custom-libs directory
             $dirs = array(CUSTOM_LIB_DIR, LIB_DIR . 'ext/');
         }
-        
+
 		// Cross any search folder to find out the class file
         foreach($dirs as $dir){
             $files = FileSystem::getInstance()->find($dir, $filename, FileSystem::FIND_FILE_ONLY);
@@ -106,7 +107,7 @@ class Autoload{
 
                 return true;
             }
-        }  
+        }
     }
 
 
@@ -114,17 +115,17 @@ class Autoload{
 	 * Save the autoload cache at the end of a script processing. It is not registered any times it is updated,
 	 * to improve the performances of the application.
 	 */
-    public static function saveCache(){        
+    public static function saveCache(){
         if(self::$cacheUpdated){
             file_put_contents(self::CACHE_FILE, "<?php return ". var_export(self::$cache, true) . ";");
         }
     }
 }
 
-// register autoload function 
+// register autoload function
 spl_autoload_register('\Hawk\Autoload::load', true, false);
 
-// Save the autoload cache 
-Event::on('process-end', function(Event $event){     
+// Save the autoload cache
+Event::on('process-end', function(Event $event){
     Autoload::saveCache();
 });

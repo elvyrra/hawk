@@ -262,30 +262,7 @@ class FormInput{
      * @return string the HTML result of the input displaying
      */
     public function __toString(){
-        try{
-    		$theme = Theme::getSelected();
-    		
-    		if($this->name == $this->errorAt){
-    			unset($this->errorAt);
-    		}
-
-    		$inputLabel = $this->label ? View::make(Theme::getSelected()->getView(Form::VIEWS_DIR . 'form-input-label.tpl'), array(
-    			'input' => $this
-    		)) : '';
-    		
-    		$inputDisplay = View::make($this->tpl, array(
-    			'input' => $this
-    		));
-                
-            return View::make(Theme::getSelected()->getView(Form::VIEWS_DIR . 'form-input-block.tpl'), array(
-                'input' => $this, 
-    			'inputLabel' => $inputLabel,
-    			'inputDisplay' => $inputDisplay
-            ));
-        }
-        catch(\Exception $e){
-            App::errorHandler()->exception($e);
-        }
+        return $this->display();
     }
 
     /**
@@ -293,7 +270,30 @@ class FormInput{
      * @return string the HTML result of the input displaying
      */
 	public function display(){
-        return $this->__toString();
+        try{
+            $theme = Theme::getSelected();
+            
+            if($this->name == $this->errorAt){
+                unset($this->errorAt);
+            }
+
+            $inputLabel = $this->label ? View::make(Theme::getSelected()->getView(Form::VIEWS_DIR . 'form-input-label.tpl'), array(
+                'input' => $this
+            )) : '';
+            
+            $inputDisplay = View::make($this->tpl, array(
+                'input' => $this
+            ));
+                
+            return View::make(Theme::getSelected()->getView(Form::VIEWS_DIR . 'form-input-block.tpl'), array(
+                'input' => $this, 
+                'inputLabel' => $inputLabel,
+                'inputDisplay' => $inputDisplay
+            ));
+        }
+        catch(\Exception $e){
+            App::errorHandler()->exception($e);
+        }
     }
 
     /**

@@ -1,9 +1,9 @@
 <?php
 
 namespace Hawk\Plugins\Main;
-	
+
 class LoginController extends Controller{
-	
+
 	/**
 	 * Generate the login form
 	 */
@@ -15,17 +15,17 @@ class LoginController extends Controller{
 			"autocomplete" => false,
 			"fieldsets" => array(
 				"form" => array(
-									
+
 					new TextInput(array(
 						"field" => "login",
 						"required" => true,
-						"label" => Lang::get('main.login-label'),						
+						"label" => Lang::get('main.login-label'),
 					)),
-					
+
 					new PasswordInput(array(
 						"field" => "password",
-						"required" => true,						
-						"get" => true,						
+						"required" => true,
+						"get" => true,
 						"label" => Lang::get('main.login-password-label'),
 					)),
 				),
@@ -34,32 +34,39 @@ class LoginController extends Controller{
 					new SubmitInput(array(
 						"name" => "connect",
 						"value" => Lang::get('main.connect-button'),
-						'icon' => 'sign-in'						
+						'icon' => 'sign-in'
 					)),
-					
-					Option::get('main.open-register') ? 
+
+					Option::get('main.open-register') ?
 						new ButtonInput(array(
 							'name' => 'register',
 							'value' => Lang::get('main.register-button'),
 							'href' => App::router()->getUri('register'),
 							'target' => 'dialog',
 							'class' => 'btn-success'
-						)) : 
-						null
+						)) :
+						null,
+
+					new ButtonInput(array(
+						'name' => 'forgottenPassword',
+						'label' => Lang::get('main.login-forgotten-password-label'),
+						'href' => App::router()->getUri('forgotten-password'),
+						'target' => 'dialog'
+					))
 				),
 			),
-			'onsuccess' => '$.cookie("redirect", data.redirect); location = app.getUri("index");',
-		);	
+			'onsuccess' => 'location = location.pathname;',
+		);
 
 		return new Form($param);
 	}
-	
+
 	/**
 	 * Display the login page
 	 */
 	public function login(){
 		$form = $this->form();
-		if(!$form->submitted()){	
+		if(!$form->submitted()){
 			if(App::request()->getParams('code') == 403){
 				$form->status = Form::STATUS_ERROR;
 				$form->addReturn('message', Lang::get('main.403-message'));
@@ -69,52 +76,52 @@ class LoginController extends Controller{
 				'page' => $form->__toString(),
 				'icon' => 'sign-in',
 				'title' => Lang::get('main.login-form-title'),
-				'width' => '400px',
+				// 'width' => '40rem',
 			));
 		}
 		else{
 			if($form->check()){
 				$hash = Crypto::saltHash($form->getData('password'));
-				
+
 				$example = new DBExample(array(
 					'$and' => array(
 						'$or' => array(
 							array('email' => $form->getData('login')),
 							array('username' => $form->getData('login'))
-						),						
-						array('password' => $hash),						
-					)					
+						),
+						array('password' => $hash),
+					)
 				));
 
 				$user = User::getByExample($example);
-					
-				if($user){					
+
+				if($user){
 					if(!$user->active){
-						// The user is not active					
+						// The user is not active
 						return $form->response(Form::STATUS_ERROR, Lang::get('main.login-error-inactive-user'));
 					}
-					
-					// The user can be connected 
-					App::session()->setData('user', array(						
-						'id' => $user->id,						
+
+					// The user can be connected
+					App::session()->setData('user', array(
+						'id' => $user->id,
 						'email' => $user->email,
 						'username' => $user->getUsername(),
-						'ip' => App::request()->clientIp()						
+						'ip' => App::request()->clientIp()
 					));
 
 					if(App::request()->getParams('redirect')){
 						$form->addReturn('redirect',App::request()->getParams('redirect'));
 					}
-					
+
 					return $form->response(Form::STATUS_SUCCESS, Lang::get('main.login-success'));
 				}
-				else{					
+				else{
 					return $form->response(Form::STATUS_ERROR, Lang::get('main.login-error-authentication'));
-				}			
-			}			
+				}
+			}
 		}
-	}	
-	
+	}
+
 
 	/**
 	 * Register a new user
@@ -129,7 +136,7 @@ class LoginController extends Controller{
 					'legend' => Lang::get('main.register-connection-legend'),
 
 					new TextInput(array(
-						'name' => 'username',						
+						'name' => 'username',
 						'required' => true,
 						'unique' => true,
 						'pattern' => '/^\w+$/',
@@ -164,7 +171,7 @@ class LoginController extends Controller{
 				),
 
 				'terms' => array(
-					Option::get('main.confirm-register-terms') ? 
+					Option::get('main.confirm-register-terms') ?
 						new CheckboxInput(array(
 							'name' => 'terms',
 							'required' => true,
@@ -175,7 +182,7 @@ class LoginController extends Controller{
 						null
 				),
 
-				'_submits' => array(					
+				'_submits' => array(
 					new SubmitInput(array(
 						'name' => 'valid',
 						'value' => Lang::get('main.register-button')
@@ -189,7 +196,7 @@ class LoginController extends Controller{
 					))
 				)
 			),
-			
+
 			'onsuccess' => 'app.dialog(app.getUri("login"))',
 		);
 
@@ -200,24 +207,24 @@ class LoginController extends Controller{
             $field['name'] = $question->name;
             $field['independant'] = true;
             $field['label'] = Lang::get('admin.profile-question-' . $question->name . '-label');
-            
+
             $param['fieldsets']['profile'][] = new $classname($field);
 
             if($question->type === 'file'){
             	$param['upload'] = true;
             }
        	}
-		
+
 		$form = new Form($param);
 		if(!$form->submitted()){
-			return View::make(Theme::getSelected()->getView('dialogbox.tpl'), array(
+			return Dialogbox::make(array(
 				'page' => $form->__toString(),
 				'icon' => 'sign-in',
 				'title' => Lang::get('main.login-form-title'),
 				'width' => '50rem',
 			));
 		}
-		else{	
+		else{
 			if($form->check()){
 				try{
 					$user = new User(array(
@@ -243,7 +250,7 @@ class LoginController extends Controller{
 	                            if(!is_dir($dir)){
 	                                mkdir($dir, 0755, true);
 	                            }
-	                            
+
 	                            $upload->move($file, $dir);
 	                            $user->setProfileData($question->name, $url . $file->basename);
 	                        }
@@ -251,7 +258,7 @@ class LoginController extends Controller{
 	                    else{
 	                        $user->setProfileData($question->name, $form->inputs[$question->name]->dbvalue());
 	                    }
-	                }            
+	                }
 
                 	$user->saveProfile();
 
@@ -270,9 +277,8 @@ class LoginController extends Controller{
 						$data = array(
 							'themeBaseCss' => Theme::getSelected()->getBaseLessUrl(),
 							'themeCustomCss' => Theme::getSelected()->getCustomCssUrl(),
-							'mainCssUrl' => Plugin::current()->getCssUrl(),
 							'logoUrl' =>  Option::get('main.logo') ? Plugin::current()->getUserfilesUrl(Option::get('main.logo')) : Plugin::current()->getStaticUrl('img/hawk-logo.png'),
-							'sitename' => Option::get('main.title'),
+							'sitename' => Option::get('main.sitename'),
 							'url' => $url
 						);
 						if(Option::get('main.confirm-email-content')){
@@ -287,9 +293,9 @@ class LoginController extends Controller{
 							 ->fromName(Option::get('main.mailer-from-name'))
 							 ->to($user->email)
 							 ->html($mailContent)
-							 ->subject(Lang::get('main.register-email-title', array('sitename' => Option::get('main.title'))))
+							 ->subject(Lang::get('main.register-email-title', array('sitename' => Option::get('main.sitename'))))
 							 ->send();
-						
+
 						return $form->response(Form::STATUS_SUCCESS, Lang::get('main.register-send-email-success'));
 					}
 					else{
@@ -300,7 +306,7 @@ class LoginController extends Controller{
 				catch(Exception $e){
 					return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get('main.register-error') );
 				}
-			}		
+			}
 		}
 	}
 
@@ -337,7 +343,7 @@ class LoginController extends Controller{
 		return MainController::getInstance()->compute('main');
 
 	}
-	
+
 	/**
 	 * Sign-out
 	 */
@@ -345,6 +351,177 @@ class LoginController extends Controller{
 		session_destroy();
 
 		App::response()->redirectToAction('index');
+	}
+
+
+	/**
+	 * Display and treat the form when the user forgot his password
+	 */
+	public function forgottenPassword(){
+		$form = new Form(array(
+			'id' => 'forgotten-password-form',
+			'fieldsets' => array(
+				'form' => array(
+					new EmailInput(array(
+						'name' => 'email',
+						'required' => true,
+						'label' => Lang::get('main.forgotten-pwd-form-email-label')
+					))
+				),
+
+				'submits' => array(
+					new SubmitInput(array(
+						'name' => 'valid',
+						'label' => Lang::get('main.valid-button')
+					)),
+
+					new ButtonInput(array(
+						'name' => 'cancel',
+						'label' => Lang::get('main.cancel-button'),
+						'href' => App::router()->getUri('login'),
+						'target' => 'dialog'
+					))
+
+				)
+			),
+			'onsuccess' => 'app.dialog(app.getUri("reset-password")); app.notify("warning", Lang.get("main.forgotten-pwd-sent-email-message"));',
+		));
+
+		if(!$form->submitted()){
+			Lang::addKeysToJavascript('main.forgotten-pwd-sent-email-message');
+
+			return Dialogbox::make(array(
+				'title' => Lang::get('main.forgotten-pwd-form-title'),
+				'icon' => 'lock-alt',
+				'page' => $form
+			));
+		}
+		else{
+			if($form->check()){
+				$user = User::getByEmail($form->getData('email'));
+
+				if(!$user){
+					// The user does not exists. For security reasons, reply the email was successfully sent, after a random delay to work around robots
+					usleep(mt_rand(0,500) * 100);
+					return $form->response(Form::STATUS_SUCCESS, Lang::get('main.forgotten-pwd-sent-email-message'));
+				}
+
+				try {
+					// The user exists, send an email with a 6 chars random verification code
+					$code = Crypto::generateKey(6);
+
+					// Register the verification code in the session
+					App::session()->setData('forgottenPassword', array(
+						'email' => $form->getData('email'),
+						'code' => Crypto::aes256Encode($code)
+					));
+
+					$mail = new Mail();
+					$mail
+						->from(Option::get('main.mailer-from'), Option::get('main.mailer-from-name'))
+						->to($form->getData('email'))
+						->subject(Lang::get('main.reset-pwd-email-title', array('sitename' => Option::get('main.sitename'))))
+						->html(View::make(
+							Plugin::current()->getView('reset-password-email.tpl'),
+							array(
+								'themeBaseCss' => Theme::getSelected()->getBaseLessUrl(),
+								'themeCustomCss' => Theme::getSelected()->getCustomCssUrl(),
+								'logoUrl' =>  Option::get('main.logo') ? Plugin::current()->getUserfilesUrl(Option::get('main.logo')) : Plugin::current()->getStaticUrl('img/hawk-logo.png'),
+								'sitename' => Option::get('main.sitename'),
+								'code' => $code
+							)
+						))
+						->send();
+
+					return $form->response(Form::STATUS_SUCCESS, Lang::get('main.forgotten-pwd-sent-email-message'));
+
+				}
+				catch(\Exception $e){
+					return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get('main.forgotten-pwd-form-error'));
+				}
+
+			}
+		}
+	}
+
+	/**
+	 * Display and treat the form to reset the user's password
+	 */
+	public function resetPassword(){
+		$form = new Form(array(
+			'id' => 'reset-password-form',
+			'fieldsets' => array(
+				'form' => array(
+					new TextInput(array(
+						'name' => 'code',
+						'required' => true,
+						'label' => Lang::get('main.reset-pwd-form-code-label')
+					)),
+
+					new PasswordInput(array(
+						'name' => 'password',
+						'required' => true,
+						'label' => Lang::get('main.reset-pwd-form-password-label'),
+						'encrypt' => array('\Hawk\Crypto', 'saltHash')
+					)),
+
+					new PasswordInput(array(
+						'name' => 'confirmation',
+						'required' => true,
+						'compare' => 'password',
+						'label' => Lang::get('main.reset-pwd-form-confirmation-label')
+					))
+				),
+
+				'submits' => array(
+					new SubmitInput(array(
+						'name' => 'valid',
+						'label' => Lang::get('main.valid-button')
+					)),
+
+					new ButtonInput(array(
+						'name' => 'cancel',
+						'label' => Lang::get('main.cancel-button'),
+						'href' => App::router()->getUri('login'),
+						'target' => 'dialog'
+					))
+				)
+			),
+			'onsuccess' => 'app.dialog(app.getUri("login"));'
+		));
+
+		if(!$form->submitted()){
+			return Dialogbox::make(array(
+				'title' => Lang::get('main.reset-pwd-form-title'),
+				'icon' => 'lock-alt',
+				'page' => $form
+			));
+		}
+		else{
+			if($form->check()){
+				// Check the verficiation code
+				if($form->getData('code') !== Crypto::aes256Decode(App::session()->getData('forgottenPassword.code'))){
+					$form->error('code', Lang::get('main.reset-pwd-form-bad-verification-code'));
+					return $form->response(Form::STATUS_CHECK_ERROR);
+				}
+
+				try{
+					$user = User::getByEmail(App::session()->getData('forgottenPassword.email'));
+					if($user){
+						$user->set('password', $form->inputs['password']->dbvalue());
+						$user->save();
+					}
+					else{
+						return $form->response(Form::STATUS_ERROR, App::session()->getData('forgottenPassword.email'));
+					}
+
+					return $form->response(Form::STATUS_SUCCESS, Lang::get('main.reset-pwd-form-success'));
+				}
+				catch(\Exception $e){
+					return $form->response(Form::STATUS_ERROR, Lang::get('main.reset-pwd-form-error'));
+				}
+			}
+		}
 	}
 
 }

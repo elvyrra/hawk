@@ -32,6 +32,8 @@ abstract class ViewPlugin{
 	
 	/**
 	 * Contructor
+     * @param string $viewFile The view file that instances this plugin
+     * @param array $viewData The data injected in the view
 	 * @param array $params The instance parameters
 	 */
     public function __construct($viewFile, $viewData = array(), $params = array()){

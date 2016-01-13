@@ -7,6 +7,7 @@ namespace Hawk;
 
 /**
  * This class describes the MenuItem model
+ * @package BaseModels
  */
 class MenuItem extends Model{
 	/**
@@ -14,6 +15,11 @@ class MenuItem extends Model{
 	 */
 	public static $tablename = "MenuItem";
 
+	/**
+	 * The primary column
+	 */
+	protected static $primaryColumn = 'id';
+	
 	/**
 	 * The id of the user menu
 	 */
@@ -30,6 +36,11 @@ class MenuItem extends Model{
 	private static $instances = array();
 
 	/**
+	 * The menu item label
+	 */
+	public $label = '';
+
+	/**
 	 * Constructor
 	 * @param array $data The data to set on the instance properties	 
 	 */
@@ -38,7 +49,7 @@ class MenuItem extends Model{
 
 		$this->visibleItems = array();
 
-		if(!empty($this->labelKey)){
+		if(empty($this->label) && !empty($this->labelKey)){
 			$this->label = Lang::get($this->labelKey);
 		}
 

@@ -118,13 +118,13 @@ define('ko-extends', ['jquery', 'ko'], function($, ko){
 
                 ace.config.set("modePath", app.baseUrl + "ext/ace/");
                 ace.config.set("workerPath", app.baseUrl + "ext/ace/") ;
-                ace.config.set("themePath", app.baseUrl + "ext/ace/"); 
-                ace.config.set('readOnly', parameters.readonly || false);
+                ace.config.set("themePath", app.baseUrl + "ext/ace/");                 
 
                 var editor = ace.edit(element.id);
-                editor.setTheme("ace/theme/" + (parameters.theme || chrome));
+                editor.setTheme("ace/theme/" + (parameters.theme || 'chrome'));
                 editor.getSession().setMode("ace/mode/" + (parameters.language));
                 editor.setShowPrintMargin(false);
+                editor.setReadOnly( parameters.readonly || false);
 
                 editor.getSession().on("change", function(event){
                     var value = editor.getValue();
@@ -141,19 +141,21 @@ define('ko-extends', ['jquery', 'ko'], function($, ko){
      * Custom binding for CKEditor
      */
     ko.bindingHandlers.wysiwyg = {
-        update : function(element, valueAccessor, allBindings, viewModel, bindingContext) { 
+        update : function(element, valueAccessor, allBindings, viewModel, bindingContext) {             
             require(['ckeditor'], function(CKEDITOR){
-                var editor = CKEDITOR.replace(element.id, {
-                    language : app.language,
-                    removeButtons : 'Save,Scayt,Rtl,Ltr,Language,Flash',
-                    entities : false,       
-                    on : {              
-                        change : function(event){ 
-                            $("#" + element.id).val(event.editor.getData()).trigger('change');
+                if(!CKEDITOR.dom.element.get(element.id).getEditor()){
+                    var editor = CKEDITOR.replace(element.id, {
+                        language : app.language,
+                        removeButtons : 'Save,Scayt,Rtl,Ltr,Language,Flash',
+                        entities : false,       
+                        on : {              
+                            change : function(event){ 
+                                $("#" + element.id).val(event.editor.getData()).trigger('change');
+                            }
                         }
-                    }
-                }); 
-                editor.addContentsCss(document.getElementById('less:static-themes-hawk-less-theme').innerText);
+                    }); 
+                    editor.addContentsCss(document.getElementById('less:theme-base-less').innerText);
+                }
             });
         }
     };

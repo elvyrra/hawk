@@ -21,33 +21,36 @@ class DatabaseSessionHandler implements \SessionHandlerInterface{
      * The name of the table containing the sessions
      */
 	$table;
-	
+
     /**
      * Close the session
      */
     public function close(){
         return true;
     }
-    
+
     /**
      * Destroy the session
      * @param string $sessionId The session id, corresponding to the session cookie
      */
     public function destroy($sessionId){
-        return $this->db->delete($this->table, 'id = :id', array('id' => $sessionId)) ? true : false;
-
         // Clean expired sessions
         $this->gc(0);
+
+        return !!$this->db->delete($this->table, 'id = :id', array('id' => $sessionId));
     }
-    
+
     /**
      * Clean expired sessions
      * @param int $maxlifetime The session lifetime (not used)
      */
     public function gc($maxlifetime){
-        return $this->db->delete($this->table, ':lifetime AND mtime + :lifetime < UNIX_TIMESTAMP()', array('lifetime' => App::conf()->get('session.lifetime'))) ? true : false;
+        if(!$maxlifetime){
+            $maxlifetime = max(App::conf()->get('session.lifetime'), ini_get('session.gc_maxlifetime'));
+        }
+        return !! $this->db->delete($this->table, ':lifetime AND mtime + :lifetime < UNIX_TIMESTAMP()', array('lifetime' => $maxlifetime));
     }
-    
+
 
     /**
      * Open a new session
@@ -55,7 +58,7 @@ class DatabaseSessionHandler implements \SessionHandlerInterface{
      * @param string $name Not used
      */
     public function open($savePath, $name){
-        $this->db = App::db();   
+        $this->db = App::db();
         $this->table = DB::getFullTablename('Session');
 
         // Update the session mtime
@@ -66,7 +69,7 @@ class DatabaseSessionHandler implements \SessionHandlerInterface{
         // Clean expired sessions
         $this->gc(0);
     }
-    
+
 
     /**
      * Read data of a session
@@ -80,17 +83,17 @@ class DatabaseSessionHandler implements \SessionHandlerInterface{
             'binds' => array('id' => $sessionId),
             'one' => true
         ));
-        
+
         return $line['data'];
     }
-    
+
 
     /**
      * Write data on the session
      * @param string $sessionId The session id, corresponding to the session cookie
-     * @param string $data The data session to write, serialized    
+     * @param string $data The data session to write, serialized
      */
-    public function write($sessionId, $data){	
+    public function write($sessionId, $data){
         $sql = 'REPLACE INTO ' . $this->table . ' (id, data, mtime) VALUES (:id, :data, UNIX_TIMESTAMP())';
         return $this->db->query($sql, array(
             'id' => $sessionId,

@@ -1,15 +1,20 @@
 define('tabs', ['jquery', 'ko'], function($, ko){
-	
+
 	/**
 	 * This class describes the behavior of a tab
 	 * @param int id The unique tab id
 	 */
 	window.Tab = function(id){
 		this.id = ko.observable(id);
-		this.title = ko.observable("");
-		this.url = ko.observable("");
+		this.uri = ko.observable("");
 		this.content = ko.observable('');
 		this.route = ko.observable("");
+
+		this.title = ko.computed({
+			read : function(){
+				return $(".page-name", this.content()).first().val();
+			}.bind(this)
+		});
 
 		this.history = [];
 
@@ -36,7 +41,7 @@ define('tabs', ['jquery', 'ko'], function($, ko){
 		});
 
 		this.activeTab.subscribe(function(tab){
-			history.replaceState({}, "", "#!" + tab.history[tab.history.length - 1]);
+			history.replaceState({}, "", tab.history[tab.history.length - 1]);
 		}.bind(this));
 	};
 
@@ -53,7 +58,7 @@ define('tabs', ['jquery', 'ko'], function($, ko){
 		/* Create the tab */
 		var tab = new Tab(Tabset.index ++);
 		this.tabs.push(tab);
-		
+
 		/*** Activate the new tab ***/
 		this.activeId(tab.id());
 	};
@@ -72,23 +77,23 @@ define('tabs', ['jquery', 'ko'], function($, ko){
 					this.activeId(next.id());
 				}
 			}
-			
+
 			/* Delete the tab nodes */
-			this.tabs.splice(index, 1);	
+			this.tabs.splice(index, 1);
 
 			/* Register the new list of tabs */
 			this.registerTabs();
-		}		
+		}
 	};
 
 
 	/**
 	 * Save the tabs last urls in a cookie
 	 */
-	Tabset.prototype.registerTabs = function(){	
+	Tabset.prototype.registerTabs = function(){
 		var data = [];
 		for(var i = 0; i < this.tabs().length; i++){
-			data.push(this.tabs()[i].url());
+			data.push(this.tabs()[i].uri());
 		}
 		$.cookie('open-tabs', JSON.stringify(data), {expire : 365, path : '/'});
 	};

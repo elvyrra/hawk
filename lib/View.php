@@ -235,6 +235,7 @@ class View{
 
 /**
  * This class describes the View exceptions
+ * @package Exceptions
  */
 class ViewException extends \Exception{
 	const TYPE_FILE_NOT_FOUND = 1;

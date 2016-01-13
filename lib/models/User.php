@@ -10,6 +10,7 @@ namespace Hawk;
 
 /**
  * This model describes the user data
+ * @package BaseModels
  */
 class User extends Model{
 	/**
@@ -23,7 +24,7 @@ class User extends Model{
 	 * The user profile data
 	 * @var array
 	 */
-	private $profile, 
+	private $profile,
 
 	/**
 	 * The user permissions
@@ -40,7 +41,7 @@ class User extends Model{
 	 * The id for the first administrator user
 	 */
 	const ROOT_USER_ID = 1;
-	
+
 	/**
 	 * Constructor
 	 * @param array $data The data to set to the user
@@ -48,7 +49,7 @@ class User extends Model{
 	public function __construct($data = array()){
 		parent::__construct($data);
 		if(!empty($this->roleId)){
-			$this->role = Role::getById($this->roleId);		
+			$this->role = Role::getById($this->roleId);
 		}
 	}
 
@@ -67,7 +68,7 @@ class User extends Model{
 		);
 		return self::getListByExample(new DBExample($example), $index, $fields, $order);
 	}
-	
+
 
 	/**
 	 * Get a user by it username
@@ -77,29 +78,37 @@ class User extends Model{
 	public static function getByUsername($username){
 		return self::getByExample(new DBExample(array('username' => $username)));
 	}
-	
+
+
+	/**
+	 * Get a user by it email address
+	 */
+	public static function getByEmail($email){
+		return self::getByExample(new DBExample(array('email' => $email)));
+	}
+
 	/**
 	 * Set all the permissions on the user
 	 */
 	private function getPermissions(){
 		if(!isset($this->permissions)){
 			$sql = 'SELECT P.plugin, P.key, P.id
-					FROM ' . RolePermission::getTable() . ' RP 
-						INNER JOIN ' . Permission::getTable() . ' P ON RP.permissionId = P.id						
+					FROM ' . RolePermission::getTable() . ' RP
+						INNER JOIN ' . Permission::getTable() . ' P ON RP.permissionId = P.id
 						INNER JOIN ' . self::getTable() . ' U ON U.roleId = RP.roleId
 					WHERE U.id = :id AND RP.value=1';
 
 			$permissions = App::db()->query($sql, array('id' => $this->id), array('return' => DB::RETURN_OBJECT));
-			$this->permissions = array();			
+			$this->permissions = array();
 			foreach($permissions as $permission){
 				// Register the permission by it id
-				$this->permissions[$permission->id] = 1;
+				$this->permissions['byId'][$permission->id] = 1;
 
 				// Regoster the permission by it name
-				$this->permissions[$permission->plugin][$permission->key] = 1;
+				$this->permissions['byName'][$permission->plugin][$permission->key] = 1;
 			}
-		}		
-	}	
+		}
+	}
 
 
 	/**
@@ -109,13 +118,13 @@ class User extends Model{
 	 */
 	public function getProfileData($prop = ""){
 		if(!isset($this->profile)){
-			$sql = 'SELECT Q.name, V.value 
+			$sql = 'SELECT Q.name, V.value
 					FROM ' . ProfileQuestionValue::getTable()  . ' V INNER JOIN ' . ProfileQuestion::getTable() . ' Q ON V.question = Q.name
 					WHERE V.userId = :id';
 
-			$data = App::db()->query($sql, array('id' => $this->id), array('return' => DB::RETURN_ARRAY, 'index' => 'name'));			
+			$data = App::db()->query($sql, array('id' => $this->id), array('return' => DB::RETURN_ARRAY, 'index' => 'name'));
 			$this->profile = array_map(function($v){ return $v['value']; }, $data);
-		}		
+		}
 		return $prop ? (isset($this->profile[$prop]) ? $this->profile[$prop] : null) : $this->profile;
 	}
 
@@ -124,7 +133,7 @@ class User extends Model{
 	 * Set the user's profile data. This method does not register the data in database, only set in the user properties
 	 * @param string $prop The property name to set
 	 * @param string $value The value to set
-	 * @see saveProfile	 
+	 * @see saveProfile
 	 */
 	public function setProfileData($prop, $value){
 		$this->profile[$prop] = $value;
@@ -144,60 +153,49 @@ class User extends Model{
 			$questionValue->save();
 		}
 	}
-	
+
 
 	/**
 	 * 	Check if the user is allowed to perform an action
 	 * @param string|int $action This parameter can represent :
 	 *								- A specific action, formatted as "<plugin>.<key>"
 	 *								- A permission id, when an integer is given
-	 *								- A plugin name, so this method will check if at least one action of the plugin is avaialble for the user
-	 * @return boolean TRUE if the suer is allowed to perform the action, else FALSE
+	 * @return boolean TRUE if the user is allowed to perform the action, else FALSE
 	 */
 	public function isAllowed($action){
 		if($this->roleId == Role::ADMIN_ROLE_ID){
 			// The admins can perform any action
 			return true;
 		}
-		if($action !== Permission::ALL_PRIVILEGES_ID && $action !== Permission::ALL_PRIVILEGES_NAME){
-			if($this->isAllowed(Permission::ALL_PRIVILEGES_ID)){
-				// The user has all privileges
-				return true;
-			}
+		if($action !== Permission::ALL_PRIVILEGES_ID && $action !== Permission::ALL_PRIVILEGES_NAME && $this->isAllowed(Permission::ALL_PRIVILEGES_ID)){
+			// The user has all privileges
+			return true;
 		}
-		
+
 		// Get the user permissions
 		$this->getPermissions();
 
-		if(strpos($action, '.') !== false){
-			// Check a specific action
-			list($plugin, $command) = explode('.', $action);
+		if(is_numeric($action)){
+			// $action represents the id of the action
+			return !empty($this->permissions['byId'][$action]);
 		}
 		else{
-			// Check a action by it id or a while plugin
-			$plugin = $action;
-		}
-		
+			// The action is formatted as <plugin>.<key>
+			list($plugin, $key) = explode('.', $action);
 
-		if(empty($command)){
-			// Return if the user has at least one authorization in the plugin
-			return !empty($this->permissions[$plugin]);
+			return !empty($this->permissions['byName'][$plugin][$key]);
 		}
-		else{
-			// Return if the user can perform the action
-			return !empty($this->permissions[$plugin][$command]);
-		}
-	}	
-	
+	}
+
 
 	/**
 	 * Get the user's username
 	 * @return string The user's username
-	 */	
+	 */
 	public function getUsername(){
 		return $this->id ? $this->username : Lang::get('main.guest-username');
 	}
-	
+
 
 	/**
 	 * Get the user's full name. This method returns the real name if it set in the user's profile, else, it returns his username
@@ -206,7 +204,7 @@ class User extends Model{
 	public function getDisplayName(){
 		return $this->getProfileData('realname') ? $this->getProfileData('realname') : $this->getUsername();
 	}
-	
+
 	/**
 	 * Check if the user is connected or not
 	 * @return bool
@@ -214,7 +212,7 @@ class User extends Model{
 	public function isConnected(){
 		return $this->id && App::session()->getData('user.id') == $this->id && $this->active;
 	}
-	
+
 
 	/**
 	 * Check if the user can access the application

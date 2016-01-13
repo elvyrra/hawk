@@ -7,7 +7,7 @@ namespace Hawk;
 
 /**
  * This class is used to send HTTP request and get the result
- * @package Utils
+ * @package Network
  */
 class HTTPRequest{
 	use Utils;

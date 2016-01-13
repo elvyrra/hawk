@@ -19,7 +19,7 @@ class ObjectInput extends FormInput{
      * Display the input
      * @return string The HTML result to display
      */
-    public function __toString(){
+    public function display(){
 		if(empty($this->value)){
 			$this->value = "{}";
 		}
@@ -27,7 +27,7 @@ class ObjectInput extends FormInput{
 			$this->value = json_encode($this->value, JSON_NUMERIC_CHECK | JSON_HEX_APOS | JSON_HEX_QUOT);
 		}
 		
-        return parent::__toString();
+        return parent::display();
     }
 	
 }

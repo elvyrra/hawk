@@ -8,12 +8,12 @@ namespace Hawk;
 
 /**
  * This class is used to generate and display smart lists, getting data from the database or a given array
- * @package Core\List
+ * @package List
  */
 class ItemList{
 	use Utils;
 
-	/*** Class constants ***/	
+	/*** Class constants ***/
 	const DEFAULT_MODEL = 'GenericModel';
 	const ALL_LINES = 'all';
 	const DEFAULT_LINE_CHOICE = 20;
@@ -22,7 +22,7 @@ class ItemList{
 	 * The possible choices for the number of lines to display
 	 */
 	public static $lineChoice = array(10, 20, 50, 100);
-	
+
 	/**
 	 * The list control buttons
 	 * @var array
@@ -67,7 +67,7 @@ class ItemList{
 
 	/**
 	 * The URI called to refresh the list
-	 * @var string 
+	 * @var string
 	 */
 	$action,
 
@@ -84,7 +84,7 @@ class ItemList{
 	$group = array(),
 
 	/**
-	 * The id of the selected line 
+	 * The id of the selected line
 	 * @var mixed
 	 */
 	$selected = null,
@@ -103,7 +103,7 @@ class ItemList{
 
 	/**
 	 * If set to true, the columns headers are not displayed
-	 * @var bool	 
+	 * @var bool
 	 */
 	$noHeader = false,
 
@@ -158,11 +158,11 @@ class ItemList{
 	 * @param arary $params The parameter of the list
 	 */
 	public function __construct($params){
-		/*** Default values ***/		
+		/*** Default values ***/
 		$this->emptyMessage = Lang::get('main.list-no-result');
 		$this->action = getenv('REQUEST_URI');
 		$this->refresh = !!App::request()->getParams('refresh');
-		
+
 		/*** Get the values from the parameters array **/
 		$this->map($params);
 
@@ -172,15 +172,15 @@ class ItemList{
 			$this->model = $reflection->getNamespaceName() . '\\' . $this->model;
 		}
 
-		
-		$model = $this->model;		
-		
+
+		$model = $this->model;
+
 		if(!isset($this->reference)){
-			$this->reference = $model::getPrimaryColumn();			
+			$this->reference = $model::getPrimaryColumn();
 		}
 		$this->refAlias = is_array($this->reference) ? reset($this->reference) : $this->reference;
 		$this->refField = is_array($this->reference) ? reset(array_keys($this->reference)) : $this->reference;
-		
+
 		$model::setPrimaryColumn($this->refField);
 		if(isset($this->table)){
 			$model::setTable($this->table);
@@ -188,34 +188,34 @@ class ItemList{
 		if(isset($this->dbname)){
 			$model::setDbName($this->dbname);
 		}
-		
+
 		$this->dbo= DB::get($model::getDbName());
 		$this->table = $model::getTable();
-		
+
 		/*** initialize controls ***/
 		foreach($this->controls as &$button){
 			if(!empty($button['template'])){
-				switch($button['template']){				
+				switch($button['template']){
 					case "refresh" :
 						$button = array(
-							"icon" => "refresh", 						
+							"icon" => "refresh",
 							"onclick" => "app.lists['$this->id'].refresh();"
 						);
 					break;
 				}
 			}
 		}
-		
+
 		/*** Get the filters sent by POST or registered in COOKIES ***/
 		$parameters = array('searches', 'sorts', 'lines', 'page');
 		$cookie = isset($_COOKIE["list-{$this->id}"]) ? json_decode($_COOKIE["list-$this->id"], true) : array();
-		
+
 		foreach($parameters as $name){
 			if(isset($cookie[$name])){
 				$this->$name = $cookie[$name];
 			}
 		}
-		
+
 		/*** initialize fields default values ***/
 		foreach($this->fields as $name => &$field){
 			$field = new ItemListField($name, $field, $this);
@@ -233,12 +233,12 @@ class ItemList{
 		));
 		$event->trigger();
 	}
-	
+
 	/**
 	 * Get the data to display
 	 * @return array The data to display
 	 */
-	public function get(){		
+	public function get(){
 		if(isset($this->data) && is_array($this->data)){
 	    	return $this->getFromArray($this->data);
 	    }
@@ -246,7 +246,7 @@ class ItemList{
 			return $this->getFromDatabase();
 		}
 	}
-	
+
 
 	/**
 	 * Get the data from the database
@@ -254,11 +254,11 @@ class ItemList{
 	 */
 	private function getFromDatabase(){
 		$fields = array();
-				
+
 		$where = array();
 		if(!empty($this->filter)){
 			if($this->filter instanceof DBExample){
-				$where[] = $this->filter->parse($this->binds);	
+				$where[] = $this->filter->parse($this->binds);
 			}
 			elseif(is_array($this->filter)){
 				$where[] = $this->filter[0];
@@ -267,8 +267,8 @@ class ItemList{
 			else{
 				$where[] = $this->filter;
 			}
-		} 		
-		
+		}
+
 		/* insert the reference if not present in the fields **/
 		if(!isset($this->fields[$this->refAlias])){
 			$this->fields[$this->refAlias] = new ItemListField($this->refAlias, array(
@@ -276,15 +276,15 @@ class ItemList{
 				'hidden' => true
 			), $this);
 		}
-		
+
 		/*** Prepare the fields to research ***/
 		$searches = array();
 		foreach($this->fields as $name => &$field){
 			if(!$field->independant){
 				$fields[$this->dbo->formatField($field->field)] = $this->dbo->formatField($name);
-				
-				/*** Get the pattern condition ***/			
-				$sql = $field->getSearchCondition($this->binds);				
+
+				/*** Get the pattern condition ***/
+				$sql = $field->getSearchCondition($this->binds);
 				if($sql){
 					$where[] = $sql;
 				}
@@ -294,17 +294,17 @@ class ItemList{
 		try{
 			$where = implode(" AND ", $where);
 
-			$model = $this->model;		
+			$model = $this->model;
 			$this->recordNumber = $this->dbo->count($this->table, $where, $this->binds, $this->refField, $this->group);
-			
+
 			/*** Get the number of the page ***/
 			if($this->lines == self::ALL_LINES){
 				$this->lines = $this->recordNumber;
 			}
-			if($this->page > ceil($this->recordNumber / $this->lines) && $this->page > 1){
-				$this->page= (ceil($this->recordNumber / $this->lines) > 0) ? ceil($this->recordNumber / $this->lines) : 1;					
+			if($this->page > 1 && $this->page > ceil($this->recordNumber / $this->lines)){
+				$this->page= (ceil($this->recordNumber / $this->lines) > 0) ? ceil($this->recordNumber / $this->lines) : 1;
 			}
-			$this->start = ($this->page-1) * $this->lines;  
+			$this->start = ($this->page-1) * $this->lines;
 
 			/*** Get the data from the database ***/
 			$request = array(
@@ -321,14 +321,14 @@ class ItemList{
 			);
 
 			$this->results = $this->dbo->select($request);
-			
+
 			return $this->results;
 		}
 		catch(DBException $e){
 			exit(DEBUG_MODE ? $e->getMessage() : Lang::get('main.list-error'));
-		}  
+		}
 	}
-	
+
 	/**
 	 * Get the data of the list from a given array
 	 * @param array $data The array where to take the data to display
@@ -341,7 +341,7 @@ class ItemList{
 					return stripos($line[$name], $pattern) !== false;
 				});
 			}
-			
+
 			$sort = isset($this->sorts[$name]) ? $this->sorts[$name] : null;
 			if($sort){
 				usort($data, function($a, $b) use($sort, $name){
@@ -354,18 +354,18 @@ class ItemList{
 				});
 			}
 		}
-				
-		$this->recordNumber = count($data);			
-		
+
+		$this->recordNumber = count($data);
+
 		if($this->page > ceil($this->recordNumber / $this->lines) && $this->page > 1){
-			$this->page = (ceil($this->recordNumber / $this->lines) > 0) ? ceil($this->recordNumber / $this->lines) : 1;				
+			$this->page = (ceil($this->recordNumber / $this->lines) > 0) ? ceil($this->recordNumber / $this->lines) : 1;
 		}
-		$this->start = ($this->page - 1) * $this->lines;  
+		$this->start = ($this->page - 1) * $this->lines;
 		$this->results = array_slice(array_map(function($line){ return (object)$line; }, $data), $this->start, $this->lines);
-		
+
 		return $this->results;
 	}
-	
+
 
 	/**
 	 * Set the list data
@@ -374,8 +374,8 @@ class ItemList{
 	public function set($data){
 		$this->getFromArray($data);
 	}
-	
-	
+
+
 	/**
 	 * Get the list views files
 	 */
@@ -408,7 +408,7 @@ class ItemList{
 	/**
 	 * display the list
 	 * @return string The HTML result of displaying
-	 */	
+	 */
 	public function display(){
 		try{
 	    	// get the data to display
@@ -416,7 +416,7 @@ class ItemList{
 
 			// get the total number of pages
 	        $pages = (ceil($this->recordNumber / $this->lines) > 0) ? ceil($this->recordNumber / $this->lines) : 1;
-			
+
 			/*** At least one result to display ***/
 			$data = array();
 			$param = array();
@@ -446,44 +446,44 @@ class ItemList{
 			// Generate the script to insert the list in the application , client side
 			if($this->refresh){
 				$tplFile = $this->resultTpl;
-				$script = 
+				$script =
 					'app.ready(function(){
 				        if(list = app.lists["' . $this->id . '"]){
-				            list.selected = ' . ($this->selected !== false ? '"' . $this->selected . '"' : 'null') .' 
+				            list.selected = ' . ($this->selected !== false ? '"' . $this->selected . '"' : 'null') .'
 							list.maxPages(' . $pages . ');
 							list.recordNumber(' . $this->recordNumber . ');
 				        }
 				    });';
 			}
 			else{
-				$script = 
+				$script =
 					'require(["app"], function(){
-						app.ready(function(){									
+						app.ready(function(){
 							var list = new List({
 								id : "' . $this->id . '",
 								action : "' . $this->action . '",
 								target : "' . $this->target . '",
 								fields : ' . json_encode(array_keys($this->fields)) .',
 							});
-							
-							list.selected = ' . ($this->selected !== false ? '"' . $this->selected . '"' : 'null') .' 
+
+							list.selected = ' . ($this->selected !== false ? '"' . $this->selected . '"' : 'null') .'
 							list.maxPages(' . $pages . ');
 							list.recordNumber(' . $this->recordNumber . ');
 
-							app.lists["' . $this->id . '"] = list;			
+							app.lists["' . $this->id . '"] = list;
 						});
 					});';
-				
+
 				$tplFile = $this->tpl;
 			}
 
-			return 				
-				View::make($tplFile, array(			
+			return
+				View::make($tplFile, array(
 					'list' => $this,
 					'data' => $data,
 					'linesParameters' => $param,
 					'pages' => $pages
-				)) . 
+				)) .
 				'<script type="text/javascript">' . $script . '</script>';
 		}
 		catch(\Exception $e){

@@ -17,9 +17,9 @@ class ColorInput extends FormInput{
      * Display the color input
      * @return string the displayed HTML 
      */
-	public function __toString(){
+	public function display(){
 		$this->type = "text";
 
-		return parent::__toString();
+		return parent::display();
 	}
 }
