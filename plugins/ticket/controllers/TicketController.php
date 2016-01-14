@@ -14,10 +14,10 @@ class TicketController extends Controller{
 		$list = $this->compute('getlistTicket');
 
 		// Add css file
-        $this->addCss(Plugin::current()->getCssUrl('ticket.less'));
+    	$this->addCss(Plugin::current()->getCssUrl('ticket.less'));
         
-        // Add javascript file
-        $this->addJavaScript(Plugin::current()->getJsUrl('ticket.js'));
+    	// Add javascript file
+    	$this->addJavaScript(Plugin::current()->getJsUrl('ticket.js'));
 
 		return LeftSidebarTab::make(array(
 			'page' => array(
@@ -56,8 +56,15 @@ class TicketController extends Controller{
 			'filter' => $filter,
 			'reference' => 'id',
 			"lineClass" => function($line){
-				return "danger";
-			},
+				if($line->status != 'done'){
+					if(strtotime($line->deadLine) < strtotime(date('Y-m-d'))){
+									return "danger";
+					}
+				}
+			else{
+					return "success";
+				}
+			 },
 			'controls' => array(
 				array(
 					'icon' => 'plus',
@@ -133,6 +140,7 @@ class TicketController extends Controller{
 					)
 				),
 
+
 				'deadLine' => array(
 					'label' => Lang::get('ticket.deadLine-label'),
 					'display' => function($value, $field){
@@ -140,13 +148,14 @@ class TicketController extends Controller{
        					if(empty($value)){
        						return '<span class="text-danger"> - </span>';
        					}
-
+								/*
        					if(strtotime($value) < strtotime(date('Y-m-d'))){
        						return '<span class="text-danger">' . date(Lang::get('main.date-format'), strtotime($value)) . '</span>';
        					}
        					else{
 							return '<span class="text-success">' . date(Lang::get('main.date-format'), strtotime($value)) . '</span>';
-       					}
+       					}*/
+							return '<span>' . date(Lang::get('main.date-format'), strtotime($value)) . '</span>';
 					},	
 					'search' => array(
 						'type' => 'date'
@@ -156,9 +165,9 @@ class TicketController extends Controller{
 				'mtime' => array(
 					'label' => Lang::get('ticket.mtime-label'),
 					'display' => function($value, $field){
-                        return date(Lang::get('main.time-format'), $value);
-                    },
-                    'search' => false,
+           		return date(Lang::get('main.time-format'), $value);
+          },
+     			'search' => false,
 				),
 			)
 		);
@@ -282,11 +291,15 @@ class TicketController extends Controller{
 
 				if($oldValues){
 					$comments = array();
-					foreach(array('title', 'description', 'deadLine') as $key){
+					foreach(array('title', 'description') as $key){
 						if($oldValues->$key !== $form->getData($key)){  //$form->fields['status']->dbvalue()
 							$comments[] = Lang::get('ticket.' . $key . '-change-comment', array('oldValue' => $oldValues->$key, 'newValue' => $form->getData($key)));
 						}
 					}
+					
+					/*if(date('Y-m-d', $oldValues->deadLine) !== $form->getData('deadLine')){
+						$comments[] = Lang::get('ticket.deadLine-change-comment', array('oldValue' => $oldValues->deadLine, 'newValue' => $form->getData('deadLine')));
+					}*/
 
 					if($oldValues->status !== $form->getData('status')){
 						$oldValue = $oldValues->status;

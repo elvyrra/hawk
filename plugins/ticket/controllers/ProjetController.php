@@ -129,9 +129,7 @@ class ProjetController extends Controller{
 			'reference' => array('id' => $this->projectId),
 			'fieldsets' => array(
 				'general' => array(
-					'nofieldset' => true,
 					
-
 					new TextInput(array(
 						'name' => 'name',
 						'required' => true,
@@ -141,8 +139,10 @@ class ProjetController extends Controller{
 					new WysiwygInput(array(
 						'name' => 'description',
 						'label' => Lang::get('ticket.project-description-label'),
+						'labelWidth' => 'auto',
+						'attributes' => array('ko-wysiwyg' => '1'),
 					)),
-
+				
 					new SelectInput(array(
 						'name' => 'status',
 						'options' => $options,

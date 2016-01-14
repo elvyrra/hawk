@@ -23,5 +23,3 @@ $("#tickets-page")
 	
 	app.lists['ticket-list'].refresh();
 });
-
-

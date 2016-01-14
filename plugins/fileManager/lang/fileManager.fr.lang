@@ -18,4 +18,5 @@ old-name-folder-label = "Nom actuel"
 new-name-folder-label = "Nouveau nom"
 new-name-label = "Nouveau nom"
 edit-submit-value = "Valider"
+alert-remove-file-text = "Attention: le fichier sera supprimer définitivement du serveur"
 

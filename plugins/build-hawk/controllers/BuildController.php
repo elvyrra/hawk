@@ -55,7 +55,7 @@ class BuildController extends Controller{
 						'type' => 'select',
 						'options' => HawkBuild::$status,
 						'invitation' => '-',
-						'emptyValue' => '',						
+						'emptyValue' => '',
 					),
 					'display' => function($value){
 						return HawkBuild::$status[$value];
@@ -65,7 +65,7 @@ class BuildController extends Controller{
 				'actions' => array(
 					'independant' => true,
 					'display' => function($value, $field, $line){
-						switch($line->status){
+						switch((int) $line->status){
 							case HawkBuild::STATUS_OPEN :
 								break;
 
@@ -92,7 +92,7 @@ class BuildController extends Controller{
 								return $dev->display() . $prod->display();
 								break;
 
-							case HawkBuild::STATUS_TESTED : 
+							case HawkBuild::STATUS_TESTED :
 								break;
 
 							case HawkBuild::STATUS_DEPLOYED :
@@ -126,7 +126,7 @@ class BuildController extends Controller{
 
 		$form = new Form(array(
 			'id' => 'new-build-form',
-			'model' => __NAMESPACE__ . '\\HawkBuild',			
+			'model' => __NAMESPACE__ . '\\HawkBuild',
 			'fieldsets' => array(
 				'form' => array(
 					new TextInput(array(
@@ -146,7 +146,7 @@ class BuildController extends Controller{
 					new CheckboxInput(array(
 						'name' => 'override',
 						'independant' => true,
-						'label' => Lang::get(self::PLUGIN_NAME . '.new-build-override-label'),						
+						'label' => Lang::get(self::PLUGIN_NAME . '.new-build-override-label'),
 					)),
 				),
 
@@ -181,35 +181,35 @@ class BuildController extends Controller{
 					$form->error('fromVersion', Lang::get(self::PLUGIN_NAME . '.from-version-equals-version'));
 					return $form->response(Form::STATUS_CHECK_ERROR);
 				}
-				
+
 				$lastBuild = HawkBuild::getByVersion($form->getData('fromVersion'));
 				if(!$lastBuild){
-					// The 
+					// The
 					$form->error('fromVersion', Lang::get(self::PLUGIN_NAME . '.from-version-not-existing'));
 					return $form->response(Form::STATUS_CHECK_ERROR);
-				}					
+				}
 
 				$build = HawkBuild::getByVersion($form->getData('version'));
 				if($build && !$form->getData('override')){
 					// The version already exists
 					$form->error('version', Lang::get(self::PLUGIN_NAME . '.version-already-exists'));
 					return $form->response(Form::STATUS_CHECK_ERROR);
-				}				
+				}
 				elseif(!$build){
 					$build = new HawkBuild(array(
 						'version' => $form->getData('version'),
 						'fromVersion' => $form->getData('fromVersion'),
-						'createTime' => time(),						
+						'createTime' => time(),
 						'status' => HawkBuild::STATUS_OPEN
-					));					
-				}				
-				
+					));
+				}
+
 				// Prepare the folder that will home the update
 				$buildDir = $build->getBuildDirname();
 
 				// Clean the folder and recreate it
 				if(is_dir($buildDir)){
-					shell_exec('rm -r ' . $buildDir);					
+					shell_exec('rm -r ' . $buildDir);
 				}
 				mkdir($buildDir, 0775, true);
 
@@ -261,7 +261,7 @@ class BuildController extends Controller{
 		        ));
 
 		        $build->save();
-		        	
+
 		        return $form->response(Form::STATUS_SUCCESS);
 			}
 		}
@@ -279,18 +279,24 @@ class BuildController extends Controller{
 	 * 	1. Push the code on github
 	 * 	2. Deploy the update on Hawk site by the API
 	 */
-	public function deploy(){		
+	public function deploy(){
 		$build = HawkBuild::getById($this->id);
 
 		if($this->env === 'prod'){
-			// Development environment - Push on github
-			$repo = \Git::open(HawkBuild::REPOSITORY_DIR);
+			try{
+				// Development environment - Push on github
+				$repo = \Git::open(HawkBuild::REPOSITORY_DIR);
 
-			$repo->push('origin', 'master');
+				$repo->push('origin', 'master');
+			}
+			catch(\Exception $e){
+				App::response()->setStatus(500);
+				throw $e;
+			}
 		}
 
 		// Send the update on the website
-		$url = ($this->env === 'dev' ? HawkApiDev::BASE_URL : HawkApi::BASE_URL) . '/hawk/update/deploy';
+		$url = ($this->env === 'dev' ? HawkApiDev::BASE_URL : HAWK_SITE_URL . '/api') . '/hawk/update/deploy';
 		$request = new HTTPRequest(array(
 			'method' => HTTPRequest::METHOD_POST,
 			'url' => $url,
@@ -315,11 +321,11 @@ class BuildController extends Controller{
 				));
 
 				$build->update();
-			}			
+			}
 		}
-		
+
 		App::response()->setContentType('json');
 		App::response()->setStatus($request->getStatusCode());
-		App::response()->end($request->getResponse());
+		App::response()->setBody($request->getResponse());
 	}
 }

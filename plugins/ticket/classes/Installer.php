@@ -170,7 +170,7 @@ class Installer extends PluginInstaller{
                 $keys = array();
                 foreach(explode(PHP_EOL, $form->getData("options")) as $i => $option){
                     if(!empty($option)){
-                        $keys[$option] = trim($option);
+                        $keys[trim($option)] = trim($option);
                     }
                 }   
 

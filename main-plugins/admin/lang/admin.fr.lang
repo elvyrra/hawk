@@ -235,3 +235,6 @@ update-page-tab-hawk-title = "Mettre Hawk à jour"
 update-page-update-hawk-btn = "Installer Hawk v{version}"
 update-page-confirm-update-hawk = "Voulez-vous réellement mettre Hawk à jour ?"
 update-hawk-error = "Une erreur est survenue pendant la mise à jour de Hawk"
+
+
+BodyTextColor-label = " Couleur de fond"

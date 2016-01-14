@@ -5,7 +5,6 @@ namespace Hawk\Plugins\FileManager;
 class FileManagerController extends Controller{
 
 	const PLUGIN_NAME = 'fileManager';
-	const ROOT_FILE_MANAGER_DIR = '/home/devs/manager/static/plugins/fileManager/userfiles/';
 
 	/**
 	 * Entry point for the page of fileManager
@@ -13,15 +12,13 @@ class FileManagerController extends Controller{
 	public function index(){
 		// Get list of all subject
 		$tree = $this->getMainTree();
-		$preview = $this->getPreviewFile();
+		$preview = $this->getPreview();
 
-		header('X-Frame-Options: GOFORIT'); 
 		// Add css file
 	    $this->addCss(Plugin::current()->getCssUrl('fileManager.less'));
 	        
 	    // Add javascript file
 		$this->addJavaScript(Plugin::current()->getJsUrl('jquery.media.js'));
-	    $this->addJavaScript(Plugin::current()->getJsUrl('jquery.gdocsviewer.js'));
 	    $this->addJavaScript(Plugin::current()->getJsUrl('fileManager.js'));
 	
 		return View::make(Plugin::current()->getView('fileManager.tpl'), array(
@@ -42,22 +39,39 @@ class FileManagerController extends Controller{
 	/*
 	* Get Main tree for ROOT_FILE_MANAGER_DIRECTORY
 	*/
-	public function getPreviewFile(){
-    	return View::make(Plugin::current()->getView('preview.tpl'), array(
-			//'file' => Plugin::current()->getUserfilesUrl() . 'Documents/facture.pdf',
-		)); 
+	public function getPreview(){
+    	return View::make(Plugin::current()->getView('preview.tpl')); 
  	}
 
 	/*
 	* Get Main tree for ROOT_FILE_MANAGER_DIRECTORY
 	*/
 	public function getMainTree(){
+
+		if(! is_dir(Plugin::current()->getPublicUserfilesDir() . 'Documents')){						
+			mkdir(Plugin::current()->getPublicUserfilesDir() . 'Documents', 0775, true);					
+		}
+
+		$this->idElement = 0;
     	// Scan temporary directory and check if it's contains dir with plugin name
-		$tree = $this->scanFolder('/home/devs/manager/static/plugins/fileManager/userfiles');
-    	
+    	$tree = "<ol class='main-tree sortable active' data-id='" . $this->idElement . "'>";
+    	$tree = $tree . "<li><span><i class='icon icon-folder-open icon-3x'></i>Documents</span>";
+    	$this->idElement++;
+
+    	$tree = $tree . "<a target='dialog' href='" . App::router()->getUri("fileManager-editRootFolder") . "'><i class='icon icon-edit icon-lg'></i></a>";
+    	$tree = $tree . $this->scanFolder(Plugin::current()->getPublicUserfilesDir() . 'Documents');
+    	$tree = $tree . "</li></ol>";
+
     	return View::make(Plugin::current()->getView('tree.tpl'), array(
-				'tree' => $tree
-			)); 
+			'tree' => $tree
+		)); 
+    }
+
+    /*
+	* Get URL of selected file to display or download it
+	*/
+    public function getUrlFile($basename){
+    	return Plugin::current()->getUserfilesUrl() . $basename;
     }
 
 	/*
@@ -67,7 +81,7 @@ class FileManagerController extends Controller{
    		$result = "<ul>";
 		
    		$cdir = scandir($dir); 
-		$path = str_replace("/home/devs/manager/static/plugins/fileManager/userfiles/", "", $dir);
+		$path = str_replace(Plugin::current()->getPublicUserfilesDir(), "", $dir);
 		$path = Plugin::current()->getUserfilesUrl() . $path;
    		
    		foreach ($cdir as $key => $value){ 
@@ -75,15 +89,19 @@ class FileManagerController extends Controller{
 	         
 		        if (is_dir($dir . DIRECTORY_SEPARATOR . $value)){
 		        	
-		        	$result = $result . "<li><span><i class='icon icon-folder-open icon-3x'></i>" .  $value . "</span>";
-					$result = $result . "<i class='icon icon-edit icon-lg edit-folder' data-path='" . $dir . "' data-folder='" . $value . "' ></i>";
+		        	$result = $result . "<li><span class='sortable-item' data-id='" . $this->idElement . "'><i class='icon icon-folder-open icon-3x'></i>" .  $value . "</span>";
+		        	$result = $result . "<i class='icon icon-edit icon-lg edit-folder pointer' data-path='" . $dir . "' data-folder='" . $value . "' ></i>";
+					$this->idElement++;
 					// recusrive
 		          	$result = $result . $this->scanFolder($dir . DIRECTORY_SEPARATOR . $value); 
 		          	$result = $result . "</li>";
 		        } 
 		        else{ 
-					$result = $result . "<li><span class='preview-file' data-path='" . $path . DIRECTORY_SEPARATOR . $value . "'><i class='icon icon-file icon-3x' ></i>" . $value . "</span>";
-					$result = $result . "<i class='icon icon-edit icon-lg edit-file' data-path='" . $dir . "' data-file='" . $value . "' ></i></li>";
+					$result = $result . "<li><span class='sortable-item preview-file' data-id='" . $this->idElement . "' data-path='" . $path . DIRECTORY_SEPARATOR . $value . "'><i class='icon icon-file icon-3x' data-path='" . $path . DIRECTORY_SEPARATOR . $value . "'></i>" . $value . "</span>";
+					$result = $result . "<i class='icon icon-edit icon-lg edit-file pointer' data-path='" . $dir . "' data-file='" . $value . "' ></i>";
+					$result = $result . "<a target='_blank' href='" . $path . DIRECTORY_SEPARATOR . $value . "' ><i class='icon icon-download icon-lg' ></i></a>";
+					$result = $result . "</li>";
+					$this->idElement++;
 				} 
 			} 
    		} 
@@ -91,9 +109,99 @@ class FileManagerController extends Controller{
    		$result = $result . "</ul>";
    		return $result; 
 	} 
+
+	/*
+	* Edit Root Folder: Documents
+	*/
+	public function editRootFolder(){
+		
+		$param = array(
+			'id' => 'fileManager-editFolder',
+			'fieldsets' => array(
+				'general' => array(
+
+					new RadioInput(array(
+						'name' => 'typeAction',
+						'label' => Lang::get(self::PLUGIN_NAME . '.add-type-action'),
+						'options' => array(
+							'addFolder' => Lang::get('fileManager.addFolder-label'),
+							'importFile' => Lang::get('fileManager.importFile-label'),
+						),
+						'default' => 'addFolder',
+						'layout' => 'vertical',
+						'attributes' => array(
+							'ko-checked' => 'editFolder.type'
+						)
+					)),
+					
+					new TextInput(array(
+						'name' => 'new-name',
+						'required' => true,
+						'label' => Lang::get(self::PLUGIN_NAME . '.new-name-folder-label'),
+					)),
+								
+					new FileInput(array(
+						'name' => 'file',
+						'label' => Lang::get(self::PLUGIN_NAME . '.file-label'),
+						'independant' => true,
+					)),
+				),
+				
+				'_submits' => array(
+					new SubmitInput(array(
+						'name' => 'valid',
+						'icon' => 'save',
+						'value' => Lang::get(self::PLUGIN_NAME . '.edit-submit-value'),						
+					)),
+				),
+			),
+			'onsuccess' => 'app.dialog("close");app.load(app.getUri("fileManager-index"));'
+		); 
+
+		// Get form add new plugin
+		$form = new Form($param);
+		
+		if(!$form->submitted()){
+			$this->addCss(Plugin::current()->getCssUrl('fileManager.less'));
+    		$this->addJavaScript(Plugin::current()->getJsUrl('formEdit.js'));
+			
+			return View::make(Plugin::current()->getView('editFolder.tpl'), array(
+				'title' => Lang::get(self::PLUGIN_NAME . '.editFolder-title'),
+				'icon' => 'edit',
+      			'form' => $form
+			)); 
+		}
+		elseif($form->check()){
+
+			if($form->getData('typeAction') == "addFolder"){
+				mkdir(Plugin::current()->getPublicUserfilesDir() . 'Documents/' . $form->getData('new-name'), 0775, true);
+			}
+			else if($form->getData('typeAction') == "importFile"){
+				$upload = Upload::getInstance('file');
+				if($upload){
+					$file = $upload->getFile(0);
+					$extension = $file->extension;
+
+					if(strstr($form->getData('new-name'), '.' . $extension) === false)
+						 $upload->move($file, Plugin::current()->getPublicUserfilesDir() . 'Documents/', $form->getData('new-name') . '.' . $extension);
+					else
+						$upload->move($file, Plugin::current()->getPublicUserfilesDir() . 'Documents/', $form->getData('new-name'));
+				}
+				else{
+					$form->error('file', Lang::get(self::PLUGIN_NAME . '.no-file-error'));
+          			return $form->response(Form::STATUS_CHECK_ERROR, Lang::get(self::PLUGIN_NAME . '.no-file-error'));
+				}
+			}
+			else{
+
+			}
+
+			return $form->response(Form::STATUS_SUCCESS);
+		}
+  	}
 	
 	/*
-	* Add new element
+	* Edit folder
 	*/
 	public function editFolder(){
 		$path = App::request()->getParams('path');
@@ -189,22 +297,29 @@ class FileManagerController extends Controller{
 
 			}
 			else if($form->getData('typeAction') == "importFile"){
-				$uploader = Upload::getInstance('file');
-				if($uploader){
-					$tempFile = $uploader->getFile();
-					$file = $tempFile->tmpFile;
-					rename($file, $path . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . $form->getData('new-name'));
+				$upload = Upload::getInstance('file');
+				if($upload){
+					$file = $upload->getFile(0);
+					$extension = $file->extension;
+
+					if(strstr($form->getData('new-name'), '.' . $extension) === false)
+						 $upload->move($file, $path . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR, $form->getData('new-name') . '.' . $extension);
+					else
+						$upload->move($file, $path . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR, $form->getData('new-name'));
 				}
 				else{
 					$form->error('file', Lang::get(self::PLUGIN_NAME . '.no-file-error'));
-          		return $form->response(Form::STATUS_CHECK_ERROR, Lang::get(self::PLUGIN_NAME . '.no-file-error'));
+          			return $form->response(Form::STATUS_CHECK_ERROR, Lang::get(self::PLUGIN_NAME . '.no-file-error'));
 				}
 			}
 
 			return $form->response(Form::STATUS_SUCCESS);
 		}
   	}
-	
+
+	/*
+	* Edit file
+	*/
 	public function editFile(){
 		$path = App::request()->getParams('path');
 		$file = App::request()->getParams('file');
@@ -269,7 +384,12 @@ class FileManagerController extends Controller{
 				shell_exec('rm ' . $path . DIRECTORY_SEPARATOR . $file);
 			}
 			else if($form->getData('typeFileAction') == "editNameFile"){
-				rename($path . DIRECTORY_SEPARATOR . $file, $path . DIRECTORY_SEPARATOR . $form->getData('new-name'));
+
+				$path_parts = pathinfo($file);
+				if(strstr($form->getData('new-name'), '.' . $path_parts['extension']) === false)
+					rename($path . DIRECTORY_SEPARATOR . $file, $path . DIRECTORY_SEPARATOR . $form->getData('new-name') . '.' . $path_parts['extension']);
+				else
+					rename($path . DIRECTORY_SEPARATOR . $file, $path . DIRECTORY_SEPARATOR . $form->getData('new-name'));
 			}
 			
 			return $form->response(Form::STATUS_SUCCESS);

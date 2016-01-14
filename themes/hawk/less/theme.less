@@ -1,10 +1,13 @@
 /* Editable variables */
-@text-color: #4b5259; // editable : "Body text color", color
+@text-color: #4b5259; // editable : "theme-BodyTextColor-label", color
 @body-bg: #ffffff; // editable : "Body background", color
+@body-modal-bg: #ffffff; // editable : "Modal Body background", color
+
 @font-size-base: 10px; // editable : "Global font size"
 
 @header-bg: #37424d; // editable : "Header and footer background", color
-@header-color: #d6d6d6; // edtaible : "Header and footer font color", color
+@sub-header-bg: #37424d; // editable : "Sub Header and footer background", color
+@header-color: #d6d6d6; // editable : "Header and footer font color", color
 
 @btn-default-color: #fff; // editable : "Default buttons font color", color
 @btn-default-bg: #5f6e7d; // editable : "Default buttons background", color
@@ -878,6 +881,10 @@ table {
     .dropdown-menu li i.icon{
         width: 2rem;
     }
+
+    .dropdown-menu{
+        background: @sub-header-bg;
+    }
 }
 
 
@@ -1020,10 +1027,14 @@ a, a:active, a:hover, a:visited, a:focus{
 
 /*-------------------- Dialog box ---------------------*/
 .modal-dialog{
+    
     z-index: @zindex-modal;
 
     .modal-title{
         color: @brand-primary;
+    }
+    .modal-body{
+        background: @body-modal-bg;
     }
 }
 
