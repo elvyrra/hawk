@@ -41,7 +41,7 @@ define('tabs', ['jquery', 'ko'], function($, ko){
 		});
 
 		this.activeTab.subscribe(function(tab){
-			history.replaceState({}, "", tab.history[tab.history.length - 1]);
+			history.replaceState({}, "", '#!' + tab.history[tab.history.length - 1]);
 		}.bind(this));
 	};
 

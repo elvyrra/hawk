@@ -2,12 +2,12 @@
 
 {if(empty($content))}
 	<div id="main-content" role="tabpanel" ko-with="tabset">
-		<!-- Nav tabs --> 
+		<!-- Nav tabs -->
 		{if($canAccessApplication)}
 			<ul class="nav nav-tabs" role="tablist" id="main-nav-tabs">
 				<!-- ko foreach: tabs -->
-				<li role="presentation" class="main-tab-title corner-top" 
-					ko-click="function(data, event){ $parent.clickTab($index(), event) }" 
+				<li role="presentation" class="main-tab-title corner-top"
+					ko-click="function(data, event){ $parent.clickTab($index(), event) }"
 					ko-attr="{ id : 'main-tab-title-' + id(), 'data-tab' : $index }"
 					ko-class="{active : $parent.activeTab() == $data }"
 					ko-style="{ width: 'calc((100% - 25px )/ ' + $parent.tabs().length + ' - 2px )' }"
@@ -27,7 +27,7 @@
 				</li>
 			</ul>
 		{/if}
-		
+
 		<!-- Tab panes -->
 		<div class="tab-content" id="main-tab-content" ko-foreach="tabs">
 			<div role="tabpanel" class="tab-pane main-tab-pane" ko-attr="{ id : 'main-tab-' + id(), 'data-tab' : $index}" ko-html="content" ko-class="{active : $parent.activeTab() == $data}"></div>
@@ -49,7 +49,7 @@
 <div id="footer">
 	{text key='main.hawk-powered'}
 	{if(DEV_MODE)}
-		<a href="{uri action='clear-cache'}" class="real-link pull-right" title="{text key="main.clear-cache"}"> 
+		<a href="{uri action='clear-cache'}" class="real-link pull-right" title="{text key="main.clear-cache"}">
 			<i class="icon icon-calendar-times-o icon-lg clear-cache-btn"></i>
 		</a>
 	{/if}
@@ -57,7 +57,7 @@
 
 
 <div id='loading' ko-visible="loading.display">
-	<span class='icon icon-spinner icon-spin icon-5x'></span>
+	<span class='icon icon-spinner icon-spin icon-5x center'></span>
 	<div id="loading-bar" ko-class="{processing: loading.processing}">
 		<span id='loading-purcentage' ko-style="{ width: loading.purcentage() + '%'}"></span>
 	</div>

@@ -15,31 +15,12 @@ try{
     (new Event('process-start'))->trigger();
 
     /*** Initialize the plugins ***/
-    $plugins = App::conf()->has('db') ? array_merge(Plugin::getMainPlugins(), Plugin::getActivePlugins()) : array(Plugin::get('main'), Plugin::get('install'));
+    $plugins = App::conf()->has('db') ? Plugin::getActivePlugins() : array(Plugin::get('main'), Plugin::get('install'));
     foreach($plugins as $plugin){
     	if(is_file($plugin->getStartFile())){
     		include $plugin->getStartFile();
     	}
     }
-
-    Event::on('after-routing', function($event){
-        $route = $event->getData('route');
-        $controllerClass = $route->getActionClassname();
-        $controller = $controllerClass::getInstance();
-
-
-        if(!App::conf()->has('db') && App::request()->getUri() == App::router()->getUri('index')) {
-            App::logger()->debug('Hawk is not installed yet, redirect to install process page');
-            App::response()->redirectToAction('install');
-            return;
-        }
-
-        if(!App::request()->isAjax() && App::request()->getMethod() == 'get' && ! in_array($controller->getPlugin()->getName(), array('main', 'install'))) {
-
-            $event->setData('route', App::router()->getRouteByName('index'));
-        }
-    });
-
 
     /*** Initialize the theme ***/
     if(is_file(Theme::getSelected()->getStartFile())){
@@ -47,6 +28,21 @@ try{
     }
 
     (new Event('before-routing'))->trigger();
+
+    /*** Execute action just after routing ***/
+    Event::on('after-routing', function($event){
+        $route = $event->getData('route');
+        $controllerClass = $route->getActionClassname();
+        $controller = $controllerClass::getInstance();
+
+
+        if(!App::conf()->has('db') && App::request()->getUri() == App::router()->getUri('index')) {
+            // The application is not installed yet
+            App::logger()->notice('Hawk is not installed yet, redirect to install process page');
+            App::response()->redirectToAction('install');
+            return;
+        }
+    });
 
     /*** Compute the routage ***/
     App::router()->route();

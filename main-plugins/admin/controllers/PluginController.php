@@ -41,7 +41,7 @@ class PluginController extends Controller{
      * Display the list of available plugins on the file system
      */
     public function availablePlugins(){
-        $plugins = Plugin::getAll(true);
+        $plugins = Plugin::getAll(false, true);
 
         $api = new HawkApi;
         try{
@@ -349,11 +349,7 @@ class PluginController extends Controller{
      * Delete a plugin from the file system
      */
     public function delete(){
-        $directory = Plugin::get($this->plugin)->getRootDir();
-
-        App::fs()->remove($directory);
-
-        App::response()->redirectToAction('plugins-list');
+        return $this->computeAction('delete');
     }
 
     /**
@@ -438,7 +434,7 @@ class PluginController extends Controller{
                 $namespace = Plugin::getNamespaceByName($form->getData('name'));
 
                 // Check the plugin does not exists
-                foreach(Plugin::getAll(true) as $plugin){
+                foreach(Plugin::getAll(false) as $plugin){
                     if($namespace === $plugin->getNamespace()){
                         // A plugin with the same name already exists
                         $form->error('name', Lang::get('admin.new-plugin-already-exists-error'));

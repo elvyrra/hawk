@@ -82,6 +82,8 @@ class User extends Model{
 
 	/**
 	 * Get a user by it email address
+	 * @param string $email The user email
+	 * @return User
 	 */
 	public static function getByEmail($email){
 		return self::getByExample(new DBExample(array('email' => $email)));

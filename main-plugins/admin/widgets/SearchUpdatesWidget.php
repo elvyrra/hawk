@@ -9,7 +9,7 @@ namespace Hawk\Plugins\Admin;
  * This widget displays in the main menu a little div with the number of available updates
  */
 class SearchUpdatesWidget extends Widget{
-    
+
     public function display(){
 
         // The number of updates
@@ -37,7 +37,7 @@ class SearchUpdatesWidget extends Widget{
         // Get the available updates for the plugins
         $plugins = array_map(function($plugin){
             return $plugin->getDefinition('version');
-        }, Plugin::getAll(true));
+        }, Plugin::getAll(false));
 
         try{
             $pluginsUpdates = count($api->getPluginsAvailableUpdates($plugins));
@@ -54,10 +54,9 @@ class SearchUpdatesWidget extends Widget{
         }
 
         // Get the available updates on themes
-        $themes = Plugin::getAll();
         $themes = array_map(function($theme){
             return $theme->getDefinition('version');
-        }, $themes);
+        }, Theme::getAll());
 
         try{
             $themesUpdates = count($api->getThemesAvailableUpdates($themes));
@@ -69,7 +68,7 @@ class SearchUpdatesWidget extends Widget{
             \Hawk\Plugins\Main\MenuItem::getByName('admin.themes')->label .= View::make(Plugin::current()->getView('available-updates.tpl'), array(
                 'updates' => $themesUpdates,
                 'title' => Lang::get('admin.available-updates-title-plugins', array('number' => $themesUpdates), $themesUpdates)
-            ));            
+            ));
         }
     }
 }
