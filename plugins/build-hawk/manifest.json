@@ -1,7 +1,0 @@
-{
-    "title": "Update Hawk",
-    "description": "This plugin is used to manage the versions of Hawk, and build new versions",
-    "version": "1.0.0",
-    "author": "Elvyrra SAS",
-    "dependencies": []
-}
