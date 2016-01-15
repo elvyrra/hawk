@@ -98,7 +98,7 @@ class DB{
             $this->connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
             $this->connection->setAttribute(\PDO::ATTR_EMULATE_PREPARES, 1);
 
-			$this->connection->query('SET NAMES "'.$this->charset.'"');
+			$this->connection->query('SET NAMES "' . $this->charset . '"');
         }
         catch(\PDOException $e) {
             throw new DBException($e->getMessage(), DBException::CONNECTION_ERROR, $this->host);
@@ -355,7 +355,7 @@ class DB{
 		}
 		$where = !empty($query->where) ? "WHERE $query->where" : '';
 
-		$group = !empty($query->group) ? "GROUP BY ".implode(",", array_map(array(self, 'formatField'), $query->group)) : "";
+		$group = !empty($query->group) ? "GROUP BY ".implode(",", array_map(array($this, 'formatField'), $query->group)) : "";
 
 		$having = !empty($query->having) ? "HAVING $query->having" : '';
 

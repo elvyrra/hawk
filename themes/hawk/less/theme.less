@@ -273,6 +273,7 @@ select{
 
 textarea{
 	height: auto;
+    width: inherit;
 }
 
 input[type="text"]:focus,
@@ -304,7 +305,6 @@ input[type="file"] {
             width: 1.5rem;
             display: inline-block;
             float: right;
-            line-height: 3rem;
         }
     }
 
@@ -1123,35 +1123,6 @@ p .icon{
 }
 
 
-
-/*----------------------- Error tooltips -------------------*/
-// .tooltip.input-error{
-// 	.tooltip-inner{
-//         background: @state-danger-bg;
-//         color: @state-danger-text;
-//     }
-
-//     .tooltip-arrow{
-//         border-right-color: @state-danger-bg;
-//     }
-// }
-
-
-/*------------------- Manage themes page -----------------------*/
-#manage-themes-page .theme-item{
-	position: relative;
-
-    .icons{
-        position: absolute;
-        top : .5rem;
-        right: .5rem;
-        display: none;
-    }
-
-    &:hover .icons{
-        display: block;
-    }
-}
 
 /*------------------------------- Profile ----------------------------------*/
 .profile-image{

@@ -5,7 +5,7 @@ $("#manage-themes-page")
     	$.get(app.getUri("select-theme", {name : $(this).data("theme")}), function(){
             location.reload();
     	});
-    }        
+    }
 })
 
 .on("click", ".delete-theme", function(){
@@ -47,7 +47,7 @@ app.forms["search-themes-form"].submit = function(){
     return false;
 };
 
-/** 
+/**
  * Download a plugin from the platform
  */
 $(".download-theme").click(function(){
@@ -56,7 +56,28 @@ $(".download-theme").click(function(){
     $.get($(this).attr('href'))
 
     .success(function(response){
-        app.load(location.hash.substr(2));
+        app.load(app.tabset.activeTab().uri());
+    })
+
+    .error(function(xhr, status, error){
+        app.loading.stop();
+        app.notify('error', error.message);
+    });
+
+    return false;
+});
+
+/**
+ * Update a theme from the platform
+ */
+$(".update-theme").click(function(){
+    debugger;
+    app.loading.start();
+
+    $.get(app.getUri('update-theme', {theme : $(this).data('theme')}))
+
+    .success(function(response){
+        app.load(app.tabset.activeTab().uri());
     })
 
     .error(function(xhr, status, error){
@@ -74,8 +95,8 @@ $(".download-theme").click(function(){
     var form = app.forms['custom-theme-form'];
     var model = {
         vars : {},
-        reset : function(){            
-            for(var i in this.vars){                
+        reset : function(){
+            for(var i in this.vars){
                 this.vars[i](less.options.initVars[i]);
             }
         },
@@ -84,20 +105,20 @@ $(".download-theme").click(function(){
     for(var i in form.inputs){
         var input = form.inputs[i];
         model.vars[input.name] = ko.observable(input.val());
-        model.vars[input.name].subscribe(function(value){            
+        model.vars[input.name].subscribe(function(value){
             clearTimeout(model.updateTimeout);
 
-            model.updateTimeout = setTimeout(function(){                
+            model.updateTimeout = setTimeout(function(){
                 less.modifyVars(form.valueOf());
             }.bind(this), 50);
 
             if(this.type === "color"){
                 this.node.parent().colorpicker('setValue', value);
             }
-        }.bind(input));       
-    } 
+        }.bind(input));
+    }
 
-    ko.applyBindings(model, form.node.get(0));   
+    ko.applyBindings(model, form.node.get(0));
 })();
 
 /***
@@ -119,11 +140,11 @@ $(".download-theme").click(function(){
 /**
  * Treat the menu sort
  */
-(function(){    
+(function(){
     var activeNode = document.getElementById('sort-menu-active');
     var inactiveNode = document.getElementById('sort-menu-inactive');
 
-    var MenuModel = function(){        
+    var MenuModel = function(){
         this.items = ko.observableArray(JSON.parse(app.forms['set-menus-form'].inputs['data'].val()));
         this.items.extend({ notify: 'always' });
 
@@ -149,7 +170,7 @@ $(".download-theme").click(function(){
         }.bind(this));
 
         this.templateClone = $("#sort-menu-template").clone();
-    }    
+    }
 
     MenuModel.prototype.getItemById = function(id){
         for(var i = 0; i < this.items().length; i++){
@@ -161,7 +182,7 @@ $(".download-theme").click(function(){
 
     MenuModel.prototype.getItemsByParent = function(parentId){
         var children = [];
-        for(var i = 0; i < this.activeItems().length; i++ ){  
+        for(var i = 0; i < this.activeItems().length; i++ ){
             if(this.activeItems()[i].parentId == parentId){
                 delete(this.activeItems()[i].children);
                 children.push(this.activeItems()[i]);
@@ -177,9 +198,9 @@ $(".download-theme").click(function(){
         item.active = 1;
         item.parentId = 0;
         item.order = this.getItemsByParent(0).length;
-        
+
         this.refresh();
-    };        
+    };
 
     MenuModel.prototype.deactivateItem = function(item, event){
         item.active = 0;
@@ -198,13 +219,13 @@ $(".download-theme").click(function(){
         }.bind(this));
     };
 
-    MenuModel.prototype.refresh = function(){        
+    MenuModel.prototype.refresh = function(){
     	this.items.valueHasMutated();
 
     	$("#sort-menu-template").remove();
         $("#sort-menu-wrapper").after(this.templateClone.clone());
         this.template = $("#sort-menu-template").get(0);
-        
+
         ko.cleanNode(activeNode);
         ko.applyBindings(this, activeNode);
 
@@ -224,7 +245,7 @@ $(".download-theme").click(function(){
 	        },
 
 	        onDrop: function ($item, container, _super, event) {
-	            _super($item, container);          
+	            _super($item, container);
 
 	            // Get the moved item
 	            var id = parseInt($item.attr('data-id'));
@@ -233,7 +254,7 @@ $(".download-theme").click(function(){
                 // Get the parent item
                 var parentId = parseInt(container.target.attr('data-parent'));
                 var parent = model.getItemById(parentId);
-            
+
                 // calculate the new order of the item
                 var index = $item.parent().children().index($item);
                 moved.order = index;
@@ -243,7 +264,7 @@ $(".download-theme").click(function(){
                     var item = model.getItemById($(this).attr('data-id'));
                     item.order = index;
                 });
-               
+
                 // Set the parent id to the item
                 moved.parentId = parentId;
 
@@ -254,7 +275,7 @@ $(".download-theme").click(function(){
 
 
     var model = new MenuModel();
-    model.refresh(); 
+    model.refresh();
     ko.applyBindings(model, inactiveNode);
 
 

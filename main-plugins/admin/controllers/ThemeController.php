@@ -7,7 +7,7 @@ class ThemeController extends Controller{
 	 * Display the main page of themes
 	 */
 	public function index(){
-		
+
 		$tabs = array(
 			'select' => array(
 				'id' => 'admin-themes-select-tab',
@@ -18,7 +18,7 @@ class ThemeController extends Controller{
 				'id' => 'admin-themes-customize-tab',
 				'title' => Lang::get('admin.theme-tab-basic-custom-title'),
 				'content' => $this->compute('customize'),
-			),			
+			),
 			'css' => array(
 				'id' => 'admin-themes-css-tab',
 				'title' => Lang::get('admin.theme-tab-advanced-custom-title'),
@@ -46,24 +46,37 @@ class ThemeController extends Controller{
 	}
 
 
-	
+
 
 	/**
 	 * Display the list of available themes to choose one
 	 */
 	public function listThemes(){
 		$themes = Theme::getAll();
-		$selectedTheme = Theme::getSelected();	
+		$selectedTheme = Theme::getSelected();
+
+        $api = new HawkApi;
+        $versions = array_map(function($theme){
+            return $theme->getDefinition('version');
+        }, $themes);
+
+        try{
+            $updates = $api->getThemesAvailableUpdates($versions);
+        }
+        catch(\Hawk\HawkApiException $e){
+            $updates = array();
+        }
 
 		Lang::addKeysToJavaScript("admin.theme-update-reload-page-confirm");
 
 		return View::make(Plugin::current()->getView("themes-list.tpl"), array(
 			'themes' => Theme::getAll(),
 			'selectedTheme' => Theme::getSelected(),
+            'updates' => $updates
 		));
 	}
 
-	
+
 
 	/**
 	 * Select a theme to be active
@@ -73,7 +86,7 @@ class ThemeController extends Controller{
 	}
 
 
-	
+
 
 	/**
 	 * Customize the current selected theme
@@ -81,9 +94,9 @@ class ThemeController extends Controller{
 	public function customize(){
 		$theme = Theme::getSelected();
 		$variables = $theme->getEditableVariables();
-		
+
 		$options = $theme->getVariablesCustomValues();
-		
+
 		$param = array(
 			'id' => 'custom-theme-form',
 			'upload' => true,
@@ -111,7 +124,7 @@ class ThemeController extends Controller{
 			'onsuccess' => '$("#theme-base-stylesheet").attr("href", data.href)',
 		);
 
-		
+
 		foreach($variables as $var){
 			switch($var['type']){
 				case 'color' :
@@ -125,7 +138,7 @@ class ThemeController extends Controller{
 				case 'file' :
 					$input = new FileInput(array(
 						'name' => $var['name'],
-						'label' => $var['description'],						
+						'label' => $var['description'],
 					));
 				break;
 
@@ -148,12 +161,12 @@ class ThemeController extends Controller{
 		$submitted = $form->submitted();
 		if(!$submitted){
 			return $form;
-		}	
-		else{	
+		}
+		else{
 			try{
 				$options = array();
-				foreach($variables as $var){										
-					if($var['type'] == 'file'){						
+				foreach($variables as $var){
+					if($var['type'] == 'file'){
 						$upload = Upload::getInstance($var['name']);
 						if($upload){
 							$dir = $theme->getStaticDir() . 'medias/';
@@ -163,12 +176,12 @@ class ThemeController extends Controller{
 
 							$file = $upload->getFile();
 							$upload->move($file, $dir);
-							
-							$options[$var['name']] = $theme->getMediasUrl($filename);							
+
+							$options[$var['name']] = $theme->getMediasUrl($filename);
 						}
 					}
 					else{
-						$options[$var['name']] = $form->getData($var['name']);						
+						$options[$var['name']] = $form->getData($var['name']);
 					}
 				}
 
@@ -194,7 +207,7 @@ class ThemeController extends Controller{
 			'id' => 'theme-css-form',
 			'action' => App::router()->getUri('theme-css'),
 			'fieldsets' => array(
-				'_submits' => array(			
+				'_submits' => array(
 					new HtmlInput(array(
 						'name' => 'desctiption',
 						'value' => Lang::get('admin.theme-css-description'),
@@ -203,7 +216,7 @@ class ThemeController extends Controller{
 					new SubmitInput(array(
 						'class' => 'pull-right',
 						'name' => 'valid',
-						'value' => Lang::get('main.valid-button'),					
+						'value' => Lang::get('main.valid-button'),
 					))
 				),
 
@@ -213,12 +226,12 @@ class ThemeController extends Controller{
 						'hidden' => true,
 						'value' => $css,
 						'attributes' => array(
-							'ko-value' => 'css'							
+							'ko-value' => 'css'
 						)
 					)),
 
-					new HtmlInput(array(	
-						'name' => 'ace',					
+					new HtmlInput(array(
+						'name' => 'ace',
 						'value' => '<style id="editing-css-computed" ko-text="css">' . $css . '</style>
 									<div id="theme-css-edit" contenteditable ko-ace="{language : \'css\', change : function(value){ css(value); }}">' . $css . '</div>'
 					)),
@@ -249,7 +262,7 @@ class ThemeController extends Controller{
 
 		$rootDir = $theme->getMediasDir();
 
-		$files = glob($rootDir . '*');		
+		$files = glob($rootDir . '*');
 		$medias = array(
 			'image' => array(
 				'icon' => 'picture-o',
@@ -258,13 +271,13 @@ class ThemeController extends Controller{
 			'audio' => array(
 				'icon' => 'music',
 				'files' => array(),
-			),			
+			),
 			'other' => array(
 				'icon' => 'file',
 				'files' => array()
 			),
 		);
-			
+
 		$finfo = finfo_open(FILEINFO_MIME_TYPE);
 		foreach($files as $file){
 			if(is_file($file)){
@@ -273,7 +286,7 @@ class ThemeController extends Controller{
 				if(!in_array($category, array('audio', 'image') )){
 					$category = 'other';
 				}
-				
+
 				$url = $theme->getMediasUrl(basename($file));
 				switch($category){
 					case 'image' :
@@ -289,13 +302,13 @@ class ThemeController extends Controller{
 							'display' => "<i class='icon icon-{$medias[$category]['icon']}'></i>" . basename($file)
 						);
 						break;
-				}				
+				}
 			}
 		}
 
 		Lang::addKeysToJavaScript('admin.theme-delete-media-confirm');
 		return View::make(Plugin::current()->getView("theme-medias.tpl"), array(
-			'medias' => $medias,				
+			'medias' => $medias,
 		));
 	}
 
@@ -310,7 +323,7 @@ class ThemeController extends Controller{
 					new FileInput(array(
 						'name' => 'medias[]',
 						'multiple' => true,
-						'required' => true,						
+						'required' => true,
 						'nl' => false,
 					)),
 
@@ -361,59 +374,6 @@ class ThemeController extends Controller{
 
 
 	/**
-	 * The form to import a new theme
-	 */
-	public function importThemeForm(){
-		$param = array(
-			'id' => 'import-theme-form',
-			'upload' => true,
-			'action' => App::router()->getUri('import-theme'),
-			'fieldsets' => array(
-				'form' => array(
-					new FileInput(array(
-						'name' => 'theme',
-						'required' => true,
-						'extensions' => array('zip'),
-						'nl' => false,
-					)),
-
-					new SubmitInput(array(
-						'name' => 'valid',
-						'icon' => 'upload',
-						'value' => Lang::get('admin.theme-import-submit-value'),						
-					)),
-				)
-			),
-			'onsuccess' => 'app.load(app.getUri("available-themes"), { selector : $("#admin-themes-select-tab")} );'
-
-		);
-
-		return new Form($param);
-	}
-
-
-	/**
-	 * Import a new theme
-	 */
-	public function import(){
-		$form = $this->importThemeForm();
-		if($form->check()){
-			$uploader = Upload::getInstance('theme');
-
-			if($uploader){
-				$zip = new \ZipArchive;
-				$file = $uploader->getFile();
-				$zip->open($file->tmpFile);
-				$zip->extractTo(THEMES_DIR);
-				$zip->close();
-			}
-
-			return $form->response(Form::STATUS_SUCCESS);
-		}
-	}
-
-
-	/**
 	 * Create a custom theme
 	 */
 	public function create(){
@@ -454,10 +414,10 @@ class ThemeController extends Controller{
 
                     new TextInput(array(
                         'name' => 'author',
-                        'label' => Lang::get('admin.theme-create-author-label'),                    
+                        'label' => Lang::get('admin.theme-create-author-label'),
                     )),
 				),
-				
+
 				'submits' => array(
 					new SubmitInput(array(
 						'name' => 'valid',
@@ -482,7 +442,7 @@ class ThemeController extends Controller{
                 'page' => $form
             ));
         }
-        else{ 
+        else{
         	if($form->check()){
         		$dir = THEMES_DIR . $form->getData('name') . '/';
         		if(is_dir($dir)){
@@ -510,7 +470,7 @@ class ThemeController extends Controller{
 
         			// Create the file manifest.json
         			$conf = array(
-        				'title' => $form->getData('title'),        				
+        				'title' => $form->getData('title'),
         				'version' => $form->getData('version'),
         				'author' => $form->getData('author')
         			);
@@ -541,7 +501,7 @@ class ThemeController extends Controller{
 	        				throw new \Exception('Impossible to create the file ' . $theme->getBaseLessFile());
 	        			}
         			}
-					
+
         			return $form->response(Form::STATUS_SUCCESS, Lang::get('admin.theme-create-success'));
         		}
         		catch(\Exception $e){
@@ -557,7 +517,7 @@ class ThemeController extends Controller{
 
 
 	/**
-	 * Delete a theme 
+	 * Delete a theme
 	 */
 	public function delete(){
 		$theme = Theme::get($this->name);
@@ -575,7 +535,7 @@ class ThemeController extends Controller{
 		$api = new HawkApi;
 
         $search = App::request()->getParams('search');
-        
+
         // Search themes on the API
         try{
             $themes = $api->searchThemes($search);
@@ -595,8 +555,8 @@ class ThemeController extends Controller{
 
         $list = new ItemList(array(
             'id' => 'search-themes-list',
-            'data' => $themes,       
-            'resultTpl' => Plugin::current()->getView('theme-search-list.tpl'),     
+            'data' => $themes,
+            'resultTpl' => Plugin::current()->getView('theme-search-list.tpl'),
             'fields' => array()
         ));
 
@@ -609,7 +569,7 @@ class ThemeController extends Controller{
 
             return LeftSidebarTab::make(array(
             	'page' => array(
-            		'content' => $list->display(), 
+            		'content' => $list->display(),
             	),
             	'sidebar' => array(
             		'widgets' => array(
@@ -617,7 +577,7 @@ class ThemeController extends Controller{
             		)
             	),
             	'icon' => 'picture-o',
-            	'title' => Lang::get('admin.search-themes-result-title', array('search' => $search))
+            	'title' => Lang::get('admin.search-theme-result-title', array('search' => $search))
             ));
         }
 	}
@@ -639,19 +599,15 @@ class ThemeController extends Controller{
 
             $zip->extractTo(THEMES_DIR);
 
-            $theme = Theme::get($this->theme);            
+            $theme = Theme::get($this->theme);
             if(!$theme){
                 throw new \Exception('An error occured while downloading the theme');
-            }            
+            }
 
             return $theme;
-            // App::response()->setBody($theme);
         }
         catch(\Exception $e){
             App::response()->setStatus(500);
-            // App::response()->setBody(array(
-            //     'message' => $e->getMessage()
-            // ));
             return array(
                 'message' => $e->getMessage()
             );
@@ -666,7 +622,7 @@ class ThemeController extends Controller{
         $theme = Theme::get($this->theme);
         if($theme){
             App::fs()->remove($theme->getRootDir());
-            $this->compute('download');
+            return $this->compute('download');
         }
     }
 }

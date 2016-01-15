@@ -194,9 +194,16 @@ App.prototype.start = function(){
 					}
 				}
 				else{
-					// Click on a link with an anchor as href
-					var url = history[history.length - 1];
-					window.history.replaceState({}, '', "#!" + url);
+					var hash = location.hash.replace(/^#\!/, '');
+					if(hash){
+						// Load a new page in the current tab
+						app.load(hash);
+					}
+					else{
+						// Click on a link with an anchor as href
+						var url = history[history.length - 1];
+						window.history.replaceState({}, '', "#!" + url);
+					}
 				}
 			}
 		}.bind(this);
