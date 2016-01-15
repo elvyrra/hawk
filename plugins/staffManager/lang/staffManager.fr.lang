@@ -1,0 +1,23 @@
+menu-absence-manager-title = "Gestion des absences"
+menu-my-absence-title = "Mes absences"
+menu-calendar-absence-title = "Calendrier de mon équipe"
+menu-new-absence-title = "Nouvelle demande"
+
+menu-team-manager-title = "Gérer mon équipe"
+menu-team-absence-manager-title = "Gestion des absences"
+
+
+
+myAbsences-page-title = "Mes absences"
+new-absence-form-title = "Demande de congés"
+
+new-absence-btn = "Nouvelle demande"
+
+type-label = "Type"
+description-label = "Description"
+startDate-label = "Date de début"
+endDate-label = "Date de fin"
+status-label = "Status"
+
+filter-type-title-legend = "Filtre par type d'absence"
+filter-status-title-legend = "Filtre par status"

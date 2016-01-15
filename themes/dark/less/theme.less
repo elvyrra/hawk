@@ -1,0 +1,1248 @@
+/* Editable variables */
+@text-color: #4b5259; // editable : "Body text color", color
+@body-bg: #ffffff; // editable : "Body background", color
+@font-size-base: 10px; // editable : "Global font size"
+
+@header-bg: #37424d; // editable : "Header and footer background", color
+@header-color: #d6d6d6; // edtaible : "Header and footer font color", color
+
+@btn-default-color: #fff; // editable : "Default buttons font color", color
+@btn-default-bg: #5f6e7d; // editable : "Default buttons background", color
+@btn-default-border: #186467; // editable : "Default buttons border color, color
+
+@brand-primary: #337d87; // editable : "Base color for primary elements", color
+@brand-success: #8dcc8d; // editable : "Base color for success elements", color
+@brand-info: #5bc0de; // editable : "Base color for information elements", color
+@brand-warning: #f2b661; // editable : "Base color for warning elements", color
+@brand-danger: #cf4242; // editable : "Base color for error elements", color
+
+@state-success-text: #1e7527; // editable : "Success alerts font color", color
+@state-success-bg: #c3dec3; // editable : "Success alerts background color", color
+
+@state-info-text: #176566; // editable : "Info alerts font color", color
+@state-info-bg: #e0eff1; // editable : "Info alerts background color", color
+
+@state-warning-text: #a64e32; // editable : "Warning alerts font color", color
+@state-warning-bg: #f7e9be; // editable : "Warning alerts background color", color
+
+@state-danger-text: #940a0a; // editable : "Error alerts font color", color
+@state-danger-bg: #ebb3b2; // editable : "Error alerts background color", color
+
+@import url(https://fonts.googleapis.com/css?family=Ubuntu);
+
+@import "bootstrap.less";
+@import "bootstrap-colorpicker.less";
+@import "bootstrap-datepicker.less";
+
+@import "font-awesome.less";
+
+html{
+    font-size: @font-size-base;
+}
+
+body{
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    position: absolute;
+    width: 100%;
+	font-size: 1.2rem;
+	color : @text-color;
+    background: @body-bg;
+	font-family: 'Ubuntu';
+}
+
+/* Some overrides from default bootstrap styles */
+h1,h2,h3,h4,h5,h6{
+	font-weight: normal;
+}
+
+.btn{
+	font-size: inherit;
+	margin-top: .5rem;
+    border-radius: 1px;
+    margin-right: .5rem;
+}
+
+/* labels */
+.label, .badge {font-weight: lighter;}
+.label-success, .badge-success {
+	background-color: rgb(129, 189, 130);
+}
+.label-info, .badge-info {
+	background-color: rgb(104, 163, 213);
+}
+
+
+/* code*/
+code {
+	color: rgb(78, 153, 223);
+}
+
+
+/*------------------------------ Helper classes ----------------------------------*/
+.mt-5{ margin-top: 5px;}
+.mt-10{ margin-top: 10px;}
+.mt-15{ margin-top: 15px;}
+.mt-20{ margin-top: 20px;}
+.mt-25{ margin-top: 25px;}
+.mt-30{ margin-top: 30px;}
+.mt-50{ margin-top: 50px;}
+
+.mb-5{  margin-bottom: 5px;}
+.mb-10{ margin-bottom: 10px;}
+.mb-15{ margin-bottom: 15px;}
+.mb-20{ margin-bottom: 20px;}
+.mb-25{ margin-bottom: 25px;}
+.mb-30{ margin-bottom: 30px;}
+.mb-50{ margin-bottom: 50px;}
+
+.mr-5{  margin-right: 5px;}
+.mr-10{ margin-right: 10px;}
+.mr-15{ margin-right: 15px;}
+.mr-20{ margin-right: 20px;}
+.mr-25{ margin-right: 25px;}
+.mr-30{ margin-right: 30px;}
+.mr-50{ margin-right: 50px;}
+
+.ml-5{  margin-left: 5px;}
+.ml-10{ margin-left: 10px;}
+.ml-15{ margin-left: 15px;}
+.ml-20{ margin-left: 20px;}
+.ml-25{ margin-left: 25px;}
+.ml-30{ margin-left: 30px;}
+.ml-50{ margin-left: 50px;}
+
+.bold{ font-weight: bold; }
+.italic{ font-style: italic;}
+.underline{ text-decoration: underline;}
+
+.no-display{ display: none;}
+.inline{ display: inline;}
+.inline-block{ display: inline-block;}
+.block{ display: block;}
+
+/** Border radius **/
+.corner-all{
+    border-radius: 4px;
+}
+.corner-top{
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+.corner-bottom{
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+.corner-left{
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+.corner-right{
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+.corner-top-left{
+    border-top-left-radius : 4px;
+}
+.corner-top-right{
+    border-top-right-radius : 4px;
+}
+.corner-bottom-left{
+    border-bottom-left-radius : 4px;
+}
+.corner-bottom-right{
+    border-bottom-right-radius : 4px;
+}
+
+.pointer{
+    cursor: pointer;
+}
+
+.vertical-center{
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.horizontal-center{
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.center{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/*---------------------------------------------------------------------------*/
+/*------------------------------- FORMS -------------------------------------*/
+/*---------------------------------------------------------------------------*/
+form .clearfix{
+    margin-top: .5rem;
+    margin-bottom: .5rem;
+}
+
+input, button, select, textarea {
+    font-family: "Open Sans", Arial;
+    outline-style: none;
+    color: @text-color;
+
+    &.error{
+        .alert-danger();
+
+        & + .input-error-message{
+            opacity: 0;
+            transition: opacity .4s ease;
+            .alert();
+            .alert-danger();
+            position: absolute;
+            z-index: 2000;
+            margin-left: 2rem;
+            min-width: 20rem;
+
+            @arrow-size: 1rem;
+            @arrow-width: .1rem;
+
+            &:before, &:after{
+                width: 0;
+                height: 0;
+                content: " ";
+                position: absolute;
+                border-style: solid;
+                border-color: transparent;
+                left: 0;
+                top: 0;
+            }
+
+            &:before{
+                border-width: @arrow-size + @arrow-width;
+                border-right-color: @state-danger-border;
+                margin-left: -2 * (@arrow-size + @arrow-width);
+                margin-top: .65rem;
+            }
+
+            &:after{
+                border-width: @arrow-size;
+                border-right-color: @state-danger-bg;
+                margin-left: -2 * @arrow-size;
+                margin-top: .75rem;
+            }
+        }
+
+        &:hover + .input-error-message{
+            opacity: 1;
+        }
+    }
+}
+
+input[type="text"],
+input[type="password"],
+input[type="date"],
+input[type="number"],
+select,
+textarea {
+	font-size: 1.3rem;
+	box-shadow: inset 0 0px 1px rgba(0, 0, 0, 0.075);
+	border-radius: 4px;
+    border: 1px solid darken(@body-bg, 13.5%);
+    height: 3rem;
+    padding-left: .3rem;
+    padding-right: .3rem;
+    width: 15rem;
+
+    /** readonly inputs **/
+    &:disabled, &:readonly{
+        color: rgb(177, 177, 177);
+    }
+
+    /** Placeholder style **/
+    &:-moz-placeholder, &:-ms-input-placeholder, &::-webkit-input-placeholder {
+        color: #9ba0a5;
+        font-family: "Open Sans", Arial;
+        font-size: 1.2rem;
+    }
+}
+
+select{
+    width: auto;
+}
+
+textarea{
+	height: auto;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+textarea:focus{
+	border-color: #A2CEF0;
+	box-shadow: inset 0 0px 1px rgba(0, 0, 0, 0.075), 0 0 4px rgba(82, 168, 236, 0.6);
+}
+
+/*----------------------- File inputs -----------------------*/
+input[type="file"] {
+	display: none;
+
+    & + label{
+        padding: 0 1.2rem;
+        border-radius: 0;
+        overflow: hidden;
+        height: 3rem;
+        background: @btn-default-bg;
+        color: @btn-default-color;
+        border-color: @btn-default-border;
+        margin-left: 0 !important;
+        width: auto !important;
+        cursor: pointer;
+        line-height: 3rem;
+
+        & > .file-chosen-icon{
+            visibility: hidden;
+            width: 1.5rem;
+            display: inline-block;
+            float: right;
+            line-height: 3rem;
+        }
+    }
+
+    &.filled + label{
+        .btn-success();
+
+        & > .input-file-invitation-text{
+            width: calc(~"100% - 1.6rem");
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            display: inline-block;
+        }
+
+        & > .file-chosen-icon {
+            visibility: visible;
+        }
+    }
+}
+
+
+/*----------------------- Radio buttons -----------------------*/
+.input-radio-wrapper{
+    display: inline-block;
+    vertical-align: middle;
+
+    .input-radio-list{
+        list-style-type: none;
+        padding-left: 0;
+
+
+        &.input-radio-horizontal{
+            li{
+                float: left;
+                margin-right: .8rem;
+            }
+        }
+
+        &.input-radio-vertical {
+            margin-top: -.9rem;
+            li {
+                margin-top: .8rem;
+            }
+        }
+    }
+}
+
+
+input[type="radio"]{
+    position: relative;
+    visibility: hidden;
+
+    &:before{
+        position: absolute;
+        visibility: visible;
+        .fa-icon();
+        font-size: 1.5em;
+        line-height: 2rem;
+        content: @fa-var-circle-o;
+        background: @body-bg;
+        visibility: visible;
+    }
+
+    &:checked:before{
+        content: @fa-var-circle;
+        color: @brand-primary;
+    }
+
+    & + label{
+        display: inline;
+    }
+}
+
+/*------------------------ Checkboxes --------------------------*/
+input[type="checkbox"]{
+    position: relative;
+    visibility: hidden;
+
+    &:before{
+        position: absolute;
+        .pointer();
+        .fa-icon();
+        font-size: 1.5rem;
+        line-height: 2rem;
+        content: @fa-var-square-o;
+        background: @body-bg;
+        padding-top: .45rem;
+        visibility: visible;
+    }
+
+    &:hover, &:focus, &:checked{
+        color: @brand-primary;
+    }
+
+    &:checked:before{
+        content: @fa-var-check-square-o;
+    }
+}
+
+form{
+    /*------------------------- Fieldsets -----------------------------*/
+    fieldset{
+    	border : 1px solid @brand-primary;
+    	box-shadow: none;
+
+        legend{
+            color: @brand-primary;
+            border: none;
+            background: none;
+            margin-left: 1.5rem;
+            text-align: left;
+            display: inline;
+            width: auto;
+            padding: 0 .5rem;
+        }
+    }
+
+    .form-input-wrap{
+        margin: .5rem;
+
+        > :not(textarea, .cke) {
+            float: left;
+        }
+
+
+
+        label{
+            font-weight: normal;
+            vertical-align: middle;
+            margin: 0;
+            margin-left: 1rem;
+            width: 15rem;
+            line-height: 1.2rem;
+            padding-top: .9rem;
+
+            &.required:after{
+                content: " *";
+                color: @state-info-text;
+            }
+        }
+
+        @media(max-width: @screen-xs-max){
+            width: 100%;
+
+            & > input:not([type="radio"]):not([type="checkbox"]), & > select, & > textarea, & >.input-inline, & > .input-radio-wrapper{
+                width: calc(~"100% - 1rem");
+            }
+
+            & > label{
+                margin-left: 0;
+            }
+
+            &:not(.form-input-wrap-checkbox) > label{
+                width: 100%;
+                display: block;
+
+                &.input-file-invitation{
+                    display: inline-block;
+                }
+            }
+        }
+    }
+}
+
+/*------------------ prepend and append inputs -------------------------*/
+.input-group{
+    // append
+    input{
+        border-radius: 4px 0 0 4px;
+        max-width: none;
+    }
+
+    input + .input-group-addon{
+        border-radius: 0 4px 4px 0;
+    }
+
+    // prepend
+    .input-group-addon{
+        border-radius: 4px 0 0 4px;
+    }
+
+
+    .input-group-addon + input{
+        border-radius: 0 4px 4px 0;
+    }
+}
+
+
+.input-append, .input-prepend{
+    input, .uneditable-input{
+        border: 1px solid #d6e2eb;
+    }
+
+    .add-on{
+        background-color: #f2f5f9;
+        border: 1px solid #d6e2eb;
+        padding: .4rem .8rem;
+        font-size: 1.3rem;
+    }
+}
+
+
+/*-------------------- Lists -----------------------------*/
+.list-forced-result{
+    display:none;
+}
+
+.list{
+    width: 100%;
+    border-collapse: collapse;
+
+    tbody > tr > td {
+        text-align: left;
+        padding: .3rem .5rem .2rem .5rem;
+        height: 4em;
+        vertical-align: middle;
+
+        .icon{
+            margin: .3rem;
+            cursor: pointer;
+            padding: 0.2rem 0.25rem;
+        }
+    }
+
+    th{
+        text-align: left;
+        padding-left: .5rem;
+        padding-right: .5rem;
+    }
+}
+
+/*** The icon to sort the list ***/
+.list-title-label{
+    margin-right: 1.5rem;
+}
+.list-sort-column{
+    background: transparent;
+    border: none;
+    font-size: 1.3rem;
+    opacity: 0.5;
+
+    &:hover{
+        opacity: 1;
+    }
+
+    &.list-sort-active{
+        color: @brand-primary;
+        opacity: 1;
+    }
+}
+
+/*** The search icon ***/
+.list-search-block > .form-input-wrap{
+    margin: 0;
+}
+
+.list-search-input{
+    padding-right: 1.5rem;
+
+    &.not-empty {
+        background-color: @state-info-bg;
+        color: @state-info-text;
+        padding-right: 1.6rem;
+    }
+}
+
+.clean-search{
+    font-size: 1.5rem;
+    margin-left: -1.5rem;
+}
+
+/** The search field ***/
+.list-line{
+    height: 3rem;
+
+    &.selected{
+        background: @state-info-text;
+
+        &> td{
+            color: white;
+        }
+
+        &:hover > td{
+            color: @text-color;
+        }
+    }
+}
+
+.list-cell-clickable{
+    cursor: pointer;
+}
+
+.list-cell-hidden{
+    display: none;
+}
+
+
+/*** Tha navigation table ***/
+.list-navigation{
+    width: auto;
+    font-size: inherit;
+
+    td{
+        background-color: transparent;
+        border-right: 1px solid darken(@body-bg, 13.5%);
+        border-left: 1px solid darken(@body-bg, 13.5%);
+        padding-left: .5rem;
+        padding-right: .5rem;
+    }
+
+    .line-by-page-label{
+        margin-left: .5rem;
+    }
+
+    .list-max-lines{
+        width: 5rem;
+        border : none;
+    }
+
+    .list-next-page, .list-previous-page{
+        font-size: 1.5rem;
+        top: .2rem;
+        position: relative;
+    }
+
+    input[type="text"].list-page-number{
+        width: 3rem;
+        text-align: center;
+        margin-top: .7rem;
+        font-size: 1.2rem;
+        height: 2rem;
+    }
+
+    .btn{
+        @media(max-width: @screen-xs-max){
+            .btn-label{
+                display: none;
+            }
+        }
+    }
+}
+
+
+
+
+/*-------------------------------- Navbars ----------------------------------------*/
+.navbar-inverse {
+	margin-bottom: 0;
+    background: @header-bg;
+    color: @header-color;
+
+    .btn-navbar {
+        float: left;
+        margin-top: 1rem;
+    }
+
+    .brand {
+        color: @btn-default-color;
+        text-transform: uppercase;
+        font-weight: lighter;
+        padding: 1.2rem 2rem 1.2rem;
+
+        strong {
+            font-weight: normal;
+        }
+    }
+}
+
+.nav-tabs:not(#main-nav-tabs){
+    width: 100%;
+    height: 3rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+
+    .-subloop(@j, @i) when (@j < @i){
+        @opposite: @i - @j;
+        li:nth-child(@{j}):nth-last-child(@{opposite}){
+            max-width: 100% / (@i - 1);
+        }
+
+        .-subloop((@j + 1), (@i));
+    }
+
+    .-loop(@i) when (@i > 0){
+
+        .-loop((@i - 1));
+
+        .-subloop(1, @i);
+    }
+    .-loop(10);
+
+    li{
+        display: inline-block;
+        height: 3rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        a{
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-top: 0;
+            padding-bottom: 0;
+            height: 3rem;
+            line-height: 3rem;
+        }
+
+    }
+
+}
+
+
+/*---------------------------- Dropdown menus ------------------------------------------*/
+.dropdown-menu{
+	font-size: 1em;
+    min-width: 0;
+
+    & > li > a{
+        &:hover, &:focus{
+            background: @state-info-bg;
+            color: @state-info-text;
+        }
+    }
+}
+
+.dropdown-submenu:hover,.dropdown-submenu:focus {
+    a {
+    	background: @state-info-bg;
+    	color: @state-info-text;
+    }
+}
+
+
+/*----------------------------- Tables ------------------------------------------*/
+table {
+    tr.first td{
+        border-top: 0 none;
+    }
+    th span.line{
+        position: absolute;
+        top: 0;
+        left: -.8rem;
+        height: 1rem;
+    }
+
+    &.table {
+        thead{
+            & > tr > th{
+                position: relative;
+                padding-bottom: 2rem;
+                padding-top: .5rem;
+                vertical-align: top;
+            }
+        }
+        th.sortable {
+            cursor: pointer;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+
+        tbody > tr > td{
+            vertical-align: middle;
+        }
+
+        th, td{
+            &.align-right{
+                text-align: right;
+                padding-right: 1rem !important;
+            }
+        }
+    }
+
+    &.table-hover tbody tr:hover{
+        td, th {
+            background-color: darken(@body-bg, 5%);
+        }
+    }
+}
+
+
+/*------------------------ Panels -------------------------*/
+.panel-title a{
+    display: block;
+    height: 100%;
+    width: 100%;
+}
+
+
+/*------------------------ Main layout ----------------------*/
+#main-menu, #footer{
+    width: 100%;
+    border: none;
+    background: @header-bg;
+    color: @header-color;
+}
+
+@main-menu-height: 3rem;
+#main-menu{
+    min-height: @main-menu-height;
+    margin-bottom: .5rem;
+    border-radius: 0;
+
+    .navbar-header{
+        color: white;
+        position: relative;
+        min-height: @main-menu-height;
+
+        .app-title{
+            font-size: 1.5rem;
+            width: 100%;
+            margin: 0;
+        }
+    }
+
+    .application-logo{
+        max-width: @main-menu-height;
+        max-height:@main-menu-height;
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+    }
+
+    .main-menu{
+        background: none;
+        height: @main-menu-height;
+        line-height: @main-menu-height;
+        padding: 0 .5rem;
+        vertical-align: middle;
+        cursor: pointer;
+
+        &:hover{
+            background-color: darken(@header-bg, 10%);
+            color: lighten(@header-color, 10%);
+        }
+
+        a {
+            display: block;
+        }
+    }
+
+    @media (max-width: @screen-xs-max) {
+        .main-menu{
+            height: auto;
+        }
+
+        #main-menu-collapse{
+            position: absolute;
+            background: @header-bg;
+            color: #d6d6d6;
+            z-index: 1000;
+            min-width: 50%;
+        }
+
+        .application-logo{
+            float: left;
+
+            .vertical-center();
+        }
+    }
+
+    @media(min-width: @screen-sm-min){
+        #main-menu-collapse{
+            padding-left: 3.5rem;
+        }
+    }
+
+    .dropdown-menu li i.icon{
+        width: 2rem;
+    }
+}
+
+
+
+
+#footer{
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    height: 2rem;
+    text-align: center;
+
+    .clear-cache-btn{
+        cursor: pointer;
+        margin-right: 1rem;
+    }
+}
+
+/*-------------------- Main Tab System ---------------------*/
+#main-content{
+    position: relative;
+    width: 100%;
+  	height: calc(~"100% - " 2 * @main-menu-height);
+}
+
+#main-nav-tabs{
+    height: 2rem;
+    width: 100%;
+
+    .main-tab-title{
+        border: 1px solid darken(@body-bg, 13.5%);
+        border-bottom: none;
+        background: darken(@body-bg, 6.5%);
+        height: 2rem;
+        margin-right: .2rem;
+        max-width: 20rem;
+    }
+
+    .main-tab-title{
+        &.active{
+            background: @body-bg;
+            color: black;
+        }
+
+        & > a{
+            padding: 0 1rem;
+            display: inline-block;
+            border: none;
+            background: none;
+            width: calc(~"100% - 2.5rem");
+            .text-overflow();
+            height: 100%;
+
+            & > .icon {
+                margin-right: .5rem;
+            }
+        }
+
+        .main-tab-close{
+            padding: 0;
+            padding-left: .8rem;
+            height: 100%;
+            width: 2rem;
+        }
+    }
+
+    .add-tab-button{
+        padding: .1rem .5rem 0 .5rem;
+        border: 1px solid darken(@body-bg, 13.5%);
+        margin-left: .3rem;
+        width: 2.2rem;
+    }
+}
+
+
+#main-tab-content{
+    height: calc(~"100% - 2rem");
+    width: 100%;
+
+    .main-tab-pane{
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+    }
+}
+
+.tab-pane{
+    padding: 1rem;
+}
+
+
+
+/*--------------------- Tabs content --------------------*/
+.main-tab-pane .page-title{
+	color: @brand-primary;
+	text-align: center;
+	margin: .5rem 0;
+}
+
+
+/*----------------------- New tab ------------------------*/
+.new-tab-default-content{
+    .text-center();
+
+    .application-logo{
+        height: 30rem;
+        width: auto;
+    }
+}
+
+/*--------------------- Links -------------------------*/
+a, a:active, a:hover, a:visited, a:focus{
+    color: inherit;
+    text-decoration: none;
+}
+
+/*-------------------- Advert message ------------------*/
+.app-notification{
+    position: fixed;
+    width: 50%;
+    top: 4.5rem;
+    left: 25%;
+    z-index: 1050;
+    font-size: 1.5rem;
+    min-height: 4rem;
+	visibility: hidden;
+	opacity: 0;
+    transition: visibility .35s, opacity .35s;
+
+    .close{
+        color: inherit;
+        opacity: 0.7;
+        text-shadow: none;
+
+        &:hover, &:focus{
+            opacity: 0.9;
+        }
+    }
+}
+
+/*-------------------- Dialog box ---------------------*/
+.modal-dialog{
+    z-index: @zindex-modal;
+
+    .modal-title{
+        color: @brand-primary;
+    }
+}
+
+.modal.in .modal-dialog{
+    transition: none;
+    &.center{
+        transform: translate(-50%, -50%);
+        margin: 0;
+    }
+
+    @media(max-width: @screen-xs-max){
+        width: 100%;
+    }
+}
+
+
+
+
+
+
+
+/*---------------------- Login page ----------------------------*/
+#login-page{
+	top : 50%;
+	margin-top: -12.5rem;
+	height: 25rem;
+}
+
+/*---------------------- Loading ----------------------------*/
+#loading{
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 500;
+	padding: 25% 50%;
+	background: rgba(128,128,128,0.5);
+	color: white;
+
+    & > .icon {
+        margin-left: -0.5em;
+        margin-bottom: 1.5rem;
+    }
+}
+
+#loading-bar{
+	width: 20rem;
+	margin-left: -10rem;
+	height: .5rem;
+	display: block;
+	background: darken(@body-bg, 6.5%);
+	border-radius: .5rem;
+
+    &:not(.progressing){
+        display:none;
+    }
+}
+
+#loading-purcentage{
+	width: 0%;
+	background: @brand-success;
+	height: 100%;
+	display: block;
+	border-radius: 5px;
+	transition: width .2s;
+}
+
+
+/*----------------------- Icons -----------------------------*/
+p .icon{
+	margin-right: .7rem;
+}
+
+
+/*----------------------- Boxes -----------------------------*/
+.box{
+    border-radius: 4px;
+    border : 1px solid @panel-primary-border;
+    margin-top: .5rem;
+    height: 100%;
+    box-shadow: 0 .5rem 1.5rem rgba(0, 0, 0, 0.5);
+
+    .box-header{
+        background: @panel-primary-heading-bg;
+        font-size: 1.2em;
+        color: @panel-primary-text;
+        padding-left: .5rem;
+
+        .box-icon{
+            margin-right: 1rem;
+        }
+    }
+
+    .box-content{
+        padding: .5rem;
+    }
+
+    input[type=text], input[type=pasword], textarea, select{
+        width: 100%;
+    }
+}
+
+
+
+/*----------------------- Error tooltips -------------------*/
+// .tooltip.input-error{
+// 	.tooltip-inner{
+//         background: @state-danger-bg;
+//         color: @state-danger-text;
+//     }
+
+//     .tooltip-arrow{
+//         border-right-color: @state-danger-bg;
+//     }
+// }
+
+
+/*------------------- Manage themes page -----------------------*/
+#manage-themes-page .theme-item{
+	position: relative;
+
+    .icons{
+        position: absolute;
+        top : .5rem;
+        right: .5rem;
+        display: none;
+    }
+
+    &:hover .icons{
+        display: block;
+    }
+}
+
+/*------------------------------- Profile ----------------------------------*/
+.profile-image{
+    width: 15rem;
+    height: auto;
+}
+
+/*------------------------------ Autocomplete ------------------------------*/
+.ko-autocomplete{
+    position: absolute;
+    z-index: 1000;
+    background-color: white;
+    border-radius: 4px;
+    border: 1px solid rgba(0,0,0,.15);
+    padding: .5rem 0;
+    list-style-type: none;
+    min-width: 16rem;
+
+    &:empty{
+        display: none;
+    }
+
+    & > li {
+        cursor: pointer;
+        padding: .5rem;
+
+        &:hover{
+            .alert-info();
+        };
+    }
+}
+
+
+/*------------------------------ Sortable lists -----------------------*/
+body.dragging, body.dragging * {
+  cursor: move !important;
+}
+
+.dragged {
+  position: absolute;
+  opacity: 0.5;
+  z-index: 2000;
+}
+
+.sortable{
+    list-style-type: none;
+
+    li{
+        list-style-type: none;
+
+        .sortable-item{
+            margin: .5rem 0;
+            border: 1px solid rgba(0,0,0,0.5);
+            border-radius: 5px;
+
+            .drag-handle{
+                cursor: move;
+                background: darken(@body-bg, 6.5%);
+                padding: 1rem;
+                border-radius: 5px 0 0 5px;
+                height: 100%;
+            }
+        }
+
+        &.placeholder {
+            position: relative;
+            background: @state-info-bg;
+            border: 1px solid rgba(0,0,0,0.5);
+            border-radius: 5px;
+            min-height: 2.5rem;
+
+            &:before {
+                position: absolute;
+            }
+        }
+    }
+}
+
+/*------------------------------ Available updates -----------------------*/
+.available-updates{
+    border-radius: 100%;
+    text-align: center;
+    font-size: 1.2rem;
+    height: 1.5rem;
+    width: 1.5rem;
+    line-height: 1.5rem;
+    position: absolute;
+    right: .5rem;
+}

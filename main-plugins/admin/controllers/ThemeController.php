@@ -130,7 +130,7 @@ class ThemeController extends Controller{
 				case 'color' :
 					$input = new ColorInput(array(
 						'name' => $var['name'],
-						'label' => $var['description'],
+						'label' => Lang::get('admin.' . $var['description']),
 						'value' => !empty($options[$var['name']]) ? $options[$var['name']] : $var['default']
 					));
 				break;
