@@ -237,7 +237,7 @@ final class Router extends Singleton{
 					App::response()->setStatus(403);
 					$response = array(
 						'message' => Lang::get('main.403-message'),
-						'reason' => !App::session()->isConnected() ? 'login' : 'permission'
+						'reason' => !App::session()->isLogged() ? 'login' : 'permission'
 					);
 
 					if(App::request()->isAjax()){

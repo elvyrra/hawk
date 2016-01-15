@@ -7,20 +7,20 @@
 namespace Hawk;
 
 /**
- * This trait is used to manage the user's sessions. It's declared as trait 
+ * This trait is used to manage the user's sessions. It's declared as trait
  * to be used in custom classes developer could want to develop to extend
  * the session management (manage licences, number of simultaneous connections, ...)
  * @package Core
  */
 class Session extends Singleton{
 	/**
-	 * Static variable that registers the connected state of the current user	
+	 * Static variable that registers the logged state of the current user
 	 * @var boolean
 	 */
-	private $connected, 
+	private $logged,
 
 	/**
-	 * Static variable that registers the current user of the session	 
+	 * Static variable that registers the current user of the session
 	 * @var User
 	 */
 	$user,
@@ -56,15 +56,14 @@ class Session extends Singleton{
 				'id' => User::GUEST_USER_ID,
 				'username' => 'guest',
 				'active' => 0,
-				'ip' => App::request()->clientIp()
 			));
 
-			$this->connected = false;
+			$this->logged = false;
 		}
 
-		$this->connected = $this->user->isConnected();		
+		$this->logged = $this->user->isLogged();
 	}
-	
+
 	/**
 	 * Get the user of the current session
 	 * @return User the user of the current session
@@ -72,13 +71,13 @@ class Session extends Singleton{
 	public function getUser(){
 		return $this->user;
 	}
-	
+
 	/**
-	 * Returns if the current user is connected or not
-	 * @return bool true if the user is connected, else returns false
+	 * Returns if the current user is logged or not
+	 * @return bool true if the user is logged, else returns false
 	 */
-	public function isConnected(){
-		return $this->connected;
+	public function isLogged(){
+		return $this->logged;
 	}
 
 
@@ -97,14 +96,14 @@ class Session extends Singleton{
 	 * @param array $name The variable name to set in the session. To set a parameter in a sub array, type 'index1.index2'. For example, to set the parameter $data['user']['name'], type 'user.name'
 	 * @param mixed $value The value to set
 	 */
-	public function setData($name, $value){				
+	public function setData($name, $value){
 		$fields = explode('.', $name);
 		$tmp = &$this->data;
 		foreach($fields as $field){
-			$tmp = &$tmp[$field];		
+			$tmp = &$tmp[$field];
 		}
-		$tmp = $value;		
-		
+		$tmp = $value;
+
 		$_SESSION = $this->data;
 	}
 
@@ -118,16 +117,16 @@ class Session extends Singleton{
 		if(!isset($this->data)){
 			return null;
 		}
-		
+
 		if(!$name){
 			return $this->data;
 		}
-		else{		
+		else{
 			$fields = explode('.', $name);
 			$tmp = $this->data;
 			foreach($fields as $field){
 				if(isset($tmp[$field])){
-					$tmp = $tmp[$field];		
+					$tmp = $tmp[$field];
 				}
 				else{
 					return null;

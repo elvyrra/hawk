@@ -8,7 +8,7 @@ App::router()->setProperties(
 		'prefix' => '/admin/'
 	),
 	function(){
-		App::router()->auth(App::session()->isConnected(), function(){
+		App::router()->auth(App::session()->isLogged(), function(){
 			App::router()->auth(App::session()->isAllowed('admin.users') || App::session()->isAllowed('admin.all'), function(){
 				/*** Manage users  ***/
 

@@ -63,7 +63,7 @@ var App = function(){
 
 	this.language = ''; // The application language
 	this.rootUrl = ''; // The application root url
-	this.isConnected = false; // The user is connected or not ?
+	this.isLogged = false; // The user is connected or not ?
 	this.routes = []; // The application routes
 	this.forms = {}; // The instanciated forms
 	this.lists = {}; // The instanciated lists
@@ -96,7 +96,7 @@ App.prototype.start = function(){
 		this.setRootUrl(this.conf.rooturl);
 		Lang.init(this.conf.Lang.keys);
 		this.baseUrl = require.toUrl('');
-		this.isConnected = this.conf.user.connected;
+		this.isLogged = this.conf.user.logged;
 
 
 		// Manage the notification area
@@ -386,7 +386,7 @@ App.prototype.load = function(url, data){
 					element.content(response);
 
 					// Regiter the tabs in the cookie
-					if(this.isConnected) {
+					if(this.isLogged) {
 						this.tabset.registerTabs();
 					}
 
