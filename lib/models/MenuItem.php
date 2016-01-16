@@ -77,11 +77,27 @@ class MenuItem extends Model{
 		}
 
 		// Get all items
-		$items = self::getAll(self::$primaryColumn, array(), array('parentId' => 'ASC', 'order' => 'ASC'));
+		$items = self::getListByExample(
+			new DBExample(array(
+				'active' => 1
+			)),
+			self::$primaryColumn, 
+			array(), 
+			array(
+				'parentId' => 'ASC', 
+				'order' => 'ASC'
+			)
+		);
 
 		// Filter unavailable items (that are not active or not accessible)
 		$items = array_filter($items, function($item) use($user){
-			return $item->active && (!$item->permissionId || $user->isAllowed($item->permissionId));
+			$route = App::router()->getRouteByName($item->action);
+			if($route){
+				return $route->isAccessible();
+			}
+			else{
+				return !$item->permissionId || $user->isAllowed($item->permissionId);
+			}
 		});
 
 		// Put the sub items under their parent item
