@@ -2,10 +2,13 @@
 namespace Hawk;
 
 // Display or not the errors
-define('DEBUG_MODE', false); 
+define('DEBUG_MODE', true);
 
 // If set to true, then the javascript files won't be uglified
-define('DEV_MODE', false); 
+define('DEV_MODE', true);
 
 // Defines if logs are active or not (lower when active)
-define('ENABLE_LOG', false);
+define('ENABLE_LOG', true);
+
+ini_set('display_errors', true);
+error_reporting(E_ALL & ~E_STRICT);

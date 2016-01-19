@@ -1,5 +1,7 @@
 <?php
 /*** Constant paths ***/
+define('ETC_DIR', ROOT_DIR . 'etc/'); // The folder containing the config files for each environment
+
 define('LIB_DIR', ROOT_DIR . 'lib/'); // The folder containing all the core classes
 
 define('CUSTOM_LIB_DIR', ROOT_DIR . 'custom-lib/'); // The folder containing the developper custom libraries
