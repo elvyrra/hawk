@@ -13,62 +13,48 @@ class SearchUpdatesWidget extends Widget{
     public function display(){
 
         // The number of updates
-        $updates = 0;
+        $updates = array();
         $titles = array();
 
         $api = new HawkApi;
 
-        // Get the available updates on Hawk
-        try{
-            $coreUpdates = count($api->getCoreAvailableUpdates());
-        }
-        catch(\Hawk\HawkApiException $e){
-            $coreUpdates = 0;
-        }
-
-        if($coreUpdates){
-            \Hawk\Plugins\Main\MenuItem::getByName('admin.settings')->label .= View::make(Plugin::current()->getView('available-updates.tpl'), array(
-                'updates' => $coreUpdates,
-                'title' => Lang::get('admin.available-updates-title-core', array('number' =>$coreUpdates), $coreUpdates)
-            ));
-        }
-
-
-        // Get the available updates for the plugins
         $plugins = array_map(function($plugin){
             return $plugin->getDefinition('version');
         }, Plugin::getAll(false));
 
-        try{
-            $pluginsUpdates = count($api->getPluginsAvailableUpdates($plugins));
-        }
-        catch(\Hawk\HawkApiException $e){
-            $pluginsUpdates = 0;
-        }
-
-        if($pluginsUpdates){
-            \Hawk\Plugins\Main\MenuItem::getByName('admin.plugins')->label .= View::make(Plugin::current()->getView('available-updates.tpl'), array(
-                'updates' => $pluginsUpdates,
-                'title' => Lang::get('admin.available-updates-title-plugins', array('number' => $pluginsUpdates), $pluginsUpdates)
-            ));
-        }
-
-        // Get the available updates on themes
         $themes = array_map(function($theme){
             return $theme->getDefinition('version');
         }, Theme::getAll());
 
+
         try{
-            $themesUpdates = count($api->getThemesAvailableUpdates($themes));
+            $updates = $api->getAllAvailableUpdates($plugins, $themes);
         }
         catch(\Hawk\HawkApiException $e){
-            $themesUpdates = 0;
+            $updates = array();          
         }
-        if($themesUpdates){
-            \Hawk\Plugins\Main\MenuItem::getByName('admin.themes')->label .= View::make(Plugin::current()->getView('available-updates.tpl'), array(
-                'updates' => $themesUpdates,
-                'title' => Lang::get('admin.available-updates-title-plugins', array('number' => $themesUpdates), $themesUpdates)
-            ));
-        }
+
+        if(!empty($updates)){
+            if(!empty($updates['hawk'])){
+                \Hawk\Plugins\Main\MenuItem::getByName('admin.settings')->label .= View::make(Plugin::current()->getView('available-updates.tpl'), array(
+                    'updates' => count($updates['hawk']),
+                    'title' => Lang::get('admin.available-updates-title-core', array('number' => count($updates['hawk'])), count($updates['hawk']))
+                ));
+            }
+
+            if(!empty($updates['plugins'])){
+                \Hawk\Plugins\Main\MenuItem::getByName('admin.plugins')->label .= View::make(Plugin::current()->getView('available-updates.tpl'), array(
+                    'updates' => count($updates['plugins']),
+                    'title' => Lang::get('admin.available-updates-title-plugins', array('number' => count($updates['plugins'])), count($updates['plugins']))
+                ));
+            }
+
+            if(!empty($updates['themes'])){
+                \Hawk\Plugins\Main\MenuItem::getByName('admin.themes')->label .= View::make(Plugin::current()->getView('available-updates.tpl'), array(
+                    'updates' => count($updates['themes']),
+                    'title' => Lang::get('admin.available-updates-title-plugins', array('number' => count($updates['themes'])), count($updates['themes']))
+                ));
+            }
+        }       
     }
 }

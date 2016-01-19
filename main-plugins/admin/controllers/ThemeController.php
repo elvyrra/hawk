@@ -186,7 +186,7 @@ class ThemeController extends Controller{
 				}
 
 				$theme->setVariablesCustomValues($options);
-				touch($theme->getStaticLessFile());
+				touch($theme->getBaseLessFile());
 
 				return $form->response(Form::STATUS_SUCCESS);
 			}

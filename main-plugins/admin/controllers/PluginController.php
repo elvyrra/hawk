@@ -19,7 +19,7 @@ class PluginController extends Controller{
 
         $this->addJavaScript(Plugin::current()->getJsUrl('plugins.js'));
 
-        Lang::addKeysToJavaScript('admin.plugins-advert-menu-changed', 'admin.confirm-delete-plugin', 'admin.confirm-uninstall-plugin');
+        Lang::addKeysToJavaScript('admin.confirm-delete-plugin', 'admin.confirm-uninstall-plugin');
 
         return LeftSidebarTab::make(array(
             'tabId' => self::TABID,

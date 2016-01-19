@@ -73,11 +73,15 @@ final class Logger extends Singleton{
      * @param string $message The message to write
      */
     private function write($level, $message){
+        if(! ENABLE_LOG){
+            return;
+        }
+        
         if(empty($this->resources[$level])) {
             $this->open($level);
         }
 
-        $trace = debug_backtrace();
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
         $trace = (object) $trace[1];
 
         $data = array(

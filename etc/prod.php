@@ -1,6 +1,11 @@
 <?php
 namespace Hawk;
 
-/** DEVELOPER ZONE **/
-define('DEBUG_MODE', false); // Display or not the errors
-define('DEV_MODE', false); // Display or not the dev debug bar
+// Display or not the errors
+define('DEBUG_MODE', false); 
+
+// If set to true, then the javascript files won't be uglified
+define('DEV_MODE', false); 
+
+// Defines if logs are active or not (lower when active)
+define('ENABLE_LOG', false);

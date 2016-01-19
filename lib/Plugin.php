@@ -123,13 +123,14 @@ class Plugin{
 	 * Get the plugin containing the file where this function is called
 	 * @return Plugin - The current plugin
 	 */
-	public static function current(){
-		$trace = debug_backtrace()[0]['file'];
-		if(strpos($trace, PLUGINS_DIR) !== false){
-			$dir = str_replace(PLUGINS_DIR, '', $trace);
+	public static function current(){		
+		$callingFile = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'];
+
+		if(strpos($callingFile, PLUGINS_DIR) !== false){
+			$dir = str_replace(PLUGINS_DIR, '', $callingFile);
 		}
-		elseif(strpos($trace, MAIN_PLUGINS_DIR) !== false){
-			$dir = str_replace(MAIN_PLUGINS_DIR, '', $trace);
+		elseif(strpos($callingFile, MAIN_PLUGINS_DIR) !== false){
+			$dir = str_replace(MAIN_PLUGINS_DIR, '', $callingFile);
 		}
 		else{
 			return null;

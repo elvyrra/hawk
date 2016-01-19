@@ -517,6 +517,7 @@ form{
 
 .list{
     width: 100%;
+    max-width: 100%;
     border-collapse: collapse;
 
     tbody > tr > td {
@@ -609,7 +610,7 @@ form{
 .list-navigation{
     width: auto;
     font-size: inherit;
-
+    
     td{
         background-color: transparent;
         border-right: 1px solid darken(@body-bg, 13.5%);
@@ -641,10 +642,13 @@ form{
         height: 2rem;
     }
 
-    .btn{
-        @media(max-width: @screen-xs-max){
-            .btn-label{
-                display: none;
+    .list-controls{
+        .btn{
+            margin-top: 0;
+            @media(max-width: @screen-xs-max){
+                .btn-label{
+                    display: none;
+                }
             }
         }
     }
@@ -982,6 +986,18 @@ table {
 	color: @brand-primary;
 	text-align: center;
 	margin: .5rem 0;
+
+    .left-sidebar-tab{
+        .tab-sidebar{
+            margin-bottom: .5rem;
+        }
+    }
+
+    .right-sidebar-tab{
+        .tab-content{
+            margin-bottom: .5rem;
+        }
+    }
 }
 
 

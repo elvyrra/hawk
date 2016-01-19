@@ -14,7 +14,6 @@ plugin-list-description-meta-data = "Version : {version} | Author : {author}"
 
 plugin-name = "Admin"
 plugin-settings-button = "Settings"
-plugins-advert-menu-changed = "The main menu changed."
 plugins-list-controls-label = "Plugin"
 plugins-list-description-label = "Description"
 plugin-install-error = "An error occured while installing the plugin {plugin}."

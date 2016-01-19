@@ -55,41 +55,41 @@ require.config({
 	}
 });
 
-/**
- * @class App - This class describes the behavior of the application
- */
-var App = function(){
-	this.conf = window.appConf;
 
-	this.language = ''; // The application language
-	this.rootUrl = ''; // The application root url
-	this.isLogged = false; // The user is connected or not ?
-	this.routes = []; // The application routes
-	this.forms = {}; // The instanciated forms
-	this.lists = {}; // The instanciated lists
+define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 'sortable', 'bootstrap', 'colorpicker' , 'datepicker', 'ko-extends', 'extends' , 'date' ], function($, ko, Tabset, Form, List, Lang) {
+	// export libraries to global context
+	window.$ = $;
+	window.ko = ko;
+	window.Tabset = Tabset;
+	window.Form = Form;
+	window.List = List;
+	window.Lang = Lang;
+	/**
+	 * @class App - This class describes the behavior of the application
+	 */
+	var App = function(){
+		this.conf = window.appConf;
 
-	this.isReady = false; // The ready state of the application
-};
+		this.language = ''; // The application language
+		this.rootUrl = ''; // The application root url
+		this.isLogged = false; // The user is connected or not ?
+		this.routes = []; // The application routes
+		this.forms = {}; // The instanciated forms
+		this.lists = {}; // The instanciated lists
+
+		this.isReady = false; // The ready state of the application
+	};
 
 
-/**
- * @const {string} INVALID_URI - The URI to return for non existing route
- */
-App.INVALID_URI = window.appConf.basePath + '/INVALID_URI';
+	/**
+	 * @const {string} INVALID_URI - The URI to return for non existing route
+	 */
+	App.INVALID_URI = window.appConf.basePath + '/INVALID_URI';
 
-/**
- * Initialize the application
- */
-App.prototype.start = function(){
-	define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 'sortable', 'bootstrap', 'colorpicker' , 'datepicker', 'ko-extends', 'extends' , 'date' ], function($, ko, Tabset, Form, List, Lang) {
-		// export libraries to global context
-		window.$ = $;
-		window.ko = ko;
-		window.Tabset = Tabset;
-		window.Form = Form;
-		window.List = List;
-		window.Lang = Lang;
-
+	/**
+	 * Initialize the application
+	 */
+	App.prototype.start = function(){
 		// Set the configuration data
 		this.setLanguage(this.conf.Lang.language);
 		this.setRoutes(this.conf.routes);
@@ -296,355 +296,356 @@ App.prototype.start = function(){
 		}
 
 		this.openLastTabs(this.conf.tabs.open, onload);
-
-
-
-	}.bind(this));
-};
-
-
-
-/**
- * Add a callback when the application is ready to run
- */
-App.prototype.ready = function(callback){
-	if (this.isReady) {
-		callback();
-	}
-	else{
-		addEventListener("app-ready", function(){
-			this.isReady = true;
-			callback();
-		}.bind(this));
-	}
-};
-
-
-/**
- * Load a page in the current step, or a new step, or a given html node
- * @param {string} url The url to load
- * @param {object} data, the options. This object can hasve the following data :
-  	- newtab (default false) : if set to true, the page will be loaded in a new tab of the application
-  	- onload (default null) : A callback function to execute when the page is loaded
-  	- post (default null) : an object of POST data to send in the URL
- */
-App.prototype.load = function(url, data){
-	/*** Default options ***/
-	var options = {
-		newtab : false,
-		onload : null,
-		post : null,
-		selector : null
 	};
 
-	for(var i in data){
-		options[i] = data[i];
-	}
 
-	if(url){
-		/*** we first check that page does not already exist in a tab ***/
-		var route = this.getRouteFromUri(url);
 
-		for(var i= 0; i < this.tabset.tabs().length; i++){
-			var tab = this.tabset.tabs()[i];
-			if (tab.uri() == url || tab.route() == route) {
-				if (tab !== this.tabset.activeTab()) {
-					this.tabset.activeTab(tab);
-				}
-				options.newtab = false;
-				break;
-			}
-		}
-
-		this.loading.start();
-
-        /*** A new tab has been asked ***/
-        if(options.newtab){
-            this.tabset.push();
-        }
-
-		var element = options.selector ? $(options.selector).get(0) : this.tabset.activeTab();
-
-		/*** DETERMINE THE NODE THAT WILL BE LOADED THE PAGE ***/
-		if(element){
-			$.ajax({
-				xhr : this.xhr,
-				url : url,
-				type : options.post ? 'post' : 'get',
-				data : options.post,
-				dataType : 'text',
-			})
-			.done(function(response){
-				this.loading.stop();
-
-				if(element === this.tabset.activeTab()){
-					// The page has been loaded in a whole tab
-					// Register the tab url
-					element.uri(url);
-					element.route(route);
-
-					element.content(response);
-
-					// Regiter the tabs in the cookie
-					if(this.isLogged) {
-						this.tabset.registerTabs();
-					}
-
-					// register the url in the tab history
-					element.history.push(url);
-
-					history.pushState({}, '', '#!' + url);
-				}
-				else{
-					$(element).html(response);
-				}
-
-				if(options.onload){
-			        /*** A 'onload' callback has been asked ****/
-					options.onload();
-				}
-			}.bind(this))
-
-			.fail(function(xhr, status, error){
-				var code = xhr.status;
-
-				if(code === 403){
-					// The page is not accessible for the user
-					var response;
-					try{
-						response = JSON.parse(xhr.responseText);
-					}
-					catch(e){
-						response = {
-							message : Lang.get('main.access-forbidden')
-						};
-					}
-
-					if(response.reason == "login"){
-						// The user is not connected, display the login form
-						this.dialog(this.getUri('login') + '?redirect=' + url + '&code=' + code);
-					}
-					else{
-						// Other reason, display the message in a notification
-						var message = response.message;
-						this.notify("danger", message);
-					}
-				}
-				else{
-					var message = xhr.responseText;
-					this.notify("danger", message);
-				}
-
-				this.loading.stop();
-			}.bind(this));
+	/**
+	 * Add a callback when the application is ready to run
+	 */
+	App.prototype.ready = function(callback){
+		if (this.isReady) {
+			callback();
 		}
 		else{
-	        /*** The selector to home the loaded url doesn't exist ***/
-			this.loading.stop();
-			this.notify("danger", Lang.get('main.loading-page-selector-not-exists'));
-		}
-	}
-	else{
-		return false;
-	}
-};
-
-
-/**
- * Open a set of pages
- * @param {array} uris The uris to open, each one in a tab
- * @param {function} onload The callback to execute when all the tabs are loaded
- */
-App.prototype.openLastTabs = function(uris, onload){
-	if(!uris.length){
-		if(onload){
-			onload(uris);
-		}
-		// No more tab has to be open
-		return;
-	}
-
-	var uri = uris.shift();
-	this.load(uri, {
-		newtab : true,
-		onload : this.openLastTabs.bind(this, uris, onload)
-	});
-};
-
-
-/**
- * Display a notification on the application or on the user desktop
- * @param {string} level - The notification level (info, success, warning, danger or desktop)
- * @param {string} message - The message to display in the notification
- * @parma {object} options - The options for desktop notifications
- */
-App.prototype.notify = function(level, message, options){
-	if(level === "error"){
-		level = "danger";
-	}
-	if(level == "desktop"){
-		// this is a desktop notification
-		if(! ('Notification' in window)){
-			this.notify('success', message);
-		}
-		else if(Notification.permission === 'granted'){
-			var notification = new Notification(message, options);
-		}
-		else if(Notification.permission !== 'denied'){
-			// Ask for user permission to display notifications
-			Notification.requestPermission(function(permission){
-				Notification.permission = permission;
-
-				this.notify(level, message, options);
+			addEventListener("app-ready", function(){
+				this.isReady = true;
+				callback();
 			}.bind(this));
 		}
-	}
-	else{
-		// Display an advert message in the application
-		this.notification.display(true);
-		this.notification.message(message);
-		this.notification.level(level);
+	};
 
-		if(level != "danger"){
-			this.notification.timeout = setTimeout(function(){
-				this.hideNotification();
-			}.bind(this), 5000);
+
+	/**
+	 * Load a page in the current step, or a new step, or a given html node
+	 * @param {string} url The url to load
+	 * @param {object} data, the options. This object can hasve the following data :
+	  	- newtab (default false) : if set to true, the page will be loaded in a new tab of the application
+	  	- onload (default null) : A callback function to execute when the page is loaded
+	  	- post (default null) : an object of POST data to send in the URL
+	 */
+	App.prototype.load = function(url, data){
+		/*** Default options ***/
+		var options = {
+			newtab : false,
+			onload : null,
+			post : null,
+			selector : null
+		};
+
+		for(var i in data){
+			options[i] = data[i];
 		}
+
+		if(url){
+			/*** we first check that page does not already exist in a tab ***/
+			var route = this.getRouteFromUri(url);
+
+			for(var i= 0; i < this.tabset.tabs().length; i++){
+				var tab = this.tabset.tabs()[i];
+				if (tab.uri() == url || tab.route() == route) {
+					if (tab !== this.tabset.activeTab()) {
+						this.tabset.activeTab(tab);
+					}
+					options.newtab = false;
+					break;
+				}
+			}
+
+			this.loading.start();
+
+	        /*** A new tab has been asked ***/
+	        if(options.newtab){
+	            this.tabset.push();
+	        }
+
+			var element = options.selector ? $(options.selector).get(0) : this.tabset.activeTab();
+
+			/*** DETERMINE THE NODE THAT WILL BE LOADED THE PAGE ***/
+			if(element){
+				$.ajax({
+					xhr : this.xhr,
+					url : url,
+					type : options.post ? 'post' : 'get',
+					data : options.post,
+					dataType : 'text',
+				})
+				.done(function(response){
+					this.loading.stop();
+
+					if(element === this.tabset.activeTab()){
+						// The page has been loaded in a whole tab
+						// Register the tab url
+						element.uri(url);
+						element.route(route);
+
+						element.content(response);
+
+						// Regiter the tabs in the cookie
+						if(this.isLogged) {
+							this.tabset.registerTabs();
+						}
+
+						// register the url in the tab history
+						element.history.push(url);
+
+						history.pushState({}, '', '#!' + url);
+					}
+					else{
+						$(element).html(response);
+					}
+
+					if(options.onload){
+				        /*** A 'onload' callback has been asked ****/
+						options.onload();
+					}
+				}.bind(this))
+
+				.fail(function(xhr, status, error){
+					var code = xhr.status;
+
+					if(code === 403){
+						// The page is not accessible for the user
+						var response;
+						try{
+							response = JSON.parse(xhr.responseText);
+						}
+						catch(e){
+							response = {
+								message : Lang.get('main.access-forbidden')
+							};
+						}
+
+						if(response.reason == "login"){
+							// The user is not connected, display the login form
+							this.dialog(this.getUri('login') + '?redirect=' + url + '&code=' + code);
+						}
+						else{
+							// Other reason, display the message in a notification
+							var message = response.message;
+							this.notify("danger", message);
+						}
+					}
+					else{
+						var message = xhr.responseText;
+						this.notify("danger", message);
+					}
+
+					this.loading.stop();
+				}.bind(this));
+			}
+			else{
+		        /*** The selector to home the loaded url doesn't exist ***/
+				this.loading.stop();
+				this.notify("danger", Lang.get('main.loading-page-selector-not-exists'));
+			}
+		}
+		else{
+			return false;
+		}
+	};
+
+
+	/**
+	 * Open a set of pages
+	 * @param {array} uris The uris to open, each one in a tab
+	 * @param {function} onload The callback to execute when all the tabs are loaded
+	 */
+	App.prototype.openLastTabs = function(uris, onload){
+		if(!uris.length){
+			if(onload){
+				onload(uris);
+			}
+			// No more tab has to be open
+			return;
+		}
+
+		var uri = uris.shift();
+		this.load(uri, {
+			newtab : true,
+			onload : this.openLastTabs.bind(this, uris, onload)
+		});
+	};
+
+
+	/**
+	 * Display a notification on the application or on the user desktop
+	 * @param {string} level - The notification level (info, success, warning, danger or desktop)
+	 * @param {string} message - The message to display in the notification
+	 * @parma {object} options - The options for desktop notifications
+	 */
+	App.prototype.notify = function(level, message, options){
+		if(level === "error"){
+			level = "danger";
+		}
+		if(level == "desktop"){
+			// this is a desktop notification
+			if(! ('Notification' in window)){
+				this.notify('success', message);
+			}
+			else if(Notification.permission === 'granted'){
+				var notification = new Notification(message, options);
+			}
+			else if(Notification.permission !== 'denied'){
+				// Ask for user permission to display notifications
+				Notification.requestPermission(function(permission){
+					Notification.permission = permission;
+
+					this.notify(level, message, options);
+				}.bind(this));
+			}
+		}
+		else{
+			// Display an advert message in the application
+			this.notification.display(true);
+			this.notification.message(message);
+			this.notification.level(level);
+
+			if(level != "danger"){
+				this.notification.timeout = setTimeout(function(){
+					this.hideNotification();
+				}.bind(this), 5000);
+			}
+		}
+	};
+
+	App.prototype.hideNotification = function(){
+		clearTimeout(this.notification.timeout);
+		this.notification.display(false);
 	}
-};
-
-App.prototype.hideNotification = function(){
-	clearTimeout(this.notification.timeout);
-	this.notification.display(false);
-}
 
 
-/**
- * Load a URL in a dialog box
- * @param {string} action - The action to perform. If "close", it will wlose the current dialog box, else it will load the action in the dialog box and open it
- */
-App.prototype.dialog = function(action){
-	var container = $("#dialogbox");
-	container.modal('hide');
+	/**
+	 * Load a URL in a dialog box
+	 * @param {string} action - The action to perform. If "close", it will wlose the current dialog box, else it will load the action in the dialog box and open it
+	 */
+	App.prototype.dialog = function(action){
+		var container = $("#dialogbox");
+		container.modal('hide');
 
-	if(action == "close"){
-		return;
-	}
+		if(action == "close"){
+			return;
+		}
 
-	// Load the content from an url
-	this.loading.start();
-	$.ajax({
-		url : action,
-		type : 'get',
-		data : {
-			_dialog: true
-		},
-	})
-	.done(function(content){
-		// Page successfully loaded
-		container.html(content).modal("show");
-	})
+		// Load the content from an url
+		this.loading.start();
+		$.ajax({
+			url : action,
+			type : 'get',
+			data : {
+				_dialog: true
+			},
+		})
+		.done(function(content){
+			// Page successfully loaded
+			container.html(content).modal("show");
+		})
 
-	.fail(function(xhr, status, error){
-		// Page load failed
-		var code = xhr.status;
-		var message = xhr.responseText;
-		this.notify("danger", message);
-	}.bind(this))
+		.fail(function(xhr, status, error){
+			// Page load failed
+			var code = xhr.status;
+			var message = xhr.responseText;
+			this.notify("danger", message);
+		}.bind(this))
 
-	.always(function(){
-		this.loading.stop();
-	}.bind(this));
-};
+		.always(function(){
+			this.loading.stop();
+		}.bind(this));
+	};
 
 
-/**
- * Get uri for a given route name or the controller of the route
- * @param {string} method - The route name or the controller method executed by this route
- * @param {object} args - The route parameters
- * @return {string} - the computed URI
- */
-App.prototype.getUri = function(method, args){
-	var route = null;
-	if(method in this.routes){
-		route = this.routes[method];
-	}
-	else{
+	/**
+	 * Get uri for a given route name or the controller of the route
+	 * @param {string} method - The route name or the controller method executed by this route
+	 * @param {object} args - The route parameters
+	 * @return {string} - the computed URI
+	 */
+	App.prototype.getUri = function(method, args){
+		var route = null;
+		if(method in this.routes){
+			route = this.routes[method];
+		}
+		else{
+			for(var i in this.routes){
+				if(this.routes[i].action === method){
+					route = this.routes[i];
+					break;
+				}
+			}
+		}
+
+		if(route !== null){
+			var url = route.url;
+			if(args){
+				for(var j in args){
+					url = url.replace("{" + j + "}", args[j]);
+				}
+			}
+			return this.conf.basePath + url;
+		}
+		else{
+			return App.INVALID_URI;
+		}
+	};
+
+
+	/**
+	 * Get the route name corresponding to an URI
+	 * @param {string} uri - The uri to look the corresponding route for
+	 */
+	App.prototype.getRouteFromUri = function(uri){
 		for(var i in this.routes){
-			if(this.routes[i].action === method){
-				route = this.routes[i];
-				break;
+			var regex = new RegExp('^' + this.routes[i].pattern + '$');
+			if(uri.match(regex)){
+				return i;
 			}
 		}
+	};
+
+
+	/**
+	 * Set the existing routes of the application
+	 * @param {object} routes - The routes to set
+	 */
+	App.prototype.setRoutes = function(routes){
+		this.routes = routes;
+	};
+
+
+	/**
+	 * Set the language of the application
+	 * @param {string} language - The language tag
+	 */
+	App.prototype.setLanguage = function(language){
+		this.language = language;
+	};
+
+
+	/**
+	 * Set the root url of the application
+	 * @param {string} url - The root url to set
+	 */
+	App.prototype.setRootUrl = function(url){
+		this.rootUrl = url;
+	};
+
+
+	App.prototype.refreshMenu = function(){
+	    $.get(this.getUri('refresh-menu'), function(response){
+	        $("#main-menu").replaceWith(response);
+			this.notify('warning', Lang.get('main.main-menu-changed'));
+	    }.bind(this));
+	};
+
+	if(!window.app){
+		window.app = new App();
 	}
 
-	if(route !== null){
-		var url = route.url;
-		if(args){
-			for(var j in args){
-				url = url.replace("{" + j + "}", args[j]);
-			}
-		}
-		return this.conf.basePath + url;
-	}
-	else{
-		return App.INVALID_URI;
-	}
-};
+	app.ready(function(){
+		ko.applyBindings(app);
+	});
 
-
-/**
- * Get the route name corresponding to an URI
- * @param {string} uri - The uri to look the corresponding route for
- */
-App.prototype.getRouteFromUri = function(uri){
-	for(var i in this.routes){
-		var regex = new RegExp('^' + this.routes[i].pattern + '$');
-		if(uri.match(regex)){
-			return i;
-		}
-	}
-};
-
-
-/**
- * Set the existing routes of the application
- * @param {object} routes - The routes to set
- */
-App.prototype.setRoutes = function(routes){
-	this.routes = routes;
-};
-
-
-/**
- * Set the language of the application
- * @param {string} language - The language tag
- */
-App.prototype.setLanguage = function(language){
-	this.language = language;
-};
-
-
-/**
- * Set the root url of the application
- * @param {string} url - The root url to set
- */
-App.prototype.setRootUrl = function(url){
-	this.rootUrl = url;
-};
-
-
-App.prototype.refreshMenu = function(){
-    $.get(this.getUri('refresh-menu'), function(response){
-        $("#main-menu").replaceWith(response);
-		this.notify('warning', Lang.get('admin.plugins-advert-menu-changed'));
-    }.bind(this));
-};
-
-window.app = new App();
-
-app.ready(function(){
-	ko.applyBindings(app);
+	app.start();
 });
 
-app.start();
+require(["app"]);

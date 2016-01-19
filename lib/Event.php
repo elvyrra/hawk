@@ -132,7 +132,7 @@ class Event{
     public function trigger(){
         $name = $this->getName();
 
-        $trace = debug_backtrace()[0];
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
         App::logger()->debug('The event ' . $name . ' has been triggered from ' . $trace['file'] . ':' . $trace['line']);
 
         if(isset(self::$events[$name])){

@@ -1,12 +1,12 @@
 <div class="list-navigation">
-    <div class="pull-left">
+    <div class="pull-left list-controls">
         {foreach($list->controls as $control)}
             {button _attrs="{$control}" }            
         {/foreach}
     </div>
     
     {if($list->navigation !== false)}
-        <div class="pull-right">
+        <div class="pull-right list-pagination">
             <table>
                 <tr>
                     <td class='list-result-number' ko-text="recordNumberLabel"></td>

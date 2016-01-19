@@ -5,4 +5,5 @@ refresh-list-error = "Une erreur est survenue pendant le rafraichissement de la 
 list-results-number[0] = "Aucun résultats"
 list-results-number[1] = "1 résultat"
 list-results-number[p] = "{number} résultats"
-access-forbidden = "VOus n'avez pas les droits nécessaires pour accéder à cette page"
+access-forbidden = "Vous n'avez pas les droits nécessaires pour accéder à cette page"
+main-menu-changed = "Le menu principal a été modifié."

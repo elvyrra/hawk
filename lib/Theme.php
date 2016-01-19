@@ -11,7 +11,7 @@ namespace Hawk;
  * This class describes the themes behavior
  * @package Core
  */
-class Theme{ 
+class Theme{
     /**
      * The default theme name
      */
@@ -43,15 +43,20 @@ class Theme{
     const PREVIEW_BASENAME = 'preview.png';
 
     /**
-     * The pattern for a theme name     
+     * The pattern for a theme name
      */
     const NAME_PATTERN = '[a-zA-Z0-9\-_.]+';
+
+    /**
+     * The pattern to find the editable variables in the less main file
+     */
+    const EDITABLE_VARS_PATTERN = '#^\s*@([\w\-]+)\s*\:\s*(.+?)\s*\;\s*//\s*editable\s*\:\s*"(.+?)"\s*\,?\s*(color|file)?\s*$#m';
 
     /**
      * The theme name
      * @var string
      */
-    private $name, 
+    private $name,
 
     /**
      * The theme manifest data
@@ -92,7 +97,7 @@ class Theme{
             return null;
         }
     }
-    
+
 
     /**
      * Get the theme configured for the application
@@ -101,30 +106,30 @@ class Theme{
     public static function getSelected(){
         return self::get(App::conf()->has('db') ? Option::get('main.selected-theme') : self::DEFAULT_THEME);
     }
-    
+
     /**
      * Set a theme as the selected one for the application
      * @param string $name The name of the theme
      */
     public static function setSelected($name){
-        Option::set('main.selected-theme', $name);        
-    }  
+        Option::set('main.selected-theme', $name);
+    }
 
     /**
      * Get all the available themes
      * @return array All the themes
      */
-    public static function getAll(){        
+    public static function getAll(){
         foreach(glob(THEMES_DIR . '*', GLOB_ONLYDIR) as $theme){
             self::get(basename($theme));
         }
 
         return self::$themes;
-    } 
+    }
 
     /**
      * Constructor
-     * @param string $name The theme name     
+     * @param string $name The theme name
      */
     private function __construct($name){
         $this->name = $name;
@@ -141,13 +146,13 @@ class Theme{
 
 
     /**
-     * Get the theme data in the file manifest.json. 
+     * Get the theme data in the file manifest.json.
      * If $prop is set, this method returns the property value in the theme data, else it returns all the theme data
      * @param string $prop The property in data to get
      * @return mixed The value of the property $prop if it is set, else, all the theme data
      */
-    public function getDefinition($prop = ""){    
-        if(!isset($this->data)){ 
+    public function getDefinition($prop = ""){
+        if(!isset($this->data)){
             if(!is_file($this->getRootDir() . self::MANIFEST_BASENAME)) {
                 throw new \Exception('Impossible to get the manifest.json file for the theme '  . $this->name . ' : No such file or directory');
             }
@@ -164,16 +169,16 @@ class Theme{
     public function getStartFile(){
         return $this->getRootDir() . 'start.php';
     }
-    
+
 
     /**
      * Get the root directory of the theme files
      * @return string The root directory of the theme files
      */
     public function getRootDir(){
-        return THEMES_DIR . $this->name . '/';    
+        return THEMES_DIR . $this->name . '/';
     }
-    
+
 
     /**
      * Get the directory for HTTP accessible files. During theme build, the files are copied in this directory
@@ -182,7 +187,7 @@ class Theme{
     public function getStaticDir(){
         return STATIC_THEMES_DIR . $this->name . '/';
     }
-    
+
 
     /**
      * Get the root URL to get theme files by HTTP request
@@ -234,7 +239,7 @@ class Theme{
     public function getPreviewUrl(){
         return $this->getFileUrl(self::PREVIEW_BASENAME);
     }
-    
+
 
     /**
      * Get the dirname containing the less files
@@ -248,7 +253,7 @@ class Theme{
      * @return string
      */
     public function getBaseLessFile(){
-        return $this->getLessDirname() . self::LESS_BASENAME;        
+        return $this->getLessDirname() . self::LESS_BASENAME;
     }
 
 
@@ -270,12 +275,12 @@ class Theme{
         return $this->getRootUrl() . 'less/' . self::LESS_BASENAME;
     }
 
-   
+
     /**
      * Build the theme : copy every resource files in themes/{themename}
      * @param boolean $force If set to true, the theme will be rebuilt without condition
      */
-    public function build($force = false){        
+    public function build($force = false){
         $build = false;
         if($force){
             $build = true;
@@ -286,20 +291,20 @@ class Theme{
             $build = true;
         }
 
-        
+
         if(!$build){
             $dest = $this->getStaticLessFile();
 
             if(!is_file($dest)){
                 $build = true;
-            }          
+            }
             else{
                 // Get all files in less/
                 $files = App::fs()->find($this->getLessDirname(), '*.less');
                 $lastUpdate = filemtime($dest);
                 foreach($files as $file){
                     if(filemtime($file) > $lastUpdate){
-                        $build = true;                        
+                        $build = true;
                         break;
                     }
                 }
@@ -313,6 +318,14 @@ class Theme{
                     App::fs()->copy($elt, $this->getStaticDir());
                 }
             }
+
+            // In the main less file, replace the editable vars by their cusotmized values
+            $values = $this->getVariablesCustomValues();
+            $precompiledLess = preg_replace_callback(self::EDITABLE_VARS_PATTERN, function($m) use($values){
+                return '@' . $m[1] . ' : ' . (isset($values[$m[1]]) ? $values[$m[1]] : $m[2]) . ';';
+            }, file_get_contents($this->getBaseLessFile()));
+
+            file_put_contents($this->getStaticLessFile(), $precompiledLess);
         }
 
         return $build;
@@ -329,7 +342,7 @@ class Theme{
         if(!$less){
             $less = file_get_contents($this->getBaseLessFile());
         }
-        preg_match_all('#^\s*@([\w\-]+)\s*\:\s*(.+?)\s*\;\s*//\s*editable\s*\:\s*"(.+?)"\s*\,?\s*(color|file)?\s*$#m', $less, $matches, PREG_SET_ORDER);                     
+        preg_match_all(self::EDITABLE_VARS_PATTERN, $less, $matches, PREG_SET_ORDER);
         $variables = array();
         foreach($matches as $match){
             $variables[] = array(
@@ -349,17 +362,17 @@ class Theme{
      */
     public function getVariablesCustomValues(){
         $options = Option::getPluginOptions('theme-' . $this->name);
-        
+
         $values = array();
         foreach($options as $key => $value){
             if(preg_match('/^custom\-value\-(.+?)$/', $key, $m)){
                 $values[$m[1]] = $value;
             }
         }
-        
+
         return $values;
     }
-    
+
 
     /**
      * Set customized variables values
@@ -395,7 +408,7 @@ class Theme{
      * @return string The directory containing the medias uploaded by the administrator
      */
     public function getMediasDir(){
-        return $this->getStaticUserfilesDir() . 'medias/';        
+        return $this->getStaticUserfilesDir() . 'medias/';
     }
 
     /**
@@ -415,7 +428,7 @@ class Theme{
     public function getCustomCssFile(){
         return $this->getStaticUserfilesDir() . self::CSS_CUSTOM_BASENAME;
     }
-    
+
 
     /**
      * Get the URL of the CSS file customized by the application administrator
@@ -430,10 +443,10 @@ class Theme{
 		if(!is_file($file)){
             file_put_contents($file, '');
         }
-		
+
         return $this->getStaticUserfilesUrl(self::CSS_CUSTOM_BASENAME);
     }
-    
+
 
     /**
      * Get the directory containing the theme views
@@ -442,7 +455,7 @@ class Theme{
     public function getViewsDir(){
         return $this->getRootDir() . 'views/';
     }
-    
+
 
     /**
      * Get the filename of a view in the theme. If the view file does not exists in the theme, the method will return the view in the default theme

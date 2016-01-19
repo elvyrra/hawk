@@ -18,8 +18,8 @@ trait Utils{
      * @param bool $exit if set to true, exit the script
      */
     public static function debug($var, $exit = false){
-        if(DEBUG_MODE){     
-            $trace = debug_backtrace()[0];
+        if(DEBUG_MODE){                 
+            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
             echo "<pre>" ,
                     var_export($var, true) , PHP_EOL ,
                     $trace['file'], ":", $trace['line'], PHP_EOL,

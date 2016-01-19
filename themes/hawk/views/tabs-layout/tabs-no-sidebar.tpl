@@ -1,4 +1,4 @@
-<div id="{{ !empty($tabId) ? $tabId  : ''}}">
+<div id="{{ !empty($tabId) ? $tabId  : ''}}" class="no-sidebar-tab">
 	<input type="hidden" class="page-name" value="<i class='icon icon-{{$icon}}'></i> {{ isset($tabTitle) ? $tabTitle : $title }}"/>
 	<div class="whole-page">	
 		{if(!empty($title))}

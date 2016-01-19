@@ -180,14 +180,10 @@ class MainController extends Controller{
 		// Get the theme variables
 		$theme = Theme::getSelected();
         $editableVariables = $theme->getEditableVariables();
-        $options = $theme->getVariablesCustomValues();
 
-
-        $themeVariables = array();
         $initVariables = array();
         foreach($editableVariables as $variable){
         	$initVariables[$variable['name']] = $variable['default'];
-            $themeVariables[$variable['name']] = isset($options[$variable['name']]) ? $options[$variable['name']] : $variable['default'];
         }
 
 		App::response()->setContentType('javascript');
@@ -199,7 +195,6 @@ class MainController extends Controller{
 			'accessible' => $canAccessApplication,
 			'less' => array(
 				'initVars' => json_encode($initVariables, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRETTY_PRINT),
-				'globalVars' => json_encode($themeVariables, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRETTY_PRINT),
 			)
 		));
 	}

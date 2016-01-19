@@ -30,6 +30,8 @@ class Controller{
 	public function __construct($param = array()){
 		$this->map($param);
 
+		$this->_plugin = $this->getPlugin()->getName();
+
 		self::$currentInstance = $this;
 	}
 

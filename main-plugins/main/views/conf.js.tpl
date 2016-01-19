@@ -20,7 +20,6 @@ window.appConf = {
 
 (function(){
 	window.less = {
-		modifyVars : {{ $less['globalVars'] }},
 		initVars : {{ $less['initVars'] }},
 		env : 'production',
 		useFileCache : true
