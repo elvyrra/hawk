@@ -31,7 +31,7 @@
     /**
      * Click on a button in the plugins list
      */
-    var classes = ['install-plugin', 'activate-plugin', 'deactivate-plugin', 'uninstall-plugin', 'delete-plugin'];
+    var classes = ['install-plugin', 'activate-plugin', 'deactivate-plugin', 'uninstall-plugin', 'delete-plugin', 'update-plugin'];
     classes.forEach(function(classname){
         $('#available-plugins-list').on('click', '.' + classname, function(){
             var confirmation = '';

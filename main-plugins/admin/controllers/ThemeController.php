@@ -11,27 +11,27 @@ class ThemeController extends Controller{
 		$tabs = array(
 			'select' => array(
 				'id' => 'admin-themes-select-tab',
-				'title' => Lang::get('admin.theme-tab-select-title'),
+				'title' => Lang::get($this->_plugin . '.theme-tab-select-title'),
 				'content' => $this->compute('listThemes'),
 			),
 			'customize' => array(
 				'id' => 'admin-themes-customize-tab',
-				'title' => Lang::get('admin.theme-tab-basic-custom-title'),
+				'title' => Lang::get($this->_plugin . '.theme-tab-basic-custom-title'),
 				'content' => $this->compute('customize'),
 			),
 			'css' => array(
 				'id' => 'admin-themes-css-tab',
-				'title' => Lang::get('admin.theme-tab-advanced-custom-title'),
+				'title' => Lang::get($this->_plugin . '.theme-tab-advanced-custom-title'),
 				'content' => $this->compute('css'),
 			),
 			'medias' => array(
 				'id' => 'admin-themes-medias-tab',
-				'title' => Lang::get('admin.theme-tab-medias-title'),
+				'title' => Lang::get($this->_plugin . '.theme-tab-medias-title'),
 				'content' => $this->compute('medias'),
 			),
 			'menu' => array(
 				'id' => 'admin-themes-menu-tab',
-				'title' => Lang::get('admin.theme-tab-menu-title'),
+				'title' => Lang::get($this->_plugin . '.theme-tab-menu-title'),
 				'content' => MenuController::getInstance()->compute('index')
 			)
 		);
@@ -112,7 +112,7 @@ class ThemeController extends Controller{
 
 					new ButtonInput(array(
 						'name' => 'reset',
-						'value' => Lang::get('admin.theme-custom-reset'),
+						'value' => Lang::get($this->_plugin . '.theme-custom-reset'),
 						'class' => 'btn-default',
 						'attributes' => array(
 							'ko-click' => 'reset',
@@ -130,7 +130,7 @@ class ThemeController extends Controller{
 				case 'color' :
 					$input = new ColorInput(array(
 						'name' => $var['name'],
-						'label' => Lang::get('admin.' . $var['description']),
+						'label' => Lang::get($this->_plugin . '.' . $var['description']),
 						'value' => !empty($options[$var['name']]) ? $options[$var['name']] : $var['default']
 					));
 				break;
@@ -210,7 +210,7 @@ class ThemeController extends Controller{
 				'_submits' => array(
 					new HtmlInput(array(
 						'name' => 'desctiption',
-						'value' => Lang::get('admin.theme-css-description'),
+						'value' => Lang::get($this->_plugin . '.theme-css-description'),
 					)),
 
 					new SubmitInput(array(
@@ -306,7 +306,7 @@ class ThemeController extends Controller{
 			}
 		}
 
-		Lang::addKeysToJavaScript('admin.theme-delete-media-confirm');
+		Lang::addKeysToJavaScript($this->_plugin . '.theme-delete-media-confirm');
 		return View::make(Plugin::current()->getView("theme-medias.tpl"), array(
 			'medias' => $medias,
 		));
@@ -330,7 +330,7 @@ class ThemeController extends Controller{
 					new SubmitInput(array(
 						'name' => 'valid',
 						'icon' => 'upload',
-						'value' => Lang::get('admin.theme-add-media-submit'),
+						'value' => Lang::get($this->_plugin . '.theme-add-media-submit'),
 					)),
 				)
 			),
@@ -386,13 +386,13 @@ class ThemeController extends Controller{
 						'name' => 'name',
 						'required' => true,
 						'pattern' => '/^[\w\-]+$/',
-						'label' => Lang::get('admin.theme-create-name-label')
+						'label' => Lang::get($this->_plugin . '.theme-create-name-label')
 					)),
 
 					new TextInput(array(
 						'name' => 'title',
 						'required' => true,
-						'label' => Lang::get('admin.theme-create-title-label')
+						'label' => Lang::get($this->_plugin . '.theme-create-title-label')
 					)),
 
 					new SelectInput(array(
@@ -401,20 +401,20 @@ class ThemeController extends Controller{
 						'options' => array_map(function($theme){
 							return $theme->getTitle();
 						}, Theme::getAll()),
-						'label' => Lang::get('admin.theme-create-extends-label')
+						'label' => Lang::get($this->_plugin . '.theme-create-extends-label')
 					)),
 
 					new TextInput(array(
                         'name' => 'version',
                         'required' => true,
                         'pattern' => '/^(\d+\.){2,3}\d+$/',
-                        'label' => Lang::get('admin.theme-create-version-label'),
+                        'label' => Lang::get($this->_plugin . '.theme-create-version-label'),
                         'default' => '0.0.1'
                     )),
 
                     new TextInput(array(
                         'name' => 'author',
-                        'label' => Lang::get('admin.theme-create-author-label'),
+                        'label' => Lang::get($this->_plugin . '.theme-create-author-label'),
                     )),
 				),
 
@@ -437,7 +437,7 @@ class ThemeController extends Controller{
 		if(!$form->submitted()){
             // Display the form
             return View::make(Theme::getSelected()->getView('dialogbox.tpl'), array(
-                'title' => Lang::get('admin.theme-create-title'),
+                'title' => Lang::get($this->_plugin . '.theme-create-title'),
                 'icon' => 'picture-o',
                 'page' => $form
             ));
@@ -446,8 +446,8 @@ class ThemeController extends Controller{
         	if($form->check()){
         		$dir = THEMES_DIR . $form->getData('name') . '/';
         		if(is_dir($dir)){
-        			$form->error('name', Lang::get('admin.theme-create-name-already-exists-error'));
-        			return $form->response(Form::STATUS_CHECK_ERROR, Lang::get('admin.theme-create-name-already-exists-error'));
+        			$form->error('name', Lang::get($this->_plugin . '.theme-create-name-already-exists-error'));
+        			return $form->response(Form::STATUS_CHECK_ERROR, Lang::get($this->_plugin . '.theme-create-name-already-exists-error'));
         		}
 
         		// The theme can be created
@@ -502,13 +502,13 @@ class ThemeController extends Controller{
 	        			}
         			}
 
-        			return $form->response(Form::STATUS_SUCCESS, Lang::get('admin.theme-create-success'));
+        			return $form->response(Form::STATUS_SUCCESS, Lang::get($this->_plugin . '.theme-create-success'));
         		}
         		catch(\Exception $e){
         			if(is_dir($dir)){
         				App::fs()->remove($dir);
         			}
-        			return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get('admin.theme-create-error'));
+        			return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get($this->_plugin . '.theme-create-error'));
         		}
         	}
         }
@@ -577,7 +577,7 @@ class ThemeController extends Controller{
             		)
             	),
             	'icon' => 'picture-o',
-            	'title' => Lang::get('admin.search-theme-result-title', array('search' => $search))
+            	'title' => Lang::get($this->_plugin . '.search-theme-result-title', array('search' => $search))
             ));
         }
 	}

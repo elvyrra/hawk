@@ -46,12 +46,12 @@ class UserProfileController extends Controller{
                 '_submits' => array(
                     new SubmitInput(array(
                         'name' => 'valid',
-                        'value' => Lang::get('main.valid-button')
+                        'value' => Lang::get($this->_plugin . '.valid-button')
                     )),
                     
                     new ButtonInput(array(
                         'name' => 'cancel',
-                        'value' => Lang::get('main.cancel-button'),
+                        'value' => Lang::get($this->_plugin . '.cancel-button'),
                         'onclick' => 'app.dialog("close")'
                     ))
                 ),
@@ -93,7 +93,7 @@ class UserProfileController extends Controller{
                 }
                 $field['options'] = $options;
                 if(!$field['default']){
-                    $field['default'] = Option::get('main.language');
+                    $field['default'] = Option::get($this->_plugin . '.language');
                 }
             }
 
@@ -135,10 +135,10 @@ class UserProfileController extends Controller{
                 }            
 
                 $user->saveProfile();
-                return $form->response(Form::STATUS_SUCCESS, Lang::get('main.user-profile-update-success'));
+                return $form->response(Form::STATUS_SUCCESS, Lang::get($this->_plugin . '.user-profile-update-success'));
             }
             catch(Exception $e){
-                return $form->response(Form::STATUS_ERROR, Lang::get('main.user-profile-update-error'));
+                return $form->response(Form::STATUS_ERROR, Lang::get($this->_plugin . '.user-profile-update-error'));
             }
         }
         
@@ -154,20 +154,20 @@ class UserProfileController extends Controller{
                 'form' => array(
                     new PasswordInput(array(
                         'name' => 'current-password',
-                        'label' => Lang::get('main.update-password-current-password-label'),
+                        'label' => Lang::get($this->_plugin . '.update-password-current-password-label'),
                         'required' => true,
                     )),
 
                     new PasswordInput(array(
                         'name' => 'new-password',
                         'required' => true,
-                        'label' => Lang::get('main.update-password-new-password-label'),                        
+                        'label' => Lang::get($this->_plugin . '.update-password-new-password-label'),                        
                     )),
 
                     new PasswordInput(array(
                         'name' => 'password-confirm',
                         'required' => true,
-                        'label' => Lang::get('main.update-password-new-password-confirm-label'),
+                        'label' => Lang::get($this->_plugin . '.update-password-new-password-confirm-label'),
                         'compare' => 'new-password'
                     ))
                 ),
@@ -175,12 +175,12 @@ class UserProfileController extends Controller{
                 '_submits' => array(
                     new SubmitInput(array(
                         'name' => 'valid',
-                        'value' => Lang::get('main.valid-button'),                        
+                        'value' => Lang::get($this->_plugin . '.valid-button'),                        
                     )),
 
                     new ButtonInput(array(
                         'name' => 'cancel',
-                        'value' => Lang::get('main.cancel-button'),
+                        'value' => Lang::get($this->_plugin . '.cancel-button'),
                         'onclick' => 'app.dialog("close")'
                     ))
                 ),
@@ -193,7 +193,7 @@ class UserProfileController extends Controller{
 
         if(!$form->submitted()){
             return View::make(Theme::getSelected()->getView("dialogbox.tpl"), array(
-                'title' => Lang::get('main.update-password-title'),
+                'title' => Lang::get($this->_plugin . '.update-password-title'),
                 'icon' => 'lock',
                 'page' => $form
             ));
@@ -202,16 +202,16 @@ class UserProfileController extends Controller{
             if($form->check()){
                 $me = Session::getUser();
                 if($me->password != Crypto::saltHash($form->getData('current-password'))){
-                    return $form->response(Form::STATUS_ERROR, Lang::get('main.update-password-bad-current-password'));
+                    return $form->response(Form::STATUS_ERROR, Lang::get($this->_plugin . '.update-password-bad-current-password'));
                 }
                 try{
                     $me->set('password', Crypto::saltHash($form->getData('new-password')));
                     $me->save();
 
-                    return $form->response(Form::STATUS_SUCCESS, Lang::get('main.update-password-success'));
+                    return $form->response(Form::STATUS_SUCCESS, Lang::get($this->_plugin . '.update-password-success'));
                 }
                 catch(Exception $e){
-                    return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get('main.update-password-error'));
+                    return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get($this->_plugin . '.update-password-error'));
                 }
 
             }

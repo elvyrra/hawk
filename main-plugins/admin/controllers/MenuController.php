@@ -39,7 +39,7 @@ class MenuController extends Controller{
 		));
 
 		if(!$form->submitted()){
-			Lang::addKeysToJavaScript('admin.plugins-advert-menu-changed');
+			Lang::addKeysToJavaScript($this->_plugin . '.plugins-advert-menu-changed');
 			return View::make(Plugin::current()->getView('sort-main-menu.tpl'), array(
 				'form' => $form,				
 			));
@@ -60,10 +60,10 @@ class MenuController extends Controller{
 					$item->save();
 				}
 
-				return $form->response(Form::STATUS_SUCCESS, Lang::get('admin.sort-menu-success'));
+				return $form->response(Form::STATUS_SUCCESS, Lang::get($this->_plugin . '.sort-menu-success'));
 			} 
 			catch (Exception $e) {
-				return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get('admin.sort-menu-error'));
+				return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get($this->_plugin . '.sort-menu-error'));
 			}
 			
 		}
@@ -154,7 +154,7 @@ class MenuController extends Controller{
 			$param['fieldsets']['parameters'][] = new TextInput(array(
 				'name' => 'label[' . $language->tag . ']',
 				'independant' => true,
-				'label' => Lang::get('admin.menu-item-form-label', array('language' => $language->tag)),
+				'label' => Lang::get($this->_plugin . '.menu-item-form-label', array('language' => $language->tag)),
 				'default' => $itemId ? Lang::get('custom.menu-item-' . $name . '-title', null, null, $language->tag) : ''
 			));
 		}
@@ -172,7 +172,7 @@ class MenuController extends Controller{
 		if(!$form->submitted()){
 			return View::make(Theme::getSelected()->getView('dialogbox.tpl'), array(
 				'page' => $form->display(),
-				'title' => Lang::get('admin.menu-item-form-edit-title'),
+				'title' => Lang::get($this->_plugin . '.menu-item-form-edit-title'),
 				'icon' => 'pencil'
 			));
 		}
@@ -192,10 +192,10 @@ class MenuController extends Controller{
 
 					$form->addReturn(get_object_vars($form->object));
 					$form->addReturn('label', App::request()->getBody('label')[LANGUAGE]);
-					return $form->response(Form::STATUS_SUCCESS, Lang::get('admin.menu-item-form-success'));
+					return $form->response(Form::STATUS_SUCCESS, Lang::get($this->_plugin . '.menu-item-form-success'));
 				}
 				catch(\Exception $e){
-					return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get('admin.menu-item-form-error'));
+					return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get($this->_plugin . '.menu-item-form-error'));
 				}
 			}		
 		}
