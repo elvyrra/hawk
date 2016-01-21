@@ -89,6 +89,7 @@ class InstallController extends Controller{
 						'name' => 'db[password]',
 						'required' => true,
 						'label' => Lang::get('install.settings-db-password-label', null, null, $this->language),
+						'pattern' => '/^.*$/'
 					)),
 
 					new TextInput(array(

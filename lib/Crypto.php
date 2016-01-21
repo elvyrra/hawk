@@ -2,7 +2,7 @@
 /**
  * Crypto.php
  * @author Elvyrra SAS
- */ 
+ */
 
 namespace Hawk;
 
@@ -23,7 +23,7 @@ class Crypto{
 		$block = mcrypt_get_block_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
 		$pad = $block - (strlen($data) % $block);
 		$data .= str_repeat(chr($pad), $pad);
-		
+
 		$result = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, $data, MCRYPT_MODE_CBC, $iv );
 		$result = base64_encode($result);
 		return $result;
@@ -43,7 +43,7 @@ class Crypto{
 		return $code;
 	}
 
-	
+
 	/**
 	 * Hash a string with a salt
 	 * @param string $data The data to hash
@@ -56,14 +56,18 @@ class Crypto{
 
 
 	/**
-	 * Generate random key 
+	 * Generate random key
 	 * @param int $length The length of the generated key
 	 * @return string the generated key
 	 */
 	public static function generateKey($length){
 		$result = '';
-		for ($i=0; $i < $length; $i++) { 
-			$result .= chr(mt_rand(33,126));
+		for ($i=0; $i < $length; $i++) {
+			do{
+				$char = chr(mt_rand(33,126));
+			}while($char == '\\');
+
+			$result .= $char;
 		}
 
 		return $result;
