@@ -10,7 +10,7 @@ class UserProfileController extends Controller{
     public function edit(){
         if(!$this->userId){
             $user = Session::getUser();
-        }         
+        }
         else{
             $user = User::getById($this->userId);
         }
@@ -18,19 +18,19 @@ class UserProfileController extends Controller{
 
         $param = array(
             'id' => 'user-form',
-            'upload' => true,           
+            'upload' => true,
             'object' => $user,
             'fieldsets' => array(
                 'general' => array(
                     'legend' => Lang::get('admin.user-form-general-legend'),
-                    
+
                     new TextInput(array(
                         'name' => 'username',
                         'required' => true,
                         'label' => Lang::get('admin.user-form-username-label'),
                         'disabled' => true,
-                    )),          
-                    
+                    )),
+
                     new EmailInput(array(
                         'name' => 'email',
                         'required' => true,
@@ -38,7 +38,7 @@ class UserProfileController extends Controller{
                         'disabled' => true,
                     ))
                 ),
-                
+
                 'profile' => array(
                     'legend' => Lang::get('admin.user-form-profile-legend'),
                 ),
@@ -48,7 +48,7 @@ class UserProfileController extends Controller{
                         'name' => 'valid',
                         'value' => Lang::get($this->_plugin . '.valid-button')
                     )),
-                    
+
                     new ButtonInput(array(
                         'name' => 'cancel',
                         'value' => Lang::get($this->_plugin . '.cancel-button'),
@@ -63,8 +63,8 @@ class UserProfileController extends Controller{
         // Get the user profile questions
         $questions = ProfileQuestion::getAll('name', array(), array('order' => DB::SORT_ASC));
 
-        
-        
+
+
 
         // Generate the question fields
         foreach($questions as $question){
@@ -74,7 +74,7 @@ class UserProfileController extends Controller{
             $field['id'] = 'user-form-' . $question->name. '-input';
             $field['independant'] = true;
             $field['label'] = Lang::get('admin.profile-question-' . $question->name . '-label');
-            
+
             if($user){
                 if($question->type == "file"){
                     $field['after'] = "<img src='" . ( $user->getProfileData($question->name) ? $user->getProfileData($question->name) : "") . "' class='profile-image' />";
@@ -83,7 +83,7 @@ class UserProfileController extends Controller{
                     $field['default'] = $user->getProfileData($question->name);
                 }
             }
-            
+
             if($question->name == 'language'){
                 // Get language options
                 $languages = Language::getAllActive();
@@ -101,7 +101,7 @@ class UserProfileController extends Controller{
             $param['fieldsets']['profile'][] = new $classname($field);
 
         }
-        
+
         $form = new Form($param);
         if(!$form->submitted()){
             return View::make(Theme::getSelected()->getView("dialogbox.tpl"), array(
@@ -123,16 +123,16 @@ class UserProfileController extends Controller{
                             if(!is_dir($dir)){
                                 mkdir($dir, 0755, true);
                             }
-                            
+
                             $basename = uniqid() . $file->extension;
                             $upload->move($file, $dir, $basename);
                             $user->setProfileData($question->name, $url . $basename);
                         }
                     }
                     else{
-                        $user->setProfileData($question->name, $form->fields[$question->name]->dbvalue());
+                        $user->setProfileData($question->name, $form->inputs[$question->name]->dbvalue());
                     }
-                }            
+                }
 
                 $user->saveProfile();
                 return $form->response(Form::STATUS_SUCCESS, Lang::get($this->_plugin . '.user-profile-update-success'));
@@ -141,8 +141,8 @@ class UserProfileController extends Controller{
                 return $form->response(Form::STATUS_ERROR, Lang::get($this->_plugin . '.user-profile-update-error'));
             }
         }
-        
-    } 
+
+    }
 
     /**
      * Change the current user password
@@ -161,7 +161,7 @@ class UserProfileController extends Controller{
                     new PasswordInput(array(
                         'name' => 'new-password',
                         'required' => true,
-                        'label' => Lang::get($this->_plugin . '.update-password-new-password-label'),                        
+                        'label' => Lang::get($this->_plugin . '.update-password-new-password-label'),
                     )),
 
                     new PasswordInput(array(
@@ -175,7 +175,7 @@ class UserProfileController extends Controller{
                 '_submits' => array(
                     new SubmitInput(array(
                         'name' => 'valid',
-                        'value' => Lang::get($this->_plugin . '.valid-button'),                        
+                        'value' => Lang::get($this->_plugin . '.valid-button'),
                     )),
 
                     new ButtonInput(array(
@@ -217,5 +217,5 @@ class UserProfileController extends Controller{
             }
         }
 
-    }  
+    }
 }

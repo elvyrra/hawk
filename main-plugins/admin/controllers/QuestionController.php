@@ -5,17 +5,17 @@ class QuestionController extends Controller{
 	public function listQuestions(){
 		$questions = ProfileQuestion::getAll();
 		$param = array(
-			'id' => 'display-questions-form',	
+			'id' => 'display-questions-form',
 			'action' => App::router()->getUri('profile-questions'),
 			'fieldsets' => array(
 				'form' => array(),
-				
+
 				'_submits' => array(
 					new SubmitInput(array(
 						'name' => 'valid',
 						'value' => Lang::get('main.valid-button'),
 					)),
-					
+
 					new ButtonInput(array(
 						'name' => 'new-question',
 						'value' => Lang::get($this->_plugin . '.new-question-btn'),
@@ -27,7 +27,7 @@ class QuestionController extends Controller{
 				)
 			)
 		);
-		
+
 		foreach($questions as $question){
 			// Add the input to display in register form
 			$param['fieldsets']['form'][] = new CheckboxInput(array(
@@ -35,7 +35,7 @@ class QuestionController extends Controller{
 				'default' => $question->displayInRegister,
 				'nl' => false
 			));
-			
+
 			// Add the input to display in the user profile
 			$param['fieldsets']['form'][] = new CheckboxInput(array(
 				'name' => "profile-display-$question->name",
@@ -43,9 +43,9 @@ class QuestionController extends Controller{
 				'nl' => false
 			));
 		}
-		
+
 		$form = new Form($param);
-		
+
 		$list = new ItemList(array(
 			'id' => 'profile-questions-list',
 			'model' => 'ProfileQuestion',
@@ -54,13 +54,13 @@ class QuestionController extends Controller{
 			'sort' => array('order' => DB::SORT_ASC),
 			'fields' => array(
 				'name' => array(
-					'hidden' => true					
+					'hidden' => true
 				),
 
 				'editable' => array(
 					'hidden' => true
 				),
-				
+
 				'actions' => array(
 					'independant' => true,
 					'display' => function($value, $field, $line){
@@ -70,7 +70,7 @@ class QuestionController extends Controller{
 					'sort' => false,
 					'search' => false,
 				),
-				
+
 				'label' => array(
 					'independant' => true,
 					'display' => function($value, $field, $line){
@@ -79,7 +79,7 @@ class QuestionController extends Controller{
 					'sort' => false,
 					'search' => false,
 				),
-				
+
 				'displayInRegister'=> array(
 					'label' => Lang::get($this->_plugin . ".list-questions-register-visible-label"),
 					'sort' => false,
@@ -88,26 +88,17 @@ class QuestionController extends Controller{
 						return $form->inputs["register-display-$line->name"];
 					}
 				),
-				
-				'displayInProfile'=> array(
-					'label' => Lang::get($this->_plugin . ".list-questions-profile-visible-label"),
-					'sort' => false,
-					'search' => false,
-					'display' => function($value, $field, $line) use($form){
-						return $form->inputs["profile-display-$line->name"];
-					}
-				)
-			),			
+			),
 		));
-		
+
 		if(!$form->submitted()){
 			Lang::addKeysToJavaScript($this->_plugin . ".confirm-delete-question");
 			$content = View::make(Plugin::current()->getView("questions-list.tpl"), array(
-				'list' => $list,		
+				'list' => $list,
 				'form' => $form
 			));
-			
-			return $form->wrap($content);			
+
+			return $form->wrap($content);
 		}
 		else{
 			try{
@@ -127,7 +118,7 @@ class QuestionController extends Controller{
 				foreach($save as $question){
 					$question->update();
 				}
-				
+
 				return $form->response(Form::STATUS_SUCCESS);
 			}
 			catch(Exception $e){
@@ -135,12 +126,12 @@ class QuestionController extends Controller{
 			}
 		}
 	}
-	
-	
+
+
 	public function edit(){
 		$q = ProfileQuestion::getByName($this->name);
 		if(!$q || $q->editable){
-			
+
 			$allowedTypes = ProfileQuestion::$allowedTypes;
 			$param = array(
 				'id' => 'profile-question-form',
@@ -169,7 +160,7 @@ class QuestionController extends Controller{
 							'required' => true,
 							'options' => array_combine($allowedTypes, array_map(function($type){
 								return Lang::get($this->_plugin . '.profile-question-form-type-' . $type);
-							}, $allowedTypes)),							
+							}, $allowedTypes)),
 							'label' => Lang::get($this->_plugin . '.profile-question-form-type-label'),
 							'attributes' => array(
 								'ko-value' => 'type',
@@ -193,7 +184,7 @@ class QuestionController extends Controller{
 						new ObjectInput(array(
 							'name' => 'parameters',
 							'id' => 'question-form-parameters',
-							'hidden' => true,	
+							'hidden' => true,
 							'attributes' => array(
 								'ko-value' => 'parameters'
 							)
@@ -215,7 +206,7 @@ class QuestionController extends Controller{
 							'attributes' => array(
 								'ko-value' => "minDate"
 							),
-						)),				
+						)),
 
 						new DatetimeInput(array(
 							'name' => 'maxDate',
@@ -242,7 +233,7 @@ class QuestionController extends Controller{
 						new TextareaInput(array(
 							'name' => 'options',
 							'independant' => true,
-							'required' => App::request()->getBody('type') == 'select' || App::request()->getBody('type') == 'radio',							
+							'required' => App::request()->getBody('type') == 'select' || App::request()->getBody('type') == 'radio',
 							'label' => Lang::get($this->_plugin . '.profile-question-form-options-label') . '<br />' . Lang::get($this->_plugin . '.profile-question-form-options-description'),
 							'labelClass' => 'required',
 							'attributes' => array(
@@ -291,12 +282,12 @@ class QuestionController extends Controller{
 			}
 			else{
 				if($form->submitted() == "delete"){
-					$this->compute('delete');					
+					$this->compute('delete');
 
 					return $form->response(Form::STATUS_SUCCESS);
 				}
 				else{
-					if($form->check()){					
+					if($form->check()){
 						$form->register(Form::NO_EXIT);
 
 						Language::current()->saveTranslations(array(
@@ -312,11 +303,11 @@ class QuestionController extends Controller{
 								if(!empty($option)){
 									$keys['admin']['profile-question-' . $form->getData("name") . '-option-' . $i] = trim($option);
 								}
-							}	
+							}
 							Language::current()->saveTranslations($keys);
 						}
 
-						return $form->response(Form::STATUS_SUCCESS);		
+						return $form->response(Form::STATUS_SUCCESS);
 					}
 				}
 			}
@@ -333,11 +324,11 @@ class QuestionController extends Controller{
 			$params = json_decode($question->parameters, true);
 
 			$question->delete();
-			
+
 			// Remove the language keys for the label and the options
 			$keysToRemove = array(
 				'admin' => array(
-					'profile-question-' . $this->name . '-label',					
+					'profile-question-' . $this->name . '-label',
 				)
 			);
 
@@ -351,5 +342,5 @@ class QuestionController extends Controller{
 			}
 		}
 	}
-	
+
 }

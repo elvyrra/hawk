@@ -73,7 +73,7 @@ class Theme{
     /**
      * The themes embedded with Hawk, that are not removable
      */
-    private static $nativeThemes = array('hawk');
+    public static $nativeThemes = array('hawk', 'dark');
 
     /**
      * The instanciated themes

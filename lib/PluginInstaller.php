@@ -23,6 +23,7 @@ abstract class PluginInstaller {
      */
     public function __construct($plugin){
         $this->plugin = $plugin;
+        $this->_plugin = $plugin->getName();
     }
 
     /**

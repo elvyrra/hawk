@@ -320,7 +320,7 @@ class Model{
      * @return string the table name of the model
      */
     public static function getTable(){
-        return DB::getFullTablename(static::$tablename);
+        return (static::$dbname == MAINDB ? App::conf()->get('db.prefix') : '') . static::$tablename;
     }
 
 
