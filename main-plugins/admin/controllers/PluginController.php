@@ -258,11 +258,16 @@ class PluginController extends Controller{
         $plugin = Plugin::get($this->plugin);
 
         $installer = $plugin->getInstallerInstance();
-        if(method_exists($installer, 'settings')){
-            return $installer->settings();
+
+        if(App::request()->getMethod() === 'get'){
+            return Dialogbox::make(array(
+                'page' => method_exists($installer, 'settings') ? $installer->settings() : Lang::get($this->_plugin . '.plugin-settings-no-settings'),
+                'title' => lang::get($this->_plugin . '.plugin-settings-title'),
+                'icon' => 'cogs'
+            ));
         }
         else{
-            return '';
+            return method_exists($installer, 'settings') ? $installer->settings() : array();
         }
     }
 
@@ -547,7 +552,7 @@ class PluginController extends Controller{
                         }
                     }
 
-                    App::fs()->remove($backup);                    
+                    App::fs()->remove($backup);
                 }
                 catch(\Exception $e){
                     // An error occured while installing the new version, rollback to the previous version
@@ -556,7 +561,7 @@ class PluginController extends Controller{
                 }
 
                 App::fs()->remove($file);
-            }            
+            }
         }
         catch(\Exception $e){
             $this->addJavaScriptInline('app.notify("error", "' . addcslashes($e->getMessage(), '"') . '");');

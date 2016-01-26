@@ -386,6 +386,14 @@ input[type="checkbox"]{
     position: relative;
     visibility: hidden;
 
+    &:disabled{
+        color: #aaa;
+
+        &:hover, &:focus, &:checked{
+            color: #aaa;
+        }
+    }
+
     &:before{
         position: absolute;
         .pointer();
@@ -610,7 +618,7 @@ form{
 .list-navigation{
     width: auto;
     font-size: inherit;
-    
+
     td{
         background-color: transparent;
         border-right: 1px solid darken(@body-bg, 13.5%);
@@ -1020,9 +1028,7 @@ a, a:active, a:hover, a:visited, a:focus{
 /*-------------------- Advert message ------------------*/
 .app-notification{
     position: fixed;
-    width: 50%;
     top: 4.5rem;
-    left: 25%;
     z-index: 1050;
     font-size: 1.5rem;
     min-height: 4rem;
@@ -1043,7 +1049,7 @@ a, a:active, a:hover, a:visited, a:focus{
 
 /*-------------------- Dialog box ---------------------*/
 .modal-dialog{
-    
+
     z-index: @zindex-modal;
 
     .modal-title{

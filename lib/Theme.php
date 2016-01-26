@@ -163,6 +163,33 @@ class Theme{
 
 
     /**
+     * Get the theme title (data accessible in the manifest.json file of the theme)
+     * @return string the theme title
+     */
+    public function getTitle(){
+        return $this->getDefinition('title');
+    }
+
+
+    /**
+     * Get the theme name (the name of the directory containing the theme)
+     * @return string The theme name
+     */
+    public function getName(){
+        return $this->name;
+    }
+
+
+    /**
+     * Check if the theme is removable. A theme is removable if it's not a native theme, and if it is not the selected one for the application
+     * @return boolean true if the theme is removable, else false.
+     */
+    public function isRemovable(){
+        return !in_array($this->name, self::$nativeThemes) && self::getSelected() != $this;
+    }
+
+
+    /**
      * Get the start file of the theme. The start file is the file start.php in the theme that initialize special intructions for the theme
      * @return string
      */
@@ -218,9 +245,8 @@ class Theme{
             App::fs()->copy($privateFile, $publicFile);
         }
 
-        return $this->getRootUrl() . $file;
+        return $this->getRootUrl() . $file . '?' . filemtime($publicFile);
     }
-
 
 
     /**
@@ -272,7 +298,7 @@ class Theme{
      */
     public function getBaseLessUrl(){
         $this->build();
-        return $this->getRootUrl() . 'less/' . self::LESS_BASENAME;
+        return $this->getRootUrl() . 'less/' . self::LESS_BASENAME . '?' . filemtime($this->getStaticLessFile());
     }
 
 
@@ -399,7 +425,7 @@ class Theme{
      * @return string
      */
     public function getStaticUserfilesUrl($filename = ''){
-        return $this->getRootUrl() . 'userfiles/' . $filename;
+        return $this->getRootUrl() . 'userfiles/' . $filename . '?' . filemtime($this->getStaticDir() . 'userfiles/' . $filename);
     }
 
 
@@ -478,27 +504,5 @@ class Theme{
 
 
 
-    /**
-     * Get the theme title (data accessible in the manifest.json file of the theme)
-     * @return string the theme title
-     */
-    public function getTitle(){
-        return $this->getDefinition('title');
-    }
 
-    /**
-     * Get the theme name (the name of the directory containing the theme)
-     * @return string The theme name
-     */
-    public function getName(){
-        return $this->name;
-    }
-
-    /**
-     * Check if the theme is removable. A theme is removable if it's not a native theme, and if it is not the selected one for the application
-     * @return boolean true if the theme is removable, else false.
-     */
-    public function isRemovable(){
-        return !in_array($this->name, self::$nativeThemes) && self::getSelected() != $this;
-    }
 }

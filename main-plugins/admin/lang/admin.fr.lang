@@ -21,6 +21,8 @@ permission-name-users = "Gestion des utillisateurs"
 plugin-list-description-meta-data = "Version : {version} | Auteur : {author}"
 plugin-name = "Administration"
 plugin-settings-button = "Paramètres"
+plugin-settings-title = "Edition des paramètres du plugin"
+plugin-settings-no-settings = "Aucun paramètres n'est disponible pour ce plugin"
 plugins-list-controls-label = "Plugin"
 plugins-list-description-label = "Description"
 plugin-install-error = "Une erreur est survenue pendant l'installation du plugin {plugin}."
@@ -205,7 +207,7 @@ new-plugin-already-exists-error = "Un plugin avec le même nom existe déjà sur
 new-plugin-success = "Plugin créé avec succès"
 new-plugin-error = "Une erreur est survenue pendant la création du plugin"
 
-confirm-uninstall-plugin = "VOulez-vous réellement désinstaller ce plugin. Si vous le faîtes, toutes les données enregistrées par ce plugnis seront perdues. Continuer ?"
+confirm-uninstall-plugin = "Voulez-vous réellement désinstaller ce plugin. Si vous le faîtes, toutes les données enregistrées par ce plugnis seront perdues. Continuer ?"
 confirm-delete-plugin = "Voulez-vous réellement supprimer définitivement ce plugin ? Une fois supprimé, ce plugin ne sera plus disponible. Continuer ?"
 
 search-plugin-form-title = "Rechercher un plugin"

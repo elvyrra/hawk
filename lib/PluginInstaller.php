@@ -15,7 +15,13 @@ abstract class PluginInstaller {
     /**
      * The plugin the installer is associated with
      */
-    private $plugin; 
+    private $plugin;
+
+    /**
+     * The plugin name the installer is associated with
+     * @var string
+     */
+    public $_plugin;
 
     /**
      * Constructor

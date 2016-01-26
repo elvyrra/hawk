@@ -18,8 +18,8 @@
             app.lists["available-plugins-list"].refresh();
         })
 
-        .fail(function(xhr, code, response){            
-            app.notify('error', xhr.responseJSON.message);
+        .fail(function(xhr, code, response){
+            app.notify('error', xhr.responseJSON && xhr.responseJSON.message || xhr.responseText);
         })
 
         .always(function(){

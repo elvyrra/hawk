@@ -194,9 +194,9 @@ define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 
 					}
 				}
 				else{
-					var hash = location.hash.replace(/^#\!/, '');
-					if(hash){
+					if(location.hash.match(/^#\!(\/.*?)$/)) {
 						// Load a new page in the current tab
+						var hash = location.hash.replace(/^#\!(\/.*?)$/, '$1');
 						app.load(hash);
 					}
 					else{
