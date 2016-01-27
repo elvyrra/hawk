@@ -77,6 +77,13 @@ class Plugin{
 
 
 	/**
+	 * Cache array containing the plugins instances references for files.
+	 * This is used to increase performances when calling Plugin::current() or Plugin::getFilePlugin($file)
+	 */
+	private static $filePlugins = array();
+
+
+	/**
 	 * Constructor
 	 * @param string $name The plugin name, corresponding to the directory name
 	 * @param array $config The plugin configuration
@@ -126,23 +133,44 @@ class Plugin{
 
 	/**
 	 * Get the plugin containing the file where this function is called
-	 * @return Plugin - The current plugin
+	 * @return Plugin The current plugin
 	 */
 	public static function current(){
 		$callingFile = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'];
 
-		if(strpos($callingFile, PLUGINS_DIR) !== false){
-			$dir = str_replace(PLUGINS_DIR, '', $callingFile);
+		return self::getFilePlugin($callingFile);
+	}
+
+
+	/**
+	 * Get the plugin contaning a given filename
+	 * @return  Plugin The found plugin
+	 */
+	public static function getFilePlugin($file){
+		// Search plugin in cache
+		if(isset(self::$filePlugins[$file])){
+			return self::$filePlugins[$file];
 		}
-		elseif(strpos($callingFile, MAIN_PLUGINS_DIR) !== false){
-			$dir = str_replace(MAIN_PLUGINS_DIR, '', $callingFile);
+
+		if(strpos($file, PLUGINS_DIR) !== false){
+			$dir = str_replace(PLUGINS_DIR, '', $file);
+		}
+		elseif(strpos($file, MAIN_PLUGINS_DIR) !== false){
+			$dir = str_replace(MAIN_PLUGINS_DIR, '', $file);
 		}
 		else{
 			return null;
 		}
 		list($name) = explode(DIRECTORY_SEPARATOR, $dir);
 
-		return self::get($name);
+		// instanciate the plugin
+		$plugin = self::get($name);
+
+		// Register the pluygin in the memory cache
+		self::$filePlugins[$file] = &$plugin;
+
+		// return the plugin instance
+		return $plugin;
 	}
 
 

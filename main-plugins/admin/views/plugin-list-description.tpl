@@ -1,5 +1,5 @@
 <p>{{ $description }}</p>
 
-<span class="meta-data">
+<div class="meta-data bold">
     {text key="admin.plugin-list-description-meta-data" version="$version" author="$author"}
-</span>
+</div>

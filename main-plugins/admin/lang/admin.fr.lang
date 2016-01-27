@@ -136,6 +136,8 @@ theme-tab-select-title = "Choisissez votre thème"
 theme-tab-menu-title = "Personnalisation du menu"
 theme-update-reload-page-confirm = "Souhaitez-vous appliquer ce thème à l'application ? Cette action rechargera la page."
 uninstall-plugin-button = "Désinstaller"
+
+
 user-delete-confirmation = "Souhaitez-vous réellement supprimer cet utilisateur ? Cette action est irréversible."
 user-filter-legend = "Filtres"
 user-filter-roleId-label = "Statut"

@@ -77,7 +77,11 @@ class Controller{
 	 */
 	public function compute($method){
 		/*** Load widgets before calling the controller method ***/
-		(new Event(get_called_class() . '.' . $method . '.' . self::BEFORE_ACTION, array('controller' => $this)))->trigger();
+		$class = $this->getClassname();
+
+		$event = new Event($this->_plugin . '.' . $class . '.' . $method . '.' . self::BEFORE_ACTION, array('controller' => $this));
+		$event->trigger();
+
 
 		/*** Call the controller method ***/
 		$args = array_splice(func_get_args(), 1);
@@ -88,7 +92,7 @@ class Controller{
 		}
 
 		/*** Load the widgets after calling the controller method ***/
-		$event = new Event(get_called_class() . '.' . $method . '.' . self::AFTER_ACTION, array('controller' => $this, 'result' => $result));
+		$event = new Event($this->_plugin . '.' . $class . '.' . $method . '.' . self::AFTER_ACTION, array('controller' => $this, 'result' => $result));
 		$event->trigger();
 
 		$result = $event->getData('result');
@@ -106,7 +110,10 @@ class Controller{
 	 * @param string $content The content to add
 	 */
 	private function addContentAtEnd($content){
-		Event::on(App::router()->getCurrentAction() . '.' . self::AFTER_ACTION, function($event) use($content){
+		$action = App::router()->getCurrentAction();
+		list($tmp, $method) = explode('.', $action);
+
+		Event::on($this->_plugin . '.' . $this->getClassname() . '.' . $method . '.' . self::AFTER_ACTION, function($event) use($content){
 			if(App::response()->getContentType() === 'html'){
 				$dom = $event->getData('result');
 				if($dom->find('body')->length){
@@ -155,11 +162,22 @@ class Controller{
 
 	/**
 	 * get the controller namespace
+	 * @return string
 	 */
 	public function getNamespace(){
 		$reflection = new \ReflectionClass(get_called_class());
 
 		return $reflection->getNamespaceName();
+	}
+
+
+	/**
+	 * Get the controller class
+	 * @return  string
+	 */
+	public function getClassname(){
+		$reflection = new \ReflectionClass(get_called_class());
+		return $reflection->getShortName();
 	}
 
 	/**

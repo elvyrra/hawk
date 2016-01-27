@@ -88,6 +88,16 @@ class QuestionController extends Controller{
 						return $form->inputs["register-display-$line->name"];
 					}
 				),
+
+				'displayInProfile' => array(
+					'label' => Lang::get($this->_plugin . '.list-questions-profile-visible-label'),
+					'sort' => false,
+					'search' => false,
+					'display' => function($value, $field, $line) use($form){
+						return $form->inputs["profile-display-$line->name"];
+					}
+
+				)
 			),
 		));
 

@@ -93,6 +93,7 @@ class Route{
 			return "(" . $where . ")";
 		}, $this->url);
 
+
 		if($this->namespace){
 			$this->action = $this->namespace . '\\' . $this->action;
 		}

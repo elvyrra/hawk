@@ -74,6 +74,11 @@ final class Router extends Singleton{
 			$param[$key] = $value;
 		}
 
+		if(!isset($param['namespace'])){
+			$trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+			$param['namespace'] = Plugin::getFilePlugin($trace[1]['file'])->getNamespace();
+		}
+
 
 		if(isset($this->routes[$name])){
 			trigger_error("The route named '$name' already exists", E_USER_WARNING);
@@ -125,6 +130,16 @@ final class Router extends Singleton{
 		$action();
 
 		$this->predefinedData = $currentData;
+	}
+
+
+	/**
+	 * Set a prefix to routes URIs that are defined in $action callback
+	 * @param   string $prefix The prefix to set to the URIs
+	 * @param   callable $action The function that defined the routes with this prefix
+	 */
+	public function prefix($prefix, $action){
+		$this->setProperties(array('prefix' => $prefix), $action);
 	}
 
 

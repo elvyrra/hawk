@@ -95,7 +95,7 @@ define('tabs', ['jquery', 'ko'], function($, ko){
 		for(var i = 0; i < this.tabs().length; i++){
 			data.push(this.tabs()[i].uri());
 		}
-		$.cookie('open-tabs', JSON.stringify(data), {expire : 365, path : '/'});
+		$.cookie('open-tabs', JSON.stringify(data), {expires : 365, path : '/'});
 	};
 
 
