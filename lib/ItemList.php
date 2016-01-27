@@ -14,7 +14,7 @@ class ItemList{
 	use Utils;
 
 	/*** Class constants ***/
-	const DEFAULT_MODEL = 'GenericModel';
+	const DEFAULT_MODEL = '\StdClass';
 	const ALL_LINES = 'all';
 	const DEFAULT_LINE_CHOICE = 20;
 
@@ -78,6 +78,23 @@ class ItemList{
 	$model = self::DEFAULT_MODEL,
 
 	/**
+	 * The default reference field, used to index the list result table
+	 * @var string
+	 */
+	$reference,
+
+	/**
+	 * The default db instance name
+	 * @var  string
+	 */
+	$dbname = MAINDB,
+
+	/**
+	 * The raw data to display in the list (overrides table, model, dbname and reference properties)
+	 */
+	$data = null,
+
+	/**
 	 * The fields group in the search query
 	 * @var array
 	 */
@@ -122,33 +139,33 @@ class ItemList{
 
 	/**
 	 * The whole list (list + navigation bar) view filename
+	 * @var string
 	 */
 	$tpl,
 
 	/**
-	 * The navigation bar view filename
+	 * @var  sintrg The navigation bar view filename
 	 */
 	$navigationBarTpl,
 
 	/**
-	 * The list view filename
+	 * @var  string The list view filename
 	 */
 	$listTpl,
 
 	/**
-	 * The result view filename
+	 * @var string The result view filename
 	 */
 	$resultTpl;
 
 
 	/**
-	 * The DB instance used to make the database queries to get the list results
+	 * @var  DB The DB instance used to make the database queries to get the list results
 	 */
 	private $dbo,
 
 	/**
-	 * Define if the list refreshing or displayed for the first time
-	 * @var boolean
+	 * @var boolean Define if the list refreshing or displayed for the first time
 	 */
 	$refresh = false;
 
@@ -166,31 +183,40 @@ class ItemList{
 		/*** Get the values from the parameters array **/
 		$this->map($params);
 
-		if(!class_exists($this->model)){
-			$trace = debug_backtrace();
-			$reflection = new \ReflectionClass($trace[1]['class']);
-			$this->model = $reflection->getNamespaceName() . '\\' . $this->model;
+		if(!$this->data){
+			if(!class_exists($this->model)){
+				$trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+				$reflection = new \ReflectionClass($trace[1]['class']);
+				$this->model = $reflection->getNamespaceName() . '\\' . $this->model;
+			}
+
+			if($this->model == self::DEFAULT_MODEL){
+				if(!isset($this->table)){
+					throw new \Exception('ItemList contructor expects property "table" or "model" to be set');
+				}
+				if(!isset($this->reference)){
+					$this->reference = 'id';
+				}
+			}
+			else{
+				$model = $this->model;
+
+				if(!isset($this->reference)){
+					$this->reference = $model::getPrimaryColumn();
+				}
+				if(!isset($this->table)){
+					$this->table = $model::getTable();
+				}
+
+				$this->dbname = $model::getDbName();
+			}
+
+			$this->refAlias = is_array($this->reference) ? reset($this->reference) : $this->reference;
+			$this->refField = is_array($this->reference) ? reset(array_keys($this->reference)) : $this->reference;
+
+			$this->dbo = DB::get($this->dbname);
 		}
 
-
-		$model = $this->model;
-
-		if(!isset($this->reference)){
-			$this->reference = $model::getPrimaryColumn();
-		}
-		$this->refAlias = is_array($this->reference) ? reset($this->reference) : $this->reference;
-		$this->refField = is_array($this->reference) ? reset(array_keys($this->reference)) : $this->reference;
-
-		$model::setPrimaryColumn($this->refField);
-		if(isset($this->table)){
-			$model::setTable($this->table);
-		}
-		if(isset($this->dbname)){
-			$model::setDbName($this->dbname);
-		}
-
-		$this->dbo= DB::get($model::getDbName());
-		$this->table = $model::getTable();
 
 		/*** initialize controls ***/
 		foreach($this->controls as &$button){
@@ -498,8 +524,5 @@ class ItemList{
 	public function isRefreshing(){
 		return $this->refresh;
 	}
-
-
-
 
 }

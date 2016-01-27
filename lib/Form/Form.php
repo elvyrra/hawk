@@ -173,8 +173,8 @@ class Form{
         	$this->columns = 1;
         }
 
-        if(!class_exists($this->model)){
-			$trace = debug_backtrace();
+        if(!class_exists($this->model)){			
+			$trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
 			$reflection = new \ReflectionClass($trace[1]['class']);
 			$this->model = $reflection->getNamespaceName() . '\\' . $this->model;
 		}

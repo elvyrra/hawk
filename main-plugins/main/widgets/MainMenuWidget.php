@@ -10,14 +10,14 @@ class MainMenuWidget extends Widget{
 	 * */
 	public function display(){
 		$user = App::session()->getUser();
-		
+
 		$menus= array(
 			'applications' => array(),
 			'user' => array()
 		);
 
-		if($user->canAccessApplication()){			
-			// Get the menus 
+		if($user->canAccessApplication()){
+			// Get the menus
 			$items = MenuItem::getAvailableItems($user);
 
 			// Filter the menus that have no action and no item
@@ -36,10 +36,10 @@ class MainMenuWidget extends Widget{
 				else{
 					$menus['applications'][$item->order] = $item;
 				}
-			}			
+			}
 		}
-		
-		if(!App::session()->isConnected()){
+
+		if(!App::session()->isLogged()){
 			$menus['user'][] = new MenuItem(array(
 				'plugin' => 'main',
 				'name' => 'login',
@@ -50,7 +50,7 @@ class MainMenuWidget extends Widget{
 			));
 		}
 
-		// Trigger an event to add or remove menus from plugins 
+		// Trigger an event to add or remove menus from plugins
 		$event = new Event(self::EVENT_AFTER_GET_MENUS, array(
 			'menus' => $menus
 		));
@@ -63,5 +63,5 @@ class MainMenuWidget extends Widget{
 			'logo' => Option::get('main.logo') ? Plugin::current()->getUserfilesUrl(Option::get('main.logo')) : ''
 		));
 	}
-	
+
 }

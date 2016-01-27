@@ -18,8 +18,8 @@
             app.lists["available-plugins-list"].refresh();
         })
 
-        .fail(function(response){
-            app.notify('error', response.message);
+        .fail(function(xhr, code, response){
+            app.notify('error', xhr.responseJSON && xhr.responseJSON.message || xhr.responseText);
         })
 
         .always(function(){
@@ -31,7 +31,7 @@
     /**
      * Click on a button in the plugins list
      */
-    var classes = ['install-plugin', 'activate-plugin', 'deactivate-plugin', 'uninstall-plugin', 'delete-plugin'];
+    var classes = ['install-plugin', 'activate-plugin', 'deactivate-plugin', 'uninstall-plugin', 'delete-plugin', 'update-plugin'];
     classes.forEach(function(classname){
         $('#available-plugins-list').on('click', '.' + classname, function(){
             var confirmation = '';

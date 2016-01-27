@@ -23,12 +23,27 @@ class Controller{
 
     const AFTER_ACTION = 'after';
 
+    /**
+     * The plugin instance the controller is contained in
+     * @var Plugin
+     */
+    private $_pluginInstance;
+
+    /**
+     * The plugin name the controller is contained in
+     * @var string
+     */
+    public $_plugin;
+
+
 	/**
 	 * Constructor
 	 * @param array $param The parameters of the controller. This parameter is set by the router with the parameters defined in the routes as '{paramName}'
 	 */
 	public function __construct($param = array()){
 		$this->map($param);
+
+		$this->_plugin = $this->getPlugin()->getName();
 
 		self::$currentInstance = $this;
 	}
@@ -151,8 +166,13 @@ class Controller{
 	 * Get the controller plugin
 	 */
 	public function getPlugin(){
+		if(isset($this->_pluginInstance)){
+			return $this->_pluginInstance;
+		}
+
 		foreach (Plugin::getAll() as $plugin) {
 			if($plugin->getNamespace() == $this->getNamespace()){
+				$this->_pluginInstance = &$plugin;
 				return $plugin;
 			}
 		}

@@ -26,7 +26,7 @@
 		<link rel="stylesheet" id="theme-custom-stylesheet" href="{{ Theme::getSelected()->getCustomCssUrl() }}" />
 
 
-		<script type="text/javascript" src="{{ Plugin::get('main')->getJsUrl('ext/require.js') }}" data-main="{{ Plugin::get('main')->getJsUrl('app.js') }}"></script>
+		<script type="text/javascript" src="{{ Plugin::get('main')->getJsUrl('ext/require.js') }}" data-main="{{ Plugin::get('main')->getJsUrl(DEV_MODE ? 'app.js' : 'app.min.js') }}"></script>
 
 	</head>
 

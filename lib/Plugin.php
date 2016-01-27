@@ -57,20 +57,24 @@ class Plugin{
 	 */
 	$active;
 
+
 	/**
 	 * The application main plugins, not removable or editable, used for the application core
 	 */
 	public static $mainPlugins = array('main', 'install', 'admin');
+
 
 	/**
 	 * The plugin instances
 	 */
 	private static $instances = array();
 
+
 	/**
 	 * Forbidden plugin names
 	 */
 	public static $forbiddenNames = array('custom');
+
 
 	/**
 	 * Constructor
@@ -100,6 +104,7 @@ class Plugin{
 		}
 	}
 
+
 	/**
 	 * Get a plugin instance from it name
 	 * @param string $name The plugin name to instance
@@ -124,12 +129,13 @@ class Plugin{
 	 * @return Plugin - The current plugin
 	 */
 	public static function current(){
-		$trace = debug_backtrace()[0]['file'];
-		if(strpos($trace, PLUGINS_DIR) !== false){
-			$dir = str_replace(PLUGINS_DIR, '', $trace);
+		$callingFile = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'];
+
+		if(strpos($callingFile, PLUGINS_DIR) !== false){
+			$dir = str_replace(PLUGINS_DIR, '', $callingFile);
 		}
-		elseif(strpos($trace, MAIN_PLUGINS_DIR) !== false){
-			$dir = str_replace(MAIN_PLUGINS_DIR, '', $trace);
+		elseif(strpos($callingFile, MAIN_PLUGINS_DIR) !== false){
+			$dir = str_replace(MAIN_PLUGINS_DIR, '', $callingFile);
 		}
 		else{
 			return null;
@@ -367,7 +373,7 @@ class Plugin{
 				copy($privateFilename, $publicFilename);
 			}
 
-			return $baseUrl . $basename;
+			return $baseUrl . $basename . '?' . filemtime($publicFilename);
 		}
 	}
 
@@ -496,7 +502,7 @@ class Plugin{
 			return $baseUrl;
 		}
 		else{
-			return $baseUrl . $basename;
+			return $baseUrl . $basename . '?' . filemtime($this->getPublicUserfilesDir() . $basename);
 		}
 	}
 

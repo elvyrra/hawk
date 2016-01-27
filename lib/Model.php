@@ -20,7 +20,7 @@ class Model{
 
     /**
      * The primary column of the elements in the table (default 'id')
-     * @var string     
+     * @var string
      */
     protected static $primaryColumn = 'id';
 
@@ -36,21 +36,21 @@ class Model{
      * @param array $data The initial data to set.
      */
 	public function __construct($data = array()){
-        $this->map($data);        
+        $this->map($data);
     }
-    
+
 
     /**
-     * Get all the elements of the table 
+     * Get all the elements of the table
      * @param string $index The field that will be used to affect the result array keys. If not set, the method will return a non associative array
      * @param array $fields The fields to set in the instances
      * @param array $order The order to get the results. Each key of this array must be a column name in the table, and the associated value is the order value ('ASC' or 'DESC')
      * @return array An array of all Model instances
      */
-    public static function getAll($index = null, $fields = array(), $order = array()){        
+    public static function getAll($index = null, $fields = array(), $order = array()){
         return self::getListByExample(null, $index, $fields, $order);
     }
-    
+
 
     /**
      * Get a model instance by it primary column
@@ -59,10 +59,10 @@ class Model{
      * @return Model The found Model instance
      */
     public static function getById($id, $fields = array()){
-        $example = new DBExample(array(static::$primaryColumn => $id));        
+        $example = new DBExample(array(static::$primaryColumn => $id));
 		return self::getByExample($example, $fields);
 	}
-    
+
 
 	/**
 	 * Get a model instance by an example
@@ -77,10 +77,10 @@ class Model{
             'where' => $example,
             'return' => get_called_class(),
             'one' => true,
-        ));        
+        ));
 	}
-	
-	
+
+
 	/**
 	 * Get a list of model instances by an example
 	 * @param DBExample $example The example to find the data lines
@@ -97,10 +97,10 @@ class Model{
             'index' => $index,
 			'return' => get_called_class(),
             'orderby' => $order
-		));        
+		));
 	}
-	
-	
+
+
 	/**
 	 * Get a model instance by sql condition
 	 * @param string $where The SQL condition
@@ -118,8 +118,8 @@ class Model{
             'one' => true,
         ));
 	}
-	
-	
+
+
 	/**
 	 * Get a list of model instances by a SQL condition
 	 * @param string $where The SQL condition to find the elements
@@ -138,11 +138,11 @@ class Model{
             'index' => $index,
 			'return' => get_called_class(),
             'orderby' => $order
-		));        
+		));
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Delete data in the database from an example
 	 * @param DBExample $example The example to find the lines to delete
@@ -151,7 +151,7 @@ class Model{
 	public static function deleteByExample(DBExample $example = null){
 		return self::getDbInstance()->delete(static::getTable(), $example);
 	}
-	
+
 	/**
 	 * Delete data in the database from a SQL condition
 	 * @param string $where The SQL condition to find the lines to delete
@@ -161,8 +161,8 @@ class Model{
 	public static function deleteBySQL($where = null, $binds = array()){
 		return self::getDbInstance()->delete(static::getTable(), $where, $binds);
 	}
-	
-	
+
+
 	/**
 	 * Count the number of elements filtered by an example
 	 * @param DBExample $example The example to find the lines to delete
@@ -171,9 +171,9 @@ class Model{
 	 */
     public static function countElementsByExample(DBExample $example = null, $group = array()){
 		return self::getDbInstance()->count(static::getTable(), $example, array(), self::$primaryColumn, $group);
-	}    
-	
-	
+	}
+
+
     /**
 	 * Count the number of elements filtered by a SQL condition
 	 * @param string $where The SQL condition
@@ -197,18 +197,18 @@ class Model{
 		foreach(get_object_vars($this) as $key => $value){
             if(isset($fields[$key])){
                 $insert[$key] = $value;
-            }            
+            }
 		}
 
         return $insert;
     }
-    
-    
+
+
     /**
-     * This method save a new Model in the database or update it if it exists. It is based on INSERT ... ON DUPLICATE KEY. 
-     * if a new element is saved, then the created id is set to the instance     
+     * This method save a new Model in the database or update it if it exists. It is based on INSERT ... ON DUPLICATE KEY.
+     * if a new element is saved, then the created id is set to the instance
      */
-	public function save(){		
+	public function save(){
 		$insert = $this->prepareDatabaseData();
         $duplicateUpdates = array_map(function($key){
 			if($key == static::$primaryColumn){
@@ -218,20 +218,20 @@ class Model{
             	return "`$key` = VALUES(`$key`)";
 			}
         }, array_keys($insert));
-        
+
 		if(!isset($insert[static::$primaryColumn])){
 			$key = static::$primaryColumn;
-            $duplicateUpdates[] = "`$key`=LAST_INSERT_ID(`$key`)";			
+            $duplicateUpdates[] = "`$key`=LAST_INSERT_ID(`$key`)";
 		}
         $onduplicate = implode(', ', $duplicateUpdates);
-        
+
         $lastid = self::getDbInstance()->insert(static::getTable(), $insert, '', $onduplicate);
         if($lastid){
             $id = static::$primaryColumn;
             $this->$id = $lastid;
         }
 	}
-    
+
 
     /**
      * Create a new element in the database
@@ -255,7 +255,7 @@ class Model{
     public function addIfNotExists(){
         $id = static::$primaryColumn;
 		$insert = $this->prepareDatabaseData();
-        
+
         $lastid = self::getDbInstance()->insert(static::getTable(), $insert, 'IGNORE');
         if($lastid){
             $this->$id = $lastid;
@@ -271,7 +271,7 @@ class Model{
         $id = static::$primaryColumn;
         self::getDbInstance()->update(static::getTable(), new DBExample(array($id => $this->$id)), $update);
     }
-	
+
 
     /**
      * Delete the model data from the database
@@ -286,22 +286,22 @@ class Model{
 
         return (bool) $deleted;
 	}
-	
+
 
     /**
      * Get the model data, only the data present in the database.
      * @return array The object properties with their value
      */
-	public function getData(){		
+	public function getData(){
 		return get_object_vars($this);
 	}
-    
+
 
 
     /**
      * Set a property value to the object. You can use this method to set only one property, or an array of properties (where key are the names of the properties to set, and values their values)
      * @param string|array $field If a string is set, then it is the name of the property. If an array is set, then set multiple properties will be set
-     * @param mixed $value The value to set to the property, only if $field is a string 
+     * @param mixed $value The value to set to the property, only if $field is a string
      */
     public function set($field, $value = null){
         if(is_array($field) && $value === null){
@@ -313,16 +313,16 @@ class Model{
             $this->$field = $value;
         }
     }
-    
+
 
     /**
      * Get the table name of this model
      * @return string the table name of the model
      */
     public static function getTable(){
-        return DB::getFullTablename(static::$tablename);
+        return (static::$dbname == MAINDB ? App::conf()->get('db.prefix') : '') . static::$tablename;
     }
-    
+
 
     /**
      * Get the primary column of the model
@@ -353,15 +353,15 @@ class Model{
 
     /**
      * Set the table name of the model
-     * @param string $table The table name to set     
+     * @param string $table The table name to set
      */
     public static function setTable($table){
         static::$tablename = $table;
     }
-    
+
     /**
      * Set the primary column of the model
-     * @param string $primaryColumn The column to set as primary column     
+     * @param string $primaryColumn The column to set as primary column
      */
     public static function setPrimaryColumn($primaryColumn){
         static::$primaryColumn = $primaryColumn;

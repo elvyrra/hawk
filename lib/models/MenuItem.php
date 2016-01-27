@@ -19,7 +19,7 @@ class MenuItem extends Model{
 	 * The primary column
 	 */
 	protected static $primaryColumn = 'id';
-	
+
 	/**
 	 * The id of the user menu
 	 */
@@ -42,7 +42,7 @@ class MenuItem extends Model{
 
 	/**
 	 * Constructor
-	 * @param array $data The data to set on the instance properties	 
+	 * @param array $data The data to set on the instance properties
 	 */
 	public function __construct($data = array()){
 		parent::__construct($data);
@@ -64,7 +64,7 @@ class MenuItem extends Model{
 
 		self::$instances[$this->plugin . '.' . $this->name] = $this;
 	}
-	
+
 
 	/**
 	 * Get the items available for a specific user
@@ -77,11 +77,27 @@ class MenuItem extends Model{
 		}
 
 		// Get all items
-		$items = self::getAll(self::$primaryColumn, array(), array('parentId' => 'ASC', 'order' => 'ASC'));
+		$items = self::getListByExample(
+			new DBExample(array(
+				'active' => 1
+			)),
+			self::$primaryColumn,
+			array(),
+			array(
+				'parentId' => 'ASC',
+				'order' => 'ASC'
+			)
+		);
 
 		// Filter unavailable items (that are not active or not accessible)
 		$items = array_filter($items, function($item) use($user){
-			return $item->active && (!$item->permissionId || $user->isAllowed($item->permissionId));
+			$route = App::router()->getRouteByName($item->action);
+			if($route){
+				return $route->isAccessible();
+			}
+			else{
+				return !$item->permissionId || $user->isAllowed($item->permissionId);
+			}
 		});
 
 		// Put the sub items under their parent item
@@ -115,11 +131,11 @@ class MenuItem extends Model{
 		))->newOrder;
 
 		// Insert the menu item
-		$item = parent::add($data);	
+		$item = parent::add($data);
 
 		$event = new Event('menuitem.added', array('item' => $item));
 		$event->trigger();
-		
+
 		return $item;
 	}
 
@@ -144,13 +160,28 @@ class MenuItem extends Model{
 		}
 	}
 
+
+	/**
+	 * Get all the menu items of a plugin
+	 * @param   string $plugin The plugin to get
+	 * @return  array
+	 */
+	public static function getPluginMenuItems($plugin){
+		return self::getListByExample(new DBExample(
+			array(
+				'plugin' => $plugin
+			)
+		));
+	}
+
+
 	/**
 	 * Delete the menu item
 	 */
 	public function delete(){
 		App::db()->update(
-			self::getTable(), 
-			new DBExample(array('parentId' => $this->id)), 
+			self::getTable(),
+			new DBExample(array('parentId' => $this->id)),
 			array('parentId' => 0)
 		);
 

@@ -2,7 +2,7 @@
 
 namespace Hawk\Plugins\Install;
 
-class InstallController extends Controller{	
+class InstallController extends Controller{
 	public function setLanguage(){
 		$form = new Form(array(
 			'id' => 'install-form',
@@ -16,7 +16,7 @@ class InstallController extends Controller{
 							'fr' => 'Français'
 						),
 						'default' => LANGUAGE,
-						'label' => Lang::get('install.set-language-label') 
+						'label' => Lang::get('install.set-language-label')
 					)),
 				),
 
@@ -89,6 +89,7 @@ class InstallController extends Controller{
 						'name' => 'db[password]',
 						'required' => true,
 						'label' => Lang::get('install.settings-db-password-label', null, null, $this->language),
+						'pattern' => '/^.*$/'
 					)),
 
 					new TextInput(array(
@@ -157,7 +158,7 @@ class InstallController extends Controller{
 			return \Hawk\Plugins\Main\MainController::getInstance()->index($body);
 		}
 		else{
-			// Make the installation 
+			// Make the installation
 			if($form->check()){
 				/**
 				 * Generate Crypto constants
@@ -171,7 +172,7 @@ class InstallController extends Controller{
 				/**
 				 * Create the database and it tables
 				 */
-				$tmpfile = tempnam(sys_get_temp_dir(), '');	
+				$tmpfile = tempnam(sys_get_temp_dir(), '');
 
 				DB::add('tmp', array(
 					array(
@@ -207,7 +208,7 @@ class InstallController extends Controller{
 
 					/**
 					 * Create the config file
-					 */				
+					 */
 					$param = array(
 						'{{ $salt }}' => addcslashes($salt, "'"),
 						'{{ $key }}' => addcslashes($key, "'"),
@@ -225,19 +226,24 @@ class InstallController extends Controller{
 					$config = strtr(file_get_contents(Plugin::current()->getRootDir() . 'templates/config.php.tpl'), $param);
 					file_put_contents(INCLUDES_DIR . 'config.php', $config);
 
+					/**
+					 * Create etc/dev.php
+					 */
+					App::fs()->copy(Plugin::current()->getRootDir() . 'templates/etc-dev.php', ETC_DIR . 'dev.php');
 
 					/**
-					 * Create the envrionment config file
+					 * Create etc/prod.php
 					 */
-					touch(ROOT_DIR . 'etc/' . $configMode . '.php');
+					App::fs()->copy(Plugin::current()->getRootDir() . 'templates/etc-prod.php', ETC_DIR . 'prod.php');
+
 
 					$form->addReturn('rooturl', $form->getData('rooturl'));
-					
+
 					return $form->response(Form::STATUS_SUCCESS, Lang::get('install.install-success'));
 				}
 				catch(\Exception $e){
 					return $form->response(Form::STATUS_ERROR, Lang::get('install.install-error'));
-				}				
+				}
 			}
 		}
 	}

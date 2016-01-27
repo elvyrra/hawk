@@ -5,20 +5,20 @@ class QuestionController extends Controller{
 	public function listQuestions(){
 		$questions = ProfileQuestion::getAll();
 		$param = array(
-			'id' => 'display-questions-form',	
+			'id' => 'display-questions-form',
 			'action' => App::router()->getUri('profile-questions'),
 			'fieldsets' => array(
 				'form' => array(),
-				
+
 				'_submits' => array(
 					new SubmitInput(array(
 						'name' => 'valid',
 						'value' => Lang::get('main.valid-button'),
 					)),
-					
+
 					new ButtonInput(array(
 						'name' => 'new-question',
-						'value' => Lang::get('admin.new-question-btn'),
+						'value' => Lang::get($this->_plugin . '.new-question-btn'),
 						'class' => 'btn-success',
 						'href' => App::router()->getUri('edit-profile-question', array('name' => '_new')),
 						'target' => 'dialog',
@@ -27,7 +27,7 @@ class QuestionController extends Controller{
 				)
 			)
 		);
-		
+
 		foreach($questions as $question){
 			// Add the input to display in register form
 			$param['fieldsets']['form'][] = new CheckboxInput(array(
@@ -35,7 +35,7 @@ class QuestionController extends Controller{
 				'default' => $question->displayInRegister,
 				'nl' => false
 			));
-			
+
 			// Add the input to display in the user profile
 			$param['fieldsets']['form'][] = new CheckboxInput(array(
 				'name' => "profile-display-$question->name",
@@ -43,9 +43,9 @@ class QuestionController extends Controller{
 				'nl' => false
 			));
 		}
-		
+
 		$form = new Form($param);
-		
+
 		$list = new ItemList(array(
 			'id' => 'profile-questions-list',
 			'model' => 'ProfileQuestion',
@@ -54,60 +54,51 @@ class QuestionController extends Controller{
 			'sort' => array('order' => DB::SORT_ASC),
 			'fields' => array(
 				'name' => array(
-					'hidden' => true					
+					'hidden' => true
 				),
 
 				'editable' => array(
 					'hidden' => true
 				),
-				
+
 				'actions' => array(
 					'independant' => true,
 					'display' => function($value, $field, $line){
-						return 	$line->editable ? "<i class='icon icon-pencil text-info' href='" . App::router()->getUri('edit-profile-question', array('name' => $line->name)) . "' target='dialog' title='". Lang::get('admin.edit-profile-question')."' ></i>".
-												 "<i class='icon icon-times text-danger delete-question' data-question='$line->name' title='" . Lang::get('admin.delete-profile-question') . "'></i>" : "";
+						return 	$line->editable ? "<i class='icon icon-pencil text-info' href='" . App::router()->getUri('edit-profile-question', array('name' => $line->name)) . "' target='dialog' title='". Lang::get($this->_plugin . 'edit-profile-question')."' ></i>".
+												 "<i class='icon icon-times text-danger delete-question' data-question='$line->name' title='" . Lang::get($this->_plugin . 'delete-profile-question') . "'></i>" : "";
 					},
 					'sort' => false,
 					'search' => false,
 				),
-				
+
 				'label' => array(
 					'independant' => true,
 					'display' => function($value, $field, $line){
-						return Lang::get("admin.profile-question-$line->name-label") . " ( $line->name )";
+						return Lang::get($this->_plugin . ".profile-question-$line->name-label") . " ( $line->name )";
 					},
 					'sort' => false,
 					'search' => false,
 				),
-				
+
 				'displayInRegister'=> array(
-					'label' => Lang::get("admin.list-questions-register-visible-label"),
+					'label' => Lang::get($this->_plugin . ".list-questions-register-visible-label"),
 					'sort' => false,
 					'search' => false,
 					'display' => function($value, $field, $line) use($form){
 						return $form->inputs["register-display-$line->name"];
 					}
 				),
-				
-				'displayInProfile'=> array(
-					'label' => Lang::get("admin.list-questions-profile-visible-label"),
-					'sort' => false,
-					'search' => false,
-					'display' => function($value, $field, $line) use($form){
-						return $form->inputs["profile-display-$line->name"];
-					}
-				)
-			),			
+			),
 		));
-		
+
 		if(!$form->submitted()){
-			Lang::addKeysToJavaScript("admin.confirm-delete-question");
+			Lang::addKeysToJavaScript($this->_plugin . ".confirm-delete-question");
 			$content = View::make(Plugin::current()->getView("questions-list.tpl"), array(
-				'list' => $list,		
+				'list' => $list,
 				'form' => $form
 			));
-			
-			return $form->wrap($content);			
+
+			return $form->wrap($content);
 		}
 		else{
 			try{
@@ -127,7 +118,7 @@ class QuestionController extends Controller{
 				foreach($save as $question){
 					$question->update();
 				}
-				
+
 				return $form->response(Form::STATUS_SUCCESS);
 			}
 			catch(Exception $e){
@@ -135,12 +126,12 @@ class QuestionController extends Controller{
 			}
 		}
 	}
-	
-	
+
+
 	public function edit(){
 		$q = ProfileQuestion::getByName($this->name);
 		if(!$q || $q->editable){
-			
+
 			$allowedTypes = ProfileQuestion::$allowedTypes;
 			$param = array(
 				'id' => 'profile-question-form',
@@ -149,13 +140,13 @@ class QuestionController extends Controller{
 				'labelWidth' => '200px',
 				'fieldsets' => array(
 					'general' => array(
-						'legend' => Lang::get('admin.profile-question-form-general-legend'),
+						'legend' => Lang::get($this->_plugin . '.profile-question-form-general-legend'),
 
 						new TextInput(array(
 							'name' => 'name',
 							'unique' => true,
 							'maxlength' => 32,
-							'label' => Lang::get('admin.profile-question-form-name-label') . ' ' . Lang::get('admin.profile-question-form-name-description'),
+							'label' => Lang::get($this->_plugin . '.profile-question-form-name-label') . ' ' . Lang::get($this->_plugin . '.profile-question-form-name-description'),
 							'required' => true,
 						)),
 
@@ -168,9 +159,9 @@ class QuestionController extends Controller{
 							'name' => 'type',
 							'required' => true,
 							'options' => array_combine($allowedTypes, array_map(function($type){
-								return Lang::get('admin.profile-question-form-type-' . $type);
-							}, $allowedTypes)),							
-							'label' => Lang::get('admin.profile-question-form-type-label'),
+								return Lang::get($this->_plugin . '.profile-question-form-type-' . $type);
+							}, $allowedTypes)),
+							'label' => Lang::get($this->_plugin . '.profile-question-form-type-label'),
 							'attributes' => array(
 								'ko-value' => 'type',
 							)
@@ -178,22 +169,22 @@ class QuestionController extends Controller{
 
 						new CheckboxInput(array(
 							'name' => 'displayInRegister',
-							'label' => Lang::get('admin.profile-question-form-displayInRegister-label')
+							'label' => Lang::get($this->_plugin . '.profile-question-form-displayInRegister-label')
 						)),
 
 						new CheckboxInput(array(
 							'name' => 'displayInProfile',
-							'label' => Lang::get('admin.profile-question-form-displayInProfile-label')
+							'label' => Lang::get($this->_plugin . '.profile-question-form-displayInProfile-label')
 						))
 					),
 
 					'parameters' => array(
-						'legend' => Lang::get('admin.profile-question-form-parameters-legend'),
+						'legend' => Lang::get($this->_plugin . '.profile-question-form-parameters-legend'),
 
 						new ObjectInput(array(
 							'name' => 'parameters',
 							'id' => 'question-form-parameters',
-							'hidden' => true,	
+							'hidden' => true,
 							'attributes' => array(
 								'ko-value' => 'parameters'
 							)
@@ -202,7 +193,7 @@ class QuestionController extends Controller{
 						new CheckboxInput(array(
 							'name' => 'required',
 							'independant' => true,
-							'label' => Lang::get('admin.profile-question-form-required-label'),
+							'label' => Lang::get($this->_plugin . '.profile-question-form-required-label'),
 							'attributes' => array(
 								'ko-checked' => "required",
 							)
@@ -211,16 +202,16 @@ class QuestionController extends Controller{
 						new DatetimeInput(array(
 							'name' => 'minDate',
 							'independant' => true,
-							'label' => Lang::get('admin.profile-question-form-minDate-label'),
+							'label' => Lang::get($this->_plugin . '.profile-question-form-minDate-label'),
 							'attributes' => array(
 								'ko-value' => "minDate"
 							),
-						)),				
+						)),
 
 						new DatetimeInput(array(
 							'name' => 'maxDate',
 							'independant' => true,
-							'label' => Lang::get('admin.profile-question-form-maxDate-label'),
+							'label' => Lang::get($this->_plugin . '.profile-question-form-maxDate-label'),
 							'attributes' => array(
 								'ko-value' => "maxDate"
 							),
@@ -228,22 +219,22 @@ class QuestionController extends Controller{
 
 						new HtmlInput(array(
 							'name' => 'parameters-description',
-							'value' => "<p class='alert alert-info'><i class='icon icon-exclamation-circle'></i>" . Lang::get('admin.profile-question-form-translation-description') . "</p>"
+							'value' => "<p class='alert alert-info'><i class='icon icon-exclamation-circle'></i>" . Lang::get($this->_plugin . '.profile-question-form-translation-description') . "</p>"
 						)),
 
 						new TextInput(array(
 							'name' => 'label',
 							'required' => true,
 							'independant' => true,
-							'label' => Lang::get('admin.profile-question-form-label-label'),
-							'default' => $this->name != '_new' ? Lang::get('admin.profile-question-' . $this->name . '-label') : ''
+							'label' => Lang::get($this->_plugin . '.profile-question-form-label-label'),
+							'default' => $this->name != '_new' ? Lang::get($this->_plugin . '.profile-question-' . $this->name . '-label') : ''
 						)),
 
 						new TextareaInput(array(
 							'name' => 'options',
 							'independant' => true,
-							'required' => App::request()->getBody('type') == 'select' || App::request()->getBody('type') == 'radio',							
-							'label' => Lang::get('admin.profile-question-form-options-label') . '<br />' . Lang::get('admin.profile-question-form-options-description'),
+							'required' => App::request()->getBody('type') == 'select' || App::request()->getBody('type') == 'radio',
+							'label' => Lang::get($this->_plugin . '.profile-question-form-options-label') . '<br />' . Lang::get($this->_plugin . '.profile-question-form-options-description'),
 							'labelClass' => 'required',
 							'attributes' => array(
 								'ko-value' => "options",
@@ -284,19 +275,19 @@ class QuestionController extends Controller{
 				));
 
 				return View::make(Theme::getSelected()->getView("dialogbox.tpl"), array(
-					'title' => Lang::get("admin.users-questions-title"),
+					'title' => Lang::get($this->_plugin . ".users-questions-title"),
 					'icon' => 'file-word-o',
 					'page' => $content
 				));
 			}
 			else{
 				if($form->submitted() == "delete"){
-					$this->compute('delete');					
+					$this->compute('delete');
 
 					return $form->response(Form::STATUS_SUCCESS);
 				}
 				else{
-					if($form->check()){					
+					if($form->check()){
 						$form->register(Form::NO_EXIT);
 
 						Language::current()->saveTranslations(array(
@@ -312,11 +303,11 @@ class QuestionController extends Controller{
 								if(!empty($option)){
 									$keys['admin']['profile-question-' . $form->getData("name") . '-option-' . $i] = trim($option);
 								}
-							}	
+							}
 							Language::current()->saveTranslations($keys);
 						}
 
-						return $form->response(Form::STATUS_SUCCESS);		
+						return $form->response(Form::STATUS_SUCCESS);
 					}
 				}
 			}
@@ -333,11 +324,11 @@ class QuestionController extends Controller{
 			$params = json_decode($question->parameters, true);
 
 			$question->delete();
-			
+
 			// Remove the language keys for the label and the options
 			$keysToRemove = array(
 				'admin' => array(
-					'profile-question-' . $this->name . '-label',					
+					'profile-question-' . $this->name . '-label',
 				)
 			);
 
@@ -351,5 +342,5 @@ class QuestionController extends Controller{
 			}
 		}
 	}
-	
+
 }

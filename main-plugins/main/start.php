@@ -9,15 +9,12 @@ App::router()->setProperties(
 		App::router()->get('new-tab', '/newtab', array('action' => 'MainController.newTab'));
 		App::router()->get('logout', '/logout', array('action' => 'LoginController.logout'));
 
-		App::router()->auth(App::session()->isConnected(), function(){
-			App::router()->auth(App::request()->isAjax(), function(){
-				App::router()->any('edit-profile', '/profile/edit/{userId}', array('where' => array('userId' => '\d+'), 'default' => array('userId' => App::session()->getUser()->id), 'action' => 'UserProfileController.edit'));
-				App::router()->any('change-password', '/profile/change-password', array('action' => 'UserProfileController.changePassword'));
-			});
-
+		App::router()->auth(App::session()->isLogged(), function(){
+			App::router()->any('edit-profile', '/profile/edit/{userId}', array('where' => array('userId' => '\d+'), 'default' => array('userId' => App::session()->getUser()->id), 'action' => 'UserProfileController.edit'));
+			App::router()->any('change-password', '/profile/change-password', array('action' => 'UserProfileController.changePassword'));
 		});
 
-		App::router()->auth(!App::session()->isConnected(), function(){
+		App::router()->auth(!App::session()->isLogged(), function(){
 		    //Login
 		    App::router()->any('login', '/login', array('action' => 'LoginController.login'));
 

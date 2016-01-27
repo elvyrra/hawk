@@ -1,5 +1,7 @@
 <?php
 /*** Constant paths ***/
+define('ETC_DIR', ROOT_DIR . 'etc/'); // The folder containing the config files for each environment
+
 define('LIB_DIR', ROOT_DIR . 'lib/'); // The folder containing all the core classes
 
 define('CUSTOM_LIB_DIR', ROOT_DIR . 'custom-lib/'); // The folder containing the developper custom libraries
@@ -38,10 +40,6 @@ define('ENCODING', 'utf-8');
 
 // Allowed image types
 define('ALLOWED_IMAGE_UPLOAD_TYPES', 'image/png image/jpeg image/jpg image/bpm image/gif image/tif');
-
-// Hawk website URL
-define('HAWK_SITE_URL', 'http://hawk-site.dev.elvyrra.fr');
-// define('HAWK_SITE_URL', 'http://www.hawk-app.fr');
 
 // Default configuration values
 define('DEFAULT_HTML_TITLE', 'Hawk');

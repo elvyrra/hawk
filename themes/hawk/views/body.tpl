@@ -40,7 +40,7 @@
 <div class="modal fade" id="dialogbox"></div>
 
 <!-- ko with : notification -->
-<div class="app-notification alert" ko-class="'alert-' + level()" ko-style="{ visibility : display() ? 'visible' : 'hidden', opacity : display() ? 1 : 0 }" ko-click="$root.hideNotification.bind($root)">
+<div class="app-notification alert col-md-6 col-md-offset-3 col-xs-12" ko-class="'alert-' + level()" ko-style="{ visibility : display() ? 'visible' : 'hidden', opacity : display() ? 1 : 0 }" ko-click="$root.hideNotification.bind($root)">
 	<span ko-html="message"></span>
 	<span class="close">&times;</span>
 </div>

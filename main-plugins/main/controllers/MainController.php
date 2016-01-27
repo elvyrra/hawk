@@ -3,7 +3,7 @@
 namespace Hawk\Plugins\Main;
 
 class MainController extends Controller{
-	
+
 	/**
 	 * Display a while HTML page
 	 * @param string $body The HTML code to insert in the <body> tag
@@ -11,11 +11,11 @@ class MainController extends Controller{
 	 * @param string $description The page description, in the meta tag "description"
 	 * @param string $keywords The page keywords, in the meta tag "keywords"
 	 */
-	public function index($body, $title = '', $description = '', $keywords = ''){					
+	public function index($body, $title = '', $description = '', $keywords = ''){
 		$labels = array(
 			'main' => Lang::keys('javascript'),
 			'form' =>  Lang::keys('form')
-		);			
+		);
 		$labelsJSON = json_encode($labels, JSON_HEX_APOS | JSON_HEX_QUOT);
 
 		$routes = array();
@@ -25,7 +25,7 @@ class MainController extends Controller{
 			$routes[$name] = $data;
 		}
 
-		
+
 		App::fs()->copy(Plugin::current()->getJsDir() . '/*', Plugin::current()->getPublicJsDir());
 
 		return View::make(Plugin::current()->getView('html-document.tpl'), array(
@@ -43,16 +43,16 @@ class MainController extends Controller{
 	 * @param string $content A content to set to override the default index content
 	 */
 	public function main($content = ""){
-		$canAccessApplication = App::session()->getUser()->canAccessApplication();		
+		$canAccessApplication = App::session()->getUser()->canAccessApplication();
 
 		$body = View::make(Theme::getSelected()->getView('body.tpl'), array(
 			'canAccessApplication' => $canAccessApplication,
 			'content' => $content
-		));	
+		));
 
-		$title = App::conf()->has('db') ? Option::get('main.page-title-' . LANGUAGE) : DEFAULT_HTML_TITLE;
-		$description = App::conf()->has('db') ? Option::get('main.page-description-' . LANGUAGE) : '';
-		$keywords = App::conf()->has('db') ? Option::get('main.page-keywords-' . LANGUAGE) : '';
+		$title = App::conf()->has('db') ? Option::get($this->_plugin . '.page-title-' . LANGUAGE) : DEFAULT_HTML_TITLE;
+		$description = App::conf()->has('db') ? Option::get($this->_plugin . '.page-description-' . LANGUAGE) : '';
+		$keywords = App::conf()->has('db') ? Option::get($this->_plugin . '.page-keywords-' . LANGUAGE) : '';
 
 		return $this->index($body, $title, $description, $keywords);
 	}
@@ -62,11 +62,11 @@ class MainController extends Controller{
 	 * Display a new tab
 	 */
 	public function newTab(){
-		$type = Option::get('main.home-page-type');
+		$type = Option::get($this->_plugin . '.home-page-type');
 
 		// Display a page of the application
 		if($type == 'page'){
-			$page = Option::get('main.home-page-item');
+			$page = Option::get($this->_plugin . '.home-page-item');
 			$route = App::router()->getRouteByAction($page);
 
 			if($route && $route->isAccessible()){
@@ -75,16 +75,19 @@ class MainController extends Controller{
 			}
 			else{
 				// The route is not accessible
-				if(Option::get('main.home-page-html')){
+				if(Option::get($this->_plugin . '.home-page-html')){
 					// Display a custom page
 					$type = 'custom';
+				}
+				else{
+					$type = 'default';
 				}
 			}
 		}
 
 		// Display a custom page
 		if($type == 'custom'){
-			$page = View::makeFromString(Option::get('main.home-page-html'));
+			$page = View::makeFromString(Option::get($this->_plugin . '.home-page-html'));
 		}
 		else{
 			// Display the default new tab page
@@ -95,7 +98,7 @@ class MainController extends Controller{
 			'custom' => $page
 		));
 	}
-	
+
 
 	/**
 	 * Display the page 404 : page not found
@@ -103,7 +106,7 @@ class MainController extends Controller{
 	public function page404(){
 		return View::make(Plugin::current()->getViewsDir() . 'page-404.tpl');
 	}
-	
+
 
 
 	/**
@@ -111,7 +114,7 @@ class MainController extends Controller{
 	 */
 	public function getFaviconUrl(){
 		if(App::conf()->has('db')){
-			$favicon = Option::get('main.favicon') ? Option::get('main.favicon') : Option::get('main.logo');
+			$favicon = Option::get($this->_plugin . '.favicon') ? Option::get($this->_plugin . '.favicon') : Option::get($this->_plugin . '.logo');
 		}
 
 		if(empty($favicon)){
@@ -126,9 +129,9 @@ class MainController extends Controller{
 	 * Display the application terms
 	 */
 	public function terms(){
-		$content = Option::get('main.terms');
+		$content = Option::get($this->_plugin . '.terms');
 
-		return $this->compute('main', $content);		
+		return $this->compute('main', $content);
 	}
 
 
@@ -144,7 +147,7 @@ class MainController extends Controller{
 	 * Generate the conf.js file
 	 */
 	public function jsConf(){
-		$canAccessApplication = App::session()->getUser()->canAccessApplication();	
+		$canAccessApplication = App::session()->getUser()->canAccessApplication();
 
 		// Get all routes
 		$routes = array();
@@ -163,31 +166,27 @@ class MainController extends Controller{
 		$keys = array(
 			'main' => Lang::keys('javascript'),
 			'form' =>  Lang::keys('form')
-		);			
+		);
 		$keys = json_encode($keys, JSON_HEX_APOS | JSON_HEX_QUOT);
 
 		// Get the pages to open
 		$pages = array();
-		if(App::session()->isConnected() && Option::get('main.open-last-tabs') && App::request()->getCookies('open-tabs') ){
+		if(App::session()->isLogged() && Option::get($this->_plugin . '.open-last-tabs') && App::request()->getCookies('open-tabs') ){
 			// Open the last tabs the users opened before logout
 			$pages = json_decode(App::request()->getCookies('open-tabs'), true);
 		}
-		
+
 		if(empty($pages)){
 			$pages[] = App::router()->getUri('new-tab');
 		}
 
-		// Get the theme variables		
+		// Get the theme variables
 		$theme = Theme::getSelected();
-        $editableVariables = $theme->getEditableVariables();        
-        $options = $theme->getVariablesCustomValues();
-        
+        $editableVariables = $theme->getEditableVariables();
 
-        $themeVariables = array();
         $initVariables = array();
         foreach($editableVariables as $variable){
         	$initVariables[$variable['name']] = $variable['default'];
-            $themeVariables[$variable['name']] = isset($options[$variable['name']]) ? $options[$variable['name']] : $variable['default'];
         }
 
 		App::response()->setContentType('javascript');
@@ -199,8 +198,7 @@ class MainController extends Controller{
 			'accessible' => $canAccessApplication,
 			'less' => array(
 				'initVars' => json_encode($initVariables, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRETTY_PRINT),
-				'globalVars' => json_encode($themeVariables, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRETTY_PRINT),
-			)			
+			)
 		));
 	}
 
@@ -209,7 +207,7 @@ class MainController extends Controller{
 	 */
 	public function clearCache(){
 		Event::unbind('process-end');
-		
+
 		// Clear the directoty cache
 		foreach(glob(CACHE_DIR . '*') as $elt){
 			App::fs()->remove($elt);
@@ -221,7 +219,7 @@ class MainController extends Controller{
 				App::fs()->remove($element);
 			}
 		}
-		
+
 		App::response()->redirectToAction('index');
 	}
 }

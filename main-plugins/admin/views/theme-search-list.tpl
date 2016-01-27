@@ -1,4 +1,4 @@
-{button href="{uri action='manage-themes'}" label="{text key='admin.search-plugins-back'}"}
+{button href="{uri action='manage-themes'}" label="{text key='admin.search-theme-back'}" icon="reply"}
 <div class="clearfix"></div>
 <div class="row container-fluid">
     {if(count($list->results))}
@@ -32,7 +32,7 @@
 
                         {if($theme->installed)}
                             {if(Utils::getSerializedVersion($theme->availableVersion) > Utils::getSerializedVersion($theme->currentVersion))}
-                                {button label="{text key='admin.update-theme-button'}" icon="refresh" href="{uri action='update-theme' theme='{$theme->name}'}" class="pull-right update-theme btn-warning"}
+                                {button label="{text key='admin.update-theme-button'}" icon="refresh" class="pull-right update-theme btn-warning" data-theme="{$theme->name}"}
                             {else}
                                 <span class="btn btn-success pull-right">{text key="admin.search-theme-result-list-installed"}</span>
                             {/if}

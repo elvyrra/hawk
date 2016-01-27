@@ -21,6 +21,10 @@ if(is_file(INCLUDES_DIR . 'config.php')){
 	require INCLUDES_DIR . 'config.php';
 }
 
+if(!defined('HAWK_SITE_URL')){
+    define('HAWK_SITE_URL', 'http://www.hawk-app.com');
+}
+
 // Load the error handlers
 require INCLUDES_DIR . 'error-handler.php';
 

@@ -5,9 +5,15 @@
 
 @font-size-base: 10px; // editable : "theme-GlobalFontSize-label",
 
+<<<<<<< HEAD
 @header-bg: #37424d; // editable : "theme-HeaderAndFooterBackground-label", color
 @sub-header-bg: #37424d; // editable : "theme-SubHeaderBackground-label", color
 @header-color: #d6d6d6; // editable : "theme-HeaderAndFooterFontColor-label", color
+=======
+@header-bg: #37424d; // editable : "Header and footer background", color
+@sub-header-bg: #fff; // editable : "Sub Header and footer background", color
+@header-color: #d6d6d6; // editable : "Header and footer font color", color
+>>>>>>> 30ee46cb16d60e0d471263d4f19d18f0f2f7b369
 
 @btn-default-color: #fff; // editable : "theme-DefaultButtonsFontColor-label", color
 @btn-default-bg: #5f6e7d; // editable : "theme-DefaultButtonsBackground-label", color
@@ -276,6 +282,7 @@ select{
 
 textarea{
 	height: auto;
+    width: inherit;
 }
 
 input[type="text"]:focus,
@@ -307,7 +314,6 @@ input[type="file"] {
             width: 1.5rem;
             display: inline-block;
             float: right;
-            line-height: 3rem;
         }
     }
 
@@ -385,6 +391,14 @@ input[type="radio"]{
 input[type="checkbox"]{
     position: relative;
     visibility: hidden;
+
+    &:disabled{
+        color: #aaa;
+
+        &:hover, &:focus, &:checked{
+            color: #aaa;
+        }
+    }
 
     &:before{
         position: absolute;
@@ -517,6 +531,7 @@ form{
 
 .list{
     width: 100%;
+    max-width: 100%;
     border-collapse: collapse;
 
     tbody > tr > td {
@@ -641,10 +656,13 @@ form{
         height: 2rem;
     }
 
-    .btn{
-        @media(max-width: @screen-xs-max){
-            .btn-label{
-                display: none;
+    .list-controls{
+        .btn{
+            margin-top: 0;
+            @media(max-width: @screen-xs-max){
+                .btn-label{
+                    display: none;
+                }
             }
         }
     }
@@ -982,6 +1000,18 @@ table {
 	color: @brand-primary;
 	text-align: center;
 	margin: .5rem 0;
+
+    .left-sidebar-tab{
+        .tab-sidebar{
+            margin-bottom: .5rem;
+        }
+    }
+
+    .right-sidebar-tab{
+        .tab-content{
+            margin-bottom: .5rem;
+        }
+    }
 }
 
 
@@ -1004,9 +1034,7 @@ a, a:active, a:hover, a:visited, a:focus{
 /*-------------------- Advert message ------------------*/
 .app-notification{
     position: fixed;
-    width: 50%;
     top: 4.5rem;
-    left: 25%;
     z-index: 1050;
     font-size: 1.5rem;
     min-height: 4rem;
@@ -1027,7 +1055,7 @@ a, a:active, a:hover, a:visited, a:focus{
 
 /*-------------------- Dialog box ---------------------*/
 .modal-dialog{
-    
+
     z-index: @zindex-modal;
 
     .modal-title{
@@ -1134,35 +1162,6 @@ p .icon{
 }
 
 
-
-/*----------------------- Error tooltips -------------------*/
-// .tooltip.input-error{
-// 	.tooltip-inner{
-//         background: @state-danger-bg;
-//         color: @state-danger-text;
-//     }
-
-//     .tooltip-arrow{
-//         border-right-color: @state-danger-bg;
-//     }
-// }
-
-
-/*------------------- Manage themes page -----------------------*/
-#manage-themes-page .theme-item{
-	position: relative;
-
-    .icons{
-        position: absolute;
-        top : .5rem;
-        right: .5rem;
-        display: none;
-    }
-
-    &:hover .icons{
-        display: block;
-    }
-}
 
 /*------------------------------- Profile ----------------------------------*/
 .profile-image{

@@ -208,10 +208,10 @@ class User extends Model{
 	}
 
 	/**
-	 * Check if the user is connected or not
+	 * Check if the user is logged or not
 	 * @return bool
 	 */
-	public function isConnected(){
+	public function isLogged(){
 		return $this->id && App::session()->getData('user.id') == $this->id && $this->active;
 	}
 
@@ -221,7 +221,7 @@ class User extends Model{
 	 * @return bool
 	 */
 	public function canAccessApplication(){
-		return $this->isConnected() || Option::get('main.allow-guest');
+		return $this->isLogged() || Option::get('main.allow-guest');
 	}
 
 	/**

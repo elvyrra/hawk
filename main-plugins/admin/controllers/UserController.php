@@ -59,7 +59,7 @@ class UserController extends Controller{
 			'controls' => array(
 				array(
 					'icon' => 'plus',
-					'label' => Lang::get('admin.new-user-btn'),
+					'label' => Lang::get($this->_plugin . '.new-user-btn'),
 					'class' => 'btn-success',
 					'href' => App::router()->getUri("edit-user", array('username' => '_new')),
 					'target' => 'dialog',
@@ -84,15 +84,15 @@ class UserController extends Controller{
 					'sort' => false,
 				),
 				'username' => array(
-					'label' => Lang::get('admin.users-list-username-label'),
+					'label' => Lang::get($this->_plugin . '.users-list-username-label'),
 				),
 
 				'email' => array(
-					'label' => Lang::get('admin.users-list-email-label'),
+					'label' => Lang::get($this->_plugin . '.users-list-email-label'),
 				),
 
 				'roleId' => array(
-					'label' => Lang::get('admin.users-list-roleId-label'),
+					'label' => Lang::get($this->_plugin . '.users-list-roleId-label'),
 					'sort' => false,
 					'search' => array(
 						'type' => 'select',
@@ -103,7 +103,7 @@ class UserController extends Controller{
 							}
 							return $options;
 						}),
-						'invitation' => Lang::get('admin.user-filter-status-all')
+						'invitation' => Lang::get($this->_plugin . '.user-filter-status-all')
 					),
 					'display' => function($value){
 						return Lang::get('roles.role-' . $value . '-label');
@@ -111,14 +111,14 @@ class UserController extends Controller{
 				),
 
 				'active' => array(
-					'label' => Lang::get('admin.users-list-active-label'),
+					'label' => Lang::get($this->_plugin . '.users-list-active-label'),
 					'search' => false,
 					'sort' => false,
 					'class' => function($value){
 						return 'bold ' . ($value ? 'text-success' : 'text-danger');
 					},
 					'display' => function($value){
-						return $value ? Lang::get('admin.users-list-active') : Lang::get('admin.users-list-inactive');
+						return $value ? Lang::get($this->_plugin . '.users-list-active') : Lang::get($this->_plugin . '.users-list-inactive');
 					},
 					'search' => array(
 						'type' => 'checkbox'
@@ -126,7 +126,7 @@ class UserController extends Controller{
 				),
 
 				'createTime' => array(
-					'label' => Lang::get('admin.users-list-createTime-label'),
+					'label' => Lang::get($this->_plugin . '.users-list-createTime-label'),
 					'search' => false,
 					'display' => function($value){
 						return date(Lang::get('main.date-format'), $value);
@@ -175,7 +175,7 @@ class UserController extends Controller{
 						'unique' => true,
 						'readonly' => $user && $user->id !== App::session()->getUser()->id,
 						'insert' => ! $user || $user->id === App::session()->getUser()->id,
-						'label' => Lang::get('admin.user-form-username-label'),
+						'label' => Lang::get($this->_plugin . '.user-form-username-label'),
 					)),
 
 					new EmailInput(array(
@@ -184,32 +184,32 @@ class UserController extends Controller{
 						'unique' => true,
 						'readonly' => $user && $user->id !== App::session()->getUser()->id,
 						'insert' => ! $user || $user->id !== App::session()->getUser()->id,
-						'label' => Lang::get('admin.user-form-email-label'),
+						'label' => Lang::get($this->_plugin . '.user-form-email-label'),
 					)),
 
 					new CheckboxInput(array(
 						'name' => 'active',
-						'label' => Lang::get('admin.user-form-active-label'),
+						'label' => Lang::get($this->_plugin . '.user-form-active-label'),
 					)),
 
 					new SelectInput(array(
 						'name' => 'roleId',
 						'options' => $roles,
-						'label' => Lang::get('admin.user-form-roleId-label')
+						'label' => Lang::get($this->_plugin . '.user-form-roleId-label')
 					)),
 
 					$user ? null :
 					new PasswordInput(array(
 						'name' => 'password',
 						'required' => true,
-						'label' => Lang::get('admin.user-form-password-label'),
+						'label' => Lang::get($this->_plugin . '.user-form-password-label'),
 						'encrypt' => array('Hawk\\Crypto', 'saltHash')
 					)),
 
 					$user ? null :
 					new PasswordInput(array(
 						'name' => 'passagain',
-						'label' => Lang::get('admin.user-form-passagain-label'),
+						'label' => Lang::get($this->_plugin . '.user-form-passagain-label'),
 						'required' => true,
 						'compare' => 'password',
 						'independant' => true,
@@ -249,7 +249,7 @@ class UserController extends Controller{
 		if(!$form->submitted()){
 			return View::make(Theme::getSelected()->getView("dialogbox.tpl"), array(
 				'page' => $form,
-				'title' => Lang::get('admin.user-form-title'),
+				'title' => Lang::get($this->_plugin . '.user-form-title'),
 				'icon' => 'user',
 			));
 		}

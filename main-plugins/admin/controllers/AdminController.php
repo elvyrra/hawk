@@ -124,7 +124,7 @@ class AdminController extends Controller{
 					new RadioInput(array(
 						'name' => 'main_home-page-type',
 						'options' => array(
-							// 'default' => Lang::get('admin.settings-home-page-type-default'),
+							'default' => Lang::get('admin.settings-home-page-type-default'),
 							'custom' => Lang::get('admin.settings-home-page-type-custom'),
 							'page' => Lang::get('admin.settings-home-page-type-page'),
 						),

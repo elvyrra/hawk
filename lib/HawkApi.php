@@ -118,6 +118,7 @@ class HawkApi{
             )
         ),
 
+        // Update Hawk
         'api-core-update' => array(
             'method' => 'get',
             'uri' => '/hawk/update/{to}',
@@ -127,6 +128,26 @@ class HawkApi{
                 )
             ),
             'dataType' => 'application/octet-stream'
+        ),
+
+        // Search for updates on Hawk, plugins and theme in one request
+        'api-all-updates' => array(
+            'method' => 'post',
+            'uri' => '/updates',
+            'where' => array(
+                'body' => array(
+                    'hawk' => array(
+                        'required' => true,
+                        'pattern' => self::VERSION_PATTERN
+                    ),
+                    'plugins' => array(
+                        'required' => true
+                    ),
+                    'themes' => array(
+                        'required' => true
+                    )
+                )
+            )
         )
     );
 
@@ -316,6 +337,37 @@ class HawkApi{
             array(
                 'params' => array(
                     'themes' => json_encode($themes)
+                )
+            )
+        );
+    }
+
+    /**
+     * Get all available updates on Hawk, plugins and themes
+     * @param array $plugins The list of plugins to search available updates for, where keys are plugin names, and values their current version
+     * @param array $themes The list of themes to search available updates for, where keys are themes names, and values their current version
+     * @return array The available udpates, in an array in the following format :
+     * array(
+     *     'hawk' => 'v1.0.0',
+     *     'plugins' => array(
+     *         'pluginName' => 'v1.2.3.0',
+     *         ...
+     *     ),
+     *     'themes' => array(
+     *         'themeName' => 'v0.0.5.1',
+     *         ...
+     *     )
+     * )
+     */
+    public function getAllAvailableUpdates($plugins, $themes){
+        return $this->callApi(
+            'api-all-updates',
+            array(),
+            array(
+                'body' => array(
+                    'hawk' => HAWK_VERSION,
+                    'plugins' => $plugins,
+                    'themes' => $themes
                 )
             )
         );
