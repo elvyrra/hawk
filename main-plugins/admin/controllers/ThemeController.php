@@ -125,14 +125,14 @@ class ThemeController extends Controller{
 				case 'file' :
 					$input = new FileInput(array(
 						'name' => $var['name'],
-						'label' => $var['description'],						
+						'label' => Lang::get('admin.' . $var['description']),					
 					));
 				break;
 
 				default :
 					$input = new TextInput(array(
 						'name' => $var['name'],
-						'label' => $var['description'],
+						'label' => Lang::get('admin.' . $var['description']),
 						'value' => !empty($options[$var['name']]) ? $options[$var['name']] : $var['default']
 					));
 				break;

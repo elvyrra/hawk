@@ -237,4 +237,37 @@ update-page-confirm-update-hawk = "Voulez-vous réellement mettre Hawk à jour ?
 update-hawk-error = "Une erreur est survenue pendant la mise à jour de Hawk"
 
 
-BodyTextColor-label = " Couleur de fond"
+theme-BodyTextColor-label = "Couleur du texte (Body Text Color)"
+theme-BodyBackground-label = "Couleur du fond (Body Background)"
+theme-ModalBodyBackground-label = "Couleur de fond des fenêtres Modal (Modal Body Background)"
+theme-GlobalFontSize-label = "Taille de l'écriture (Global Font Size)"
+theme-HeaderAndFooterBackground-label =  "Couleur de fond du menu et du pied de page (Header and Footer Background)"
+theme-SubHeaderBackground-label = "Couleur de fond du sous-menu (Second Header Background)"
+theme-HeaderAndFooterFontColor-label = "Couleur de l'écriture du menu et du pied de page (Header and Footer Font color)"
+
+theme-DefaultButtonsFontColor-label = "Couleur de l'ecriture par défaut des boutons (Default buttons Font color)"
+theme-DefaultButtonsBackground-label = "Couleur de fond par défaut des boutons (Default buttons Background)"
+theme-DefaultButtonsBorderColor-label = "Couleur des bordures par défaut des boutons (Default buttons Bordder color)"
+
+theme-BaseColorForPrimaryElements-label = "Couleur pour les élements principaux (Base color for Primary elements)"
+theme-BaseColorForSuccessElements-label = "Couleur pour les éléments de succès (Base color for success elements)"
+theme-BaseColorForInformationElements-label = "Couleur pour les éléments d'information (Base color for information elements)"
+theme-BaseColorForWarningElements-label = "Couleur pour les éléments d'alerte (Base color for warning elements)"
+theme-BaseColorForErrorElements-label = "Couleur pour les éléments d'erreur (Base color for error elements)"
+
+theme-SuccessAlertsFontColor-label = "Couleur de l'écriture pour les notifications de succès (Success Alerts Font color)"
+theme-SuccessAlertsBackgroundColor-label = "Couleur de fond pour les notifications de succès (Success Alerts Background color)"
+theme-InfoAlertsFontColor-label = "Couleur de l'écriture pour les notifications d'information (Info Alerts Font color)"
+theme-InfoAlertsBackgroundColor-label = "Couleur de fond pour les notifications d'information (Info Alerts Background color)"
+theme-WarningAlertsFontColor-label = "Couleur de l'écriture pour les notifications d'alerte (Warning Alerts Font color)"
+theme-WarningAlertsBackgroundColor-label = "Couleur de fond pour les notifications d'alerte (Warning Alerts Background color)"
+theme-ErrorAlertsFontColor-label = "Couleur de l'écriture pour les notifications d'erreur (Error Alerts Font color)"
+theme-ErrorAlertsBackgroundColor-label = "Couleur de fond pour les notifications d'erreur (Error Alerts Background color)"
+
+
+
+
+
+
+
+
