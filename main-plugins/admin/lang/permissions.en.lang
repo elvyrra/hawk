@@ -1,4 +1,2 @@
-; plugin = "permissions"
-; language = "en"
 page-title = "Permissions management"
 permission-name-users = "Manage users"

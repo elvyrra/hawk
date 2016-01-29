@@ -39,7 +39,6 @@ class ThemeController extends Controller{
 		$this->addJavaScript(Plugin::current()->getJsUrl('themes.js'));
 		$this->addCss(Plugin::current()->getCssUrl('themes.less'));
 
-		Lang::addKeysToJavaScript("admin.theme-delete-confirm");
 		return View::make(Plugin::current()->getView("themes.tpl"), array(
 			'tabs' => $tabs
 		));
@@ -67,7 +66,7 @@ class ThemeController extends Controller{
             $updates = array();
         }
 
-		Lang::addKeysToJavaScript("admin.theme-update-reload-page-confirm");
+		Lang::addKeysToJavaScript("admin.theme-update-reload-page-confirm", "admin.theme-delete-confirm");
 
 		return View::make(Plugin::current()->getView("themes-list.tpl"), array(
 			'themes' => Theme::getAll(),
@@ -130,7 +129,7 @@ class ThemeController extends Controller{
 				case 'color' :
 					$input = new ColorInput(array(
 						'name' => $var['name'],
-						'label' => Lang::get($this->_plugin . '.' . $var['description']),
+						'label' => View::makeFromString($var['description']),
 						'value' => !empty($options[$var['name']]) ? $options[$var['name']] : $var['default']
 					));
 				break;
@@ -138,14 +137,14 @@ class ThemeController extends Controller{
 				case 'file' :
 					$input = new FileInput(array(
 						'name' => $var['name'],
-						'label' => $var['description'],
+						'label' => View::makeFromString($var['description']),
 					));
 				break;
 
 				default :
 					$input = new TextInput(array(
 						'name' => $var['name'],
-						'label' => $var['description'],
+						'label' => View::makeFromString($var['description']),
 						'value' => !empty($options[$var['name']]) ? $options[$var['name']] : $var['default']
 					));
 				break;
