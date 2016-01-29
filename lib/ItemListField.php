@@ -21,13 +21,13 @@ class ItemListField {
 	 */
 	private static $callableProperties = array(
 		'class',
-		'title', 
+		'title',
 		'href',
 		'target',
-		'onclick', 
-		'style', 
+		'onclick',
+		'style',
 		'unit',
-		'display', 
+		'display',
 	);
 
 
@@ -37,7 +37,7 @@ class ItemListField {
 	public $name,
 
 	/**
-	 * The field name in the search table 
+	 * The field name in the search table
 	 * @var string
 	 */
 	$field = null,
@@ -52,7 +52,7 @@ class ItemListField {
 	 * The 'title' attribute on hover on the cell
 	 * @var string|callable
 	 */
-	$title = null, 
+	$title = null,
 
 	/**
 	 * This property, if set, will permit to open the set URL in the target defined by the property $target on a click event
@@ -65,19 +65,19 @@ class ItemListField {
 	 * @var string|callable
 	 */
 	$target = null,
-	
+
 	/**
 	 * The 'onclick' attribute
 	 * @var string|callable
 	 */
-	$onclick = null, 
+	$onclick = null,
 
 	/**
 	 * The 'style' attribute
 	 * @var string|callable
 	 */
-	$style = null, 
-	
+	$style = null,
+
 	/**
 	 * A unit to add after the value of the cell
 	 * @var string|callable
@@ -88,7 +88,7 @@ class ItemListField {
 	 * Define if you want a specific displaying for this cell
 	 * @var string|callable
 	 */
-	$display = null, 
+	$display = null,
 
 	/**
 	 * Display the widgets to sort the list by this field values
@@ -97,7 +97,7 @@ class ItemListField {
 	$sort = true,
 
 	/**
-	 * The sort value 
+	 * The sort value
 	 * @var string (ASC or DESC)
 	 */
 	$sortValue = null,
@@ -113,13 +113,13 @@ class ItemListField {
 	 * @var string
 	 */
 	$searchValue = null,
-	
+
 	/**
 	 * If set to true, this field will not be searched in the database
 	 * @var bool
 	 */
 	$independant = false,
-			
+
 	/**
 	 * The label to display in the list header
 	 * @var string
@@ -152,7 +152,7 @@ class ItemListField {
 
 		if(!$this->field){
 			$this->field = $this->name;
-		}		
+		}
 
 		$this->list = $list;
 	}
@@ -165,7 +165,7 @@ class ItemListField {
 	public function getSearchCondition(&$binds){
 		if($this->searchValue !== null){
 			return DBExample::make(array($this->field => array('$like' => '%' . $this->getInput()->dbvalue() . '%')), $binds);
-		}	
+		}
 	}
 
 
@@ -197,7 +197,7 @@ class ItemListField {
 				$input = new CheckboxInput(array(
 					'attributes' => array(
 						'ko-checked' => 'search'
-						
+
 					)
 				));
 				break;
@@ -208,12 +208,12 @@ class ItemListField {
 					'after' => '<i class="icon icon-times-circle clean-search" ko-click="function(data){ data.search(null); }" ko-visible="search()"></i>',
 					'attributes' => array(
 						'ko-value' => 'search',
-						'ko-class' => "search() ? 'alert-info not-empty' : 'empty'"						
+						'ko-class' => "search() ? 'alert-info not-empty' : 'empty'"
 					)
 				));
 				break;
 
-			
+
 			case 'text' :
 			default :
 				$input = new TextInput(array(
@@ -250,7 +250,7 @@ class ItemListField {
 
 	/**
 	 * Display the field header
-	 * @return string The HTML result to display	 
+	 * @return string The HTML result to display
 	 */
 	public function displayHeader(){
 		return View::make(Theme::getSelected()->getView('item-list/field-header.tpl'), array(
@@ -265,13 +265,13 @@ class ItemListField {
 	 */
 	public function displayCell($lineIndex){
 		$line = $this->list->results[$lineIndex];
-		$name = $this->name;		
+		$name = $this->name;
 
 		$cell = new \StdClass;
 		foreach(self::$callableProperties as $prop){
 			if(! is_null($this->$prop) && is_callable($this->$prop)){
-				$func = $this->$prop;				
-				$cell->$prop = $func(!empty($line->$name) ? $line->$name : null, $this, $line);
+				$func = $this->$prop;
+				$cell->$prop = $func(isset($line->$name) ? $line->$name : null, $this, $line);
 			}
 			else{
 				$cell->$prop = $this->$prop;
@@ -296,5 +296,5 @@ class ItemListField {
 			'field' => $this
 		));
 	}
-	
+
 }

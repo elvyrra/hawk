@@ -39,30 +39,28 @@ final class Logger extends Singleton{
         $basename = $level . '.log';
         $filename = LOG_DIR . $basename;
 
-        if(is_file($filename)){
-            // The file already exists
-            if(filesize($filename) >= self::MAX_FILE_SIZE){
-                // Archive the last file and create a new one
+        if(is_file($filename) && filesize($filename) >= self::MAX_FILE_SIZE){
+            // Archive the last file and create a new one
 
-                // rename all archives already existing (keep only last 9 archives)
-                $archives = array_reverse(glob($filename . '.*.zip'));
-                foreach($archives as $archive){
-                    preg_match('/^' . preg_quote($basename, '/') . '\.(\d+)\.zip$/', basename($archive), $match);
-                    if($match[1] > self::MAX_FILES_BY_LEVEL){
-                        unlink($archive);
-                    }
-                    else{
-                        rename($archive, $filename . '.' . ($match[1] + 1) . '.zip');
-                    }
+            // rename all archives already existing (keep only last 9 archives)
+            $archives = array_reverse(glob($filename . '.*.zip'));
+            foreach($archives as $archive){
+                preg_match('/^' . preg_quote($basename, '/') . '\.(\d+)\.zip$/', basename($archive), $match);
+                if($match[1] > self::MAX_FILES_BY_LEVEL){
+                    unlink($archive);
                 }
-
-                // Create the new archive
-                $zip = new \ZipArchive;
-                $zip->open($filename . '.0.zip', \ZipArchive::CREATE);
-                $zip->addFile($filename);
-                $zip->close();
-
+                else{
+                    rename($archive, $filename . '.' . ($match[1] + 1) . '.zip');
+                }
             }
+
+            // Create the new archive
+            $zip = new \ZipArchive;
+            $zip->open($filename . '.0.zip', \ZipArchive::CREATE);
+            $zip->addFile($filename);
+            $zip->close();
+
+            unlink($filename);
         }
         $this->resources[$level] = fopen($filename, 'a+');
     }
@@ -76,7 +74,7 @@ final class Logger extends Singleton{
         if(! ENABLE_LOG){
             return;
         }
-        
+
         if(empty($this->resources[$level])) {
             $this->open($level);
         }
@@ -85,9 +83,8 @@ final class Logger extends Singleton{
         $trace = (object) $trace[1];
 
         $data = array(
-            'date' => date('Y-m-d H:i:s.P'),
+            'date' => date_create()->format('Y-m-d H:i:s'),
             'uri' => App::request()->getUri(),
-            'ip' => App::request()->clientIp(),
             'trace' => $trace->file . ':' . $trace->line,
             'message' => $message,
         );

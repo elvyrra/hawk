@@ -343,9 +343,10 @@ define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 
 
 			for(var i= 0; i < this.tabset.tabs().length; i++){
 				var tab = this.tabset.tabs()[i];
-				if (tab.uri() == url || tab.route() == route) {
+				if (tab.uri() === url || tab.route() === route) {
 					if (tab !== this.tabset.activeTab()) {
 						this.tabset.activeTab(tab);
+						return;
 					}
 					options.newtab = false;
 					break;
