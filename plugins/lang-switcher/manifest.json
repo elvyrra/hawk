@@ -3,5 +3,6 @@
     "description": "This plugin display a widget to the user to change it language",
     "version": "0.2.0",
     "author": "Elvyrra SAS",
+    "namespace" : "LangSwitcher",
     "dependencies": []
 }
