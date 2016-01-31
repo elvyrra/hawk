@@ -203,3 +203,14 @@ INSERT IGNORE INTO `{{ $prefix }}User` (`id`, `email`, `username`, `password`, `
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+
+
+CREATE TABLE IF NOT EXISTS `{{ $prefix }}UserOption`(
+  `userId`  INT(11) NOT NULL DEFAULT 0,
+  `userIp` VARCHAR(15) NOT NULL DEFAULT '',
+  `plugin` VARCHAR(32) NOT NULL,
+  `key` VARCHAR(64) NOT NULL,
+  `value` VARCHAR(4096),
+  UNIQUE INDEX(`userId`, `plugin`, `key`),
+  UNIQUE INDEX(`userIp`, `plugin`, `key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

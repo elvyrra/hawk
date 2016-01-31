@@ -18,7 +18,7 @@ define('tabs', ['jquery', 'ko'], function($, ko){
 
 		this.history = [];
 
-		var self = this;
+		this.onclose = null;
 	};
 
 
@@ -76,6 +76,10 @@ define('tabs', ['jquery', 'ko'], function($, ko){
 					/* Activate the next tab */
 					this.activeId(next.id());
 				}
+			}
+			
+			if(this.tabs()[index].onclose){
+				this.tabs()[index].onclose.call(this.tabs()[index]);
 			}
 
 			/* Delete the tab nodes */

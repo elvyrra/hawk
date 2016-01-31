@@ -16,10 +16,19 @@ define('form', ['jquery', 'ko'], function($, ko){
 			this.inputs[name] = new FormInput(fields[name], this);
 		}
 		
+		// Listen for form submission
 		this.node.submit(function(event){
 			this.submit();
 
 			return false;
+		}.bind(this));
+
+		// Listen for form change
+		this.onchange = null;
+		this.node.change(function(event){
+			if(this.onchange){
+				this.onchange.call(this, event);
+			}
 		}.bind(this));
 	};
 

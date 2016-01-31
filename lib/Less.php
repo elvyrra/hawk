@@ -34,22 +34,15 @@ class Less{
 	 * @return The filename path
 	 */
 	private function getLastCompilationInfoFilename(){
-		$basename = str_replace('/', '-', str_replace(ROOT_DIR, '', $this->source));
-		return CACHE_DIR . self::CACHE_DIR . $basename;
-	}
-
+        return 'less/' . str_replace(array(ROOT_DIR, '/'), array('', '-'), realpath($this->source));
+    }
 
 	/**
 	 * Save the result of the last compilation
 	 * @param array $info The information array
 	 */
-	private function saveLastCompilationInfo($info){
-		$filename = $this->getLastCompilationInfoFilename();
-		if(!is_dir(CACHE_DIR . self::CACHE_DIR)){
-			mkdir(CACHE_DIR . self::CACHE_DIR, 0755, true);
-		}
-
-		file_put_contents($filename, '<?php return ' . var_export($info, true) . ';');
+	private function saveLastCompilationInfo($info){		
+        App::cache()->save($this->getLastCompilationInfoFilename(), '<?php return ' . var_export($info, true) . ';');		
 	}
 
 	/**
@@ -66,7 +59,7 @@ class Less{
 		$compiler = new \lessc;
 
 		
-		$lastCompilationFile = $this->getLastCompilationInfoFilename();
+		$lastCompilationFile = App::cache()->getCacheFilePath($this->getLastCompilationInfoFilename());
         if(!$force && is_file($lastCompilationFile)){
             $cache = include $lastCompilationFile;
         }

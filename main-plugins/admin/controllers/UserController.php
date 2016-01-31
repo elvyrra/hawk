@@ -37,18 +37,11 @@ class UserController extends Controller{
 	public function listUsers(){
 		$example = array('id' => array('$ne' => User::GUEST_USER_ID));
 		$filters = (new UserFilterWidget())->getFilters();
-		switch($filters['status']){
-			case 'inactive' :
-				$example['active'] = 0;
-				break;
 
-			case 'active' :
-				$example['active'] = 1;
-				break;
+		if($filters['status'] != -1){
+			$example['active'] = $filters['status'];
 		}
-		if(!empty($filters['roleId'])){
-			$example['roleId'] = $filters['roleId'];
-		}
+		
 
 		$param = array(
 			'id' => 'admin-users-list',
@@ -119,10 +112,7 @@ class UserController extends Controller{
 					},
 					'display' => function($value){
 						return $value ? Lang::get($this->_plugin . '.users-list-active') : Lang::get($this->_plugin . '.users-list-inactive');
-					},
-					'search' => array(
-						'type' => 'checkbox'
-					),
+					}
 				),
 
 				'createTime' => array(
@@ -138,7 +128,7 @@ class UserController extends Controller{
 		$list = new ItemList($param);
 
 		if(App::request()->getParams('refresh')) {
-			return $list->__toString();
+			return $list->display();
 		}
 		else{
 			Lang::addKeysToJavaScript("admin.user-delete-confirmation");

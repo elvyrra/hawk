@@ -10,23 +10,13 @@ namespace Hawk\Plugins\Admin;
  * This Widget is used to filter the users list by status or role
  */
 class UserFilterWidget extends Widget{
-	public static $filters = array('status', 'roleId');
 
-	public function getFilters(){
-		$result = App::request()->getCookies('user-filter') ? json_decode(App::request()->getCookies('user-filter'), true) : array();
-
-		foreach(self::$filters as $name){
-			if(App::request()->getParams($name) !== null){
-				$result[$name] = App::request()->getParams($name);
-			}
-			
-			if(empty($result[$name])){
-				$result[$name] = '0';
-			}
+	public function getFilters(){		
+		if(App::request()->getHeaders('X-List-Filter')){
+			App::session()->getUser()->setOption('admin.user-filter', App::request()->getHeaders('X-List-Filter'));
 		}
-		setcookie('user-filter', json_encode($result));
-		
-		return $result;
+
+		return json_decode(App::session()->getUser()->getOptions('admin.user-filter'), true);
 	}
 
 	public function display(){
@@ -43,9 +33,9 @@ class UserFilterWidget extends Widget{
 						'layout' => 'vertical',
 						'value' => $filters['status'],
 						'options' => array(
-							'0' => Lang::get('admin.user-filter-status-all'),
-							'active' => Lang::get('admin.user-filter-status-active'),
-							'inactive' => Lang::get('admin.user-filter-status-inactive')
+							'-1' => Lang::get('admin.user-filter-status-all'),
+							'1' => Lang::get('admin.user-filter-status-active'),
+							'0' => Lang::get('admin.user-filter-status-inactive')
 						),
 					))					
 				)

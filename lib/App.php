@@ -45,8 +45,10 @@ final class App extends Singleton{
         $this->singleton('request', Request::getInstance());
         
         // Load the application HTTP response
-        $this->singleton('response', Response::getInstance());     
+        $this->singleton('response', Response::getInstance());    
 
+        // Load the application cache 
+        $this->singleton('cache', Cache::getInstance());
     }
 
 

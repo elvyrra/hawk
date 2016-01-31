@@ -32,6 +32,6 @@ class CheckboxInput extends FormInput{
 	 * @return integer - if the checkbox has been submitted as checked, returns 1, else return 0
 	 */
 	public function dbvalue(){	
-        return App::request()->getBody($this->name) ? '1' : '0';		
+        return $this->value ? 1 : 0;
 	}
 }

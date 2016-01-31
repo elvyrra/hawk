@@ -9,6 +9,7 @@ define('list', ['jquery', 'ko'], function($, ko){
         this.maxPages = ko.observable();
         this.recordNumber = ko.observable(0);
 
+
         this.node = $("#" + this.id);
         this.wrapper = this.node.parent();
         this.navigationSection = this.wrapper.find('.list-navigation');
@@ -16,7 +17,7 @@ define('list', ['jquery', 'ko'], function($, ko){
         this.refreshContainer = this.node.find(".list > tbody");
 
         // Get the list display parameters (number of lines, page number, searches and sorts)
-        var params = JSON.parse($.cookie('list-' + this.id)) || {};
+        var params = data.userParam || {};
 
         this.searches = params.searches || {};
         this.sorts = params.sorts || {};
@@ -44,29 +45,33 @@ define('list', ['jquery', 'ko'], function($, ko){
 
     /**
      * Refresh the list
+     * @param {object} options Additionnal options to set to the request
      */
-    List.prototype.refresh = function(){
+    List.prototype.refresh = function(options){
+        // Set the user filters
         var data = {
             lines : this.lines(),
             page : this.page(),       
             searches : this.searches,
             sorts : this.sorts
         };
-
-        $.cookie('list-' + this.id, JSON.stringify(data), {expires : 365, path : '/'});
         
+        var headers = options && options.headers || {};
+        headers['X-List-Filter-' + this.id] = JSON.stringify(data);
+
+        // Send the list is refreshing to the server
         var get = {
             refresh : 1
-        }
-        
+        }        
         if(this.selected){
             get.selected = this.selected;
         };
 
+        // Load the new data from the server
         $.ajax({
-            async : false,
             url: this.action,
             method : 'GET',
+            headers : headers,
             data : get,
             cache : false,
         })

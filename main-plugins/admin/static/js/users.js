@@ -25,11 +25,15 @@ $("#admin-users-tabs")
 
 .on("change", ".set-default-role", function(){	
 	app.load(app.getUri("list-roles") + "?setdefault=" + $(this).attr("value") , {selector : "#admin-roles-tab"});
-})
-
-.on("change","#user-filter-form", function(){
-	app.load(app.getUri("list-users") + "?" + $(this).serialize(), {selector : "#admin-users-tab"});
 });
+
+app.forms['user-filter-form'].onchange = function(){
+	app.lists['admin-users-list'].refresh({
+		headers : {
+			'X-List-Filter' : this.toString()
+		}
+	});	
+};
 
 $("#dialogbox")
 

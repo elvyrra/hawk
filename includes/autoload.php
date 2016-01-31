@@ -10,6 +10,7 @@ namespace Hawk;
 require LIB_DIR . 'Singleton.php';
 require LIB_DIR . 'FileSystem.php';
 require LIB_DIR . 'Plugin.php';
+require LIB_DIR . 'Cache.php';
 
 
 /**
@@ -36,8 +37,8 @@ class Autoload{
 	 */
 	public static function load($classname){
         // Load the cache file for the first time the autload is called
-		if(empty(self::$cache) && is_file(CACHE_DIR . self::CACHE_FILE)){
-            self::$cache = include CACHE_DIR . self::CACHE_FILE;
+		if(empty(self::$cache) && is_file(Cache::getInstance()->getCacheFilePath(self::CACHE_FILE))) {
+            self::$cache = Cache::getInstance()->includeCache(self::CACHE_FILE);
         }
 
         // Check the class file is registered in cache
@@ -117,7 +118,7 @@ class Autoload{
 	 */
     public static function saveCache(){
         if(self::$cacheUpdated){
-            file_put_contents(CACHE_DIR . self::CACHE_FILE, "<?php return ". var_export(self::$cache, true) . ";");
+            Cache::getInstance()->save(self::CACHE_FILE, '<?php return '. var_export(self::$cache, true) . ';');            
         }
     }
 }

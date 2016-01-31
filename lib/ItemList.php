@@ -234,11 +234,16 @@ class ItemList{
 
 		/*** Get the filters sent by POST or registered in COOKIES ***/
 		$parameters = array('searches', 'sorts', 'lines', 'page');
-		$cookie = isset($_COOKIE["list-{$this->id}"]) ? json_decode($_COOKIE["list-$this->id"], true) : array();
 
+		if(App::request()->getHeaders('X-List-Filter-' . $this->id)){
+			App::session()->getUser()->setOption('main.list-' . $this->id, App::request()->getHeaders('X-List-Filter-' . $this->id));
+		}
+
+		$this->userParam = json_decode(App::session()->getUser()->getOptions('main.list-' . $this->id), true);
+		
 		foreach($parameters as $name){
-			if(isset($cookie[$name])){
-				$this->$name = $cookie[$name];
+			if(isset($this->userParam[$name])){
+				$this->$name = $this->userParam[$name];
 			}
 		}
 
@@ -490,6 +495,7 @@ class ItemList{
 								action : "' . $this->action . '",
 								target : "' . $this->target . '",
 								fields : ' . json_encode(array_keys($this->fields)) .',
+								userParam : ' . json_encode($this->userParam, JSON_FORCE_OBJECT) . '
 							});
 
 							list.selected = ' . ($this->selected !== false ? '"' . $this->selected . '"' : 'null') .'

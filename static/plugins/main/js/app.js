@@ -330,7 +330,8 @@ define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 
 			newtab : false,
 			onload : null,
 			post : null,
-			selector : null
+			selector : null,
+			headers : {}
 		};
 
 		for(var i in data){
@@ -370,11 +371,12 @@ define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 
 					type : options.post ? 'post' : 'get',
 					data : options.post,
 					dataType : 'text',
+					headers : options.headers
 				})
 				.done(function(response){
 					this.loading.stop();
 
-					if(element === this.tabset.activeTab()){
+					if(element instanceof Tab){
 						// The page has been loaded in a whole tab
 						// Register the tab url
 						element.uri(url);
@@ -453,19 +455,27 @@ define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 
 	 * @param {function} onload The callback to execute when all the tabs are loaded
 	 */
 	App.prototype.openLastTabs = function(uris, onload){
-		if(!uris.length){
-			if(onload){
-				onload(uris);
-			}
-			// No more tab has to be open
-			return;
-		}
+		var loaded = ko.observable(0);
 
-		var uri = uris.shift();
-		this.load(uri, {
-			newtab : true,
-			onload : this.openLastTabs.bind(this, uris, onload)
-		});
+		loaded.subscribe(function(value){
+			if(value === uris.length){
+				this.loading.stop();
+				if(onload){
+					onload(uris);
+				}
+			}
+		}.bind(this));
+
+
+		uris.forEach(function(uri){
+			this.load(uri, {
+				newtab : true,
+				onload : function(){
+					this.loading.start();
+					loaded(loaded() + 1);
+				}.bind(this)
+			});
+		}.bind(this));		
 	};
 
 

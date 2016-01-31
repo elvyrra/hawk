@@ -64,12 +64,12 @@ class View{
 		$this->file = $file;
 		
 		// Get the cache file containing the precompiled 
-		$this->fileCache = new FileCache($this->file, 'views');
+		$this->cacheFile = 'views/' . str_replace(array(ROOT_DIR, '/'), array('', '-'), realpath($this->file)) . '.php';
 
-		$this->content = file_get_contents($file);				
-		if(! $this->fileCache->isCached()){
-			$this->parse();
-			$this->fileCache->set($this->parsed);
+		if(! App::cache()->isCached($this->file, $this->cacheFile)) {
+			$this->content = file_get_contents($this->file);
+			$this->parse();			
+			App::cache()->save($this->cacheFile, $this->parsed);
 		}
 
 		self::$instances[realpath($this->file)] = $this;
@@ -193,7 +193,7 @@ class View{
 		$_viewData = $this->data;
 		ob_start();
 		
-		include $this->fileCache->getFile();
+		include App::cache()->getCacheFilePath($this->cacheFile);
 		
 		return ob_get_clean();
 	}	
@@ -222,9 +222,14 @@ class View{
 		$file = tempnam(TMP_DIR, '');
 		file_put_contents($file, $content);
 
-		$result = self::make($file, $data);
-
+		// calculate the view
+		$view = new self($file);
+		$view->setData($data);
+		$result = $view->display();
+		
+		// Remove temporary files
 		unlink($file);
+		unlink($view->cacheFile);
 
 		return $result;
 	}

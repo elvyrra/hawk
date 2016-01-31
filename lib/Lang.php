@@ -84,8 +84,8 @@ class Lang{
 	 * @return string The path of the origin language file
 	 */
 	private function getOriginFile(){
-		if(is_file(CACHE_DIR . self::ORIGIN_CACHE_FILE) && empty(self::$originCache)){
-			self::$originCache = include CACHE_DIR . self::ORIGIN_CACHE_FILE;
+		if(is_file(App::cache()->getCacheFilePath(self::ORIGIN_CACHE_FILE)) && empty(self::$originCache)){
+			self::$originCache = App::cache()->includeCache(self::ORIGIN_CACHE_FILE);
 		}
 
 		if(isset(self::$originCache["$this->plugin.$this->lang"])){
@@ -122,7 +122,7 @@ class Lang{
 	 * @return string path The path of the cache file
 	 */
 	private function getCacheFile(){
-		return CACHE_DIR . self::CACHE_DIR . $this->plugin . '.' . $this->lang . '.php';
+		return self::CACHE_DIR . $this->plugin . '.' . $this->lang . '.php';
 	}
 
 
@@ -141,28 +141,25 @@ class Lang{
 	 */
 	private function build(){			
 		$build = false;
-		if(!is_file($this->cacheFile)){
-			// The cache file does not exist
+
+		if(!is_file(App::cache()->getCacheFilePath($this->cacheFile))){
 			$build = true;
 		}
-		elseif(is_file($this->originFile) && filemtime($this->cacheFile) < filemtime($this->originFile)){
-			// the origin file is newer than the cache file
+		elseif(is_file($this->originFile) && !App::cache()->isCached($this->originFile, $this->cacheFile)){
+			// the origin file is not cached
 			$build = true;
 		}
-		elseif(is_file($this->translatedFile) && filemtime($this->cacheFile) < filemtime($this->translatedFile)){
-			// The translated file is newer than the cache file
+		elseif(is_file($this->translatedFile) && !App::cache()->isCached($this->translatedFile, $this->cacheFile)){
+			// The translated file is not cached
 			$build = true;
 		}
 		
+
 		if($build){
 			// Build the cache file
 			$data = array_merge($this->parse($this->originFile), $this->parse($this->translatedFile));
 			
-			if(!is_dir(dirname($this->cacheFile))) {
-				mkdir(dirname($this->cacheFile), 0755);
-			}
-
-			file_put_contents($this->cacheFile, '<?php return ' . var_export($data, true) . ';' );
+			App::cache()->save($this->cacheFile, '<?php return ' . var_export($data, true) . ';' );
 		}
 	}
 
@@ -181,12 +178,12 @@ class Lang{
 
 			$instance = new self($plugin, self::DEFAULT_LANGUAGE);
 			$instance->build();
-			self::$keys[$plugin][$language] = include $instance->cacheFile;
+			self::$keys[$plugin][$language] = App::cache()->includeCache($instance->cacheFile);
 
 			if($language !== self::DEFAULT_LANGUAGE){
 				$instance = new self($plugin, $language);
 				$instance->build();
-				$translations = include $instance->cacheFile;
+				$translations = App::cache()->includeCache($instance->cacheFile);
 
 				if(!is_array($translations)){
 					$translations = array();

@@ -30,7 +30,13 @@ class User extends Model{
 	 * The user permissions
 	 * @var array
 	 */
-	$permissions;
+	$permissions,
+
+	/**
+	 * The user's options
+	 * @var array
+	 */
+	$options;
 
 	/**
 	 * The id of guest users
@@ -155,6 +161,52 @@ class User extends Model{
 			$questionValue->save();
 		}
 	}
+
+
+	public function getOptions($name = ''){
+		if(!isset($this->options)){
+			$example = $this->isLogged() ? array('userId' => $this->id) : array('userIp' => App::request()->clientIp());
+
+			$options = App::db()->select(array(
+				'from' => DB::getFullTablename('UserOption'), 
+				'where' => new DBExample($example)
+			));
+
+			$this->options = array();
+			foreach($options as $option){
+				$this->options[$option['plugin'] . '.' . $option['key']] = $option['value'];
+			}
+		}
+
+		if($name){
+			return isset($this->options[$name]) ? $this->options[$name] : null;
+		}
+		else{
+			return $this->options;
+		}
+	}
+
+
+	public function setOption($name, $value){
+		$this->getOptions();
+		$this->options[$name] = $value;
+
+		list($plugin, $key) = explode('.', $name, 2);
+		$data = array(
+			'plugin' => $plugin,
+			'key' => $key,
+			'value' => $value
+		);
+
+		if($this->isLogged()){
+			$data['userId'] = $this->id;
+		}
+		else{
+			$data['userIp'] = App::request()->clientIp();
+		}
+		App::db()->replace(DB::getFullTablename('UserOption'), $data);
+	}
+
 
 
 	/**
