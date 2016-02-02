@@ -41,8 +41,8 @@ class Less{
 	 * Save the result of the last compilation
 	 * @param array $info The information array
 	 */
-	private function saveLastCompilationInfo($info){		
-        App::cache()->save($this->getLastCompilationInfoFilename(), '<?php return ' . var_export($info, true) . ';');		
+	private function saveLastCompilationInfo($info){
+        App::cache()->save($this->getLastCompilationInfoFilename(), '<?php return ' . var_export($info, true) . ';');
 	}
 
 	/**
@@ -58,16 +58,14 @@ class Less{
 
 		$compiler = new \lessc;
 
-		
+
 		$lastCompilationFile = App::cache()->getCacheFilePath($this->getLastCompilationInfoFilename());
         if(!$force && is_file($lastCompilationFile)){
             $cache = include $lastCompilationFile;
         }
         else{
             $cache = $this->source;
-        }	    
-
-        $compiler->setVariables($variables);
+        }
 
         $compiler->setFormatter('compressed');
         $compiler->setPreserveComments(false);
@@ -75,11 +73,11 @@ class Less{
 
         if(!is_array($cache) || $compilation['updated'] > $cache['updated']){
             file_put_contents($dest, '/*** ' . date('Y-m-d H:i:s') . ' ***/' . PHP_EOL . $compilation['compiled']);
-        	
+
         	$event = new Event('built-less', array('source' => $this->source, 'dest' => $dest));
         	$event->trigger();
-            
-            // Save the compilation information            
+
+            // Save the compilation information
         	unset($compilation['compiled']);
             $this->saveLastCompilationInfo($compilation);
         }
@@ -91,7 +89,7 @@ class Less{
 	 * @param string $source The Less source filename
 	 * @param string $dest The destination CSS file
 	 * @param bool $force, if set to true, will build whereas the cache status
-	 * @param array $variables Less variables to set before compiling the Less file 
+	 * @param array $variables Less variables to set before compiling the Less file
 	 */
 	public static function compile($source, $dest, $force = false, $variables = array()){
 		$less = new self($source);

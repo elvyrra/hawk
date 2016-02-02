@@ -192,6 +192,8 @@ class ThemeController extends Controller{
                 // Save the compiled CSS to avaoid to parse it again
                 file_put_contents($theme->getStaticCssFile(), $form->getData('compiled'));
 
+                $form->addReturn('href', $theme->getBaseCssUrl());
+
 				return $form->response(Form::STATUS_SUCCESS);
 			}
 			catch(Exception $e){

@@ -158,7 +158,13 @@ class Theme{
             }
             $this->data = json_decode(file_get_contents($this->getRootDir() . self::MANIFEST_BASENAME), true);
         }
-        return $prop ? $this->data[$prop] : $this->data;
+
+        if($prop){
+            return isset($this->data[$prop]) ? $this->data[$prop] : null;
+        }
+        else{
+            return $this->data;
+        }
     }
 
 
@@ -320,6 +326,11 @@ class Theme{
      * @param boolean $force If set to true, the theme will be rebuilt without condition
      */
     public function build($force = false){
+        if($this->getDefinition('extends')){
+            if(Theme::get($this->getDefinition('extends'))){
+                Theme::get($this->getDefinition('extends'))->build($force);
+            }
+        }
         $build = false;
         if($force){
             $build = true;

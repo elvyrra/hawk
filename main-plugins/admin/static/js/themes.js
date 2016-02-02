@@ -96,22 +96,44 @@ require(['less'], function(){
     // The id of the style tag containing the compiled CSS
     var cssId = "less:custom-base-theme";
 
-    form.onsuccess = function(){
-        $("head").append(document.getElementById(cssId));
+    /**
+     * When the form has been successfully submitted, reload the page CSS
+     */
+    form.onsuccess = function(data){
+        $("#theme-base-stylesheet").attr('href', data.href);
     };
 
     var model = {
         vars : {},
+        /**
+         * Reset the custom form
+         */
         reset : function(){
             for(var i in this.vars){
                 this.vars[i](less.options.initVars[i]);
             }
         },
+
+        /**
+         * Refresh the CSS when a form value changes
+         * @return {Promise}
+         */
+        refresh : function(){
+            var values = form.valueOf();
+            delete values.compiled, values.reset, values.valid;
+
+            return less.modifyVars(values);
+        },
+
         updateTimeout : 0
     };
 
     // Add the theme less file to lessjs
-    less.registerStylesheets();
+    setTimeout(function(){
+        less.registerStylesheets();
+        model.refresh();
+    });
+
 
     for(var i in form.inputs){
         if(i !== 'compiled'){
@@ -124,10 +146,7 @@ require(['less'], function(){
 
                 // Real time compilation of the theme
                 model.updateTimeout = setTimeout(function(){
-                    var values = form.valueOf();
-                    delete values.compiled;
-
-                    less.modifyVars(values)
+                    model.refresh()
                     .then(function(){
                         form.inputs['compiled'].val(document.getElementById(cssId).innerText);
                     });
