@@ -71,7 +71,8 @@ final class Logger extends Singleton{
      * @param string $message The message to write
      */
     private function write($level, $message){
-        if(! ENABLE_LOG){
+
+        if(defined('ENABLE_LOG') && !ENABLE_LOG){
             return;
         }
 

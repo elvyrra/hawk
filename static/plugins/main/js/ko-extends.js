@@ -12,7 +12,7 @@ define('ko-extends', ['jquery', 'ko'], function($, ko){
             parameters = ko.unwrap(valueAccessor());
             options = {
             	search : parameters.search || 'label',
-            	label : parameters.label || 'label',        	
+            	label : parameters.label || 'label',
             	source : parameters.source,
             	change : parameters.change,
             };
@@ -26,7 +26,7 @@ define('ko-extends', ['jquery', 'ko'], function($, ko){
             var model = {
     			result : ko.observableArray([]),
     		}
-    		
+
     		// Treat what's happen when an item is selected
     		model.selectedItem = ko.observable(null);
     		if(options.change){
@@ -38,14 +38,14 @@ define('ko-extends', ['jquery', 'ko'], function($, ko){
     		// Select an item
     		model.select = function(data, evt){
     			model.selectedItem(data);
-    			model.result([]);			
+    			model.result([]);
     			$(element).val(data[options.value]).trigger('change');
     		}.bind(model);
-            
-            
+
+
             // Create the template to display the selectable items
             $(element).after(
-            	'<ul class="ko-autocomplete" ko-foreach="result">'	+	
+            	'<ul class="ko-autocomplete" ko-foreach="result">'	+
     				'<li ko-attr="{value: $data.value}" ko-html="label" ko-click="$parent.select"></li>' +
     			'</ul>'
     		);
@@ -55,11 +55,11 @@ define('ko-extends', ['jquery', 'ko'], function($, ko){
             $(element).on('keyup', function(){
             	model.selectedItem(null);
             	var value = element.value;
-            	
+
         		// Search on an array
            		if(ko.isObservable(options.source) || options.source instanceof Array){
            			var source = ko.isObservable(options.source) ? options.source() : options.source;
-           			// Filter the source by the 
+           			// Filter the source by the
            			var filters = ko.utils.arrayFilter(source, function(item){
            				return item[options.search].match(element.value);
            			});
@@ -88,9 +88,9 @@ define('ko-extends', ['jquery', 'ko'], function($, ko){
     	       				}
     	       			})
     	       			.done(function(data){
-    	       				model.result(data);       				
+    	       				model.result(data);
     	       			});
-           			}, 400);       			
+           			}, 400);
            		}
            	}.bind(this));
 
@@ -103,7 +103,7 @@ define('ko-extends', ['jquery', 'ko'], function($, ko){
 
 
     /**
-     * Rename the binding css to class 
+     * Rename the binding css to class
      */
     ko.bindingHandlers.class = ko.bindingHandlers.css;
 
@@ -112,13 +112,13 @@ define('ko-extends', ['jquery', 'ko'], function($, ko){
      * Custom binding for Ace
      */
     ko.bindingHandlers.ace = {
-        update : function(element, valueAccessor, allBindings, viewModel, bindingContext) { 
-            require(['ace'], function(ace){    
+        update : function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+            require(['ace'], function(ace){
                 var parameters = ko.unwrap(valueAccessor());
 
                 ace.config.set("modePath", app.baseUrl + "ext/ace/");
                 ace.config.set("workerPath", app.baseUrl + "ext/ace/") ;
-                ace.config.set("themePath", app.baseUrl + "ext/ace/");                 
+                ace.config.set("themePath", app.baseUrl + "ext/ace/");
 
                 var editor = ace.edit(element.id);
                 editor.setTheme("ace/theme/" + (parameters.theme || 'chrome'));
@@ -130,31 +130,33 @@ define('ko-extends', ['jquery', 'ko'], function($, ko){
                     var value = editor.getValue();
                     if(parameters.change){
                         parameters.change(value);
-                    }                     
-                }); 
+                    }
+                });
             });
         }
     };
-     
+
 
     /**
      * Custom binding for CKEditor
      */
     ko.bindingHandlers.wysiwyg = {
-        update : function(element, valueAccessor, allBindings, viewModel, bindingContext) {             
+        update : function(element, valueAccessor, allBindings, viewModel, bindingContext) {
             require(['ckeditor'], function(CKEDITOR){
                 if(!CKEDITOR.dom.element.get(element.id).getEditor()){
                     var editor = CKEDITOR.replace(element.id, {
                         language : app.language,
                         removeButtons : 'Save,Scayt,Rtl,Ltr,Language,Flash',
-                        entities : false,       
-                        on : {              
-                            change : function(event){ 
+                        entities : false,
+                        on : {
+                            change : function(event){
                                 $("#" + element.id).val(event.editor.getData()).trigger('change');
                             }
                         }
-                    }); 
-                    editor.addContentsCss(document.getElementById('less:theme-base-less').innerText);
+                    });
+                    if(document.getElementById('theme-base-stylesheet')){
+                        editor.addContentsCss(document.getElementById('theme-base-stylesheet').href);
+                    }
                 }
             });
         }

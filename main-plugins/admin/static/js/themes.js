@@ -71,7 +71,6 @@ $(".download-theme").click(function(){
  * Update a theme from the platform
  */
 $(".update-theme").click(function(){
-    debugger;
     app.loading.start();
 
     $.get(app.getUri('update-theme', {theme : $(this).data('theme')}))
@@ -91,8 +90,16 @@ $(".update-theme").click(function(){
 /**
  * Customize the theme variables
  */
-(function(){
+require(['less'], function(){
     var form = app.forms['custom-theme-form'];
+
+    // The id of the style tag containing the compiled CSS
+    var cssId = "less:custom-base-theme";
+
+    form.onsuccess = function(){
+        $("head").append(document.getElementById(cssId));
+    };
+
     var model = {
         vars : {},
         reset : function(){
@@ -102,24 +109,39 @@ $(".update-theme").click(function(){
         },
         updateTimeout : 0
     };
+
+    // Add the theme less file to lessjs
+    less.registerStylesheets();
+
     for(var i in form.inputs){
-        var input = form.inputs[i];
-        model.vars[input.name] = ko.observable(input.val());
-        model.vars[input.name].subscribe(function(value){
-            clearTimeout(model.updateTimeout);
+        if(i !== 'compiled'){
+            var input = form.inputs[i];
+            model.vars[input.name] = ko.observable(input.val());
 
-            model.updateTimeout = setTimeout(function(){
-                less.modifyVars(form.valueOf());
-            }.bind(this), 50);
+            // Update a theme variable
+            model.vars[input.name].subscribe(function(value){
+                clearTimeout(model.updateTimeout);
 
-            if(this.type === "color"){
-                this.node.parent().colorpicker('setValue', value);
-            }
-        }.bind(input));
+                // Real time compilation of the theme
+                model.updateTimeout = setTimeout(function(){
+                    var values = form.valueOf();
+                    delete values.compiled;
+
+                    less.modifyVars(values)
+                    .then(function(){
+                        form.inputs['compiled'].val(document.getElementById(cssId).innerText);
+                    });
+                }.bind(this), 50);
+
+                if(this.type === "color"){
+                    this.node.parent().colorpicker('setValue', value);
+                }
+            }.bind(input));
+        }
     }
 
     ko.applyBindings(model, form.node.get(0));
-})();
+});
 
 /***
  * Ace editor for Css editing tab

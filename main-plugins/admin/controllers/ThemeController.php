@@ -101,7 +101,11 @@ class ThemeController extends Controller{
 			'upload' => true,
 			'action' => App::router()->getUri('customize-theme'),
 			'fieldsets' => array(
-				'form' => array(),
+				'form' => array(
+                    new HiddenInput(array(
+                        'name' => 'compiled'
+                    )),
+                ),
 
 				'_submits' => array(
 					new SubmitInput(array(
@@ -118,9 +122,7 @@ class ThemeController extends Controller{
 						)
 					))
 				)
-			),
-
-			'onsuccess' => '$("#theme-base-stylesheet").attr("href", data.href)',
+			)
 		);
 
 
@@ -159,7 +161,8 @@ class ThemeController extends Controller{
 		$form = new Form($param);
 		$submitted = $form->submitted();
 		if(!$submitted){
-			return $form;
+            return  '<link rel="stylesheet/less" type="text/css" href="' . Theme::getSelected()->getBaseLessUrl() .'" title="custom-base-theme"/>' .
+			        $form->display();
 		}
 		else{
 			try{
@@ -185,7 +188,9 @@ class ThemeController extends Controller{
 				}
 
 				$theme->setVariablesCustomValues($options);
-				touch($theme->getBaseLessFile());
+
+                // Save the compiled CSS to avaoid to parse it again
+                file_put_contents($theme->getStaticCssFile(), $form->getData('compiled'));
 
 				return $form->response(Form::STATUS_SUCCESS);
 			}
@@ -602,6 +607,8 @@ class ThemeController extends Controller{
             if(!$theme){
                 throw new \Exception('An error occured while downloading the theme');
             }
+
+            unlink($file);
 
             return $theme;
         }

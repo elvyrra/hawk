@@ -17,17 +17,12 @@
 		<script type="text/javascript" src="{{ App::router()->getUri('js-conf') }}"></script>
 
 		<!-- Base Less file of the theme -->
-		<link rel="stylesheet/less" type="text/css" href="{{ Theme::getSelected()->getBaseLessUrl() }}" title="theme-base-less" />
-
-		<!-- Build the less base file of the theme -->
-		<script type="text/javascript" src="{{ Plugin::get('main')->getJsUrl('ext/less.js') }}"></script>
+		<link rel="stylesheet" type="text/css" href="{{ Theme::getSelected()->getBaseCssUrl() }}" id="theme-base-stylesheet"/>
 
 		<!-- Customized file of the theme -->
-		<link rel="stylesheet" id="theme-custom-stylesheet" href="{{ Theme::getSelected()->getCustomCssUrl() }}" />
-
+		<link rel="stylesheet" href="{{ Theme::getSelected()->getCustomCssUrl() }}" id="theme-custom-stylesheet"/>
 
 		<script type="text/javascript" src="{{ Plugin::get('main')->getJsUrl('ext/require.js') }}" data-main="{{ Plugin::get('main')->getJsUrl(DEV_MODE ? 'app.js' : 'app.min.js') }}"></script>
-
 	</head>
 
 	<body>

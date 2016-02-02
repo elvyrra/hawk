@@ -284,12 +284,17 @@ class Theme{
 
 
     /**
-     * Get the base built less file theme.less
+     * Get the base less file theme.less in static folder
      * @return string
      */
     public function getStaticLessFile(){
         return $this->getStaticDir() . 'less/' . self::LESS_BASENAME;
     }
+
+    public function getStaticCssFile(){
+        return $this->getStaticDir() . 'less/' . self::COMPILED_CSS_BASENAME;
+    }
+
 
 
     /**
@@ -298,7 +303,15 @@ class Theme{
      */
     public function getBaseLessUrl(){
         $this->build();
+
         return $this->getRootUrl() . 'less/' . self::LESS_BASENAME . '?' . filemtime($this->getStaticLessFile());
+    }
+
+
+    public function getBaseCssUrl(){
+        $this->build();
+
+        return $this->getRootUrl() . 'less/' . self::COMPILED_CSS_BASENAME . '?' . filemtime($this->getStaticCssFile());
     }
 
 
@@ -319,7 +332,7 @@ class Theme{
 
 
         if(!$build){
-            $dest = $this->getStaticLessFile();
+            $dest = $this->getStaticCssFile();
 
             if(!is_file($dest)){
                 $build = true;
@@ -345,13 +358,15 @@ class Theme{
                 }
             }
 
-            // In the main less file, replace the editable vars by their cusotmized values
+            // In the main less file, replace the editable vars by their customized values
             $values = $this->getVariablesCustomValues();
             $precompiledLess = preg_replace_callback(self::EDITABLE_VARS_PATTERN, function($m) use($values){
                 return '@' . $m[1] . ' : ' . (isset($values[$m[1]]) ? $values[$m[1]] : $m[2]) . ';';
             }, file_get_contents($this->getBaseLessFile()));
 
             file_put_contents($this->getStaticLessFile(), $precompiledLess);
+
+            Less::compile($this->getStaticLessFile(), $this->getStaticCssFile());
         }
 
         return $build;

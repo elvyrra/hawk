@@ -9,7 +9,10 @@ window.appConf = {
 	routes : {{ $routes }},
 
 	tabs : {
-		open : {{ $lastTabs }}
+		open : {{ $lastTabs }},
+		new : {
+			url : "{{ $newTabUrl }}"
+		}
 	},
 
 	user : {
@@ -22,6 +25,7 @@ window.appConf = {
 	window.less = {
 		initVars : {{ $less['initVars'] }},
 		env : 'production',
-		useFileCache : true
+		useFileCache : true,
+		rootpath : "{{ dirname(Theme::getSelected()->getBaseLessUrl()) }}/"
 	};
 })();

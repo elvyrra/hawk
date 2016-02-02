@@ -275,7 +275,7 @@ class LoginController extends Controller{
 
 
 						$data = array(
-							'themeBaseCss' => Theme::getSelected()->getBaseLessUrl(),
+							'themeBaseCss' => Theme::getSelected()->getBaseCssUrl(),
 							'themeCustomCss' => Theme::getSelected()->getCustomCssUrl(),
 							'logoUrl' =>  Option::get($this->_plugin . '.logo') ? Plugin::current()->getUserfilesUrl(Option::get($this->_plugin . '.logo')) : Plugin::current()->getStaticUrl('img/hawk-logo.png'),
 							'sitename' => Option::get($this->_plugin . '.sitename'),
@@ -424,7 +424,7 @@ class LoginController extends Controller{
 						->html(View::make(
 							Plugin::current()->getView('reset-password-email.tpl'),
 							array(
-								'themeBaseCss' => Theme::getSelected()->getBaseLessUrl(),
+								'themeBaseCss' => Theme::getSelected()->getBaseCssUrl(),
 								'themeCustomCss' => Theme::getSelected()->getCustomCssUrl(),
 								'logoUrl' =>  Option::get($this->_plugin . '.logo') ? Plugin::current()->getUserfilesUrl(Option::get($this->_plugin . '.logo')) : Plugin::current()->getStaticUrl('img/hawk-logo.png'),
 								'sitename' => Option::get($this->_plugin . '.sitename'),

@@ -229,7 +229,7 @@ class View{
 		
 		// Remove temporary files
 		unlink($file);
-		unlink($view->cacheFile);
+		App::cache()->clear($view->cacheFile);
 
 		return $result;
 	}

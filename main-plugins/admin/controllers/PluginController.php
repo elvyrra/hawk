@@ -339,6 +339,8 @@ class PluginController extends Controller{
             $plugin->install();
 
             App::response()->setBody($plugin);
+
+            unlink($file);
         }
         catch(\Exception $e){
             App::response()->setStatus(500);

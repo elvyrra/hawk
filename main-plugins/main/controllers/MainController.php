@@ -189,6 +189,12 @@ class MainController extends Controller{
         	$initVariables[$variable['name']] = $variable['default'];
         }
 
+        // Get the url for the new tab
+        $newTabUrl = App::router()->getUri('new-tab');
+        if(Option::get('main.home-page-type') == 'page'){
+        	$newTabUrl = App::router()->getUri(Option::get('main.home-page-item'));
+        }
+
 		App::response()->setContentType('javascript');
 
 		return View::make(Plugin::current()->getView('conf.js.tpl'), array(
@@ -198,7 +204,8 @@ class MainController extends Controller{
 			'accessible' => $canAccessApplication,
 			'less' => array(
 				'initVars' => json_encode($initVariables, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRETTY_PRINT),
-			)
+			),
+			'newTabUrl' => $newTabUrl
 		));
 	}
 

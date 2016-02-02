@@ -5,16 +5,17 @@
  */
 require.config({
 	paths : {
-		jquery : "ext/jquery-2.1.3.min",
-		cookie : "ext/jquery.cookie",
-		mask : "ext/jquery.mask.min",
-		sortable : "ext/jquery-sortable",
-		bootstrap : "ext/bootstrap.min",
-		colorpicker : "ext/bootstrap-colorpicker.min",
-		datepicker : "ext/bootstrap-datepicker.min",
-		ko : "ext/knockout-3.3.0",
-		ckeditor : "ext/ckeditor/ckeditor",
-		ace : "ext/ace/ace"
+		jquery : 'ext/jquery-2.1.3.min',
+		cookie : 'ext/jquery.cookie',
+		mask : 'ext/jquery.mask.min',
+		sortable : 'ext/jquery-sortable',
+		bootstrap : 'ext/bootstrap.min',
+		colorpicker : 'ext/bootstrap-colorpicker.min',
+		datepicker : 'ext/bootstrap-datepicker.min',
+		ko : 'ext/knockout-3.3.0',
+		ckeditor : 'ext/ckeditor/ckeditor',
+		ace : 'ext/ace/ace',
+		less : 'ext/less'
 	},
 
 	shim : {
@@ -56,7 +57,7 @@ require.config({
 });
 
 
-define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 'sortable', 'bootstrap', 'colorpicker' , 'datepicker', 'ko-extends', 'extends' , 'date' ], function($, ko, Tabset, Form, List, Lang) {
+define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 'sortable', 'bootstrap', 'colorpicker' , 'datepicker', 'ko-extends'], function($, ko, Tabset, Form, List, Lang) {
 	// export libraries to global context
 	window.$ = $;
 	window.ko = ko;
@@ -342,6 +343,10 @@ define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 
 			/*** we first check that page does not already exist in a tab ***/
 			var route = this.getRouteFromUri(url);
 
+			if(route === 'new-tab'){
+				url = this.conf.tabs.new.url;
+			}
+
 			for(var i= 0; i < this.tabset.tabs().length; i++){
 				var tab = this.tabset.tabs()[i];
 				if (tab.uri() === url || tab.route() === route) {
@@ -475,7 +480,7 @@ define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 
 					loaded(loaded() + 1);
 				}.bind(this)
 			});
-		}.bind(this));		
+		}.bind(this));
 	};
 
 
