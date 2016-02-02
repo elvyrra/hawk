@@ -38,7 +38,7 @@ class UserController extends Controller{
 		$example = array('id' => array('$ne' => User::GUEST_USER_ID));
 		$filters = (new UserFilterWidget())->getFilters();
 
-		if($filters['status'] != -1){
+		if(isset($filters['status']) && $filters['status'] != -1){
 			$example['active'] = $filters['status'];
 		}
 		

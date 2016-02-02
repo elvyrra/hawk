@@ -441,19 +441,26 @@ class AdminController extends Controller{
                     }
                 }
 
-                // Execute the update method if exist
-                $updater = new HawkUpdater;
-                $methods = get_class_methods($updater);
-
-                $method = 'v' . str_replace('.', '_', $version['version']);
-                if(method_exists($updater, $method)){
-                    $updater->$method();
-                }
-
                 // Remove temporary files and folders
                 App::fs()->remove($folder);
                 App::fs()->remove($archive);
             }
+
+            // Execute the update method if exist
+            $updater = new HawkUpdater;
+            $methods = get_class_methods($updater);
+
+            foreach($nextVersions as $version){
+            	$method = 'v' . str_replace('.', '_', $version['version']);
+                if(method_exists($updater, $method)){
+                    $updater->$method();
+                }
+            }
+
+            App::cache()->clear('views');
+            App::cache()->clear('lang');
+            App::cache()->clear(Autoload::CACHE_FILE);
+            App::cache()->clear(Lang::ORIGIN_CACHE_FILE);
 
             $response = array('status' => true);
         }

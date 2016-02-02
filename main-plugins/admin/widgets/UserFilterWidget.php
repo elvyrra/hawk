@@ -31,7 +31,7 @@ class UserFilterWidget extends Widget{
 						'labelWidth' => '100%',
 						'label' => Lang::get('admin.user-filter-status-label'),
 						'layout' => 'vertical',
-						'value' => $filters['status'],
+						'value' => isset($filters['status']) ? $filters['status'] : -1,
 						'options' => array(
 							'-1' => Lang::get('admin.user-filter-status-all'),
 							'1' => Lang::get('admin.user-filter-status-active'),
