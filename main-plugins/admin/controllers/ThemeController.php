@@ -66,7 +66,7 @@ class ThemeController extends Controller{
             $updates = array();
         }
 
-		Lang::addKeysToJavaScript("admin.theme-update-reload-page-confirm", "admin.theme-delete-confirm");
+		$this->addKeysToJavaScript("admin.theme-update-reload-page-confirm", "admin.theme-delete-confirm");
 
 		return View::make(Plugin::current()->getView("themes-list.tpl"), array(
 			'themes' => Theme::getAll(),
@@ -312,7 +312,7 @@ class ThemeController extends Controller{
 			}
 		}
 
-		Lang::addKeysToJavaScript($this->_plugin . '.theme-delete-media-confirm');
+		$this->addKeysToJavaScript($this->_plugin . '.theme-delete-media-confirm');
 		return View::make(Plugin::current()->getView("theme-medias.tpl"), array(
 			'medias' => $medias,
 		));

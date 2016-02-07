@@ -34,7 +34,7 @@ class LanguageController extends Controller{
 	public function index(){
 		$filters = $this->getFilters();
 
-		Lang::addKeysToJavaScript("language.confirm-delete-lang", "language.confirm-delete-key");
+		$this->addKeysToJavaScript("language.confirm-delete-lang", "language.confirm-delete-key");
 
 		$this->addJavaScript( Plugin::current()->getJsUrl('languages.js'));
 

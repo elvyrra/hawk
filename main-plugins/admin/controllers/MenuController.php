@@ -27,7 +27,7 @@ class MenuController extends Controller{
 					'attributes' => array(
 						'ko-value' => 'ko.toJSON(items)'
 					),
-				)),				
+				)),
 
 				new SubmitInput(array(
 					'name' => 'valid',
@@ -39,9 +39,11 @@ class MenuController extends Controller{
 		));
 
 		if(!$form->submitted()){
-			Lang::addKeysToJavaScript($this->_plugin . '.plugins-advert-menu-changed');
+
+			$this->addKeysToJavaScript($this->_plugin . '.plugins-advert-menu-changed');
+
 			return View::make(Plugin::current()->getView('sort-main-menu.tpl'), array(
-				'form' => $form,				
+				'form' => $form,
 			));
 		}
 		else{
@@ -61,11 +63,11 @@ class MenuController extends Controller{
 				}
 
 				return $form->response(Form::STATUS_SUCCESS, Lang::get($this->_plugin . '.sort-menu-success'));
-			} 
+			}
 			catch (Exception $e) {
 				return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get($this->_plugin . '.sort-menu-error'));
 			}
-			
+
 		}
 	}
 
@@ -74,7 +76,7 @@ class MenuController extends Controller{
 	 */
 	public function removeCustomMenuItem(){
 		$item = MenuItem::getById($this->itemId);
-		
+
 		if($item && $item->plugin === 'custom'){
 			$item->delete();
 
@@ -197,7 +199,7 @@ class MenuController extends Controller{
 				catch(\Exception $e){
 					return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get($this->_plugin . '.menu-item-form-error'));
 				}
-			}		
+			}
 		}
 	}
 }

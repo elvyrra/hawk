@@ -2,12 +2,6 @@
 
 namespace {{ $namespace }};
 
-App::router()->setProperties(
-    array(
-        'namespace' => __NAMESPACE__,
-        'prefix' => '/{{ $name }}'
-    ),
-    function(){
-        /*** DEFINE HERE THE ROUTES AND EVENT LISTENERS OF YOUR PLUGIN ***/
-    }
-);
+App::router()->prefix('/{{ $name }}', function(){
+    /*** DEFINE HERE THE ROUTES AND EVENT LISTENERS OF YOUR PLUGIN ***/
+});

@@ -161,6 +161,21 @@ class Controller{
 
 
 	/**
+	 * Add language keys to be accessible by Javascript
+	 * @param string $keys The keys to add
+	 */
+	public function addKeysToJavascript(...$keys){
+		$script = "";
+		foreach($keys as $key){
+			list($plugin, $langKey) = explode(".", $key);
+			$script .= "Lang.set('$key', '" . addcslashes(Lang::get($key), "'") . "');";
+		}
+
+		$this->addJavaScriptInline($script);
+	}
+
+
+	/**
 	 * get the controller namespace
 	 * @return string
 	 */

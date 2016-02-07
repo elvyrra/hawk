@@ -22,14 +22,14 @@ class Lang{
 	 * The language keys with their translations
 	 * @var array
 	 */
-	private static $keys = array(), 
+	private static $keys = array(),
 
 	/**
 	 * The currently used language
 	 * @var string
 	 */
 	$usedLanguage = '',
-	
+
 	/**
 	 * The cache containing the source files paths
 	 * @var array
@@ -40,27 +40,27 @@ class Lang{
 	 * The plugin of the language file
 	 * @var string
 	 */
-	private $plugin, 
+	private $plugin,
 
 	/**
 	 * The language of the language file
 	 * @var string
 	 */
-	$lang, 
+	$lang,
 
 	/**
 	 * The source file
 	 * @var string
 	 */
-	$originFile, 
+	$originFile,
 
 	/**
-	 * The path of the file containing the custom translations 
+	 * The path of the file containing the custom translations
 	 */
-	$translatedFile, 
+	$translatedFile,
 
 	/**
-	 * The path of the PHP cache file 
+	 * The path of the PHP cache file
 	 */
 	$cacheFile;
 
@@ -93,7 +93,7 @@ class Lang{
 			return self::$originCache["$this->plugin.$this->lang"];
 		}
 
-		// The file is not present in the cache, search it. We use the method Autoload::find that already performs this action		
+		// The file is not present in the cache, search it. We use the method Autoload::find that already performs this action
 		foreach(array(MAIN_PLUGINS_DIR, PLUGINS_DIR) as $dir){
 			$files = App::fs()->find($dir, $this->plugin . '.' . $this->lang . '.lang', FileSystem::FIND_FILE_ONLY);
 			if(!empty($files)){
@@ -101,7 +101,7 @@ class Lang{
 
 				// register it in the cache
 				self::$originCache["$this->plugin.$this->lang"] = $file;
-				
+
 				return $file;
 			}
 		}
@@ -113,7 +113,7 @@ class Lang{
 	 * Find the translated file in userfiles directory
 	 * @return string path The path of the file
 	 */
-	private function getTranslatedFile(){		
+	private function getTranslatedFile(){
 		return USERFILES_PLUGINS_DIR . self::TRANSLATIONS_DIR . $this->plugin . '.' . $this->lang . '.lang';
 	}
 
@@ -127,11 +127,11 @@ class Lang{
 
 
 	/**
-	 * Parse a language file 
+	 * Parse a language file
 	 * @param string The file to parse
 	 * @return array The language keys of the language file
 	 */
-	private function parse($file){		
+	private function parse($file){
 		return is_file($file) ? parse_ini_string(file_get_contents($file)) : array();
 	}
 
@@ -139,7 +139,7 @@ class Lang{
 	/**
 	 * Build the language file as a PHP file contaning an array
 	 */
-	private function build(){			
+	private function build(){
 		$build = false;
 
 		if(!is_file(App::cache()->getCacheFilePath($this->cacheFile))){
@@ -153,20 +153,20 @@ class Lang{
 			// The translated file is not cached
 			$build = true;
 		}
-		
+
 
 		if($build){
 			// Build the cache file
 			$data = array_merge($this->parse($this->originFile), $this->parse($this->translatedFile));
-			
+
 			App::cache()->save($this->cacheFile, '<?php return ' . var_export($data, true) . ';' );
 		}
 	}
 
 
-	
+
 	/**
-	 * Load a language file 
+	 * Load a language file
 	 * @param string $plugin The plugin to load
 	 * @param string $language The language to get the translations in
 	 * @param string $force If set to true, force to reload the translations
@@ -189,7 +189,7 @@ class Lang{
 					$translations = array();
 				}
 
-				self::$keys[$plugin][$language] = array_merge(self::$keys[$plugin][$language], $translations);	
+				self::$keys[$plugin][$language] = array_merge(self::$keys[$plugin][$language], $translations);
 			}
 
 			self::$usedLanguage = $language;
@@ -221,21 +221,21 @@ class Lang{
 
 
 	/**
-	 * Check if a language key exists 
+	 * Check if a language key exists
 	 * @param string $langKey The key to check existence
 	 */
 	public static function exists($langKey){
 		list($plugin, $key) = explode('.', $langKey);
-        
+
 		// get the label(s)
-		self::load($plugin);			
+		self::load($plugin);
 
 		return isset(self::$keys[$plugin][self::$usedLanguage][$key]);
 	}
 
 
 
-    
+
     /**
      * get the translation of a language key in the given language
      * @param string $langKey The key to get the translation
@@ -249,15 +249,15 @@ class Lang{
 		if(count($tmp) != 2){
 			return $langKey;
 		}
-		
+
 		list($plugin, $key) = explode('.', $langKey);
 
-		
-		self::load($plugin, $language);	
+
+		self::load($plugin, $language);
 
 		// get the label(s)
 		$labels = isset(self::$keys[$plugin][$language][$key]) ? self::$keys[$plugin][$language][$key] : null;
-		
+
         if($labels !== null){
             if(is_array($labels)){
 				// Multiple values are affected to this key (singular / plural)
@@ -272,9 +272,9 @@ class Lang{
             }
             else{
 				// The language key is a single string
-                $label = $labels;			
+                $label = $labels;
             }
-			
+
 			if(!empty($param)){
 				// Replace parameters into the language key
 				return str_replace(array_map(function($key){ return '{'.$key.'}';}, array_keys($param)), $param, $label);
@@ -286,24 +286,23 @@ class Lang{
             return $langKey;
         }
     }
-	
+
 
 
 	/**
 	 * Add language keys to Javascript
+	 * @deprecated since version 0.8.0, use Controller::addKeysToJavascript instead
 	 * @param string $key1 The first key
 	 * @param string $key2 .....
 	 */
-	public static function addKeysToJavascript(){
-		$keys = func_get_args();
-			
+	public static function addKeysToJavascript(...$keys){
 		$script = "";
 		foreach($keys as $key){
 			list($plugin, $langKey) = explode(".", $key);
 			$script .= "Lang.set('$key', '" . addcslashes(self::get($key), "'") . "');";
 		}
-		
-		App::router()->getCurrentController()->addJavaScriptInline($script);			
+
+		App::router()->getCurrentController()->addJavaScriptInline($script);
 	}
 
 
@@ -346,7 +345,7 @@ class Lang{
 		if(!is_dir($dir)){
 			mkdir($dir, 0755, true);
 		}
-		
+
 		file_put_contents($file, $content);
 		touch($file, time() + 3);
 	}

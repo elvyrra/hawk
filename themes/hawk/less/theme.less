@@ -49,20 +49,20 @@ body{
     height: 100%;
     position: absolute;
     width: 100%;
-	font-size: 1.2rem;
-	color : @text-color;
+    font-size: 1.2rem;
+    color : @text-color;
     background: @body-bg;
-	font-family: 'Ubuntu';
+    font-family: 'Ubuntu';
 }
 
 /* Some overrides from default bootstrap styles */
 h1,h2,h3,h4,h5,h6{
-	font-weight: normal;
+    font-weight: normal;
 }
 
 .btn{
-	font-size: inherit;
-	margin-top: .5rem;
+    font-size: inherit;
+    margin-top: .5rem;
     border-radius: 1px;
     margin-right: .5rem;
 }
@@ -70,16 +70,16 @@ h1,h2,h3,h4,h5,h6{
 /* labels */
 .label, .badge {font-weight: lighter;}
 .label-success, .badge-success {
-	background-color: rgb(129, 189, 130);
+    background-color: rgb(129, 189, 130);
 }
 .label-info, .badge-info {
-	background-color: rgb(104, 163, 213);
+    background-color: rgb(104, 163, 213);
 }
 
 
 /* code*/
 code {
-	color: rgb(78, 153, 223);
+    color: rgb(78, 153, 223);
 }
 
 
@@ -248,9 +248,9 @@ input[type="date"],
 input[type="number"],
 select,
 textarea {
-	font-size: 1.3rem;
-	box-shadow: inset 0 0px 1px rgba(0, 0, 0, 0.075);
-	border-radius: 4px;
+    font-size: 1.3rem;
+    box-shadow: inset 0 0px 1px rgba(0, 0, 0, 0.075);
+    border-radius: 4px;
     border: 1px solid darken(@body-bg, 13.5%);
     height: 3rem;
     padding-left: .3rem;
@@ -275,20 +275,20 @@ select{
 }
 
 textarea{
-	height: auto;
+    height: auto;
     width: inherit;
 }
 
 input[type="text"]:focus,
 input[type="password"]:focus,
 textarea:focus{
-	border-color: #A2CEF0;
-	box-shadow: inset 0 0px 1px rgba(0, 0, 0, 0.075), 0 0 4px rgba(82, 168, 236, 0.6);
+    border-color: #A2CEF0;
+    box-shadow: inset 0 0px 1px rgba(0, 0, 0, 0.075), 0 0 4px rgba(82, 168, 236, 0.6);
 }
 
 /*----------------------- File inputs -----------------------*/
 input[type="file"] {
-	display: none;
+    display: none;
 
     & + label{
         padding: 0 1.2rem;
@@ -418,8 +418,8 @@ input[type="checkbox"]{
 form{
     /*------------------------- Fieldsets -----------------------------*/
     fieldset{
-    	border : 1px solid @brand-primary;
-    	box-shadow: none;
+        border : 1px solid @brand-primary;
+        box-shadow: none;
 
         legend{
             color: @brand-primary;
@@ -549,22 +549,40 @@ form{
 }
 
 /*** The icon to sort the list ***/
-.list-title-label{
-    margin-right: 1.5rem;
-}
-.list-sort-column{
-    background: transparent;
-    border: none;
-    font-size: 1.3rem;
-    opacity: 0.5;
+.list-label-sorts{
+    white-space: nowrap;
 
-    &:hover{
-        opacity: 1;
+    .list-title-label{
+        max-width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        display: inline-block;
+        text-overflow: ellipsis;
     }
 
-    &.list-sort-active{
-        color: @brand-primary;
-        opacity: 1;
+    .list-sort-block{
+        white-space: nowrap;
+        display: inline-block;
+
+        .list-sort-column{
+            background: transparent;
+            border: none;
+            font-size: 1.3rem;
+            opacity: 0.5;
+
+            &:hover{
+                opacity: 1;
+            }
+
+            &.list-sort-active{
+                color: @brand-primary;
+                opacity: 1;
+            }
+        }
+
+        & + .list-title-label{
+            max-width : calc(~"100% - 3rem");
+        }
     }
 }
 
@@ -573,13 +591,16 @@ form{
     margin: 0;
 }
 
-.list-search-input{
-    padding-right: 1.5rem;
+input[type="text"], input[type="checkbox"], select{
+    &.list-search-input{
+        padding-right: 1.5rem;
+        width: 100%;
 
-    &.not-empty {
-        background-color: @state-info-bg;
-        color: @state-info-text;
-        padding-right: 1.6rem;
+        &.not-empty {
+            background-color: @state-info-bg;
+            color: @state-info-text;
+            padding-right: 1.6rem;
+        }
     }
 }
 
@@ -667,7 +688,7 @@ form{
 
 /*-------------------------------- Navbars ----------------------------------------*/
 .navbar-inverse {
-	margin-bottom: 0;
+    margin-bottom: 0;
     background: @header-bg;
     color: @header-color;
 
@@ -736,7 +757,7 @@ form{
 
 /*---------------------------- Dropdown menus ------------------------------------------*/
 .dropdown-menu{
-	font-size: 1em;
+    font-size: 1em;
     min-width: 0;
 
     & > li > a{
@@ -749,8 +770,8 @@ form{
 
 .dropdown-submenu:hover,.dropdown-submenu:focus {
     a {
-    	background: @state-info-bg;
-    	color: @state-info-text;
+        background: @state-info-bg;
+        color: @state-info-text;
     }
 }
 
@@ -919,7 +940,7 @@ table {
 #main-content{
     position: relative;
     width: 100%;
-  	height: calc(~"100% - " 2 * @main-menu-height);
+    height: calc(~"100% - " 2 * @main-menu-height);
 }
 
 #main-nav-tabs{
@@ -991,9 +1012,9 @@ table {
 
 /*--------------------- Tabs content --------------------*/
 .main-tab-pane .page-title{
-	color: @brand-primary;
-	text-align: center;
-	margin: .5rem 0;
+    color: @brand-primary;
+    text-align: center;
+    margin: .5rem 0;
 
     .left-sidebar-tab{
         .tab-sidebar{
@@ -1032,8 +1053,8 @@ a, a:active, a:hover, a:visited, a:focus{
     z-index: 1050;
     font-size: 1.5rem;
     min-height: 4rem;
-	visibility: hidden;
-	opacity: 0;
+    visibility: hidden;
+    opacity: 0;
     transition: visibility .35s, opacity .35s;
 
     .close{
@@ -1080,31 +1101,31 @@ a, a:active, a:hover, a:visited, a:focus{
 
 /*---------------------- Login page ----------------------------*/
 #login-page{
-	top : 50%;
-	margin-top: -12.5rem;
-	height: 25rem;
+    top : 50%;
+    margin-top: -12.5rem;
+    height: 25rem;
 }
 
 /*---------------------- Loading ----------------------------*/
 #loading{
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	z-index: 500;
-	padding: 25% 50%;
-	background: rgba(128,128,128,0.5);
-	color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 500;
+    padding: 25% 50%;
+    background: rgba(128,128,128,0.5);
+    color: white;
 }
 
 #loading-bar{
-	width: 20rem;
-	margin-left: -10rem;
-	height: .5rem;
-	display: block;
-	background: darken(@body-bg, 6.5%);
-	border-radius: .5rem;
+    width: 20rem;
+    margin-left: -10rem;
+    height: .5rem;
+    display: block;
+    background: darken(@body-bg, 6.5%);
+    border-radius: .5rem;
 
     &:not(.progressing){
         display:none;
@@ -1112,18 +1133,18 @@ a, a:active, a:hover, a:visited, a:focus{
 }
 
 #loading-purcentage{
-	width: 0%;
-	background: @brand-success;
-	height: 100%;
-	display: block;
-	border-radius: 5px;
-	transition: width .2s;
+    width: 0%;
+    background: @brand-success;
+    height: 100%;
+    display: block;
+    border-radius: 5px;
+    transition: width .2s;
 }
 
 
 /*----------------------- Icons -----------------------------*/
 p .icon{
-	margin-right: .7rem;
+    margin-right: .7rem;
 }
 
 

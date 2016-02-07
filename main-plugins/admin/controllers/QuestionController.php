@@ -102,7 +102,7 @@ class QuestionController extends Controller{
 		));
 
 		if(!$form->submitted()){
-			Lang::addKeysToJavaScript($this->_plugin . ".confirm-delete-question");
+			$this->addKeysToJavaScript($this->_plugin . ".confirm-delete-question");
 			$content = View::make(Plugin::current()->getView("questions-list.tpl"), array(
 				'list' => $list,
 				'form' => $form

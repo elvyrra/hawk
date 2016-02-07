@@ -13,10 +13,10 @@ class RoleController extends Controller{
 		else{
 			$defaultRole = Option::get('roles.default-role');
 		}
-		
+
 		$param = array(
 			'id' => 'roles-list',
-			'action' => App::router()->getUri('list-roles'),			
+			'action' => App::router()->getUri('list-roles'),
 			'model' => 'Role',
 			'controls' => array(
 				array(
@@ -26,7 +26,7 @@ class RoleController extends Controller{
 					'target' => 'dialog',
 					'class' => 'btn-success'
 				),
-				
+
 				array(
 					'icon' => 'unlock-alt',
 					'label' => Lang::get('roles.edit-permissions-btn'),
@@ -39,12 +39,12 @@ class RoleController extends Controller{
 					'field' => 'removable',
 					'hidden' => true,
 				),
-				
+
 				'color' => array(
 					'field' => 'color',
 					'hidden' => true,
-				),				
-				
+				),
+
 				'actions' => array(
 					'independant' => true,
 					'display' => function($value, $field, $line){
@@ -55,7 +55,7 @@ class RoleController extends Controller{
 					'search' => false,
 					'sort' => false,
 				),
-				
+
 				'name' => array(
 					'independant' => true,
 					'label' => Lang::get('roles.list-name-label'),
@@ -63,7 +63,7 @@ class RoleController extends Controller{
 						return "<span style='color:{$line->color}'>" . Lang::get("roles.role-{$line->id}-label") . "</span>";
 					}
 				),
-				
+
 				'default' => array(
 					'independant' => true,
 					'label' => Lang::get('roles.list-default-label'),
@@ -74,75 +74,75 @@ class RoleController extends Controller{
 					},
 					'search' => false,
 					'sort' => false,
-				)				
+				)
 			)
 		);
-		
-		Lang::addKeysToJavaScript("roles.delete-role-confirmation");
-		
+
+		$this->addKeysToJavaScript("roles.delete-role-confirmation");
+
 		return View::make(Plugin::current()->getView("roles-list.tpl"), array(
 			'list' => new ItemList($param)
 		));
 	}
-	
+
 
 
 
 
 	/**
-	 * Edit a role 
+	 * Edit a role
 	 */
-	public function edit(){		
+	public function edit(){
 		$param = array(
-			'id' => 'edit-role-form',			
+			'id' => 'edit-role-form',
 			'model' => 'Role',
 			'reference' => array('id' => $this->roleId),
 			'fieldsets' => array(
 				'form' => array(
 					'nofieldset' => true,
-					
+
 					new HiddenInput(array(
 						'field' => 'removable',
 						'default' => 1,
 						'readonly' => true
 					)),
-					
+
 					new TextInput(array(
 						'field' => 'name',
 						'maxlength' => 32,
 						'label' => Lang::get('roles.form-name-label'),
 						'required' => true,
 					)),
-					
+
 					new ColorInput(array(
 						'field' => 'color',
 						'label' => Lang::get('roles.form-color-label'),
 						'default' => '#000'
 					)),
 				),
-				
+
 				'_submits' => array(
 					new SubmitInput(array(
 						'name' => 'valid',
-						'value' => Lang::get('main.valid-button'),						
+						'value' => Lang::get('main.valid-button'),
 					)),
-					
+
 					new DeleteInput(array(
 						'name' => 'delete',
 						'value' => Lang::get('main.delete-button'),
 						'notDisplayed' => $this->roleId == -1
 					)),
-					
+
 					new ButtonInput(array(
 						'name' => 'cancel',
 						'value' => Lang::get('main.cancel-button'),
 						'onclick' => 'app.dialog("close")'
 					)),
-				),			
-			),			
+				),
+			),
 			'onsuccess' => 'app.dialog("close"); app.load(app.getUri("list-roles"), {selector : "#admin-roles-tab"});'
 		);
-		
+
 
 		foreach(Language::getAll() as $language){
 			$param['fieldsets']['form'][] = new TextInput(array(
@@ -153,8 +153,8 @@ class RoleController extends Controller{
 				"default" => Lang::exists("roles.role-" . $this->roleId . "-label") ? Lang::get("roles.role-" . $this->roleId . "-label", array(), 0, $language->tag) : ''
 			));
 		}
-		
-		$form = new Form($param);		
+
+		$form = new Form($param);
 		if(!$form->submitted()){
 			return View::make(Theme::getSelected()->getView("dialogbox.tpl"), array(
 				'icon' => 'user',
@@ -162,10 +162,10 @@ class RoleController extends Controller{
 				'page' => $form
 			));
 		}
-		else{			
+		else{
 			if($form->submitted() == "delete"){
 				$form->delete(Form::NO_EXIT);
-				
+
 				if($key){
 					$key->delete();
 				}
@@ -176,7 +176,7 @@ class RoleController extends Controller{
 					try{
 						$roleId = $form->register(Form::NO_EXIT);
 
-						// Create the language key for the translations of the role name	
+						// Create the language key for the translations of the role name
 						foreach(App::request()->getBody('translation') as $tag => $translation){
 							Language::getByTag($tag)->saveTranslations(array(
 								'roles' => array(
@@ -184,26 +184,26 @@ class RoleController extends Controller{
 								)
 							));
 						}
-						
+
 						return $form->response(Form::STATUS_SUCCESS);
 					}
 					catch(Exception $e){
 						return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : "");
 					}
 				}
-			}			
+			}
 		}
 
 	}
-	
+
 
 
 	/**
-	 * Remove a role 
+	 * Remove a role
 	 */
 	public function remove(){
 		$role = Role::getById($this->roleId);
-		if($role && $role->isRemovable()){			
+		if($role && $role->isRemovable()){
 			User::getDbInstance()->update(User::getTable(), new DBExample(array('roleId' => $role->id)), array('roleId' => Option::get('roles.default-role')));
 
 			$role->delete();

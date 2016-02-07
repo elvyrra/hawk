@@ -34,6 +34,11 @@ final class Router extends Singleton{
 	$currentRoute,
 
 	/**
+	 * The current controller instance, associated to the current uri
+	 */
+	$currentController,
+
+	/**
 	 * The authentications required to match the URIs
 	 */
     $auth = array(),
@@ -239,11 +244,11 @@ final class Router extends Singleton{
 					list($classname, $method) = explode(".", $route->action);
 
 					// call a controller method
-					$controller = new $classname($route->getData());
+					$this->currentController = new $classname($route->getData());
 					App::logger()->debug('URI ' . App::request()->getUri() . ' has been routed => ' . $classname . '::' . $method);
 
 	                // Set the controller result to the HTTP response
-					App::response()->setBody($controller->compute($method));
+					App::response()->setBody($this->currentController->compute($method));
 				}
 				else{
 
@@ -315,7 +320,7 @@ final class Router extends Singleton{
 	 * @return Controller The last instanciated controller
 	 */
 	public function getCurrentController(){
-		return Controller::current();
+		return $this->currentController;
 	}
 
 	/**

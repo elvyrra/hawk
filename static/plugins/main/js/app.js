@@ -646,11 +646,36 @@ define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 
 	};
 
 
+	/**
+	 * Refresh the main menu
+	 */
 	App.prototype.refreshMenu = function(){
 	    $.get(this.getUri('refresh-menu'), function(response){
 	        $("#main-menu").replaceWith(response);
-			this.notify('warning', Lang.get('main.main-menu-changed'));
+
+			this.notify('warning', Lang.get('main.main-menu-changed'));			
 	    }.bind(this));
+	};
+
+
+	/**
+	 * Print a part of the page (or the whole page)
+	 * @param  {NodeElement} element The DOM element to print. If not set or null, then this will print the whole page
+	 */
+	App.prototype.print = function(element){
+		if(!element){
+			window.print();
+		}
+		else{
+			$("body").append('<iframe name="printer" id="hawk-printer-frame" height="0" width="0" src="about:blank"></iframe>');
+
+			var content = document.getElementById("theme-base-stylesheet").outerHTML + element.outerHTML;
+		    window.frames["printer"].document.body.innerHTML = content;
+		    window.frames["printer"].window.focus();
+		    window.frames["printer"].window.print();
+
+		    $("#hawk-printer-frame").remove();
+		}
 	};
 
 	if(!window.app){

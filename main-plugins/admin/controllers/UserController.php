@@ -41,7 +41,7 @@ class UserController extends Controller{
 		if(isset($filters['status']) && $filters['status'] != -1){
 			$example['active'] = $filters['status'];
 		}
-		
+
 
 		$param = array(
 			'id' => 'admin-users-list',
@@ -131,7 +131,7 @@ class UserController extends Controller{
 			return $list->display();
 		}
 		else{
-			Lang::addKeysToJavaScript("admin.user-delete-confirmation");
+			$this->addKeysToJavaScript("admin.user-delete-confirmation");
 			return View::make(Plugin::current()->getView("users-list.tpl"), array(
 				'list' => $list,
 			));

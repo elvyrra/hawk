@@ -13,16 +13,20 @@ namespace Hawk;
 class FloatInput extends NumberInput{
 
 	/**
+	 * The number of decimals to display
+	 * @var integer
+	 */
+	public $decimals = 2;
+
+	/**
 	 * Constructor
 	 * @param array $param The input parameters
 	 */
 	public function __construct($param){
-		$this->decimals = 2;
-		$this->pattern = "/^[0-9]+(.[0-9])?/";
-		
-		parent::__construct($param);	
+		parent::__construct($param);
+		$this->pattern = '/^[0-9]+(.[0-9]{0, ' . $this->decimals  .'})?/';
 	}
-	
+
 
 	/**
 	 * Display the input
@@ -32,7 +36,7 @@ class FloatInput extends NumberInput{
 		$this->value = number_format(floatval($this->value), $this->decimals, ".", "");
 		return parent::display();
 	}
-	
+
 
 	/**
 	 * Check the format of the submitted value
@@ -45,19 +49,19 @@ class FloatInput extends NumberInput{
 				// The value is not numeric
 				$form->error($this->errorAt, Lang::get('form.number-format'));
 				return false;
-			}			
+			}
 			return true;
-		}	
+		}
 		else{
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Get the value, formatted for the MySQL database
 	 * @return float The formatted value
 	 */
 	public function dbvalue(){
-	    return (float)($this->value);   
+	    return (float)($this->value);
 	}
 }
