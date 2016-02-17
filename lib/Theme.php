@@ -297,6 +297,11 @@ class Theme{
         return $this->getStaticDir() . 'less/' . self::LESS_BASENAME;
     }
 
+
+    /**
+     * Get the filename of the compiled theme.css file, in the static folder
+     * @return string The filename
+     */
     public function getStaticCssFile(){
         return $this->getStaticDir() . 'less/' . self::COMPILED_CSS_BASENAME;
     }
@@ -314,6 +319,10 @@ class Theme{
     }
 
 
+    /**
+     * This method return the URL to access the CSS file of the theme, compiled from theme.less
+     * @return string The URL of the file theme.css
+     */
     public function getBaseCssUrl(){
         $this->build();
 

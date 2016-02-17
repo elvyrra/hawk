@@ -8,7 +8,7 @@
 namespace Hawk;
 
 /**
- * This class is used to construct SQL WHERE expressions from arrays. 
+ * This class is used to construct SQL WHERE expressions from arrays.
  * This can be useful to build simple conditions without writing SQL query and manage binding values
  * This class is used in classes Model, Form, ItemList to get data from the database.
  * Example : To make the expression 'field1 = "value1" AND (field2 IS NOT NULL OR field3 < 12)', create an DBExample like :
@@ -16,8 +16,12 @@ namespace Hawk;
  * new DBExample(array(
  *		array('field1' => "value1"),
  *		array('$or' => array(
- *			'field2' => '$notnull',
- *			'field3' => array('$lt' => 12)
+ *			array(
+ *				'field2' => '$notnull'
+ *			),
+ *			array(
+ *				'field3' => array('$lt' => 12)
+ *			)
  *		))
  * ))
  * </code>
@@ -25,11 +29,11 @@ namespace Hawk;
  */
 class DBExample{
 	/**
-	 * The example content 
+	 * The example content
 	 * @var array
 	 */
 	public $example = array();
-	
+
 	/**
 	 * The supported binary operators
 	 */
@@ -44,7 +48,7 @@ class DBExample{
 		'$in' => 'IN',
 		'$nin' => 'NOT IN'
 	);
-	
+
 	/**
 	 * The supported unary operators
 	 */
@@ -52,7 +56,7 @@ class DBExample{
 		'$null'  => 'IS NULL',
 		'$notnull' => 'IS NOT NULl'
 	);
-	
+
 	/**
 	 * Constructor
 	 * @param array $example The DBExample structure
@@ -60,7 +64,7 @@ class DBExample{
 	public function __construct($example){
 		$this->example = $example;
 	}
-	
+
 	/**
 	 * Create a DBExample and parse it
 	 * @param array $example The DBExample structure
@@ -71,14 +75,14 @@ class DBExample{
 		$instance = new self($example);
 		return $instance->parse($binds);
 	}
-	
+
 
 	/**
 	 * Parse the example to create the corresponding SQL expression
 	 * @param array $binds This variable, passed by reference, will be filled with the binded values during example parsing
 	 * @return string the parsed SQL expression
 	 */
-	public function parse(&$binds){		
+	public function parse(&$binds){
 		return $this->parseElements($binds);
 	}
 
@@ -89,7 +93,7 @@ class DBExample{
 	 * @param array $elements The substructure to parse
 	 * @param string $operator The operator to separate the parsed substructures
 	 * @param string $upperKey The key of the parent structure. For example, if you parse array('$gt' => 3), in the whole structure array('field' => array('$gt' => 3)), $upperKey will be set to 'field'
-	 * @return string The SQL expression, result of the elements parsing 
+	 * @return string The SQL expression, result of the elements parsing
 	 */
 	private function parseElements(&$binds = null, $example = null, $operator = 'AND', $upperKey = null){
 		if($example === null){
@@ -98,17 +102,17 @@ class DBExample{
 		if(empty($binds)){
 			$binds = array();
 		}
-		
+
 		if(!is_array($example)){
 			throw new DBExampleException("The example to parse must be an integer , " . gettype($example) . " given : " . var_export($example, true));
 		}
-		
+
 		$sql = "";
 		$elements = array();
-		
+
 		foreach($example as $key => $value){
 			$bindKey = uniqid();
-			
+
 			// Binary operations (= , <, >, LIKE, IN, NOT IN, .. etc)
 			if(isset(self::$binaryOperators[$key])){
 				$op = self::$binaryOperators[$key];
@@ -119,28 +123,28 @@ class DBExample{
 					$keys = array();
 					foreach($value as $val){
 						$bindKey = uniqid();
-						$binds[$bindKey] = $val;							
+						$binds[$bindKey] = $val;
 						$keys[] = ':'.$bindKey;
 					}
 					$elements[] = DB::formatField($upperKey) . " $op (" . implode(',', $keys) . ")";
 				}
 				else{
-					$binds[$bindKey] = $value;				
-					$elements[] = DB::formatField($upperKey) . " $op :$bindKey";	
-				}				
+					$binds[$bindKey] = $value;
+					$elements[] = DB::formatField($upperKey) . " $op :$bindKey";
+				}
 			}
-			
+
 			// Unary operations (IS NULL, IS NOT NULL, ... etc)
 			elseif(is_scalar($value) && isset(self::$unaryOperators[$value])){
-				$op = self::$unaryOperators[$value];					
+				$op = self::$unaryOperators[$value];
 				$elements[] = DB::formatField($key) . " $op";
 			}
-			
+
 			// Parse a sub element
 			elseif(is_numeric($key) && is_array($value)){
 				$elements[] = $this->parseElements($binds, $value, $operator, $key);
 			}
-			
+
 			else{
 				switch($key){
 					case '$not':
@@ -166,14 +170,14 @@ class DBExample{
 						elseif(is_array($value)){
 							$elements[] = $this->parseElements($binds, $value, $operator, $key);
 						}
-						else{							
+						else{
 							throw new DBExampleException("The value must be a scalar value, given : $key => " . var_export($value, true));
 						}
 						break;
 				}
 			}
 		}
-		
+
 		if($upperKey){
 			return '(' . implode(" $operator ", $elements) . ')';
 		}
@@ -188,5 +192,5 @@ class DBExample{
  * This class describes the behavior of the exceptions throwed by DBExample class
  * @package Exceptions
  */
-class DBExampleException extends \Exception{	
+class DBExampleException extends \Exception{
 }

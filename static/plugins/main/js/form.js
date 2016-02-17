@@ -1,21 +1,26 @@
+'use strict';
+
 define('form', ['jquery', 'ko'], function($, ko){
 	/**
+	 * This class is used to validate and submit forms client side.
+	 * forms are accessible to window by app.formrs[id]
+	 *
 	 * @class Form
-	 * @constructs
 	 * @param {String} id - the id of the form
 	 * @param {Object} fields - The list of all fields in the form
 	 */
-	var Form = function(id, fields){	
-		this.id = id;	
+	var Form = function(id, fields) {
+		this.id = id;
 		this.node = $("[id='" + this.id + "']");
 		this.upload = this.node.hasClass('upload-form');
 		this.action = this.node.attr('action');
 		this.method = this.node.attr('method').toLowerCase();
 		this.inputs = {};
+
 		for(var name in fields){
 			this.inputs[name] = new FormInput(fields[name], this);
 		}
-		
+
 		// Listen for form submission
 		this.node.submit(function(event){
 			this.submit();
@@ -36,11 +41,13 @@ define('form', ['jquery', 'ko'], function($, ko){
 
 	/**
 	 * Check the dat of the form
+	 *
+	 * @memberOf Form
 	 * @return {bool} - true if the form data is correct, false else
 	 */
 	Form.prototype.isValid = function(){
 		this.removeErrors();
-		var valid = true;	
+		var valid = true;
 		for(var name in this.inputs){
 			if (!this.inputs[name].isValid()) {
 				valid = false;
@@ -49,6 +56,12 @@ define('form', ['jquery', 'ko'], function($, ko){
 		return valid;
 	};
 
+
+	/**
+	 * Remove all the form errors
+	 *
+	 * @memberOf Form
+	 */
 	Form.prototype.removeErrors = function(){
 		this.node.find(".form-result-message").removeClass("alert alert-danger").text("");
 		for(var name in this.inputs){
@@ -56,26 +69,42 @@ define('form', ['jquery', 'ko'], function($, ko){
 		}
 	};
 
+
+	/**
+	 * Display an error message to the form
+	 *
+	 * @memberOf Form
+	 * @param  {string} text The message to display
+	 */
 	Form.prototype.displayErrorMessage = function(text){
 		this.node.find(".form-result-message").addClass("alert alert-danger").html("<i class='icon icon-exclamation-circle'></i>  " + text);
 	};
 
+
+	/**
+	 * Display the errors on the form inputs
+	 *
+	 * @memberOf Form
+	 * @param  {Object} errors The errors to display, where keys are inputs names, and values the error messages
+	 */
 	Form.prototype.displayErrors = function(errors){
-		if (typeof errors === "object" && !(errors instanceof Array)) {
-			for(var id in errors){		
+		if (typeof errors === 'object' && !(errors instanceof Array)) {
+			for(var id in errors){
 				this.inputs[id].addError(errors[id]);
-			}	
-		}	
+			}
+		}
 	};
 
 
 	/**
-	 * Set the object action of the form. The object action can be "register" or "delete", 
+	 * Set the object action of the form. The object action can be "register" or "delete",
 	 * and represents the action that will be performed server side
+	 *
+	 * @memberOf Form
 	 * @param {string} action - The action value to set
 	 */
 	Form.prototype.setObjectAction = function(action){
-		if(action.toLowerCase() === 'delete'){			
+		if(action.toLowerCase() === 'delete'){
 			this.method = action;
 		}
 	};
@@ -83,15 +112,17 @@ define('form', ['jquery', 'ko'], function($, ko){
 
 	/**
 	 * Submit the form
+	 *
+	 * @memberOf Form
 	 */
-	Form.prototype.submit = function(){		
+	Form.prototype.submit = function(){
 		/*** Remove all Errors on this form ***/
 		this.removeErrors();
 		var self = this;
-		
-		if(this.objectAction == "delete" || this.isValid()){		
+
+		if(this.objectAction == "delete" || this.isValid()){
 			app.loading.start();
-			
+
 			/**** Send a POST Ajax request to submit the form ***/
 			var data;
 			if(this.method === 'get'){
@@ -99,7 +130,7 @@ define('form', ['jquery', 'ko'], function($, ko){
 			}
 			else{
 				data = new FormData(this.node.get(0))
-			}			
+			}
 
 			var options = {
 				xhr : app.xhr,
@@ -109,8 +140,8 @@ define('form', ['jquery', 'ko'], function($, ko){
 				data : data,
 				processData : false,
 				contentType : false
-			};			
-			
+			};
+
 			$.ajax(	options )
 
 			.done(function(results, code, xhr){
@@ -118,14 +149,14 @@ define('form', ['jquery', 'ko'], function($, ko){
 				if(results.message){
 					app.notify("success", results.message);
 				}
-					
+
 				/*** Trigger a form_success event to the form ***/
 				if(self.onsuccess){
 					self.onsuccess(results.data);
 				}
 			})
-			
-			.fail(function(xhr, code, err){			
+
+			.fail(function(xhr, code, err){
 				if(! xhr.responseJSON){
 					// The returned result is not a JSON
 					self.displayErrorMessage(xhr.responseText);
@@ -138,12 +169,12 @@ define('form', ['jquery', 'ko'], function($, ko){
 							self.displayErrorMessage(response.message);
 							self.displayErrors(response.errors);
 							break;
-							
+
 						case 424 :
-							// An error occured in the form treatment						
+							// An error occured in the form treatment
 							self.displayErrorMessage(response.message);
 							break;
-							
+
 						default :
 							self.displayErrorMessage(Lang.get('main.technical-error'));
 							break;
@@ -154,18 +185,20 @@ define('form', ['jquery', 'ko'], function($, ko){
 				}
 			})
 			.always(function(){
-				app.loading.stop();			
-			});	
+				app.loading.stop();
+			});
 		}
 		else{
 			self.displayErrorMessage(Lang.get('form.error-fill'));
-		}		
-		return false;	
+		}
+		return false;
 	};
 
 
 	/**
-	 * Reset the form values 
+	 * Reset the form values
+	 *
+	 * @memberOf Form
 	 */
 	Form.prototype.reset = function(){
 		this.node.get(0).reset();
@@ -174,12 +207,15 @@ define('form', ['jquery', 'ko'], function($, ko){
 
 	/**
 	 * Get the form data as Object
+	 *
+	 * @memberOf Form
+	 * @return {Object} The object containing the form inputs data
 	 */
 	Form.prototype.valueOf = function(){
 		var result = {};
 
 		for(var name in this.inputs){
-			var item = this.inputs[name];		
+			var item = this.inputs[name];
 			var matches = /^(.+?)((?:\[(.*?)\])+)$/.exec(name);
 			if(matches !== null){
 				var params = matches[2];
@@ -203,8 +239,8 @@ define('form', ['jquery', 'ko'], function($, ko){
 							}
 							else{
 								tmp[m[2]] = item.val();
-							}							
-						}						
+							}
+						}
 					}
 				} while(m && m[3]);
 			}
@@ -212,13 +248,16 @@ define('form', ['jquery', 'ko'], function($, ko){
 				result[name] = item.val();
 			}
 		}
-		
+
 		return result;
 	};
 
 
 	/**
 	 * Display the content of the form
+	 *
+	 * @memberOf Form
+	 * @return {string} The JSON representing the form inputs data
 	 */
 	Form.prototype.toString = function(){
 		return JSON.stringify(this.valueOf());
@@ -229,7 +268,11 @@ define('form', ['jquery', 'ko'], function($, ko){
 
 	/**
 	 * Class FormInput, represents any input in a form
-	 * */
+	 *
+	 * @class  FormInput
+	 * @param {Object} field The input parameters
+	 * @param {Form} form The form the input is asssociated with
+	 **/
 	var FormInput= function(field, form){
 		this.form = form;
 		for(var key in field){
@@ -237,24 +280,27 @@ define('form', ['jquery', 'ko'], function($, ko){
 		}
 		this.node = $("[id='"+this.id+"']");
 
-		if (this.type == "submit") {		
-			this.node.click(function(){			
-				// Ask for confirmation 
+		if (this.type == "submit") {
+			this.node.click(function(){
+				// Ask for confirmation
 				if(this.name == "delete" && !confirm(Lang.get("form.confirm-delete"))){
 					// The user finally doesn't want to delete the record
-					return false;	
+					return false;
 				}
-				
+
 				// The user confirmed
 				this.form.setObjectAction(this.name);
-			}.bind(this));		
+			}.bind(this));
 		}
 	};
 
 
 	/**
 	 * Get or set the value of the field
-	 * @param {string} value The value to set	 
+	 *
+	 * @memberOf FormInput
+	 * @param {string} value If this variable is set, it will be set to the input
+	 * @return {string} The value of the input if the param 'value' has not been set, else undefined
 	 */
 	FormInput.prototype.val = function(value){
 		if(value === undefined){
@@ -262,7 +308,7 @@ define('form', ['jquery', 'ko'], function($, ko){
 			switch(this.type){
 				case 'checkbox' :
 					return this.node.prop('checked');
-					
+
 				case 'radio' :
 					return this.node.find(':checked').val();
 
@@ -270,7 +316,7 @@ define('form', ['jquery', 'ko'], function($, ko){
 					return this.node.html();
 
 				default :
-					return this.node.val();		
+					return this.node.val();
 			}
 		}
 		else{
@@ -278,7 +324,7 @@ define('form', ['jquery', 'ko'], function($, ko){
 				case 'checkbox' :
 					this.node.prop('checked', value);
 					break;
-					
+
 				case 'radio' :
 					this.node.find('[value="' + value + '"]').prop('checked', true);
 					break;
@@ -289,16 +335,19 @@ define('form', ['jquery', 'ko'], function($, ko){
 
 				default :
 					this.node.val(value);
-					break;		
+					break;
 			}
-			
+
 		}
 	};
 
 
 	/**
-	 * Get a property data of the field 
+	 * Get a property data of the field
+	 *
+	 * @memberOf FormInput
 	 * @param {string} prop - the property to get the data value
+	 * @return {styring} The value of the property
 	 */
 	FormInput.prototype.data = function(prop){
 		return this.node.data(prop);
@@ -307,66 +356,74 @@ define('form', ['jquery', 'ko'], function($, ko){
 
 	/**
 	 * Check the value of the field is valid
+	 *
+	 * @memberOf FormInput
+	 * @return {bool} True if the field is valid, false else
 	 */
 	FormInput.prototype.isValid = function(){
 		/*** 1. If the field is required, the field can't be empty ***/
 		if (this.required) {
 			var emptyValue = this.emptyValue || '';
 			if(this.val() == emptyValue){
-				this.addError(Lang.get("form.required-field"));			
+				this.addError(Lang.get("form.required-field"));
 				return false;
 			}
 		}
-		
+
 		/*** 2. If the field has a specific pattern, test the value with this pattern ***/
-		if(this.pattern){		
+		if(this.pattern){
 			var regex = eval(this.pattern);
 			if(this.val() && ! regex.test(this.val())){
-				this.addError(Lang.exists('form.' + this.type + "-format") ? Lang.get('form.'+ this.type + "-format") : Lang.get("form.field-format"));			
+				this.addError(Lang.exists('form.' + this.type + "-format") ? Lang.get('form.'+ this.type + "-format") : Lang.get("form.field-format"));
 				return false;
 			}
 		}
-		
+
 		if (this.minimum) {
 			if (this.val() && this.val() < this.minimum){
 				this.addError(Lang.get('form.number-minimum', {value: this.minimum}));
 				return false;
 			}
 		}
-		
+
 		if (this.maximum) {
 			if (this.val() && this.val() > this.maximum){
 				this.addError(Lang.get('form.number-maximum', {value: this.maximum}));
 				return false;
 			}
 		}
-			
+
 		/*** 4. If the field has to be compared with another one, compare the two values ***/
 		if(this.compare){
 			if(this.val() != this.form.inputs[this.compare].val()){
-				this.addError(Lang.get('form.'+ this.type + "-comparison"));			
+				this.addError(Lang.get('form.'+ this.type + "-comparison"));
 				return false;
-			}				
+			}
 		}
-		
+
 		return true;
 	};
 
 
 	/**
-	 * Display an error on the field
+	 * Display an error on the input
+	 *
+	 * @memberOf FormInput
+	 * @param {string} text The error message to set to the input
 	 */
-	FormInput.prototype.addError = function(text){	
+	FormInput.prototype.addError = function(text){
 		if(this.errorAt){
 			this.form.inputs[this.errorAt].addError(text);
 		}
 		else{
 			this.node.addClass('error').after('<span class="input-error-message">'+ text + '</span>');
-		}			
+		}
 	};
 
-	/** 
-	 * Remove the errors on the field 
+	/**
+	 * Remove the errors on the input
+	 *
+	 * @memberOf FormInput
 	 */
 	FormInput.prototype.removeError = function(){
 		this.node.removeClass('error').next('.input-error-message').remove();

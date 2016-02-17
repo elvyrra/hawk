@@ -177,6 +177,20 @@ final class Router extends Singleton{
 
 
 	/**
+	 * Add a route acessible by PUT HTTP requests
+	 * @param string $name The route name. This name must be unique for each route
+	 * @param string $uri The route URI, defined like : /path/{param1}/to/{param2}
+	 * @param array $param The route parameters. This array can have the following data :
+	 *						- 'action' string (required) : The controller method to call when the route is matched. formatted like this : 'ControllerClass.method'
+	 *						- 'where' array (optionnal) : An array defining each parameter pattern, where keys are the names of the route parameters, and values are the regular expression to match (without delimiters)
+	 *						- 'default' array (optionnal) : An array defining the default values of parameters. This is useful to generate a URI from a route name (method getUri), without giving all parameters values
+	 */
+	public function put($name, $url, $param){
+		$this->add('put', $name, $url, $param);
+	}
+
+
+	/**
 	 * Add a route acessible by DELETE HTTP requests
 	 * @param string $name The route name. This name must be unique for each route
 	 * @param string $uri The route URI, defined like : /path/{param1}/to/{param2}
@@ -221,11 +235,11 @@ final class Router extends Singleton{
 	 * Compute the routing, and execute the controller method associated to the URI
 	 */
 	public function route(){
-		$uri = str_replace(BASE_PATH, '', parse_url(App::request()->getUri(), PHP_URL_PATH));
+		$path = str_replace(BASE_PATH, '', parse_url(App::request()->getUri(), PHP_URL_PATH));
 
 		// Scan each row
 		foreach($this->activeRoutes as $route){
-            if($route->match($uri)){
+            if($route->match($path)){
             	// The URI matches with the route
 				$this->currentRoute = &$route;
 
@@ -277,7 +291,7 @@ final class Router extends Singleton{
 		// The route was not found
 		App::logger()->warning('The URI ' . App::request()->getUri() . ' has not been routed');
 		App::response()->setStatus(404);
-        App::response()->setBody(Lang::get('main.404-message', array('uri' => $uri)));
+        App::response()->setBody(Lang::get('main.404-message', array('uri' => $path)));
 	}
 
 

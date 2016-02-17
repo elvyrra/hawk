@@ -7,14 +7,17 @@
 namespace Hawk\View\Plugins;
 
 /**
- * This class is used to display a form in a view
+ * This class is used to import a view file in another view.
+ * Importation will transfer all the view context (variables) in the imported view
+ * Exemple :
+ * <code>{import file="{$filename}"}</code>
  * @package View\Plugins
  */
 class Import extends \Hawk\ViewPlugin{
     /**
      * The id of the form to display
      */
-    public $file;    
+    public $file;
 
     /**
      * Import the file
@@ -30,6 +33,6 @@ class Import extends \Hawk\ViewPlugin{
             $basedir = dirname(realpath($this->viewFile));
         }
 
-        return \Hawk\View::make( $basedir . '/' . $this->file, $this->viewData );        
+        return \Hawk\View::make( $basedir . '/' . $this->file, $this->viewData );
     }
 }

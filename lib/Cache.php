@@ -7,7 +7,13 @@
 
 namespace Hawk;
 
+/**
+ * This class is used to manage cache in Hawk. It allows to save cache files in the folder /cache,
+ * and detect if a file is cached. This class is very useful to increase the application performances.
+ * @package Core
+ */
 class Cache extends Singleton{
+
     /**
      * The cache instance
      */
@@ -28,7 +34,7 @@ class Cache extends Singleton{
      * @param  string  $cacheFile The path of the cache file, relative to CACHE_DIR
      * @return boolean            true if the file cached, else false
      */
-    public function isCached($source, $cacheFile){        
+    public function isCached($source, $cacheFile){
         return is_file($this->getCacheFilePath($cacheFile)) && filemtime($source) < filemtime($this->getCacheFilePath($cacheFile));
     }
 
@@ -38,7 +44,7 @@ class Cache extends Singleton{
      * @param  string $cacheFile The path of the cache file
      * @return string            The content of the cache file
      */
-    public function getCacheContent($cacheFile){        
+    public function getCacheContent($cacheFile){
         return file_get_contents($this->getCacheFilePath($cacheFile));
     }
 
@@ -56,7 +62,7 @@ class Cache extends Singleton{
     /**
      * Save data in a cache file
      * @param  string $caheFile The path of the cache file, relative to CACHE_DIR
-     * @param  string $content  The content to write in the cache file     
+     * @param  string $content  The content to write in the cache file
      */
     public function save($cacheFile, $content){
         if(!is_dir(dirname($this->getCacheFilePath($cacheFile)))) {

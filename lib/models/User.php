@@ -163,6 +163,12 @@ class User extends Model{
 	}
 
 
+	/**
+	 * Get the user options. This function returns the option value for $name. If $name is not set,
+	 * it returns the array containing all the user options
+	 * @param  string $name The option name, formatted like '<plugin>.<key>'
+	 * @return mixed        The value for the option $name, or the array contaning all the user options
+	 */
 	public function getOptions($name = ''){
 		if(!isset($this->options)){
 			$example = $this->isLogged() ? array('userId' => $this->id) : array('userIp' => App::request()->clientIp());
@@ -187,6 +193,12 @@ class User extends Model{
 	}
 
 
+	/**
+	 * Register an option for the user. 
+	 * This function registers the option value in the database and in the current user options
+	 * @param string $name  The option name, formatted as '<plugin>.<key>'
+	 * @param mixed $value  The value to set to the option
+	 */
 	public function setOption($name, $value){
 		$this->getOptions();
 		$this->options[$name] = $value;

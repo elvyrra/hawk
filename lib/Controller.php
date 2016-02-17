@@ -1,6 +1,7 @@
 <?php
 /**
  * Controller.php
+ * 
  * @author Elvyrra SAS
  */
 
@@ -19,8 +20,14 @@ class Controller{
 	 */
 	public static $currentInstance = null;
 
+	/**
+	 * constant used in events triggered before a controller method to be executed
+	 */
 	const BEFORE_ACTION = 'before';
 
+	/**
+	 * constant used in events triggered afrer a controller method has been executed
+	 */
     const AFTER_ACTION = 'after';
 
     /**
@@ -161,7 +168,9 @@ class Controller{
 
 
 	/**
-	 * Add language keys to be accessible by Javascript
+	 * Add language keys to be accessible by Javascript. 
+	 * To add serveral keys, provide one key by argument
+	 * Example : $this->addKeysToJavascript('plugin.key1', 'plugin2.key2');
 	 * @param string $keys The keys to add
 	 */
 	public function addKeysToJavascript(...$keys){

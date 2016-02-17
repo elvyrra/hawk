@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /**
  *  Start by configure requirejs paths and shim
@@ -65,8 +65,11 @@ define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 
 	window.Form = Form;
 	window.List = List;
 	window.Lang = Lang;
+
 	/**
-	 * @class App - This class describes the behavior of the application
+	 * This class describes the behavior of the application
+	 *
+	 * @class App
 	 */
 	var App = function(){
 		this.conf = window.appConf;
@@ -83,12 +86,18 @@ define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 
 
 
 	/**
-	 * @const {string} INVALID_URI - The URI to return for non existing route
+	 * The URI to return for non existing route
+	 *
+	 * @constant
+	 * @memberOf App
 	 */
 	App.INVALID_URI = window.appConf.basePath + '/INVALID_URI';
 
+
 	/**
 	 * Initialize the application
+	 *
+	 * @memberOf App
 	 */
 	App.prototype.start = function(){
 		// Set the configuration data
@@ -303,6 +312,9 @@ define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 
 
 	/**
 	 * Add a callback when the application is ready to run
+	 *
+	 * @param {Function} callback The action to perform when the application is ready to run
+	 * @memberOf App
 	 */
 	App.prototype.ready = function(callback){
 		if (this.isReady) {
@@ -318,12 +330,14 @@ define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 
 
 
 	/**
-	 * Load a page in the current step, or a new step, or a given html node
+	 * Load a page in the current tab, or a new tab, or a given html node
+	 *
 	 * @param {string} url The url to load
 	 * @param {object} data, the options. This object can hasve the following data :
-	  	- newtab (default false) : if set to true, the page will be loaded in a new tab of the application
-	  	- onload (default null) : A callback function to execute when the page is loaded
-	  	- post (default null) : an object of POST data to send in the URL
+	 * 	- newtab (default false) : if set to true, the page will be loaded in a new tab of the application
+	 *	- onload (default null) : A callback function to execute when the page is loaded
+	 *	- post (default null) : an object of POST data to send in the URL
+	 * @memberOf App
 	 */
 	App.prototype.load = function(url, data){
 		/*** Default options ***/
@@ -456,8 +470,10 @@ define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 
 
 	/**
 	 * Open a set of pages
+	 *
 	 * @param {array} uris The uris to open, each one in a tab
 	 * @param {function} onload The callback to execute when all the tabs are loaded
+	 * @memberOf App
 	 */
 	App.prototype.openLastTabs = function(uris, onload){
 		var loaded = ko.observable(0);
@@ -486,9 +502,11 @@ define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 
 
 	/**
 	 * Display a notification on the application or on the user desktop
+	 *
 	 * @param {string} level - The notification level (info, success, warning, danger or desktop)
 	 * @param {string} message - The message to display in the notification
-	 * @parma {object} options - The options for desktop notifications
+	 * @param {object} options - The options for desktop notifications
+	 * @memberOf App
 	 */
 	App.prototype.notify = function(level, message, options){
 		if(level === "error"){
@@ -525,6 +543,13 @@ define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 
 		}
 	};
 
+
+
+	/**
+	 * Hide the displayed notification
+	 *
+	 * @memberOf App
+	 */
 	App.prototype.hideNotification = function(){
 		clearTimeout(this.notification.timeout);
 		this.notification.display(false);
@@ -533,7 +558,9 @@ define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 
 
 	/**
 	 * Load a URL in a dialog box
+	 *
 	 * @param {string} action - The action to perform. If "close", it will wlose the current dialog box, else it will load the action in the dialog box and open it
+	 * @memberOf App
 	 */
 	App.prototype.dialog = function(action){
 		var container = $("#dialogbox");
@@ -572,9 +599,11 @@ define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 
 
 	/**
 	 * Get uri for a given route name or the controller of the route
+	 *
 	 * @param {string} method - The route name or the controller method executed by this route
 	 * @param {object} args - The route parameters
 	 * @return {string} - the computed URI
+	 * @memberOf App
 	 */
 	App.prototype.getUri = function(method, args){
 		var route = null;
@@ -607,7 +636,10 @@ define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 
 
 	/**
 	 * Get the route name corresponding to an URI
+	 *
 	 * @param {string} uri - The uri to look the corresponding route for
+	 * @return {Object} The found route
+	 * @memberOf App
 	 */
 	App.prototype.getRouteFromUri = function(uri){
 		for(var i in this.routes){
@@ -621,7 +653,9 @@ define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 
 
 	/**
 	 * Set the existing routes of the application
+	 *
 	 * @param {object} routes - The routes to set
+	 * @memberOf App
 	 */
 	App.prototype.setRoutes = function(routes){
 		this.routes = routes;
@@ -630,7 +664,9 @@ define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 
 
 	/**
 	 * Set the language of the application
+	 *
 	 * @param {string} language - The language tag
+	 * @memberOf App
 	 */
 	App.prototype.setLanguage = function(language){
 		this.language = language;
@@ -639,7 +675,9 @@ define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 
 
 	/**
 	 * Set the root url of the application
+	 *
 	 * @param {string} url - The root url to set
+	 * @memberOf App
 	 */
 	App.prototype.setRootUrl = function(url){
 		this.rootUrl = url;
@@ -648,19 +686,23 @@ define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 
 
 	/**
 	 * Refresh the main menu
+	 *
+	 * @memberOf App
 	 */
 	App.prototype.refreshMenu = function(){
 	    $.get(this.getUri('refresh-menu'), function(response){
 	        $("#main-menu").replaceWith(response);
 
-			this.notify('warning', Lang.get('main.main-menu-changed'));			
+			this.notify('warning', Lang.get('main.main-menu-changed'));
 	    }.bind(this));
 	};
 
 
 	/**
 	 * Print a part of the page (or the whole page)
+	 *
 	 * @param  {NodeElement} element The DOM element to print. If not set or null, then this will print the whole page
+	 * @memberOf App
 	 */
 	App.prototype.print = function(element){
 		if(!element){
@@ -678,6 +720,12 @@ define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 
 		}
 	};
 
+	return App;
+});
+
+
+require(["app"], function(App){
+	// Instanciate the application
 	if(!window.app){
 		window.app = new App();
 	}
@@ -688,5 +736,3 @@ define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 
 
 	app.start();
 });
-
-require(["app"]);

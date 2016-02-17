@@ -111,11 +111,11 @@ class Route{
 
 	/**
 	 * Check if the route pattern match with a given URI, and if it matches, set the route data
-	 * @param string $uri The URI to check
+	 * @param string $path The URI to check
 	 * @return bool true if the URI match the route, else False
 	 */
-	public function match($uri){
-		if(preg_match('~^' . $this->pattern . '/?$~i', $uri, $m)){
+	public function match($path){
+		if(preg_match('~^' . $this->pattern . '/?$~i', $path, $m)){
 			// The URL match, let's test the filters to access this URL are OK
 			foreach(array_slice($m, 1) as $i => $var){
 				$this->setData($this->args[$i], $var);

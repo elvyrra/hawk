@@ -1,6 +1,14 @@
 define('list', ['jquery', 'ko'], function($, ko){
-    /** 
-     * This class describe the client behavior of the item lists
+    /**
+     * This class describe the client behavior of the item lists.
+     * Lists are available in window by `app.lists[id]`
+     *
+     * @param {Object} data The list initial parameters. this object must contain :
+     *                      - id : The list id
+     *                      - action : The URL to load to refresh the list
+     *                      - target (optionnal) : Where the list must be refreshed (defaultly, it will be replace itself)
+     *                      - userParam : The filters, orders and navigation parameters previously set by the user
+     * @class List
      */
     var List = function(data){
         this.id = data.id;
@@ -45,24 +53,26 @@ define('list', ['jquery', 'ko'], function($, ko){
 
     /**
      * Refresh the list
-     * @param {object} options Additionnal options to set to the request
+     *
+     * @param {object} options - Additionnal options to set to the request
+     * @memberOf List
      */
     List.prototype.refresh = function(options){
         // Set the user filters
         var data = {
             lines : this.lines(),
-            page : this.page(),       
+            page : this.page(),
             searches : this.searches,
             sorts : this.sorts
         };
-        
+
         var headers = options && options.headers || {};
         headers['X-List-Filter-' + this.id] = JSON.stringify(data);
 
         // Send the list is refreshing to the server
         var get = {
             refresh : 1
-        }        
+        }
         if(this.selected){
             get.selected = this.selected;
         };
@@ -75,7 +85,7 @@ define('list', ['jquery', 'ko'], function($, ko){
             data : get,
             cache : false,
         })
-        .done(function(response){                
+        .done(function(response){
             this.refreshContainer.html(response);
         }.bind(this))
 
@@ -89,6 +99,8 @@ define('list', ['jquery', 'ko'], function($, ko){
 
     /**
      * Listen for list parameters changements to refresh the list
+     *
+     * @memberOf List
      */
     List.prototype.initControls = function(){
         if(this.navigationSection.length){
@@ -96,24 +108,24 @@ define('list', ['jquery', 'ko'], function($, ko){
         }
         if(this.titleLine.length){
             ko.applyBindings(this, this.titleLine[0]);
-        }        
+        }
 
         var self = this;
-        
+
         /**
          * Select all the lines
          */
         this.node.find(".list-checkbox-all").change(function(){
             self.node.find(".list-checkbox").prop('checked',$(this).is(":checked")).trigger("change");
         });
-            
+
         /**
          * Select a line
          */
         this.node.find('.list-checkbox').change(function(){
             self.node.find(".list-checkbox-all").prop("checked", self.node.find(".list-checkbox:not(:checked)").length === 0);
         });
-        
+
 
         /**
          * Change the number of lines per page
@@ -121,8 +133,8 @@ define('list', ['jquery', 'ko'], function($, ko){
         this.lines.subscribe(function(value){
             this.refresh();
         }.bind(this));
-        
-            
+
+
         /**
          * Go to the page xx
          */
@@ -155,7 +167,7 @@ define('list', ['jquery', 'ko'], function($, ko){
             }
         }.bind(this));
 
-       
+
         $.each(this.fields, function(name, field){
             /**
              * Sort the list
@@ -182,7 +194,7 @@ define('list', ['jquery', 'ko'], function($, ko){
                 else{
                     delete(this.searches[name]);
                 }
-                
+
                 // Wait for 400 ms to refresh the list, in case the user enter new characters in this interval
                 clearTimeout(this.searchTimeout);
                 this.searchTimeout = setTimeout(function(){
@@ -190,7 +202,7 @@ define('list', ['jquery', 'ko'], function($, ko){
                 }.bind(this), 400);
 
             }.bind(this));
-        }.bind(this));      
+        }.bind(this));
     };
 
     return List;

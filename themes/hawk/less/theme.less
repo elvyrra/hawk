@@ -589,6 +589,7 @@ form{
 /*** The search icon ***/
 .list-search-block > .form-input-wrap{
     margin: 0;
+    width: 100%;
 }
 
 input[type="text"], input[type="checkbox"], select{
@@ -832,6 +833,17 @@ table {
     width: 100%;
 }
 
+/*------------------------ Accordions -------------------------*/
+.accordion{
+    .panel-heading{
+        .collapse-icon:before{
+            content : @fa-var-caret-up;
+        }
+        .collapsed .collapse-icon:before{
+            content : @fa-var-caret-down;
+        }
+    }
+}
 
 /*------------------------ Main layout ----------------------*/
 #main-menu, #footer{
@@ -1186,26 +1198,35 @@ p .icon{
 
 /*------------------------------ Autocomplete ------------------------------*/
 .ko-autocomplete{
-    position: absolute;
-    z-index: 1000;
-    background-color: white;
-    border-radius: 4px;
-    border: 1px solid rgba(0,0,0,.15);
-    padding: .5rem 0;
-    list-style-type: none;
-    min-width: 16rem;
+    display: inline-block;
+    position: relative;
 
-    &:empty{
-        display: none;
-    }
+    ul{
+        position: absolute;
+        z-index: 1000;
+        background-color: white;
+        border-radius: 4px;
+        border: 1px solid rgba(0,0,0,.15);
+        padding: .5rem 0;
+        list-style-type: none;
+        min-width: 16rem;
+        left: 0;
 
-    & > li {
-        cursor: pointer;
-        padding: .5rem;
+        &:empty{
+            display: none;
+        }
 
-        &:hover{
-            .alert-info();
-        };
+        & > li {
+            height: 100%;
+            display: block;
+            width: 100%;
+            padding: .5rem;
+            cursor: pointer;
+
+            &:hover, &:focus, &.hover{
+                .alert-info();
+            };
+        }
     }
 }
 

@@ -1,7 +1,9 @@
 define('tabs', ['jquery', 'ko'], function($, ko){
 
 	/**
-	 * This class describes the behavior of a tab
+	 * This class describes the behavior of a tab.
+	 *
+	 * @class Tab
 	 * @param int id The unique tab id
 	 */
 	window.Tab = function(id){
@@ -22,6 +24,11 @@ define('tabs', ['jquery', 'ko'], function($, ko){
 	};
 
 
+	/**
+	 * This class is the tabs manager of the application. It is accessible by `app.tabset`
+	 *
+	 * @class  Tabset
+	 */
 	var Tabset = function(){
 		this.tabs = ko.observableArray([]);
 
@@ -47,12 +54,17 @@ define('tabs', ['jquery', 'ko'], function($, ko){
 
 	/**
 	 * This index is incremented each time a tab is created, to generate a unique id for each tab
+	 *
+	 * @static
+	 * @private
 	 */
 	Tabset.index = 0;
 
 
 	/**
 	 * Push a new tab in the tabset
+	 *
+	 * @memberOf Tabset
 	 */
 	Tabset.prototype.push = function(){
 		/* Create the tab */
@@ -66,7 +78,9 @@ define('tabs', ['jquery', 'ko'], function($, ko){
 
 	/**
 	 * Remove a tab by it index in the tabset
+	 *
 	 * @param int index The tab index in the tabset
+	 * @memberOf Tabset
 	 */
 	Tabset.prototype.remove = function(index){
 		if(this.tabs().length > 1){
@@ -77,7 +91,7 @@ define('tabs', ['jquery', 'ko'], function($, ko){
 					this.activeId(next.id());
 				}
 			}
-			
+
 			if(this.tabs()[index].onclose){
 				this.tabs()[index].onclose.call(this.tabs()[index]);
 			}
@@ -93,6 +107,8 @@ define('tabs', ['jquery', 'ko'], function($, ko){
 
 	/**
 	 * Save the tabs last urls in a cookie
+	 *
+	 * @memberOf Tabset
 	 */
 	Tabset.prototype.registerTabs = function(){
 		var data = [];
@@ -105,8 +121,10 @@ define('tabs', ['jquery', 'ko'], function($, ko){
 
 	/**
 	 * Perform click action on tab title
+	 *
 	 * @param int $index The tab index in the tabset
 	 * @param Event event The triggered event
+	 * @memberOf Tabset
 	 */
 	Tabset.prototype.clickTab = function($index, event){
 		if(event.which === 2){

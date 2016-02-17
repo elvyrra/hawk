@@ -144,6 +144,7 @@ class Plugin{
 
 	/**
 	 * Get the plugin contaning a given filename
+	 * @param string $file The filename to get the containing plugin of
 	 * @return  Plugin The found plugin
 	 */
 	public static function getFilePlugin($file){

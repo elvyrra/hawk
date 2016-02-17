@@ -491,8 +491,15 @@ class PluginController extends Controller{
                         throw new \Exception('Impossible to create the file classes/Installer.php');
                     }
 
+                    // Create the file BaseController.php
+                    $controller = str_replace('{{ $namespace }}', $namespace, file_get_contents(Plugin::current()->getRootDir() . 'templates/base-controller.tpl'));
+                    if(file_put_contents($dir . 'controllers/BaseController.php', $controller) === false){
+                        throw new \Exception('Impossible to create the file controllers/BaseController.php');
+                    }
+
                     // Create the language file
-                    if(!touch($dir . 'lang/' . $plugin->getName() . '.en.lang')){
+                    $language = file_get_contents(Plugin::current()->getRootDir() . 'templates/lang.tpl');
+                    if(file_put_contents($dir . 'lang/' . $plugin->getName() . '.en.lang', $language) === false){
                         throw new \Exception('Impossible to create the file lang/' . $plugin->getName() . '.en.lang');
                     }
 

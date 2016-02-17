@@ -3,23 +3,23 @@
  * View.php
  * @author Elvyrra SAS
  */
- 
+
 namespace Hawk;
 
 /**
  * This class describes the behavior of views
  * @package View
  */
-class View{	
+class View{
 	/**
 	 * The source file of the view
 	 */
-	private $file, 
+	private $file,
 
 	/**
 	 * The content of the source template
 	 */
-	$content, 
+	$content,
 
 	/**
 	 * The data injected in the view for generation
@@ -35,10 +35,9 @@ class View{
 	 * The instanced views
 	 */
 	private static $instances = array();
-	
+
 	const PLUGINS_VIEW = 'view-plugins/';
 
-	const IMPORT_REGEX = '#\{\s*import\s*(["\'])(.+?)\\1\s*\}#is';
 	const BLOCK_START_REGEX = '#\{(if|elseif|else|for|foreach|while)\s*(\(.+?\))?\s*\}#i';
 	const BLOCK_END_REGEX = '#\{\/(if|for|foreach|while)\s*\}#is';
 	const ECHO_REGEX = '#\{{2}\s*(.+?)\}{2}#is';
@@ -47,10 +46,10 @@ class View{
 
 	const PLUGIN_REGEX = '#\{(\w+)((\s+[\w\-]+\=([\'"])((?:[^\4\\\\]|\\\\.)*?)\4)*?)\s*\}#sm';
 	const PLUGIN_ARGUMENTS_REGEX = '#([\w\-]+)\=([\'"])(\{?)((?:[^\2\\\\]|\\\\.)*?)(\}?)\\2#sm';
-	
+
 	const TRANSLATION_REGEX = '#{(?!if)([a-zA-Z]{2})}(.*?){/\\1}#ism';
 
-	
+
 	/**
 	 * Constructor
 	 * @param string $file The template file to parse
@@ -60,15 +59,15 @@ class View{
 			// The source file does not exist
 			throw new ViewException(ViewException::TYPE_FILE_NOT_FOUND, $file);
 		}
-		
+
 		$this->file = $file;
-		
-		// Get the cache file containing the precompiled 
+
+		// Get the cache file containing the precompiled
 		$this->cacheFile = 'views/' . str_replace(array(ROOT_DIR, '/'), array('', '-'), realpath($this->file)) . '.php';
 
 		if(! App::cache()->isCached($this->file, $this->cacheFile)) {
 			$this->content = file_get_contents($this->file);
-			$this->parse();			
+			$this->parse();
 			App::cache()->save($this->cacheFile, $this->parsed);
 		}
 
@@ -85,7 +84,7 @@ class View{
 		$this->data = $data;
 		return $this;
 	}
-	
+
 
 	/**
 	 * Add data to display in the view
@@ -93,19 +92,19 @@ class View{
 	 * @return View The view itself
 	 */
 	public function addData($data = array()){
-		$this->data = array_merge($this->data, $data);	
+		$this->data = array_merge($this->data, $data);
 		return $this;
 	}
 
 
 	/**
 	 * Get the data pushed in the view
-	 * @return array 
+	 * @return array
 	 */
 	public function getData(){
 		return $this->data;
 	}
-	
+
 
 	/**
 	 * Parse the view into a PHP file
@@ -119,14 +118,14 @@ class View{
 			self::ECHO_REGEX => "<?= $1 ?>", // echo
 			self::TRANSLATION_REGEX => "<?php if(LANGUAGE == '$1'): ?>$2<?php endif; ?>", // Support translations in views
 			self::ASSIGN_REGEX => "<?php ob_start(); ?>$3<?php \$$2 = ob_get_clean(); ?>" // assign template part in variable
-		);		
+		);
 		$this->parsed = preg_replace(array_keys($replaces), $replaces, $this->content);
-		
+
 		// Parse view plugins
 		$this->parsed = $this->parsePlugin($this->parsed);
 
 		$this->parsed = '<?php namespace ' . __NAMESPACE__ . '; ?>' . $this->parsed;
-		
+
 		return $this;
 	}
 
@@ -140,12 +139,12 @@ class View{
 		return preg_replace_callback(self::PLUGIN_REGEX, function($matches) use($inPlugin){
 			list($l, $component, $arguments) = $matches;
 			$componentClass = '\\Hawk\\View\\Plugins\\' . ucfirst($component);
-			
+
 			if(!class_exists($componentClass)){
 				return $matches[0];
 			}
-			try{			
-				
+			try{
+
 				$parameters = array();
 
 				while(preg_match(self::PLUGIN_ARGUMENTS_REGEX, $arguments, $m)){
@@ -157,19 +156,19 @@ class View{
 							$value = $this->parsePlugin($subPlugin, true);
 						}
 
-						// That is a PHP expression to evaluate => nothing to do						
+						// That is a PHP expression to evaluate => nothing to do
 					}
 					else{
 						// The value is a static string
 						$value = $quote .addcslashes($value, '\\') . $quote;
 					}
-					
+
 					$parameters[$name] = '\'' . $name . '\' => ' . $value;
-					
+
 					// Remove the argument from the arguments list
 					$arguments = str_replace($m[0], '', $arguments);
-				}				
-				
+				}
+
 				if(! $inPlugin){
 					return '<?= new ' . $componentClass . '("' . $this->file . '", $_viewData, array(' . implode(',',$parameters) . ') ) ?>';
 				}
@@ -192,12 +191,12 @@ class View{
 		extract($this->data);
 		$_viewData = $this->data;
 		ob_start();
-		
+
 		include App::cache()->getCacheFilePath($this->cacheFile);
-		
+
 		return ob_get_clean();
-	}	
-	
+	}
+
 
 	/**
 	 * Generate a view result
@@ -209,7 +208,7 @@ class View{
 		$view = new self($file);
 		$view->setData($data);
 		return $view->display();
-	}	
+	}
 
 
 	/**
@@ -226,7 +225,7 @@ class View{
 		$view = new self($file);
 		$view->setData($data);
 		$result = $view->display();
-		
+
 		// Remove temporary files
 		unlink($file);
 		App::cache()->clear($view->cacheFile);
@@ -245,11 +244,11 @@ class View{
 class ViewException extends \Exception{
 	const TYPE_FILE_NOT_FOUND = 1;
 	const TYPE_EVAL = 2;
-	
+
 	/**
 	 * Constructor
-	 * @param int $type The type of exception 
-	 * @param string $file The source file that caused this exception	 
+	 * @param int $type The type of exception
+	 * @param string $file The source file that caused this exception
 	 * @param Exception $previous The previous exception that caused that one
 	 */
 	public function __construct($type, $file, $previous = null){
@@ -258,7 +257,7 @@ class ViewException extends \Exception{
 			case self::TYPE_FILE_NOT_FOUND:
 				$message = "Error creating a view from template file $file : No such file or directory";
 			break;
-			
+
 			case self::TYPE_EVAL:
 				$trace = array_map(function($t){
 					return $t['file'] . ':' . $t['line'];
@@ -267,7 +266,7 @@ class ViewException extends \Exception{
 				$message = "An error occured while building the view from file $file : " . $previous->getMessage() . PHP_EOL . implode(PHP_EOL, $trace);
 			break;
 		}
-		
+
 		parent::__construct($message, $code, $previous);
 	}
 }

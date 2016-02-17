@@ -1,11 +1,11 @@
-<div class="panel-group" id="{{ $id }}" role="tablist" aria-multiselectable="true">
+<div class="panel-group accordion" id="{{ $id }}" role="tablist" aria-multiselectable="true">
     {foreach($panels as $i => $panel)}
-        <div class="panel panel-{{ $panel['type'] ? $panel['type'] : 'default' }}">
+        <div class="panel panel-{{ !empty($panel['type']) ? $panel['type'] : 'default' }}">
             <div class="panel-heading" role="tab" id="{{ $headingId = uniqid() }}">
                 <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#{{$id}}" href="#{{$panel['id']}}" aria-controls="{{$panel['id']}}">
+                    <a data-toggle="collapse" data-parent="#{{$id}}" href="#{{$panel['id']}}" aria-controls="{{$panel['id']}}" class="{{ $selected == $i ? '' :'collapsed'}}">
                         {{$panel['title']}}
-                        <i class="icon icon-caret-down pull-right"></i>
+                        <i class="icon icon-caret-down pull-right collapse-icon"></i>
                     </a>
                 </h4>
             </div>
@@ -13,7 +13,7 @@
                 <div class="panel-body">
                     {{ $panel['content'] }}
                 </div>
-            </div>  
+            </div>
         </div>
     {/foreach}
 </div>

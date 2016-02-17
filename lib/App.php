@@ -9,7 +9,8 @@
 namespace Hawk;
 
 /**
- * This class is used to generate the application singletons
+ * This class is used to generate the application singletons. It is loaded at script start, and initialize the following
+ * singletons : conf, errorHandler, logger, fs (FileSystem), session, router, request, response, cache and db
  * @package Core
  */
 final class App extends Singleton{
@@ -17,7 +18,7 @@ final class App extends Singleton{
      * The application instance
      */
     protected static $instance;
-    
+
 
     /**
      * Initialize the application
@@ -28,7 +29,7 @@ final class App extends Singleton{
 
         // Load the application error Handler
         $this->singleton('errorHandler', ErrorHandler::getInstance());
-        
+
         // Load the application logger
         $this->singleton('logger', Logger::getInstance());
 
@@ -43,11 +44,11 @@ final class App extends Singleton{
 
         // Load the application HTTP request
         $this->singleton('request', Request::getInstance());
-        
-        // Load the application HTTP response
-        $this->singleton('response', Response::getInstance());    
 
-        // Load the application cache 
+        // Load the application HTTP response
+        $this->singleton('response', Response::getInstance());
+
+        // Load the application cache
         $this->singleton('cache', Cache::getInstance());
     }
 
