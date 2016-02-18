@@ -51,7 +51,7 @@
      */
     app.forms["search-plugins-form"].submit = function(){
         if(this.isValid()){
-            app.load(app.getUri('search-plugins') + '?' + $(this.node).serialize());
+            app.load(app.getUri('search-plugins') + '?search=' + this.inputs.search.val());
         }
         else{
             this.displayErrorMessage(Lang.get('form.error-fill'));

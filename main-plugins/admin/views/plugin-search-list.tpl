@@ -1,3 +1,4 @@
+{button href="{uri action='manage-plugins'}" label="{text key='admin.search-plugin-back'}" icon="reply"}
 <div class="clearfix"></div>
 <div class="row container-fluid">
     {if(count($list->results))}

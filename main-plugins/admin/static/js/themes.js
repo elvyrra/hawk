@@ -90,76 +90,78 @@ $(".update-theme").click(function(){
 /**
  * Customize the theme variables
  */
-require(['less'], function(){
-    var form = app.forms['custom-theme-form'];
+setTimeout(function(){
+    require(['less'], function(){
+        var form = app.forms['custom-theme-form'];
 
-    // The id of the style tag containing the compiled CSS
-    var cssId = "less:custom-base-theme";
-
-    /**
-     * When the form has been successfully submitted, reload the page CSS
-     */
-    form.onsuccess = function(data){
-        $("#theme-base-stylesheet").attr('href', data.href);
-    };
-
-    var model = {
-        vars : {},
-        /**
-         * Reset the custom form
-         */
-        reset : function(){
-            for(var i in this.vars){
-                this.vars[i](less.options.initVars[i]);
-            }
-        },
+        // The id of the style tag containing the compiled CSS
+        var cssId = "less:custom-base-theme";
 
         /**
-         * Refresh the CSS when a form value changes
-         * @return {Promise}
+         * When the form has been successfully submitted, reload the page CSS
          */
-        refresh : function(){
-            var values = form.valueOf();
-            delete values.compiled, values.reset, values.valid;
+        form.onsuccess = function(data){
+            $("#theme-base-stylesheet").attr('href', data.href);
+        };
 
-            return less.modifyVars(values);
-        },
-
-        updateTimeout : 0
-    };
-
-    // Add the theme less file to lessjs
-    setTimeout(function(){
-        less.registerStylesheets();
-        model.refresh();
-    });
-
-
-    for(var i in form.inputs){
-        if(i !== 'compiled'){
-            var input = form.inputs[i];
-            model.vars[input.name] = ko.observable(input.val());
-
-            // Update a theme variable
-            model.vars[input.name].subscribe(function(value){
-                clearTimeout(model.updateTimeout);
-
-                // Real time compilation of the theme
-                model.updateTimeout = setTimeout(function(){
-                    model.refresh()
-                    .then(function(){
-                        form.inputs['compiled'].val(document.getElementById(cssId).innerText);
-                    });
-                }.bind(this), 50);
-
-                if(this.type === "color"){
-                    this.node.parent().colorpicker('setValue', value);
+        var model = {
+            vars : {},
+            /**
+             * Reset the custom form
+             */
+            reset : function(){
+                for(var i in this.vars){
+                    this.vars[i](less.options.initVars[i]);
                 }
-            }.bind(input));
-        }
-    }
+            },
 
-    ko.applyBindings(model, form.node.get(0));
+            /**
+             * Refresh the CSS when a form value changes
+             * @return {Promise}
+             */
+            refresh : function(){
+                var values = form.valueOf();
+                delete values.compiled, values.reset, values.valid;
+
+                return less.modifyVars(values);
+            },
+
+            updateTimeout : 0
+        };
+
+        // Add the theme less file to lessjs
+        setTimeout(function(){
+            less.registerStylesheets();
+            model.refresh();
+        });
+
+
+        for(var i in form.inputs){
+            if(i !== 'compiled'){
+                var input = form.inputs[i];
+                model.vars[input.name] = ko.observable(input.val());
+
+                // Update a theme variable
+                model.vars[input.name].subscribe(function(value){
+                    clearTimeout(model.updateTimeout);
+
+                    // Real time compilation of the theme
+                    model.updateTimeout = setTimeout(function(){
+                        model.refresh()
+                        .then(function(){
+                            form.inputs['compiled'].val(document.getElementById(cssId).innerText);
+                        });
+                    }.bind(this), 50);
+
+                    if(this.type === "color"){
+                        this.node.parent().colorpicker('setValue', value);
+                    }
+                }.bind(input));
+            }
+        }
+
+        ko.applyBindings(model, form.node.get(0));
+    });
 });
 
 /***

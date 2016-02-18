@@ -173,7 +173,7 @@ class Form{
         	$this->columns = 1;
         }
 
-        if(!class_exists($this->model)){			
+        if(!class_exists($this->model)){
 			$trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
 			$reflection = new \ReflectionClass($trace[1]['class']);
 			$this->model = $reflection->getNamespaceName() . '\\' . $this->model;
@@ -515,17 +515,17 @@ class Form{
 		try{
 			$this->dbaction = self::ACTION_REGISTER;
 
-
 			if($this->model == self::DEFAULT_MODEL || !$this->reference){
 				throw new \Exception("The method register of the class Form can be called only if model and reference properties are set");
 			}
 			if(!$this->object){
 				$model = $this->model;
-				$this->object = new $model();
+				$this->object = new $model($this->getData());
 			}
 			else{
 				$this->object->set($this->reference);
 			}
+
 
 			foreach($this->inputs as $name => $field){
 				/* Determine if we have to insert this field in the set of inserted values

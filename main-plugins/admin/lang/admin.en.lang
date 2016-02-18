@@ -234,6 +234,7 @@ search-plugin-result-free = "Free"
 search-plugin-result-list-installed = "Installed"
 search-plugin-downloads = "Downloaded {downloads} times"
 search-plugins-result-title = "Research plugins : {search}"
+search-plugin-back = "Back"
 update-plugin-button = "Update"
 
 search-theme-form-title = "Research a theme"

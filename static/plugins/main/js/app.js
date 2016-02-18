@@ -642,9 +642,11 @@ define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 
 	 * @memberOf App
 	 */
 	App.prototype.getRouteFromUri = function(uri){
+		var path = uri.replace(/\/?\?.*$/, '');
+
 		for(var i in this.routes){
 			var regex = new RegExp('^' + this.routes[i].pattern + '$');
-			if(uri.match(regex)){
+			if(path.match(regex)){
 				return i;
 			}
 		}
@@ -720,11 +722,6 @@ define('app', ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 
 		}
 	};
 
-	return App;
-});
-
-
-require(["app"], function(App){
 	// Instanciate the application
 	if(!window.app){
 		window.app = new App();
@@ -736,3 +733,6 @@ require(["app"], function(App){
 
 	app.start();
 });
+
+
+require(["app"]);

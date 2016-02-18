@@ -227,6 +227,7 @@ buy-plugin-button = "Acheter"
 search-plugin-result-free = "Gratuit"
 search-plugin-result-list-installed = "Installé"
 search-plugin-downloads = "Téléchargé {downloads} fois"
+search-plugin-back = "Retour"
 update-plugin-button = "Mise à jour"
 
 search-theme-form-title = "Rechercher un thème"

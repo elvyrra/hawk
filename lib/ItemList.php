@@ -24,127 +24,123 @@ class ItemList{
 	public static $lineChoice = array(10, 20, 50, 100);
 
 	/**
-	 * The list control buttons
-	 * @var array
+	 * @var string The list id
 	 */
-	public 	$controls = array(),
+	public $id,
 
 	/**
-	 * The list fields
-	 * @var array
+	 * @var array The list control buttons
+	 */
+	$controls = array(),
+
+	/**
+	 * @var array The list fields. This corresponds to the properties of each column in the list
 	 */
 	$fields = array(),
 
 	/**
-	 * The user researches in the list
-	 * @var array
+	 * @var array The user researches in the list
 	 */
 	$searches = array(),
 
 	/**
-	 * The user sorts
-	 * @var array
+	 * @var array The user sorts
 	 */
 	$sorts = array(),
 
 	/**
-	 * The binded values for the SQL queries
-	 * @var array
+	 * @var array The binded values for the SQL queries
 	 */
 	$binds = array(),
 
 	/**
-	 * The number of lines to display
-	 * @var int
+	 * @var int The number of lines to display
 	 */
 	$lines = self::DEFAULT_LINE_CHOICE,
 
 	/**
-	 * The page number to display
-	 * @var int
+	 * @var int The page number to display
 	 */
 	$page = 1,
 
 	/**
-	 * The URI called to refresh the list
-	 * @var string
+	 * @var string The URI called to refresh the list
 	 */
 	$action,
 
 	/**
-	 * The model used to get the data in the database
-	 * @var string
+	 * @var string The model used to get the data in the database
 	 */
 	$model = self::DEFAULT_MODEL,
 
 	/**
-	 * The default reference field, used to index the list result table
-	 * @var string
+	 * @var string The table where to get the data if "model" is not set
+	 */
+	$table,
+
+	/**
+	 * @var string The default reference field, used to index the list result table
 	 */
 	$reference,
 
 	/**
-	 * The default db instance name
-	 * @var  string
+	 * @var string The list filter
+	 */
+	$filter,
+
+	/**
+	 * @var  string The default db instance name
 	 */
 	$dbname = MAINDB,
 
 	/**
-	 * The raw data to display in the list (overrides table, model, dbname and reference properties)
+	 * @var  array The raw data to display in the list (overrides table, model, dbname and reference properties)
 	 */
 	$data = null,
 
 	/**
-	 * The fields group in the search query
-	 * @var array
+	 * @var array The fields group in the search query
 	 */
 	$group = array(),
 
 	/**
-	 * The id of the selected line
-	 * @var mixed
+	 * @var mixed The id of the selected line
 	 */
 	$selected = null,
 
 	/**
-	 * The class to apply to the list lines
-	 * @var strnig|function
+	 * @var string|function The class to apply to the list lines
 	 */
 	$lineClass = null,
 
 	/**
-	 * Defines if the navigation bar of the list must be displayed
-	 * @var bool
+	 * @var bool Defines if the navigation bar of the list must be displayed
 	 */
 	$navigation = true,
 
 	/**
-	 * If set to true, the columns headers are not displayed
-	 * @var bool
+	 * @var bool If set to true, the columns headers are not displayed
 	 */
 	$noHeader = false,
 
 	/**
-	 * If not empty, define the CSS selector of the node where to display the list refreshing result
-	 * @var string
+	 * @var string If not empty, define the CSS selector of the node where to display the list refreshing result
 	 */
 	$target = '',
 
 	/**
-	 * Define the message to display if no result are found for the list
-	 * @var string
+	 * @var string Define the message to display if no result are found for the list
 	 */
 	$emptyMessage,
 
 
 	/**
-	 * The whole list (list + navigation bar) view filename
-	 * @var string
+	 * @var string The whole list (list + navigation bar) view filename
 	 */
 	$tpl,
 
 	/**
-	 * @var  sintrg The navigation bar view filename
+	 * @var  string The navigation bar view filename
 	 */
 	$navigationBarTpl,
 
@@ -183,7 +179,7 @@ class ItemList{
 		/*** Get the values from the parameters array **/
 		$this->map($params);
 
-		if(!$this->data){
+		if($this->data === null){
 			if(!class_exists($this->model)){
 				$trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
 				$reflection = new \ReflectionClass($trace[1]['class']);
@@ -240,7 +236,7 @@ class ItemList{
 		}
 
 		$this->userParam = json_decode(App::session()->getUser()->getOptions('main.list-' . $this->id), true);
-		
+
 		foreach($parameters as $name){
 			if(isset($this->userParam[$name])){
 				$this->$name = $this->userParam[$name];
