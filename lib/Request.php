@@ -1,59 +1,79 @@
 <?php
 /**
  * Request.php
- * @author Elvyrra SAS
+ *
+ * @author  Elvyrra SAS
+ * @license http://rem.mit-license.org/ MIT
  */
 
 namespace Hawk;
 
 /**
- * This class define methods to get HTTP request information 
+ * This class define methods to get HTTP request information
+ *
  * @package Core
  */
 final class Request extends Singleton{
     /**
      * The clientIp, registered as static variable, to avoid to calculate it each time
+     *
      * @static
      */
     public $clientIp,
 
     /**
      * The request URI
+     *
+     * @var string
      */
     $uri,
 
     /**
-     * The request method
+     * The request method (GET, POST, PATCH, DELETE, PUT)
+     *
+     * @var string
      */
     $method,
 
     /**
      * The request parameters
+     *
+     * @var array
      */
     $params,
 
     /**
      * The request headers
+     *
+     * @var array
      */
     $headers,
 
     /**
      * The request body
+     *
+     * @var mixed
      */
     $body,
 
     /**
      * The uploaded files
+     *
+     * @var array
      */
     $files = array(),
 
     /**
      * The request sent cookies
+     *
+     * @var array
      */
     $cookies = array();
 
     /**
      * The request instance
+     *
+     * @var Request
      */
     protected static $instance;
 
@@ -75,19 +95,19 @@ final class Request extends Singleton{
         $this->params = $_GET;
 
         // Retrive the body
-        if($this->getHeaders('Content-Type') === 'application/json'){
+        if($this->getHeaders('Content-Type') === 'application/json') {
             $this->body = json_decode(file_get_contents('php://input'), true);
         }
         else{
             $this->body = $_POST;
-        }  
+        }
 
         // Retreive the client IP
         if ($this->getHeaders('X-Forwarded-For')) {
             // The user is behind a proxy that transmit HTTP_X_FORWARDED_FOR header
-            if ( ! preg_match('![0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}!', $this->getHeaders('X-Forwarded-For')) ){
+            if (! preg_match('![0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}!', $this->getHeaders('X-Forwarded-For'))) {
                 // The format of HTTP_X_FORWARDED_FOR header is not correct
-                $this->clientIp = getenv('REMOTE_ADDR');                
+                $this->clientIp = getenv('REMOTE_ADDR');
             }
             else{
                 // Get the last public IP in HTTP_X_FORWARDED_FOR header
@@ -95,7 +115,7 @@ final class Request extends Singleton{
                 for($i = 0 ; $i <= count($chain); $i ++){
                     $ip = $chain[$i];
 
-                    if((!preg_match("!^(192\.168|10\.0\.0)!", $ip) && $ip != "127.0.0.1") || $i == count($chain) - 1){
+                    if((!preg_match("!^(192\.168|10\.0\.0)!", $ip) && $ip != "127.0.0.1") || $i == count($chain) - 1) {
                         $this->clientIp = $ip;
                         break;
                     }
@@ -105,51 +125,51 @@ final class Request extends Singleton{
         else{
             // X-Forwarded-For header has not been transmitted, get the REMOTE_ADDR header
             $this->clientIp = getenv('REMOTE_ADDR');
-        }  
+        }
 
         // Get the request uploaded files
-        $this->files = $_FILES; 
+        $this->files = $_FILES;
 
         // Get the request cookies
-        $this->cookies = $_COOKIE; 
+        $this->cookies = $_COOKIE;
     }
 
 
     /**
      * Get the HTTP request method
-     * @static
+     *
      * @return string the HTTP request method
      */
-    public function getMethod(){        
+    public function getMethod(){
         return $this->method;
     }
-    
+
 
     /**
      * Get the HTTP request URI
-     * @static
-     * @return string The HTTP request URI 
+     *
+     * @return string The HTTP request URI
      */
     public function getUri(){
         return $this->uri;
     }
-    
+
 
     /**
      * Check if the request is an AJAX request
-     * @static
+     *
      * @return true if the request is an AJAX request else false
      */
     public function isAjax(){
         return strtolower($this->getHeaders('X-Requested-With')) === 'xmlhttprequest';
     }
-    
+
 
     /**
      * Get the client IP address.
-     * @static
+     *
      * @return string The IPV4 address of the client that performed the HTTP request
-     */    
+     */
     public function clientIp(){
         return $this->clientIp;
     }
@@ -157,25 +177,29 @@ final class Request extends Singleton{
 
     /**
      * This function returns the value of the variable $name in the request body, or all the body if $name is not provided
+     *
      * @param string $name The variable name
+     *
      * @return string|array The parameter value or all the body
      */
-    public function getBody($name = ""){        
-        if($name){
+    public function getBody($name = ""){
+        if($name) {
             return isset($this->body[$name]) ? $this->body[$name] : null;
         }
-        else{            
+        else{
             return $this->body;
         }
     }
 
     /**
      * Get the request uploaded files for the given name, or all files if $name is not provided
+     *
      * @param string $name The key in $_FILES to get
+     *
      * @return string|array The file or all files
      */
     public function getFiles($name = ''){
-        if($name){
+        if($name) {
             return isset($this->files[$name]) ? $this->files[$name] : array();
         }
         else{
@@ -185,11 +209,13 @@ final class Request extends Singleton{
 
     /**
      * This function returns the value of the parameter $name, or all the parameters if $name is not provided
+     *
      * @param string $name The parameter name
+     *
      * @return string|array The parameter value or all the parameters
      */
     public function getParams($name = ""){
-        if($name){
+        if($name) {
             return isset($this->params[$name]) ? $this->params[$name] : null;
         }
         else{
@@ -199,25 +225,29 @@ final class Request extends Singleton{
 
     /**
      * This function returns the header value for the key $name, of all the headers if $name is not provided
+     *
      * @param string $name The header key
+     *
      * @return string|array The header value or all the headers
      */
     public function getHeaders($name = ""){
-        if($name){
+        if($name) {
             return isset($this->headers[$name]) ? $this->headers[$name] : null;
         }
         else{
             return $this->headers;
-        }        
+        }
     }
 
     /**
      * This function returns the value of the cookie named $name, or all cookies if $name is not provided
+     *
      * @param string $name The cookie name
+     *
      * @return string|array The cookie value or all the cookies
      */
     public function getCookies($name = ""){
-        if($name){
+        if($name) {
             return isset($this->cookies[$name]) ? $this->cookies[$name] : null;
         }
         else{

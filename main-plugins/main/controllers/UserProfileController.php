@@ -1,20 +1,32 @@
 <?php
-
+/**
+ * UserProfileController.php
+ *
+ * @author  Elvyrra SAS
+ * @license http://rem.mit-license.org/ MIT
+ */
 namespace Hawk\Plugins\Main;
 
+/**
+ * User profile controller
+ *
+ * @package Plugins\Main
+ */
 class UserProfileController extends Controller{
 
     /**
      * Create or edit an user
      */
     public function edit(){
-        if(!$this->userId){
+        if(!$this->userId) {
             $user = Session::getUser();
         }
         else{
             $user = User::getById($this->userId);
         }
-        $roles = array_map(function($role){ return $role->getLabel(); }, Role::getAll('id'));
+        $roles = array_map(function ($role) {
+            return $role->getLabel();
+        }, Role::getAll('id'));
 
         $param = array(
             'id' => 'user-form',
@@ -75,16 +87,19 @@ class UserProfileController extends Controller{
             $field['independant'] = true;
             $field['label'] = Lang::get('admin.profile-question-' . $question->name . '-label');
 
-            if($user){
-                if($question->type == "file"){
-                    $field['after'] = "<img src='" . ( $user->getProfileData($question->name) ? $user->getProfileData($question->name) : "") . "' class='profile-image' />";
+            if($user) {
+                if($question->type == "file") {
+                    $field['after'] = sprintf(
+                        '<img src="%s" class="profile-image" />',
+                        $user->getProfileData($question->name) ? $user->getProfileData($question->name) : ''
+                    );
                 }
                 else{
                     $field['default'] = $user->getProfileData($question->name);
                 }
             }
 
-            if($question->name == 'language'){
+            if($question->name == 'language') {
                 // Get language options
                 $languages = Language::getAllActive();
                 $options = array();
@@ -92,7 +107,7 @@ class UserProfileController extends Controller{
                     $options[$language->tag] = $language->label;
                 }
                 $field['options'] = $options;
-                if(!$field['default']){
+                if(!$field['default']) {
                     $field['default'] = Option::get($this->_plugin . '.language');
                 }
             }
@@ -103,7 +118,7 @@ class UserProfileController extends Controller{
         }
 
         $form = new Form($param);
-        if(!$form->submitted()){
+        if(!$form->submitted()) {
             return View::make(Theme::getSelected()->getView("dialogbox.tpl"), array(
                 'page' => $form,
                 'title' => Lang::get('admin.user-form-title'),
@@ -113,14 +128,14 @@ class UserProfileController extends Controller{
         else{
             try{
                 foreach($questions as $question){
-                    if($question->type === 'file'){
+                    if($question->type === 'file') {
                         $upload = Upload::getInstance($question->name);
 
-                        if($upload){
+                        if($upload) {
                             $file = $upload->getFile(0);
                             $dir = Plugin::current()->getPublicUserfilesDir()  . 'img/';
                             $url = Plugin::current()->getUserfilesUrl() . 'img/';
-                            if(!is_dir($dir)){
+                            if(!is_dir($dir)) {
                                 mkdir($dir, 0755, true);
                             }
 
@@ -191,7 +206,7 @@ class UserProfileController extends Controller{
 
         $form = new Form($params);
 
-        if(!$form->submitted()){
+        if(!$form->submitted()) {
             return View::make(Theme::getSelected()->getView("dialogbox.tpl"), array(
                 'title' => Lang::get($this->_plugin . '.update-password-title'),
                 'icon' => 'lock',
@@ -199,9 +214,9 @@ class UserProfileController extends Controller{
             ));
         }
         else{
-            if($form->check()){
+            if($form->check()) {
                 $me = Session::getUser();
-                if($me->password != Crypto::saltHash($form->getData('current-password'))){
+                if($me->password != Crypto::saltHash($form->getData('current-password'))) {
                     return $form->response(Form::STATUS_ERROR, Lang::get($this->_plugin . '.update-password-bad-current-password'));
                 }
                 try{

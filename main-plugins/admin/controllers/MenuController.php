@@ -1,205 +1,207 @@
 <?php
 /**
  * MenuController.php
- * @author Elvyrra SAS
- * @license MIT
+ *
+ * @author  Elvyrra SAS
+ * @license http://rem.mit-license.org/ MIT
  */
-
 namespace Hawk\Plugins\Admin;
 
 /**
- * This controller is used to manage the main application menu
+ * Menu controller
+ *
+ * @package Plugins\Admin
  */
 class MenuController extends Controller{
-	/**
-	 * Customize the menu
-	 */
-	public function index(){
-		$items = MenuItem::getAll();
+    /**
+     * Customize the menu
+     */
+    public function index(){
+        $items = MenuItem::getAll();
 
-		$form = new Form(array(
-			'id' => 'set-menus-form',
-			'action' => App::router()->getUri('set-menu'),
-			'inputs' => array(
-				new HiddenInput(array(
-					'name' => 'data',
-					'default' => json_encode($items, JSON_NUMERIC_CHECK),
-					'attributes' => array(
-						'ko-value' => 'ko.toJSON(items)'
-					),
-				)),
+        $form = new Form(array(
+            'id' => 'set-menus-form',
+            'action' => App::router()->getUri('set-menu'),
+            'inputs' => array(
+                new HiddenInput(array(
+                    'name' => 'data',
+                    'default' => json_encode($items, JSON_NUMERIC_CHECK),
+                    'attributes' => array(
+                        'ko-value' => 'ko.toJSON(items)'
+                    ),
+                )),
+                new SubmitInput(array(
+                    'name' => 'valid',
+                    'value' => Lang::get('main.valid-button'),
+                )),
+            ),
+            'onsuccess' => 'app.refreshMenu()'
+        ));
 
-				new SubmitInput(array(
-					'name' => 'valid',
-					'value' => Lang::get('main.valid-button'),
-				)),
-			),
+        if(!$form->submitted()) {
 
-			'onsuccess' => 'app.refreshMenu()'
-		));
+            $this->addKeysToJavaScript($this->_plugin . '.plugins-advert-menu-changed');
 
-		if(!$form->submitted()){
+            return View::make(Plugin::current()->getView('sort-main-menu.tpl'), array(
+                'form' => $form,
+            ));
+        }
+        else{
+            try {
+                $items = MenuItem::getAll('id');
 
-			$this->addKeysToJavaScript($this->_plugin . '.plugins-advert-menu-changed');
+                $data = json_decode($form->getData('data'), true);
 
-			return View::make(Plugin::current()->getView('sort-main-menu.tpl'), array(
-				'form' => $form,
-			));
-		}
-		else{
-			try {
-				$items = MenuItem::getAll('id');
+                foreach($data as $line){
+                    $item = $items[$line['id']];
+                    $item->set(array(
+                        'active' => $line['active'],
+                        'parentId' => $line['parentId'],
+                        'order' => $line['order']
+                    ));
+                    $item->save();
+                }
 
-				$data = json_decode($form->getData('data'), true);
+                return $form->response(Form::STATUS_SUCCESS, Lang::get($this->_plugin . '.sort-menu-success'));
+            }
+            catch (Exception $e) {
+                return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get($this->_plugin . '.sort-menu-error'));
+            }
 
-				foreach($data as $line){
-					$item = $items[$line['id']];
-					$item->set(array(
-						'active' => $line['active'],
-						'parentId' => $line['parentId'],
-						'order' => $line['order']
-					));
-					$item->save();
-				}
+        }
+    }
 
-				return $form->response(Form::STATUS_SUCCESS, Lang::get($this->_plugin . '.sort-menu-success'));
-			}
-			catch (Exception $e) {
-				return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get($this->_plugin . '.sort-menu-error'));
-			}
+    /**
+     * Remove a custom menu item
+     */
+    public function removeCustomMenuItem(){
+        $item = MenuItem::getById($this->itemId);
 
-		}
-	}
+        if($item && $item->plugin === 'custom') {
+            $item->delete();
 
-	/**
-	 * Remove a custom menu item
-	 */
-	public function removeCustomMenuItem(){
-		$item = MenuItem::getById($this->itemId);
+            foreach(Language::getAll() as $language){
+                $language->removeTranslations(array(
+                    'custom' => array('menu-item-' . $item->name . '-title')
+                ));
+            }
+        }
+        else{
+            App::response()->setStatus(412);
+        }
+    }
 
-		if($item && $item->plugin === 'custom'){
-			$item->delete();
+    /**
+     * Generate the form to create / edit a custom menu item
+     *
+     * @param int $itemId The id of the item to edit
+     */
+    public function customMenuItemForm($itemId){
+        $item = MenuItem::getById($itemId);
 
-			foreach(Language::getAll() as $language){
-				$language->removeTranslations(array(
-					'custom' => array('menu-item-' . $item->name . '-title')
-				));
-			}
-		}
-		else{
-			App::response()->setStatus(412);
-		}
-	}
+        $name = $item ? $item->name : uniqid();
 
-	/**
-	 * Generate the form to create / edit a custom menu item
-	 */
-	public function customMenuItemForm($itemId){
-		$item = MenuItem::getById($itemId);
+        $param = array(
+            'id' => 'menu-item-form-' . $itemId,
+            'class' => 'menu-item-form',
+            'object' => $item,
+            'model' => 'MenuItem',
+            'reference' => array('id' => $itemId),
+            'action' => App::router()->getUri('edit-menu', array('itemId' => $itemId)),
+            'fieldsets' => array(
+                'parameters' => array(
+                    new HiddenInput(array(
+                        'name' => 'plugin',
+                        'value' => 'custom'
+                    )),
 
-		$name = $item ? $item->name : uniqid();
+                    new HiddenInput(array(
+                        'name' => 'parentId',
+                        'default' => '0'
+                    )),
 
-		$param = array(
-			'id' => 'menu-item-form-' . $itemId,
-			'class' => 'menu-item-form',
-			'object' => $item,
-			'model' => 'MenuItem',
-			'reference' => array('id' => $itemId),
-			'action' => App::router()->getUri('edit-menu', array('itemId' => $itemId)),
-			'fieldsets' => array(
-				'parameters' => array(
-					new HiddenInput(array(
-						'name' => 'plugin',
-						'value' => 'custom'
-					)),
+                    new HiddenInput(array(
+                        'name' => 'active',
+                        'default' => '0'
+                    )),
 
-					new HiddenInput(array(
-						'name' => 'parentId',
-						'default' => '0'
-					)),
+                    new HiddenInput(array(
+                        'name' => 'name',
+                        'default' => $name,
+                    )),
 
-					new HiddenInput(array(
-						'name' => 'active',
-						'default' => '0'
-					)),
+                    new HiddenInput(array(
+                        'name' => 'labelKey',
+                        'default' => 'custom.menu-item-' . $name . '-title'
+                    ))
+                ),
 
-					new HiddenInput(array(
-						'name' => 'name',
-						'default' => $name,
-					)),
+                'submits' => array(
+                    new SubmitInput(array(
+                        'name' => 'valid',
+                        'value' => Lang::get('main.valid-button')
+                    )),
 
-					new HiddenInput(array(
-						'name' => 'labelKey',
-						'default' => 'custom.menu-item-' . $name . '-title'
-					))
-				),
+                    new ButtonInput(array(
+                        'name' => 'cancel',
+                        'onclick' => 'app.dialog("close")',
+                        'value' => Lang::get('main.cancel-button'),
+                        'notDisplayed' => ! $itemId
+                    ))
+                ),
+            ),
 
-				'submits' => array(
-					new SubmitInput(array(
-						'name' => 'valid',
-						'value' => Lang::get('main.valid-button')
-					)),
+            'onsuccess' => 'app.forms["set-menus-form"].node.trigger("register-custom-item", data);'
+        );
 
-					new ButtonInput(array(
-						'name' => 'cancel',
-						'onclick' => 'app.dialog("close")',
-						'value' => Lang::get('main.cancel-button'),
-						'notDisplayed' => ! $itemId
-					))
-				),
-			),
+        foreach(Language::getAllActive() as $language){
+            $param['fieldsets']['parameters'][] = new TextInput(array(
+                'name' => 'label[' . $language->tag . ']',
+                'independant' => true,
+                'label' => Lang::get($this->_plugin . '.menu-item-form-label', array('language' => $language->tag)),
+                'default' => $itemId ? Lang::get('custom.menu-item-' . $name . '-title', null, null, $language->tag) : ''
+            ));
+        }
 
-			'onsuccess' => 'app.forms["set-menus-form"].node.trigger("register-custom-item", data);'
-		);
-
-		foreach(Language::getAllActive() as $language){
-			$param['fieldsets']['parameters'][] = new TextInput(array(
-				'name' => 'label[' . $language->tag . ']',
-				'independant' => true,
-				'label' => Lang::get($this->_plugin . '.menu-item-form-label', array('language' => $language->tag)),
-				'default' => $itemId ? Lang::get('custom.menu-item-' . $name . '-title', null, null, $language->tag) : ''
-			));
-		}
-
-		return new Form($param);
-	}
+        return new Form($param);
+    }
 
 
-	/**
-	 * Edit a custom menu item
-	 */
-	public function editCustomMenuItem(){
-		$form = $this->customMenuItemForm($this->itemId);
+    /**
+     * Edit a custom menu item
+     */
+    public function editCustomMenuItem(){
+        $form = $this->customMenuItemForm($this->itemId);
 
-		if(!$form->submitted()){
-			return View::make(Theme::getSelected()->getView('dialogbox.tpl'), array(
-				'page' => $form->display(),
-				'title' => Lang::get($this->_plugin . '.menu-item-form-edit-title'),
-				'icon' => 'pencil'
-			));
-		}
-		else{
-			if($form->check()){
-				try{
-					$form->register(Form::NO_EXIT);
+        if(!$form->submitted()) {
+            return View::make(Theme::getSelected()->getView('dialogbox.tpl'), array(
+                'page' => $form->display(),
+                'title' => Lang::get($this->_plugin . '.menu-item-form-edit-title'),
+                'icon' => 'pencil'
+            ));
+        }
+        else{
+            if($form->check()) {
+                try{
+                    $form->register(Form::NO_EXIT);
 
-					// Register the translations of the menu
-					foreach(App::request()->getBody('label') as $tag => $translation){
-						Language::getByTag($tag)->saveTranslations(array(
-							$form->getData('plugin') => array(
-								'menu-item-' . $form->getData('name') . '-title' => $translation
-							)
-						));
-					}
+                    // Register the translations of the menu
+                    foreach(App::request()->getBody('label') as $tag => $translation){
+                        Language::getByTag($tag)->saveTranslations(array(
+                            $form->getData('plugin') => array(
+                                'menu-item-' . $form->getData('name') . '-title' => $translation
+                            )
+                        ));
+                    }
 
-					$form->addReturn(get_object_vars($form->object));
-					$form->addReturn('label', App::request()->getBody('label')[LANGUAGE]);
-					return $form->response(Form::STATUS_SUCCESS, Lang::get($this->_plugin . '.menu-item-form-success'));
-				}
-				catch(\Exception $e){
-					return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get($this->_plugin . '.menu-item-form-error'));
-				}
-			}
-		}
-	}
+                    $form->addReturn(get_object_vars($form->object));
+                    $form->addReturn('label', App::request()->getBody('label')[LANGUAGE]);
+                    return $form->response(Form::STATUS_SUCCESS, Lang::get($this->_plugin . '.menu-item-form-success'));
+                }
+                catch(\Exception $e){
+                    return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get($this->_plugin . '.menu-item-form-error'));
+                }
+            }
+        }
+    }
 }

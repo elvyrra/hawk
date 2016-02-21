@@ -1,14 +1,16 @@
 <?php
 /**
  * HawkApi.php
- * @author Elvyrra SAS
- * @license MIT
+ *
+ * @author  Elvyrra SAS
+ * @license http://rem.mit-license.org/ MIT
  */
 
 namespace Hawk;
 
 /**
  * This class treats the interface with the Hawk site, to get the informations from the site database via an Restful API
+ *
  * @package Network
  */
 class HawkApi{
@@ -25,6 +27,7 @@ class HawkApi{
 
     /**
      * The callable routes on the API, with their parameters
+     *
      * @var array
      */
     public static $routes = array(
@@ -154,9 +157,12 @@ class HawkApi{
 
     /**
      * Call the API
+     *
      * @param string $routeName The route name to call
-     * @param array $param The URL parameter to set
-     * @param array $data An associative array of the data to send in the request : 'params', 'body', 'files'
+     * @param array  $param     The URL parameter to set
+     * @param array  $data      An associative array of the data to send in the request : 'params', 'body', 'files'
+     *
+     * @return mixed The API response body
      */
     private function callApi($routeName, $param = array(), $data = array()){
         $route = self::$routes[$routeName];
@@ -175,29 +181,31 @@ class HawkApi{
             $uri = str_replace('{' . $key . '}', $value, $uri);
         }
 
-        if(!empty($data['params'])){
+        if(!empty($data['params'])) {
             $uri .= '?' . http_build_query($data['params']);
         }
 
-        $request = new HTTPRequest(array(
+        $request = new HTTPRequest(
+            array(
             'url' => HAWK_SITE_URL . '/api' . $uri,
             'headers' => array(
-                'X-Requested-With' => 'XMLHttpRequest'
+            'X-Requested-With' => 'XMLHttpRequest'
             ),
             'method' => $route['method'],
             'contentType' => 'json',
             'dataType' => isset($route['dataType']) ? $route['dataType'] : 'json',
             'body' => $data['body'],
             'files' => $data['files']
-        ));
+            )
+        );
 
         $request->send();
 
-        if($request->getStatusCode() === 200){
+        if($request->getStatusCode() === 200) {
             $result = $request->getResponse();
             $contentType = $request->getResponseHeaders('Content-Type');
 
-            if($contentType == 'application/octet-stream'){
+            if($contentType == 'application/octet-stream') {
 
                 $tmpName = TMP_DIR . uniqid() . '.zip' ;
 
@@ -217,6 +225,7 @@ class HawkApi{
 
     /**
      * Get the available updates of Hawk
+     *
      * @return array The list of available version newer than the current one
      */
     public function getCoreAvailableUpdates(){
@@ -234,7 +243,9 @@ class HawkApi{
 
     /**
      * Download an update file for the core
+     *
      * @param string $version The version update to get
+     *
      * @return string The filename of the temporary file created by the downloaded content
      */
     public function getCoreUpdateArchive($version){
@@ -247,7 +258,9 @@ class HawkApi{
 
     /**
      * Search plugins
+     *
      * @param string $search The search term
+     *
      * @return array The list of found plugins
      */
     public function searchPlugins($search){
@@ -265,7 +278,9 @@ class HawkApi{
 
     /**
      * Download a plugin file
+     *
      * @param string $name The plugin name to download
+     *
      * @return string The filename of the temporary file created by the downloaded content
      */
     public function downloadPlugin($name){
@@ -278,7 +293,11 @@ class HawkApi{
 
     /**
      * Search for updates on a list of plugins
-     * @param array $plugins The list of plugins to search available updates for, where keys are plugin names, and values their current version
+     *
+     * @param array $plugins The list of plugins to search available updates for,
+     *                       where keys are plugin names, and values their current version
+     *
+     * @return array The list of the available updates on plugins
      */
     public function getPluginsAvailableUpdates($plugins){
         return $this->callApi(
@@ -295,7 +314,9 @@ class HawkApi{
 
     /**
      * Search themes
+     *
      * @param string $search The search term
+     *
      * @return array The list of found themes
      */
     public function searchThemes($search){
@@ -313,7 +334,9 @@ class HawkApi{
 
     /**
      * Download a theme file
+     *
      * @param string $name The theme name to download
+     *
      * @return string The filename of the temporary file created by the downloaded content
      */
     public function downloadTheme($name){
@@ -328,7 +351,11 @@ class HawkApi{
 
     /**
      * Search for updates on a list of themes
-     * @param array $themes The list of themes to search available updates for, where keys are themes names, and values their current version
+     *
+     * @param array $themes The list of themes to search available updates for,
+     *                      where keys are themes names, and values their current version
+     *
+     * @return array The list of available updates on themes
      */
     public function getThemesAvailableUpdates($themes){
         return $this->callApi(
@@ -344,20 +371,26 @@ class HawkApi{
 
     /**
      * Get all available updates on Hawk, plugins and themes
-     * @param array $plugins The list of plugins to search available updates for, where keys are plugin names, and values their current version
-     * @param array $themes The list of themes to search available updates for, where keys are themes names, and values their current version
+     *
+     * @param array $plugins The list of plugins to search available updates for,
+     *                        where keys are plugin names, and values their current version
+     * @param array $themes  The list of themes to search available updates for,
+     *                        where keys are themes names, and values their current version
+     *
      * @return array The available udpates, in an array in the following format :
-     * array(
-     *     'hawk' => 'v1.0.0',
-     *     'plugins' => array(
-     *         'pluginName' => 'v1.2.3.0',
-     *         ...
-     *     ),
-     *     'themes' => array(
-     *         'themeName' => 'v0.0.5.1',
-     *         ...
-     *     )
-     * )
+     *                   <code>
+     *                   array(
+     *                       'hawk' => 'v1.0.0',
+     *                       'plugins' => array(
+     *                           'pluginName' => 'v1.2.3.0',
+     *                           ...
+     *                       ),
+     *                       'themes' => array(
+     *                           'themeName' => 'v0.0.5.1',
+     *                           ...
+     *                       )
+     *                   )
+     *                   </code>
      */
     public function getAllAvailableUpdates($plugins, $themes){
         return $this->callApi(
@@ -376,6 +409,8 @@ class HawkApi{
 
 /**
  * This class describes Exceptions throwed by a request to the A.P.I
+ *
  * @package Exceptions
  */
-class HawkApiException extends \Exception{}
+class HawkApiException extends \Exception{
+}

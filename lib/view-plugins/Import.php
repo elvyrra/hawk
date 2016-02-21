@@ -1,7 +1,9 @@
 <?php
 /**
  * Import.php
- * @author Elvyrra SAS
+ *
+ * @author  Elvyrra SAS
+ * @license http://rem.mit-license.org/ MIT
  */
 
 namespace Hawk\View\Plugins;
@@ -11,11 +13,14 @@ namespace Hawk\View\Plugins;
  * Importation will transfer all the view context (variables) in the imported view
  * Exemple :
  * <code>{import file="{$filename}"}</code>
+ *
  * @package View\Plugins
  */
 class Import extends \Hawk\ViewPlugin{
     /**
      * The id of the form to display
+     *
+     * @var string
      */
     public $file;
 
@@ -23,7 +28,7 @@ class Import extends \Hawk\ViewPlugin{
      * Import the file
      */
     public function display(){
-        if($this->file{0} == '/'){
+        if($this->file{0} == '/') {
             // Absolute path
             $basedir = ROOT_DIR;
             $this->file = preg_replace('#^' . ROOT_DIR . '#', '', $this->file);
@@ -33,6 +38,6 @@ class Import extends \Hawk\ViewPlugin{
             $basedir = dirname(realpath($this->viewFile));
         }
 
-        return \Hawk\View::make( $basedir . '/' . $this->file, $this->viewData );
+        return \Hawk\View::make($basedir . '/' . $this->file, $this->viewData);
     }
 }

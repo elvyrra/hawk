@@ -1,14 +1,16 @@
 <?php
 /**
  * PluginInstaller.php
- * @author Elvyrra SAS
- * @license MIT
+ *
+ * @author  Elvyrra SAS
+ * @license http://rem.mit-license.org/ MIT
  */
 
 namespace Hawk;
 
 /**
  * This abstract class defines the methods used to install, activate, deactivate, and uninstall plugins
+ *
  * @package Core\Plugin
  */
 abstract class PluginInstaller {
@@ -19,12 +21,14 @@ abstract class PluginInstaller {
 
     /**
      * The plugin name the installer is associated with
+     *
      * @var string
      */
     public $_plugin;
 
     /**
      * Constructor
+     *
      * @param Plugin $plugin The plugin the installer is associated with
      */
     public function __construct($plugin){

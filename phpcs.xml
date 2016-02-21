@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<ruleset name="Hawk - code sniffer">
+    <description>The coding standard for PHP_CodeSniffer itself.</description>
+
+    <file>./lib</file>
+    <file>./includes</file>
+    <file>./main-plugins</file>
+    <file>index.php</file>
+    <file>start.php</file>
+
+    <extensions>php</extensions>
+
+    <exclude-pattern>lib/ext/*</exclude-pattern>
+    <exclude-pattern>cache/*</exclude-pattern>
+    <exclude-pattern>*.js</exclude-pattern>
+
+    <arg name="report" value="full"/>
+    <arg name="report-file" value="cs.txt" />
+    <arg value="np"/>
+
+    <rule ref="PEAR">
+        <exclude name="PEAR.Commenting.FileComment.Missing" />
+        <exclude name="PEAR.Commenting.FileComment.MissingCategoryTag" />
+        <exclude name="PEAR.Commenting.FileComment.MissingPackageTag" />
+        <exclude name="PEAR.Commenting.FileComment.MissingLinkTag" />
+        <exclude name="PEAR.Commenting.FileComment.InvalidAuthors" />
+
+        <exclude name="PEAR.Commenting.ClassComment.MissingCategoryTag" />
+        <exclude name="PEAR.Commenting.ClassComment.MissingLinkTag" />
+        <exclude name="PEAR.Commenting.ClassComment.MissingAuthorTag" />
+        <exclude name="PEAR.Commenting.ClassComment.InvalidAuthors" />
+        <exclude name="PEAR.Commenting.ClassComment.MissingLicenseTag" />
+
+        <exclude name="PEAR.Commenting.FunctionComment.MissingReturn" />
+
+        <exclude name="PEAR.NamingConventions.ValidVariableName.PrivateNoUnderscore" />
+        <exclude name="PEAR.NamingConventions.ValidFunctionName.PrivateNoUnderscore" />
+        <exclude name="PEAR.NamingConventions.ValidVariableName.PublicUnderscore" />
+
+        <exclude name="PEAR.Classes.ClassDeclaration.OpenBraceNewLine" />
+
+        <exclude name="PEAR.Functions.FunctionDeclaration.BraceOnSameLine" />
+        <exclude name="PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket" />
+        <exclude name="PEAR.Functions.FunctionCallSignature.CloseBracketLine" />
+        <exclude name="PEAR.Functions.FunctionCallSignature.Indent" />
+
+        <exclude name="PEAR.ControlStructures.ControlSignature" />
+
+        <exclude name="PEAR.WhiteSpace.ScopeIndent"/>
+    </rule>
+
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="120"/>
+            <property name="absoluteLineLimit" value="160"/>
+        </properties>
+    </rule>
+
+    <rule ref="PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps">
+        <exclude-pattern>./lib/HawkUpdater.php</exclude-pattern>
+    </rule>
+
+    <rule ref="Generic.WhiteSpace.ScopeIndent">
+        <properties>
+            <property name="ignoreIndentationTokens" type="array" value="T_COMMENT,T_DOC_COMMENT_OPEN_TAG"/>
+        </properties>
+    </rule>
+
+    <rule ref="PSR2.ControlStructures.ControlStructureSpacing"/>
+    <rule ref="PEAR.Functions.FunctionCallSignature.SpaceBeforeOpenBracket" />
+</ruleset>

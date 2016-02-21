@@ -1,194 +1,218 @@
 <?php
 /**
  * Route.php
- * @author Elvyrra SAS
+ *
+ * @author  Elvyrra SAS
+ * @license http://rem.mit-license.org/ MIT
  */
 
 namespace Hawk;
 
 /**
  * This class describes the routes behavior
+ *
  * @package Core\Router
  */
 class Route{
-	use Utils;
+    use Utils;
 
-	/**
-	 * The route name
-	 * @var string
-	 */
-	private $name;
+    /**
+     * The route name
+     *
+     * @var string
+     */
+    private $name;
 
-	/**
-	 * The route data, declared like '{dataname}' in the route definition
-	 * @var array
-	 */
-	private $data = array();
+    /**
+     * The route data, declared like '{dataname}' in the route definition
+     *
+     * @var array
+     */
+    private $data = array();
 
-	/**
-	 * The necessary authentications to access the route
-	 * @var array
-	 */
-	private $auth = array();
-
-
-	/**
-	 * The route URL
-	 * @var string
-	 */
-	public $url = '',
-
-	/**
-	 * The route URL prefix
-	 */
-	$prefix = '',
-
-	/**
-	 * The action namespace
-	 */
-	$namespace = '',
-
-	/**
-	 * The pattern rules
-	 * @var array
-	 */
-	$where = array(),
-
-	/**
-	 * The default values of the route parameters
-	 * @param array
-	 */
-	$default = array(),
-
-	/**
-	 * The route action
-	 * @param string
-	 */
-	$action = '',
-
-	/**
-	 * The route pattern
-	 * @param string
-	 */
-	$pattern = '';
+    /**
+     * The necessary authentications to access the route
+     *
+     * @var array
+     */
+    private $auth = array();
 
 
+    /**
+     * The route URL
+     *
+     * @var string
+     */
+    public $url = '',
 
-	/**
-	 * Constructor
-	 * @param string $name The route name
-	 * @param string $url The route URI pattern
-	 * @param array $param The route parameters, containing the pattern rules, the default values, the action associated with this route
-	 */
-	public function __construct($name, $url, $param){
-		$this->name = $name;
+    /**
+     * The route URL prefix
+     */
+    $prefix = '',
 
-		$this->map($param);
+    /**
+     * The action namespace
+     */
+    $namespace = '',
 
-		$this->args = array();
-		$this->url = $this->prefix . $url;
-		$this->pattern = preg_replace_callback("/\{(\w+)\}/", function($match){
-			$this->args[] = $match[1];
-			$where = $this->where[$match[1]] ? $this->where[$match[1]] : '.*?';
-			return "(" . $where . ")";
-		}, $this->url);
+    /**
+     * The pattern rules
+     *
+     * @var array
+     */
+    $where = array(),
 
+    /**
+     * The default values of the route parameters
+     *
+     * @param array
+     */
+    $default = array(),
 
-		if($this->namespace){
-			$this->action = $this->namespace . '\\' . $this->action;
-		}
-	}
+    /**
+     * The route action
+     *
+     * @param string
+     */
+    $action = '',
 
-
-	/**
-	 * Get the route name
-	 * @return string the route name
-	 */
-	public function getName(){
-		return $this->name;
-	}
-
-
-	/**
-	 * Check if the route pattern match with a given URI, and if it matches, set the route data
-	 * @param string $path The URI to check
-	 * @return bool true if the URI match the route, else False
-	 */
-	public function match($path){
-		if(preg_match('~^' . $this->pattern . '/?$~i', $path, $m)){
-			// The URL match, let's test the filters to access this URL are OK
-			foreach(array_slice($m, 1) as $i => $var){
-				$this->setData($this->args[$i], $var);
-			}
-			return true;
-
-		}
-		return false;
-	}
+    /**
+     * The route pattern
+     *
+     * @param string
+     */
+    $pattern = '';
 
 
-	/**
-	 * Get the route data
-	 * @param string $prop If set, the method will return the data value for this property, else it will return the whole route data
-	 * @param mixed If $prop is set, the data value for this property, else the whole route data
-	 */
-	public function getData($prop = null){
-		if(!$prop){
-			return $this->data;
-		}
-		else{
-			return $this->data[$prop];
-		}
-	}
+
+    /**
+     * Constructor
+     *
+     * @param string $name  The route name
+     * @param string $url   The route URI pattern
+     * @param array  $param The route parameters, containing the pattern rules,
+     *                      the default values, the action associated with this route
+     */
+    public function __construct($name, $url, $param){
+        $this->name = $name;
+
+        $this->map($param);
+
+        $this->args = array();
+        $this->url = $this->prefix . $url;
+        $this->pattern = preg_replace_callback(
+            "/\{(\w+)\}/", function ($match) {
+                $this->args[] = $match[1];
+                $where = $this->where[$match[1]] ? $this->where[$match[1]] : '.*?';
+                return "(" . $where . ")";
+            }, $this->url
+        );
 
 
-	/**
-	 * Set the route data
-	 * @param string $key The property name of the data to set
-	 * @param mixed $value The value to set
-	 */
-	public function setData($key, $value){
-		$this->data[$key] = $value;
-	}
+        if($this->namespace) {
+            $this->action = $this->namespace . '\\' . $this->action;
+        }
+    }
 
 
-	/**
-	 * Get the route action
-	 * @return string The action associated with the route, formatted like : '<ControllerClass>.<method>'
-	 */
-	public function getAction(){
-		return $this->action;
-	}
+    /**
+     * Get the route name
+     *
+     * @return string the route name
+     */
+    public function getName(){
+        return $this->name;
+    }
 
 
-	/**
-	 * Get the route action controller class
-	 */
-	public function getActionClassname(){
-		list($controller, $method) = explode('.', $this->action);
+    /**
+     * Check if the route pattern match with a given URI, and if it matches, set the route data
+     *
+     * @param string $path The URI to check
+     *
+     * @return bool true if the URI match the route, else False
+     */
+    public function match($path){
+        if(preg_match('~^' . $this->pattern . '/?$~i', $path, $m)) {
+            // The URL match, let's test the filters to access this URL are OK
+            foreach(array_slice($m, 1) as $i => $var){
+                $this->setData($this->args[$i], $var);
+            }
+            return true;
 
-		return $controller;
-	}
+        }
+        return false;
+    }
 
-	/**
-	 * Get the route action method name
-	 */
-	public function getActionMethodName(){
-		list($controller, $method) = explode('.', $this->action);
 
-		return $method;
-	}
+    /**
+     * Get the route data
+     *
+     * @param string $prop If set, the method will return the data value for this property.
+     *                     If not set, it will return the whole route data
+     *
+     * @return mixed If $prop is set, the data value for this property, else the whole route data
+     */
+    public function getData($prop = null){
+        if(!$prop) {
+            return $this->data;
+        }
+        else{
+            return $this->data[$prop];
+        }
+    }
 
-	/**
-	 * Check of the route is accessible by the web client
-	 * @return bool True if the route is accessible, False in other case
-	 */
-	public function isAccessible(){
-		foreach($this->auth as $auth){
-			if(!$auth){
-				return false;
-			}
-		}
-		return true;
-	}
+
+    /**
+     * Set the route data
+     *
+     * @param string $key   The property name of the data to set
+     * @param mixed  $value The value to set
+     */
+    public function setData($key, $value){
+        $this->data[$key] = $value;
+    }
+
+
+    /**
+     * Get the route action
+     *
+     * @return string The action associated with the route, formatted like : '<ControllerClass>.<method>'
+     */
+    public function getAction(){
+        return $this->action;
+    }
+
+
+    /**
+     * Get the route action controller class
+     */
+    public function getActionClassname(){
+        list($controller, $method) = explode('.', $this->action);
+
+        return $controller;
+    }
+
+    /**
+     * Get the route action method name
+     */
+    public function getActionMethodName(){
+        list($controller, $method) = explode('.', $this->action);
+
+        return $method;
+    }
+
+    /**
+     * Check of the route is accessible by the web client
+     *
+     * @return bool True if the route is accessible, False in other case
+     */
+    public function isAccessible(){
+        foreach($this->auth as $auth){
+            if(!$auth) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

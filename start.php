@@ -5,7 +5,7 @@ namespace Hawk;
 require INCLUDES_DIR . 'constants.php';
 
 // Get the constants customized by developer for the application
-if(!is_file(INCLUDES_DIR . 'custom-constants.php')){
+if(!is_file(INCLUDES_DIR . 'custom-constants.php')) {
     touch(INCLUDES_DIR . 'custom-constants.php');
 }
 require INCLUDES_DIR . 'custom-constants.php';
@@ -17,11 +17,11 @@ require INCLUDES_DIR . 'autoload.php';
 App::getInstance()->init();
 
 // Load the application configuration
-if(is_file(INCLUDES_DIR . 'config.php')){
-	require INCLUDES_DIR . 'config.php';
+if(is_file(INCLUDES_DIR . 'config.php')) {
+    include INCLUDES_DIR . 'config.php';
 }
 
-if(!defined('HAWK_SITE_URL')){
+if(!defined('HAWK_SITE_URL')) {
     define('HAWK_SITE_URL', 'http://www.hawk-app.com');
 }
 
@@ -39,7 +39,7 @@ define('STATIC_URL', BASE_PATH . '/static/');
 define('THEMES_ROOT_URL', STATIC_URL . 'themes/');
 define('PLUGINS_ROOT_URL', STATIC_URL . 'plugins/');
 
-if(App::conf()->has('db')){
+if(App::conf()->has('db')) {
     /*** Access to the OS database (MySQL) ***/
     try{
         DB::add(MAINDB, App::conf()->get('db.maindb'));
@@ -53,7 +53,7 @@ if(App::conf()->has('db')){
 }
 
 /*** Open the session ***/
-if(App::conf()->has('db')){
+if(App::conf()->has('db')) {
     session_set_save_handler(new DatabaseSessionHandler());
 }
 session_set_cookie_params((int) App::conf()->get('session.lifetime'), '/');
@@ -61,14 +61,14 @@ session_start();
 App::session()->init();
 
 /*** Constants depending to the options ***/
-if(App::request()->getCookies('language')){
+if(App::request()->getCookies('language')) {
     define('LANGUAGE', App::request()->getCookies('language'));
 }
-elseif(App::conf()->has('db')){
-    if(App::session()->getUser()->getProfileData('language')){
+elseif(App::conf()->has('db')) {
+    if(App::session()->getUser()->getProfileData('language')) {
         define('LANGUAGE', App::session()->getUser()->getProfileData('language'));
     }
-    elseif(Option::get('main.language')){
+    elseif(Option::get('main.language')) {
         define('LANGUAGE', Option::get('main.language'));
     }
 }

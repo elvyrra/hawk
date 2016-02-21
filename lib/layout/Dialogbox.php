@@ -1,22 +1,28 @@
 <?php
 /**
- * LeftSidebarTab.php
- * @author Elvyrra SAS
+ * Dialogbox.php
+ *
+ * @author  Elvyrra SAS
+ * @license http://rem.mit-license.org/ MIT
  */
 
 namespace Hawk;
 
 /**
- * This class is used to display a whole tab with a sidebar on left
+ * This class is used to display a dialogbox
+ *
  * @package Layout
  */
 class Dialogbox extends View{
-	
-	/**
-	 * Display the tab
-	 * @param array $data The data to inject in the view
-	 */
-	public static function make($data){
-		return parent::make(Theme::getSelected()->getView('dialogbox.tpl'), $data);
-	}
+
+    /**
+     * Display the dialogbox
+     *
+     * @param array $data The data to inject in the view
+     *
+     * @return string The generated HTML
+     */
+    public static function make($data){
+        return parent::make(Theme::getSelected()->getView('dialogbox.tpl'), $data);
+    }
 }

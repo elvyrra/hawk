@@ -1,16 +1,31 @@
 <?php
+/**
+ * PluginController.php
+ *
+ * @author  Elvyrra SAS
+ * @license http://rem.mit-license.org/ MIT
+ */
 namespace Hawk\Plugins\Admin;
 
+/**
+ * Plugins controller
+ *
+ * @package Plugins\Admin
+ */
 class PluginController extends Controller{
     const TABID = 'plugin-manager';
+
     /**
-     * display the page to manage the application plugins
+     * Display the page to manage the application plugins
+     *
+     * @param string $content The content to insert in the page
+     * @param string $title   The page title
      */
     public function index($content = '', $title = ''){
-        if(!$content){
+        if(!$content) {
             $content = $this->compute('availablePlugins');
         }
-        if(!$title){
+        if(!$title) {
             $title = Lang::get($this->_plugin . '.available-plugins-title');
         }
         $widgets = array(new SearchPluginWidget());
@@ -46,7 +61,7 @@ class PluginController extends Controller{
         $api = new HawkApi;
         try{
             $updates = $api->getPluginsAvailableUpdates(array_map(
-                function($plugin){
+                function ($plugin) {
                     return $plugin->getDefinition('version');
                 },
                 $plugins
@@ -72,11 +87,11 @@ class PluginController extends Controller{
             ),
             'fields' => array(
                 'controls' => array(
-                    'display' => function($value, $field, $plugin) use($updates){
+                    'display' => function ($value, $field, $plugin) use ($updates) {
                         $buttons = array();
 
                         $installer = $plugin->getInstallerInstance();
-                        if(!$plugin->isInstalled()){
+                        if(!$plugin->isInstalled()) {
                             // the plugin is not installed
                             $buttons = array(
                                 // Install button
@@ -99,7 +114,7 @@ class PluginController extends Controller{
                             $status = Lang::get($this->_plugin . '.plugin-uninstalled-status');
                         }
                         else{
-                            if(! $plugin->isActive()){
+                            if(! $plugin->isActive()) {
                                 // The plugin is installed but not activated
                                 $buttons = array(
                                     // Activate button
@@ -156,7 +171,7 @@ class PluginController extends Controller{
                             }
                         }
 
-                        if(isset($updates[$plugin->getName()])){
+                        if(isset($updates[$plugin->getName()])) {
                             array_unshift($buttons, ButtonInput::create(array(
                                 'icon' => 'refresh',
                                 'class' => 'btn-info update-plugin',
@@ -180,7 +195,7 @@ class PluginController extends Controller{
                     'search' => false,
                     'sort' => false,
                     'label' => Lang::get($this->_plugin . '.plugins-list-description-label'),
-                    'display' => function($value, $field, $plugin){
+                    'display' => function ($value, $field, $plugin) {
                         return View::make(Plugin::current()->getView("plugin-list-description.tpl"), $plugin->getDefinition());
                     }
                 )
@@ -195,12 +210,14 @@ class PluginController extends Controller{
 
     /**
      * Compute an action on a plugin (install, uninstal, activate, deactivate)
+     *
+     * @param string $action The action to perform : 'install', 'uninstall', 'activate', 'deactivate'
      */
     private function computeAction($action){
         App::response()->setContentType('json');
 
         $response = array();
-        Event::on('menuitem.added menuitem.deleted', function() use(&$response){
+        Event::on('menuitem.added menuitem.deleted', function () use (&$response) {
             $response['menuUpdated'] = true;
         });
 
@@ -208,7 +225,13 @@ class PluginController extends Controller{
             Plugin::get($this->plugin)->$action();
         }
         catch(\Exception $e){
-            $response['message'] = Lang::get($this->_plugin . '.plugin-' . $action . '-error', array('plugin' => $this->plugin)) . ( DEBUG_MODE ? preg_replace('/\s/', ' ', $e->getMessage()) : '');
+            $response['message'] = Lang::get($this->_plugin . '.plugin-' . $action . '-error', array(
+                'plugin' => $this->plugin
+            ));
+
+            if(DEBUG_MODE) {
+                $response['messahe'] .= preg_replace('/\s/', ' ', $e->getMessage());
+            }
             App::response()->setStatus(500);
         }
 
@@ -259,9 +282,11 @@ class PluginController extends Controller{
 
         $installer = $plugin->getInstallerInstance();
 
-        if(App::request()->getMethod() === 'get'){
+        if(App::request()->getMethod() === 'get') {
             return Dialogbox::make(array(
-                'page' => method_exists($installer, 'settings') ? $installer->settings() : Lang::get($this->_plugin . '.plugin-settings-no-settings'),
+                'page' => method_exists($installer, 'settings') ?
+                    $installer->settings() :
+                    Lang::get($this->_plugin . '.plugin-settings-no-settings'),
                 'title' => lang::get($this->_plugin . '.plugin-settings-title'),
                 'icon' => 'cogs'
             ));
@@ -293,7 +318,7 @@ class PluginController extends Controller{
         foreach($plugins as &$plugin){
             $installed = Plugin::get($plugin['name']);
             $plugin['installed'] = $installed !== null;
-            if($installed){
+            if($installed) {
                 $plugin['currentVersion'] = $installed->getDefinition('version');
             }
         }
@@ -305,11 +330,17 @@ class PluginController extends Controller{
             'fields' => array()
         ));
 
-        if($list->isRefreshing()){
+        if($list->isRefreshing()) {
             return $list->display();
         }
         else{
-            return $this->compute('index', $list->display(), Lang::get($this->_plugin . '.search-plugins-result-title', array('search' => htmlentities($search))));
+            return $this->compute(
+                'index',
+                $list->display(),
+                Lang::get($this->_plugin . '.search-plugins-result-title', array(
+                    'search' => htmlentities($search)
+                ))
+            );
         }
 
     }
@@ -326,14 +357,14 @@ class PluginController extends Controller{
             $file = $api->downloadPlugin($this->plugin);
 
             $zip = new \ZipArchive;
-            if($zip->open($file) !== true){
+            if($zip->open($file) !== true) {
                 throw new \Exception('Impossible to open the zip archive');
             }
 
             $zip->extractTo(PLUGINS_DIR);
 
             $plugin = Plugin::get($this->plugin);
-            if(!$plugin){
+            if(!$plugin) {
                 throw new \Exception('An error occured while downloading the plugin');
             }
             $plugin->install();
@@ -372,25 +403,21 @@ class PluginController extends Controller{
                         'name' => 'intro',
                         'value' => '<div class="alert alert-info">' . Lang::get($this->_plugin . '.new-plugin-intro') . '</div>'
                     )),
-
                     new TextInput(array(
                         'name' => 'name',
                         'required' => true,
                         'pattern' => '/^[\w\-]+$/',
                         'label' => Lang::get($this->_plugin . '.new-plugin-name-label')
                     )),
-
                     new TextInput(array(
                         'name' => 'title',
                         'required' => true,
                         'label' => Lang::get($this->_plugin . '.new-plugin-title-label')
                     )),
-
                     new TextareaInput(array(
                         'name' => 'description',
                         'label' => Lang::get($this->_plugin . '.new-plugin-description-label')
                     )),
-
                     new TextInput(array(
                         'name' => 'version',
                         'required' => true,
@@ -398,19 +425,16 @@ class PluginController extends Controller{
                         'label' => Lang::get($this->_plugin . '.new-plugin-version-label'),
                         'default' => '0.0.1'
                     )),
-
                     new TextInput(array(
                         'name' => 'author',
                         'label' => Lang::get($this->_plugin . '.new-plugin-author-label'),
                     )),
                 ),
-
                 'submits' => array(
                     new SubmitInput(array(
                         'name' => 'valid',
                         'value' => Lang::get('main.valid-button'),
                     )),
-
                     new ButtonInput(array(
                         'name' => 'cancel',
                         'value' => Lang::get('main.cancel-button'),
@@ -421,7 +445,7 @@ class PluginController extends Controller{
             'onsuccess' => 'app.dialog("close"); app.load(app.getUri("manage-plugins"));'
         ));
 
-        if(!$form->submitted()){
+        if(!$form->submitted()) {
             // Display the form
             return View::make(Theme::getSelected()->getView('dialogbox.tpl'), array(
                 'title' => Lang::get($this->_plugin . '.new-plugin-title'),
@@ -431,8 +455,8 @@ class PluginController extends Controller{
         }
         else{
             // Create the plugin
-            if($form->check()){
-                if(in_array($form->getData('name'), Plugin::$forbiddenNames)){
+            if($form->check()) {
+                if(in_array($form->getData('name'), Plugin::$forbiddenNames)) {
                     $message = Lang::get($this->_plugin . '.new-plugin-forbidden-name', array('forbidden' =>  implode(', ', Plugin::$forbiddenNames)));
                     $form->error('name', $message);
                     return $form->response(Form::STATUS_CHECK_ERROR, $message);
@@ -442,7 +466,7 @@ class PluginController extends Controller{
 
                 // Check the plugin does not exists
                 foreach(Plugin::getAll(false) as $plugin){
-                    if($namespace === $plugin->getNamespace()){
+                    if($namespace === $plugin->getNamespace()) {
                         // A plugin with the same name already exists
                         $form->error('name', Lang::get($this->_plugin . '.new-plugin-already-exists-error'));
                         return $form->response(Form::STATUS_CHECK_ERROR, Lang::get($this->_plugin . '.new-plugin-already-exists-error'));
@@ -454,12 +478,12 @@ class PluginController extends Controller{
 
                 try{
                     // Create the directories structure
-                    if(!mkdir($dir)){
+                    if(!mkdir($dir)) {
                         throw new \Exception('Impossible to create the directory ' . $dir);
                     }
 
                     foreach(array('controllers', 'models', 'classes', 'lang', 'views', 'static', 'widgets') as $subdir){
-                        if(!mkdir($dir . $subdir)){
+                        if(!mkdir($dir . $subdir)) {
                             throw new \Exception('Impossible to create the directory ' . $dir . $subdir);
                         }
                     }
@@ -472,7 +496,7 @@ class PluginController extends Controller{
                         'author' => $form->getData('author'),
                         'dependencies' => array()
                     );
-                    if(file_put_contents($dir . Plugin::MANIFEST_BASENAME, json_encode($conf, JSON_PRETTY_PRINT)) === false){
+                    if(file_put_contents($dir . Plugin::MANIFEST_BASENAME, json_encode($conf, JSON_PRETTY_PRINT)) === false) {
                         throw new \Exception('Impossible to create the file ' . Plugin::MANIFEST_BASENAME);
                     }
 
@@ -480,33 +504,57 @@ class PluginController extends Controller{
                     $namespace = $plugin->getNamespace();
 
                     // Create the file start.php
-                    $start = str_replace(array('{{ $namespace }}', '{{ $name }}'), array($namespace, $plugin->getName()), file_get_contents(Plugin::current()->getRootDir() . 'templates/start.tpl'));
-                    if(file_put_contents($dir . 'start.php', $start) === false){
+                    $start = str_replace(
+                        array(
+                            '{{ $namespace }}',
+                            '{{ $name }}'
+                        ),
+                        array(
+                            $namespace,
+                            $plugin->getName()
+                        ),
+                        file_get_contents(Plugin::current()->getRootDir() . 'templates/start.tpl')
+                    );
+                    if(file_put_contents($dir . 'start.php', $start) === false) {
                         throw new \Exceptio('Impossible to create the file start.php');
                     }
 
                     // Create the file Installer.php
-                    $installer = str_replace(array('{{ $namespace }}', '{{ $name }}'), array($namespace, $plugin->getName()), file_get_contents(Plugin::current()->getRootDir() . 'templates/installer.tpl'));
-                    if(file_put_contents($dir . 'classes/Installer.php', $installer) === false){
+                    $installer = str_replace(
+                        array(
+                            '{{ $namespace }}',
+                            '{{ $name }}'
+                        ),
+                        array(
+                            $namespace,
+                            $plugin->getName()
+                        ),
+                        file_get_contents(Plugin::current()->getRootDir() . 'templates/installer.tpl')
+                    );
+                    if(file_put_contents($dir . 'classes/Installer.php', $installer) === false) {
                         throw new \Exception('Impossible to create the file classes/Installer.php');
                     }
 
                     // Create the file BaseController.php
-                    $controller = str_replace('{{ $namespace }}', $namespace, file_get_contents(Plugin::current()->getRootDir() . 'templates/base-controller.tpl'));
-                    if(file_put_contents($dir . 'controllers/BaseController.php', $controller) === false){
+                    $controller = str_replace(
+                        '{{ $namespace }}',
+                        $namespace,
+                        file_get_contents(Plugin::current()->getRootDir() . 'templates/base-controller.tpl')
+                    );
+                    if(file_put_contents($dir . 'controllers/BaseController.php', $controller) === false) {
                         throw new \Exception('Impossible to create the file controllers/BaseController.php');
                     }
 
                     // Create the language file
                     $language = file_get_contents(Plugin::current()->getRootDir() . 'templates/lang.tpl');
-                    if(file_put_contents($dir . 'lang/' . $plugin->getName() . '.en.lang', $language) === false){
+                    if(file_put_contents($dir . 'lang/' . $plugin->getName() . '.en.lang', $language) === false) {
                         throw new \Exception('Impossible to create the file lang/' . $plugin->getName() . '.en.lang');
                     }
 
                     return $form->response(Form::STATUS_SUCCESS, Lang::get($this->_plugin . '.new-plugin-success'));
                 }
                 catch(\Exception $e){
-                    if(is_dir($dir)){
+                    if(is_dir($dir)) {
                         App::fs()->remove($dir);
                     }
                     return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : Lang::get($this->_plugin . '.new-plugin-error'));
@@ -522,7 +570,7 @@ class PluginController extends Controller{
     public function update(){
         try{
             $plugin = Plugin::get($this->plugin);
-            if(!$plugin){
+            if(!$plugin) {
                 throw new \Exception('The plugin "' . $this->plugin . '" does not exist');
             }
 
@@ -532,11 +580,11 @@ class PluginController extends Controller{
                 $plugin->getName() => $plugin->getDefinition('version')
             ));
 
-            if(count($updates[$plugin->getName()])){
+            if(count($updates[$plugin->getName()])) {
                 $file = $api->downloadPlugin($this->plugin);
 
                 $zip = new \ZipArchive;
-                if($zip->open($file) !== true){
+                if($zip->open($file) !== true) {
                     throw new \Exception('Impossible to open the zip archive');
                 }
 
@@ -548,7 +596,7 @@ class PluginController extends Controller{
                     $zip->extractTo(PLUGINS_DIR);
 
                     $plugin = Plugin::get($this->plugin);
-                    if(!$plugin){
+                    if(!$plugin) {
                         throw new \Exception('An error occured while downloading the plugin');
                     }
 
@@ -556,7 +604,7 @@ class PluginController extends Controller{
                     foreach($updates[$plugin->getName()] as $version){
                         $method = str_replace('.', '_', 'updateV' . $version);
 
-                        if(method_exists($installer, $method)){
+                        if(method_exists($installer, $method)) {
                             $installer->$method();
                         }
                     }

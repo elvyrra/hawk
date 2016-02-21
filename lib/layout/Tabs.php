@@ -1,33 +1,39 @@
 <?php
 /**
- * LeftSidebarTab.php
- * @author Elvyrra SAS
+ * Tabs.php
+ *
+ * @author  Elvyrra SAS
+ * @license http://rem.mit-license.org/ MIT
  */
 
 namespace Hawk;
 
 /**
- * This class is used to display a whole tab with a sidebar on left
+ * This class is used to display a tabset
+ *
  * @package Layout
  */
 class Tabs extends View{
-	
-	/**
-	 * Display the tab
-	 * @param array $data The data to inject in the view
-	 */
-	public static function make($data){
-		if(empty($data['id'])){
-			$data['id'] = uniqid();
-		}
-		foreach($data['tabs'] as $i => &$tab){			
-			if(empty($tab['id'])){
-				$tab['id'] = uniqid();
-			}
-			if(empty($data['selected'])){
-				$data['selected'] = $i;
-			}
-		}		
-		return parent::make(Theme::getSelected()->getView('tabs.tpl'), $data);
-	}
+
+    /**
+     * Display the tabset
+     *
+     * @param array $data The data to inject in the view
+     *
+     * @return string The generated HTML
+     */
+    public static function make($data){
+        if(empty($data['id'])) {
+            $data['id'] = uniqid();
+        }
+        foreach($data['tabs'] as $i => &$tab){
+            if(empty($tab['id'])) {
+                $tab['id'] = uniqid();
+            }
+            if(empty($data['selected'])) {
+                $data['selected'] = $i;
+            }
+        }
+        return parent::make(Theme::getSelected()->getView('tabs.tpl'), $data);
+    }
 }

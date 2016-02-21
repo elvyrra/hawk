@@ -1,14 +1,16 @@
 <?php
 /**
  * Theme.php
- * @author Elvyrra SAS
- * @license MIT
+ *
+ * @author  Elvyrra SAS
+ * @license http://rem.mit-license.org/ MIT
  */
 
 namespace Hawk;
 
 /**
  * This class describes the themes behavior
+ *
  * @package Core
  */
 class Theme{
@@ -54,41 +56,50 @@ class Theme{
 
     /**
      * The theme name
+     *
      * @var string
      */
     private $name,
 
     /**
      * The theme manifest data
+     *
      * @var array
      */
     $data,
 
     /**
      * The parent theme name
+     *
      * @var Theme
      */
     $parent = null;
 
     /**
      * The themes embedded with Hawk, that are not removable
+     *
+     * @var array
      */
     public static $nativeThemes = array('hawk', 'dark');
 
     /**
      * The instanciated themes
+     *
+     * @var array
      */
     private static $themes;
 
 
     /**
      * Instanciate a new theme by it name
+     *
      * @param string $name The name of the theme, corresponding to it directory name under /themes
+     *
      * @return Theme The found theme
      */
     public static function get($name = self::DEFAULT_THEME){
         try{
-            if(!isset($themes[$name])){
+            if(!isset($themes[$name])) {
                 self::$themes[$name] = new self($name);
             }
             return self::$themes[$name];
@@ -101,6 +112,7 @@ class Theme{
 
     /**
      * Get the theme configured for the application
+     *
      * @return Theme The selected theme
      */
     public static function getSelected(){
@@ -109,6 +121,7 @@ class Theme{
 
     /**
      * Set a theme as the selected one for the application
+     *
      * @param string $name The name of the theme
      */
     public static function setSelected($name){
@@ -117,6 +130,7 @@ class Theme{
 
     /**
      * Get all the available themes
+     *
      * @return array All the themes
      */
     public static function getAll(){
@@ -129,6 +143,7 @@ class Theme{
 
     /**
      * Constructor
+     *
      * @param string $name The theme name
      */
     private function __construct($name){
@@ -136,10 +151,10 @@ class Theme{
 
         $this->getDefinition();
 
-        if(isset($this->data['extends'])){
+        if(isset($this->data['extends'])) {
             $this->parent = self::get($this->data['extends']);
         }
-        elseif($this->name != self::DEFAULT_THEME){
+        elseif($this->name != self::DEFAULT_THEME) {
             $this->parent = self::get(self::DEFAULT_THEME);
         }
     }
@@ -148,18 +163,20 @@ class Theme{
     /**
      * Get the theme data in the file manifest.json.
      * If $prop is set, this method returns the property value in the theme data, else it returns all the theme data
+     *
      * @param string $prop The property in data to get
+     *
      * @return mixed The value of the property $prop if it is set, else, all the theme data
      */
     public function getDefinition($prop = ""){
-        if(!isset($this->data)){
+        if(!isset($this->data)) {
             if(!is_file($this->getRootDir() . self::MANIFEST_BASENAME)) {
                 throw new \Exception('Impossible to get the manifest.json file for the theme '  . $this->name . ' : No such file or directory');
             }
             $this->data = json_decode(file_get_contents($this->getRootDir() . self::MANIFEST_BASENAME), true);
         }
 
-        if($prop){
+        if($prop) {
             return isset($this->data[$prop]) ? $this->data[$prop] : null;
         }
         else{
@@ -170,6 +187,7 @@ class Theme{
 
     /**
      * Get the theme title (data accessible in the manifest.json file of the theme)
+     *
      * @return string the theme title
      */
     public function getTitle(){
@@ -179,6 +197,7 @@ class Theme{
 
     /**
      * Get the theme name (the name of the directory containing the theme)
+     *
      * @return string The theme name
      */
     public function getName(){
@@ -188,6 +207,7 @@ class Theme{
 
     /**
      * Check if the theme is removable. A theme is removable if it's not a native theme, and if it is not the selected one for the application
+     *
      * @return boolean true if the theme is removable, else false.
      */
     public function isRemovable(){
@@ -197,6 +217,7 @@ class Theme{
 
     /**
      * Get the start file of the theme. The start file is the file start.php in the theme that initialize special intructions for the theme
+     *
      * @return string
      */
     public function getStartFile(){
@@ -206,6 +227,7 @@ class Theme{
 
     /**
      * Get the root directory of the theme files
+     *
      * @return string The root directory of the theme files
      */
     public function getRootDir(){
@@ -215,6 +237,7 @@ class Theme{
 
     /**
      * Get the directory for HTTP accessible files. During theme build, the files are copied in this directory
+     *
      * @return string
      */
     public function getStaticDir(){
@@ -224,6 +247,7 @@ class Theme{
 
     /**
      * Get the root URL to get theme files by HTTP request
+     *
      * @return string
      */
     public function getRootUrl(){
@@ -233,19 +257,21 @@ class Theme{
 
     /**
      * Copy a file from the theme directory to the static directory (to be accessible by HTTP requests) and returns it URL
+     *
      * @param string $file The source file to get the URL
+     *
      * @return string The public copied file URL
      */
     public function getFileUrl($file){
         $privateFile = $this->getRootDir() . $file;
         $publicFile = $this->getStaticDir() . $file;
 
-        if(!is_file($privateFile)){
+        if(!is_file($privateFile)) {
             throw new \Exception('Impossible to get the URL for the file ' . $privateFile . ' : No such file or directory');
         }
 
-        if(!is_file($publicFile) || filemtime($publicFile) < filemtime($privateFile)){
-            if(!is_dir(dirname($publicFile))){
+        if(!is_file($publicFile) || filemtime($publicFile) < filemtime($privateFile)) {
+            if(!is_dir(dirname($publicFile))) {
                 mkdir(dirname($publicFile), 0755, true);
             }
             App::fs()->copy($privateFile, $publicFile);
@@ -257,6 +283,7 @@ class Theme{
 
     /**
      * Get the file path for the theme preview image
+     *
      * @return string
      */
     public function getPreviewFilename(){
@@ -266,6 +293,7 @@ class Theme{
 
     /**
      * Get the URL for the theme preview image
+     *
      * @return string
      */
     public function getPreviewUrl(){
@@ -282,6 +310,7 @@ class Theme{
 
     /**
      * Get the base CSS file path
+     *
      * @return string
      */
     public function getBaseLessFile(){
@@ -291,6 +320,7 @@ class Theme{
 
     /**
      * Get the base less file theme.less in static folder
+     *
      * @return string
      */
     public function getStaticLessFile(){
@@ -300,6 +330,7 @@ class Theme{
 
     /**
      * Get the filename of the compiled theme.css file, in the static folder
+     *
      * @return string The filename
      */
     public function getStaticCssFile(){
@@ -310,6 +341,7 @@ class Theme{
 
     /**
      * Build the base css file of the theme, and get the URL of the built file
+     *
      * @return string The URL of the built CSS file
      */
     public function getBaseLessUrl(){
@@ -321,6 +353,7 @@ class Theme{
 
     /**
      * This method return the URL to access the CSS file of the theme, compiled from theme.less
+     *
      * @return string The URL of the file theme.css
      */
     public function getBaseCssUrl(){
@@ -332,29 +365,32 @@ class Theme{
 
     /**
      * Build the theme : copy every resource files in themes/{themename}
+     *
      * @param boolean $force If set to true, the theme will be rebuilt without condition
+     *
+     * @return boole True if the theme has been built, false it it has been taken from cache
      */
     public function build($force = false){
-        if($this->getDefinition('extends')){
-            if(Theme::get($this->getDefinition('extends'))){
+        if($this->getDefinition('extends')) {
+            if(Theme::get($this->getDefinition('extends'))) {
                 Theme::get($this->getDefinition('extends'))->build($force);
             }
         }
         $build = false;
-        if($force){
+        if($force) {
             $build = true;
         }
 
-        if(!file_exists($this->getStaticDir())){
+        if(!file_exists($this->getStaticDir())) {
             mkdir($this->getStaticDir(), 0755, true);
             $build = true;
         }
 
 
-        if(!$build){
+        if(!$build) {
             $dest = $this->getStaticCssFile();
 
-            if(!is_file($dest)){
+            if(!is_file($dest)) {
                 $build = true;
             }
             else{
@@ -362,7 +398,7 @@ class Theme{
                 $files = App::fs()->find($this->getLessDirname(), '*.less');
                 $lastUpdate = filemtime($dest);
                 foreach($files as $file){
-                    if(filemtime($file) > $lastUpdate){
+                    if(filemtime($file) > $lastUpdate) {
                         $build = true;
                         break;
                     }
@@ -370,9 +406,9 @@ class Theme{
             }
         }
 
-        if($build){
+        if($build) {
             // Build the theme => Copy each accessible files in static dir
-            foreach(glob($this->getRootDir() . '*' ) as $elt){
+            foreach(glob($this->getRootDir() . '*') as $elt){
                 if(! in_array(basename($elt), array('views', 'start.php'))) {
                     App::fs()->copy($elt, $this->getStaticDir());
                 }
@@ -380,9 +416,11 @@ class Theme{
 
             // In the main less file, replace the editable vars by their customized values
             $values = $this->getVariablesCustomValues();
-            $precompiledLess = preg_replace_callback(self::EDITABLE_VARS_PATTERN, function($m) use($values){
-                return '@' . $m[1] . ' : ' . (isset($values[$m[1]]) ? $values[$m[1]] : $m[2]) . ';';
-            }, file_get_contents($this->getBaseLessFile()));
+            $precompiledLess = preg_replace_callback(
+                self::EDITABLE_VARS_PATTERN, function ($m) use ($values) {
+                    return '@' . $m[1] . ' : ' . (isset($values[$m[1]]) ? $values[$m[1]] : $m[2]) . ';';
+                }, file_get_contents($this->getBaseLessFile())
+            );
 
             file_put_contents($this->getStaticLessFile(), $precompiledLess);
 
@@ -396,11 +434,13 @@ class Theme{
     /**
      * Get the variables in a CSS file content. In CSS files, variables are defined with the folowing format :
      * /* define("variableName", color|dimension|file, "variable description that will appear in the customization page of the theme", defaultValue) *\/
+     *
      * @param string $less The Less code to parse
+     *
      * @return array The variables, where each element contains the 'name' of the variable, it 'type', it 'description', and it 'default' value
      */
     public function getEditableVariables($less = null){
-        if(!$less){
+        if(!$less) {
             $less = file_get_contents($this->getBaseLessFile());
         }
         preg_match_all(self::EDITABLE_VARS_PATTERN, $less, $matches, PREG_SET_ORDER);
@@ -429,6 +469,7 @@ class Theme{
 
     /**
      * Get the customized variables values
+     *
      * @return array The custom values
      */
     public function getVariablesCustomValues(){
@@ -436,7 +477,7 @@ class Theme{
 
         $values = array();
         foreach($options as $key => $value){
-            if(preg_match('/^custom\-value\-(.+?)$/', $key, $m)){
+            if(preg_match('/^custom\-value\-(.+?)$/', $key, $m)) {
                 $values[$m[1]] = $value;
             }
         }
@@ -447,7 +488,8 @@ class Theme{
 
     /**
      * Set customized variables values
-     * @param array The values to set
+     *
+     * @param array $values The values to set
      */
     public function setVariablesCustomValues($values){
         foreach($values as $key => $value){
@@ -466,7 +508,9 @@ class Theme{
 
     /**
      * Get the URL of a static user file
+     *
      * @param string $filename The basename of the file to get the url
+     *
      * @return string
      */
     public function getStaticUserfilesUrl($filename = ''){
@@ -476,6 +520,7 @@ class Theme{
 
     /**
      * Get the directory containing the medias uplaoded by the administrator
+     *
      * @return string The directory containing the medias uploaded by the administrator
      */
     public function getMediasDir(){
@@ -484,7 +529,9 @@ class Theme{
 
     /**
      * Get the URL of the directory containing the medias uplaoded by the administrator
+     *
      * @param string $filename The basename of the file to get the URL
+     *
      * @return string The URL of the directory containing the medias uplaoded by the administrator
      */
     public function getMediasUrl($filename = ''){
@@ -494,6 +541,7 @@ class Theme{
 
     /**
      * Get the file path of the CSS file customized by the application administrator
+     *
      *  @return string The file path of the custom CSS file
      */
     public function getCustomCssFile(){
@@ -503,15 +551,16 @@ class Theme{
 
     /**
      * Get the URL of the CSS file customized by the application administrator
+     *
      * @return string The URL of the custom CSS file
      */
     public function getCustomCssUrl(){
         $file = $this->getCustomCssFile();
-        if(!is_dir(dirname($file))){
+        if(!is_dir(dirname($file))) {
             mkdir(dirname($file), 0775, true);
         }
 
-		if(!is_file($file)){
+        if(!is_file($file)) {
             file_put_contents($file, '');
         }
 
@@ -521,6 +570,7 @@ class Theme{
 
     /**
      * Get the directory containing the theme views
+     *
      * @return string The directory containing the theme views files
      */
     public function getViewsDir(){
@@ -530,13 +580,15 @@ class Theme{
 
     /**
      * Get the filename of a view in the theme. If the view file does not exists in the theme, the method will return the view in the default theme
+     *
      * @param string $filename The basename of the view file, relative to the theme views directory path
+     *
      * @return string The path of the view file
      */
     public function getView($filename){
         $file = $this->getViewsDir() . $filename;
-        if(!is_file($file) && $this->name != self::DEFAULT_THEME){
-            if($this->parent){
+        if(!is_file($file) && $this->name != self::DEFAULT_THEME) {
+            if($this->parent) {
                 // The view does not exists in the theme, and the theme is not the default one, Try to get the view file in the default theme
                 $file = $this->parent->getView($filename);
             }
@@ -546,8 +598,4 @@ class Theme{
         }
         return $file;
     }
-
-
-
-
 }

@@ -1,41 +1,47 @@
 <?php
 /**
  * SelectInput.php
- * @author Elvyrra SAS
- * @license MIT
+ *
+ * @author  Elvyrra SAS
+ * @license http://rem.mit-license.org/ MIT
  */
 
 namespace Hawk;
 
 /**
  * This class describes the behavior of select inputs
+ *
  * @package Form\Input
  */
 class SelectInput extends FormInput{
-	const TYPE = 'select';	
+    const TYPE = 'select';    
 
     /**
      * The value considered as the empty one (default '')
+     *
      * @var string
      */
-    public 	$emptyValue = '',
+    public     $emptyValue = '',
 
-	/**
+    /**
      * If set, the select will display a first option, with this property as label, and the $emptyValue as option value
+     *
      * @var string
      */
     $invitation = null,
 
     /**
      * The 'size' attribute
+     *
      * @var int
      */
-	$size = 0,
+    $size = 0,
 
     /**
      * The 'multiple' attribute
+     *
      * @var boolean
      */
-	$multiple = false;
+    $multiple = false;
 
 }

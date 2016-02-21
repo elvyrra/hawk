@@ -1,28 +1,32 @@
 <?php
 /**
  * TextareaInput.php
- * @author Elvyrra SAS
- * @license MIT
+ *
+ * @author  Elvyrra SAS
+ * @license http://rem.mit-license.org/ MIT
  */
 
 namespace Hawk;
 
 /**
  * This class describes the behavior of textareas
+ *
  * @package Form\Input
  */
 class TextareaInput extends FormInput{
-	const TYPE = 'textarea';
+    const TYPE = 'textarea';
 
-	/**
-	 * The attribute 'rows'
-	 * @var int
-	 */
-	public 	$rows = 15, 
+    /**
+     * The attribute 'rows'
+     *
+     * @var int
+     */
+    public     $rows = 15, 
 
-	/**
-	 * The attribute 'cols'
-	 * @var int
-	 */
-	$cols = 30;
+    /**
+     * The attribute 'cols'
+     *
+     * @var int
+     */
+    $cols = 30;
 }

@@ -1,7 +1,9 @@
 <?php
 /**
  * Autoload.php
- * @author Elvyrra SAS
+ *
+ * @author  Elvyrra SAS
+ * @license http://rem.mit-license.org/ MIT
  */
 
 namespace Hawk;
@@ -15,6 +17,8 @@ require LIB_DIR . 'Cache.php';
 
 /**
  * This class describes the autoload behavior of the application
+ *
+ * @package Core
  */
 class Autoload{
     /**
@@ -22,7 +26,7 @@ class Autoload{
      */
     private static $cache = array();
 
-	// Autoload cache file
+    // Autoload cache file
     const CACHE_FILE = 'autoload-cache.php';
 
     /**
@@ -32,24 +36,25 @@ class Autoload{
 
 
     /**
-	 * Load a file containing the wanted class
-	 * @param string $classname The class to load
-	 */
-	public static function load($classname){
+     * Load a file containing the wanted class
+     *
+     * @param string $classname The class to load
+     */
+    public static function load($classname){
         // Load the cache file for the first time the autload is called
-		if(empty(self::$cache) && is_file(Cache::getInstance()->getCacheFilePath(self::CACHE_FILE))) {
+        if(empty(self::$cache) && is_file(Cache::getInstance()->getCacheFilePath(self::CACHE_FILE))) {
             self::$cache = Cache::getInstance()->includeCache(self::CACHE_FILE);
         }
 
         // Check the class file is registered in cache
-		if(isset(self::$cache[$classname])){
-			// The file is registered in cache, include it, and exit the function
+        if(isset(self::$cache[$classname])) {
+            // The file is registered in cache, include it, and exit the function
             include self::$cache[$classname];
             return true;
         }
 
         $parts = explode('\\', $classname);
-        if(count($parts) > 1){
+        if(count($parts) > 1) {
             $namespace = implode('\\', array_slice($parts, 0, -1));
         }
         else{
@@ -59,7 +64,7 @@ class Autoload{
 
         $filename = "$class.php";
 
-		// The file is not registered in cache, let's find it. Any class file must be as <classname>.php
+        // The file is not registered in cache, let's find it. Any class file must be as <classname>.php
         $dirs = array();
         $searchDirectories = array(
             'Hawk' => array(LIB_DIR, CUSTOM_LIB_DIR),
@@ -67,12 +72,12 @@ class Autoload{
             '' => array(LIB_DIR . 'ext', CUSTOM_LIB_DIR)
         );
 
-        if(isset($searchDirectories[$namespace])){
+        if(isset($searchDirectories[$namespace])) {
             $dirs = $searchDirectories[$namespace];
         }
-        elseif(strpos($namespace, 'Hawk\\Plugins\\') === 0){
+        elseif(strpos($namespace, 'Hawk\\Plugins\\') === 0) {
             $alias = '\\Hawk\\' . $class;
-            if(class_exists($alias) || trait_exists($alias)){
+            if(class_exists($alias) || trait_exists($alias)) {
                 class_alias($alias, $classname);
 
                 return true;
@@ -81,7 +86,7 @@ class Autoload{
                 // Find the plugins associated to this namespace
                 $plugins = Plugin::getAll();
                 foreach($plugins as $plugin){
-                    if($plugin->getNamespace() === $namespace){
+                    if($plugin->getNamespace() === $namespace) {
                         $dirs = array($plugin->getRootDir());
                         break;
                     }
@@ -93,10 +98,10 @@ class Autoload{
             $dirs = array(CUSTOM_LIB_DIR, LIB_DIR . 'ext/');
         }
 
-		// Cross any search folder to find out the class file
+        // Cross any search folder to find out the class file
         foreach($dirs as $dir){
             $files = FileSystem::getInstance()->find($dir, $filename, FileSystem::FIND_FILE_ONLY);
-            if(!empty($files)){
+            if(!empty($files)) {
                 $file = $files[0];
 
                 // The class file has been found, include it
@@ -113,12 +118,12 @@ class Autoload{
 
 
     /**
-	 * Save the autoload cache at the end of a script processing. It is not registered any times it is updated,
-	 * to improve the performances of the application.
-	 */
+     * Save the autoload cache at the end of a script processing. It is not registered any times it is updated,
+     * to improve the performances of the application.
+     */
     public static function saveCache(){
-        if(self::$cacheUpdated){
-            Cache::getInstance()->save(self::CACHE_FILE, '<?php return '. var_export(self::$cache, true) . ';');            
+        if(self::$cacheUpdated) {
+            Cache::getInstance()->save(self::CACHE_FILE, '<?php return '. var_export(self::$cache, true) . ';');
         }
     }
 }
@@ -127,6 +132,8 @@ class Autoload{
 spl_autoload_register('\Hawk\Autoload::load', true, false);
 
 // Save the autoload cache
-Event::on('process-end', function(Event $event){
-    Autoload::saveCache();
-});
+Event::on(
+    'process-end', function (Event $event) {
+        Autoload::saveCache();
+    }
+);

@@ -96,7 +96,7 @@ reset-pwd-email-thanks = "Nous espéron vous revoir bientôt ! <br /> {sitename}
 ; Reset password
 reset-pwd-form-title = "Je réinitialise mon mot de passe"
 reset-pwd-form-code-label = "Votre code de vérification"
-reset-pwd-form-new-pwd-label = "Votre nouveau mot de passe"
+reset-pwd-form-password-label = "Votre nouveau mot de passe"
 reset-pwd-form-confirmation-label = "Tapez-le à nouveau"
 reset-pwd-form-success = "Votre mot de passe a été réinitialisé avec succès. Vous pouvez dès maintenant vous connecter avec votre nouveau mot de passe"
 reset-pwd-form-error = "Une erreur est survenue pendant la réinitialisation de votre mot de passe. Veuillez ressayer ultérieurement."

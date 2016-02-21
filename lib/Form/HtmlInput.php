@@ -1,51 +1,58 @@
 <?php
 /**
  * HtmlInput.php
- * @author Elvyrra SAS
+ *
+ * @author  Elvyrra SAS
+ * @license http://rem.mit-license.org/ MIT
  */
 
 namespace Hawk;
 
 /**
- * This class describes html inputs. These objects are not really inputs, but can be used in forms to display HTML content betweeen other inputs, 
+ * This class describes html inputs. These objects are not really inputs, but can be used in forms to display HTML content betweeen other inputs,
  * for instance short description of a set of inputs.
+ *
  * @package Form\Input
  */
 class HtmlInput extends FormInput{
-	const TYPE = 'html';
-	const INDEPENDANT = true;
+    const TYPE = 'html';
+    const INDEPENDANT = true;
 
-	/**
-	 * Defines if the content must be displayed as plain text
-	 */
+    /**
+     * Defines if the content must be displayed as plain text
+     */
     public $plainText = false;
 
     /**
      * Display the value of the input
+     *
      * @return string The displayed HTML or text
      */
     public function display(){
-    	if($this->plainText){
-    		$this->value = nl2br($this->value);
-    	}
+        if($this->plainText) {
+            $this->value = nl2br($this->value);
+        }
 
-    	return parent::display();
+        return parent::display();
     }
 
     /**
      * Check the submitted value format. For this class, this method always return true, because no data can be submitted
+     *
      * @param Form $form The form this "input" is associated with
-	 * @return boolean True
+     *
+     * @return boolean True
      */
-	public function check(&$form = null){
-		return true;
-	}
-	
-	/**
-	 * Get the value, formatted for MySQL database
-	 * @return string The value itself
-	 */
-	public function dbvalue(){ 
-		return $this->value;
-	}
+    public function check(&$form = null){
+        return true;
+    }
+
+    /**
+     * Get the value, formatted for MySQL database
+     *
+     * @return string The value itself
+     */
+    public function dbvalue(){
+        return $this->value;
+    }
 }

@@ -214,10 +214,6 @@ confirm-delete-plugin = "Voulez-vous réellement supprimer définitivement ce pl
 
 search-plugin-form-title = "Rechercher un plugin"
 search-plugin-form-search-label = "Recherche"
-search-plugin-form-price-label = "Prix"
-search-plugin-form-price-all-value = "Tous les plugins"
-search-plugin-form-price-free-value = "Plugins gratuits"
-search-plugin-form-price-charged-value = "Plugins payants"
 search-plugin-form-submit-btn = "Rechercher"
 
 search-plugins-result-title = "Recherche de plugins : {search}"
@@ -248,8 +244,6 @@ available-updates-title-plugins[p] = "{number} mises à jour de plugins"
 available-updates-title-themes[s] = "1 themes mise à jour de thème"
 available-updates-title-themes[p] = "{number} mises à jour de thèmes"
 
-update-page-title = "Mettre à jour mon application"
-update-page-tab-hawk-title = "Mettre Hawk à jour"
 update-page-update-hawk-btn = "Installer Hawk v{version}"
 update-page-confirm-update-hawk = "Voulez-vous réellement mettre Hawk à jour ?"
 update-hawk-error = "Une erreur est survenue pendant la mise à jour de Hawk"

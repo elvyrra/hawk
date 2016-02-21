@@ -1,206 +1,234 @@
 <?php
 /**
  * Mail.php
+ *
+ * @author  Elvyrra SAS
+ * @license http://rem.mit-license.org/ MIT
  */
 
 namespace Hawk;
 
 /**
  * This class use PHPMailer library to send mails from Hawk applications
- * @package Network 
+ *
+ * @package Network
  */
 class Mail{
-	use Utils;
+    use Utils;
 
-	/**
-	 * The PHPMailer instance
-	 */
-	private $mailer;
+    /**
+     * The PHPMailer instance
+     */
+    private $mailer;
 
-	/**
-	 * Default mailing engine
-	 */
-	const DEFAULT_MAILER = 'mail';
+    /**
+     * Default mailing engine
+     */
+    const DEFAULT_MAILER = 'mail';
 
-	/**
-	 * Make a new mail
-	 * @param array $param The parameters to pass to PHPMailer
-	 */
-	public function __construct($param = array()){
-		$this->mailer = new \PHPMailer;
+    /**
+     * Make a new mail
+     *
+     * @param array $param The parameters to pass to PHPMailer
+     */
+    public function __construct($param = array()){
+        $this->mailer = new \PHPMailer;
 
-		$param['Mailer'] = Option::get('main.mailer-type') ? Option::get('main.mailer-type') : self::DEFAULT_MAILER;
-		if($param['Mailer'] == 'smtp' || $param['Mailer'] == 'pop3'){
-			$param['Host'] = Option::get('main.mailer-host');
-			$param['Port'] = Option::get('main.mailer-port');
-			$param['Username'] = Option::get('main.mailer-username');
-			$param['Password'] = Option::get('main.mailer-password');			
-		}
+        $param['Mailer'] = Option::get('main.mailer-type') ? Option::get('main.mailer-type') : self::DEFAULT_MAILER;
+        if($param['Mailer'] == 'smtp' || $param['Mailer'] == 'pop3') {
+            $param['Host'] = Option::get('main.mailer-host');
+            $param['Port'] = Option::get('main.mailer-port');
+            $param['Username'] = Option::get('main.mailer-username');
+            $param['Password'] = Option::get('main.mailer-password');
+        }
 
-		if($param['Mailer'] == 'smtp'){
-			$param['Secure'] = Option::get('main.smtp-secured');
-		}
+        if($param['Mailer'] == 'smtp') {
+            $param['Secure'] = Option::get('main.smtp-secured');
+        }
 
-		$this->map($param, $this->mailer);
-		
-		$this->mailer->CharSet = 'utf-8';
-	}
+        $this->map($param, $this->mailer);
 
-	/**
-	 * Static method to make a new mailer
-	 * @param array $param The parameters to pass to PHPMailer	 
-	 */
-	public static function getInstance($param){
-		return new self($param);
-	}
+        $this->mailer->CharSet = 'utf-8';
+    }
 
-	/**
-	 * Set 'from'
-	 * @param string $email The sender email address to set
-	 * @param string $name The sender name to set
-	 * @param Mail The instance itself, to permit chained actions
-	 */
-	public function from($email, $name = null) {
-		$this->mailer->From = $email;
-		if($name !== null){
-			$this->fromName($name);
-		}
+    /**
+     * Static method to make a new mailer
+     *
+     * @param array $param The parameters to pass to PHPMailer
+     */
+    public static function getInstance($param){
+        return new self($param);
+    }
 
-		return $this;
-	}
+    /**
+     * Set 'from'
+     *
+     * @param string $email The sender email address to set
+     * @param string $name  The sender name to set
+     *
+     * @return Mail The instance itself, to permit chained actions
+     */
+    public function from($email, $name = null) {
+        $this->mailer->From = $email;
+        if($name !== null) {
+            $this->fromName($name);
+        }
 
-	/**
-	 * Set 'from-name'
-	 * @param string $name The sender name to set
-	 * @param Mail The instance itself, to permit chained actions
-	 */
-	public function fromName($name) {
-		$this->mailer->FromName = $name;
+        return $this;
+    }
 
-		return $this;
-	}
+    /**
+     * Set 'from-name'
+     *
+     * @param string $name The sender name to set
+     *
+     * @return Mail The instance itself, to permit chained actions
+     */
+    public function fromName($name) {
+        $this->mailer->FromName = $name;
 
-	/**
-	 * Add a recipient
-	 * @param string $email The recipient email address
-	 * @param string $name The recipient name
-	 * @param Mail The instance itself, to permit chained actions
-	 */
-	public function to($email, $name = '') {
-		$this->mailer->addAddress($email, $name);
+        return $this;
+    }
 
-		return $this;
-	}
+    /**
+     * Add a recipient
+     *
+     * @param string $email The recipient email address
+     * @param string $name  The recipient name
+     *
+     * @return Mail The instance itself, to permit chained actions
+     */
+    public function to($email, $name = '') {
+        $this->mailer->addAddress($email, $name);
 
-	/**
-	 * Set 'Reply-To'
-	 * @param string $email The email address to reply to
-	 * @param string $name The name of the person to reply to
-	 * @param Mail The instance itself, to permit chained actions
-	 */
-	public function replyTo($email, $name = '') {
-		$this->mailer->addReplyTo($email, $name);
+        return $this;
+    }
 
-		return $this;
-	}
+    /**
+     * Set 'Reply-To'
+     *
+     * @param string $email The email address to reply to
+     * @param string $name  The name of the person to reply to
+     *
+     * @return Mail The instance itself, to permit chained actions
+     */
+    public function replyTo($email, $name = '') {
+        $this->mailer->addReplyTo($email, $name);
 
-	/**
-	 * Add a recipient in copy
-	 * @param string $email The email address to add in copy
-	 * @param string $name The recipient's name to add in copy
-	 * @param Mail The instance itself, to permit chained actions
-	 */
-	public function cc($email, $name = '') {
-		$this->mailer->addCC($email, $name);
+        return $this;
+    }
 
-		return $this;
-	}
+    /**
+     * Add a recipient in copy
+     *
+     * @param string $email The email address to add in copy
+     * @param string $name  The recipient's name to add in copy
+     *
+     * @return Mail The instance itself, to permit chained actions
+     */
+    public function cc($email, $name = '') {
+        $this->mailer->addCC($email, $name);
 
-	/**
-	 * Add a recipient in hidden copy
-	 * @param string $email The recipient's email address to add in hidden copy
-	 * @param string $name The recipient's name to add in hidden copy
-	 * @param Mail The instance itself, to permit chained actions
-	 */
-	public function bcc($email, $name){
-		$this->mailer->addBCC($email, $name);
+        return $this;
+    }
 
-		return $this;
-	}
+    /**
+     * Add a recipient in hidden copy
+     *
+     * @param string $email The recipient's email address to add in hidden copy
+     * @param string $name  The recipient's name to add in hidden copy
+     *
+     * @return Mail The instance itself, to permit chained actions
+     */
+    public function bcc($email, $name){
+        $this->mailer->addBCC($email, $name);
 
-	/**
-	 * Attach a file
-	 * @param string $path The file path to attach
-	 * @param string $name The attachment name
-	 * @param string $encoding The encoding system to add the attachment
-	 * @param string $type The file MIME type
-	 * @param string $disposition Disposition to use
-	 * @param Mail The instance itself, to permit chained actions
-	 */
-	public function attach($path, $name = '', $encoding = 'base64', $type = '', $disposition = 'attachment'){
-		$this->mailer->addAttachment($path, $name, $encoding, $type, $disposition);
+        return $this;
+    }
 
-		return $this;
-	}
+    /**
+     * Attach a file
+     *
+     * @param string $path        The file path to attach
+     * @param string $name        The attachment name
+     * @param string $encoding    The encoding system to add the attachment
+     * @param string $type        The file MIME type
+     * @param string $disposition Disposition to use
+     *
+     * @return Mail The instance itself, to permit chained actions
+     */
+    public function attach($path, $name = '', $encoding = 'base64', $type = '', $disposition = 'attachment'){
+        $this->mailer->addAttachment($path, $name, $encoding, $type, $disposition);
 
-	/**
-	 * Set email subject
-	 * @param string $subject The email subject
-	 * @param Mail The instance itself, to permit chained actions
-	 */
-	public function subject($subject){
-		$this->mailer->Subject = $subject;
+        return $this;
+    }
 
-		return $this;
-	}
+    /**
+     * Set email subject
+     *
+     * @param string $subject The email subject
+     *
+     * @return Mail The instance itself, to permit chained actions
+     */
+    public function subject($subject){
+        $this->mailer->Subject = $subject;
 
-	/**
-	 * set HTML content
-	 * @param string $html The html content to set
-	 * @param Mail The instance itself, to permit chained actions
-	 */
-	public function html($html){
-		$this->mailer->isHTML(true);
+        return $this;
+    }
 
-		$this->mailer->Body = $html;
+    /**
+     * Set HTML content
+     *
+     * @param string $html The html content to set
+     *
+     * @return Mail The instance itself, to permit chained actions
+     */
+    public function html($html){
+        $this->mailer->isHTML(true);
 
-		if(empty($this->mailer->AltBody)){
-			$text = preg_replace('/\<br(\s*)?\/?\>/i', PHP_EOL, $html);
-			$text = strip_tags($text);
+        $this->mailer->Body = $html;
 
-			$this->text($text);
-		}
+        if(empty($this->mailer->AltBody)) {
+            $text = preg_replace('/\<br(\s*)?\/?\>/i', PHP_EOL, $html);
+            $text = strip_tags($text);
 
-		return $this;
-	}
+            $this->text($text);
+        }
 
-	/**
-	 * Set text content
-	 * @param string $text The text to set
-	 * @param Mail The instance itself, to permit chained actions
-	 */
-	public function text($text){
-		$this->mailer->AltBody = $text;
+        return $this;
+    }
 
-		return $this;
-	}
+    /**
+     * Set text content
+     *
+     * @param string $text The text to set
+     *
+     * @return Mail The instance itself, to permit chained actions
+     */
+    public function text($text){
+        $this->mailer->AltBody = $text;
+
+        return $this;
+    }
 
 
-	/**
-	 * Send the mail
-	 * @throws MailException	 
-	 */
-	public function send(){
-		if(!$this->mailer->send()){
-			App::logger()->error('The mail could not be sent because : ' . $this->mailer->ErrorInfo);
-			throw new MailException($this->mailer->ErrorInfo);
-		}
-		App::logger()->info('An email was sent to ' . implode(', ', $this->mailer->getAllRecipientAddresses()));
-	}
+    /**
+     * Send the mail
+     *
+     * @throws MailException
+     */
+    public function send(){
+        if(!$this->mailer->send()) {
+            App::logger()->error('The mail could not be sent because : ' . $this->mailer->ErrorInfo);
+            throw new MailException($this->mailer->ErrorInfo);
+        }
+        App::logger()->info('An email was sent to ' . implode(', ', $this->mailer->getAllRecipientAddresses()));
+    }
 }
 
 /**
  * MailException
+ *
  * @package Exceptions
  */
 class MailException extends \Exception{

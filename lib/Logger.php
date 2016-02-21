@@ -1,12 +1,17 @@
 <?php
 /**
  * Logger.php
+ *
+ * @author  Elvyrra
+ * @license http://rem.mit-license.org/ MIT
  */
 
 namespace Hawk;
 
 /**
- * This class is used to log data in /logs directory. You can use it to log the action of the users on the application, for example to make stats.
+ * This class is used to log data in /logs directory.
+ * You can use it to log the action of the users on the application, for example to make stats.
+ *
  * @package Core
  */
 final class Logger extends Singleton{
@@ -21,6 +26,7 @@ final class Logger extends Singleton{
 
     /**
      * The logger instance
+     *
      * @var Logger
      */
     protected static $instance;
@@ -33,20 +39,21 @@ final class Logger extends Singleton{
 
     /**
      * Open a log file
+     *
      * @param string $level The level of the log file
      */
     private function open($level){
         $basename = $level . '.log';
         $filename = LOG_DIR . $basename;
 
-        if(is_file($filename) && filesize($filename) >= self::MAX_FILE_SIZE){
+        if(is_file($filename) && filesize($filename) >= self::MAX_FILE_SIZE) {
             // Archive the last file and create a new one
 
             // rename all archives already existing (keep only last 9 archives)
             $archives = array_reverse(glob($filename . '.*.zip'));
             foreach($archives as $archive){
                 preg_match('/^' . preg_quote($basename, '/') . '\.(\d+)\.zip$/', basename($archive), $match);
-                if($match[1] > self::MAX_FILES_BY_LEVEL){
+                if($match[1] > self::MAX_FILES_BY_LEVEL) {
                     unlink($archive);
                 }
                 else{
@@ -67,12 +74,13 @@ final class Logger extends Singleton{
 
     /**
      * Write log
-     * @param string $level The log level : 'debug', 'info', 'notice', 'warning', 'error'
+     *
+     * @param string $level   The log level : 'debug', 'info', 'notice', 'warning', 'error'
      * @param string $message The message to write
      */
     private function write($level, $message){
 
-        if(defined('ENABLE_LOG') && !ENABLE_LOG){
+        if(defined('ENABLE_LOG') && !ENABLE_LOG) {
             return;
         }
 
@@ -95,7 +103,9 @@ final class Logger extends Singleton{
     }
 
     /**
-     * Log info data. Use this function to log user action like form submission
+     * Log info data.
+     * Use this function to log user action like form submission
+     *
      * @param string $message The message to write
      */
     public function info($message){
@@ -103,7 +113,9 @@ final class Logger extends Singleton{
     }
 
     /**
-     * Log debug data. this function is used to log script execution steps
+     * Log debug data.
+     * This function is used to log script execution steps
+     *
      * @param string $message The message to write
      */
     public function debug($message){
@@ -111,7 +123,9 @@ final class Logger extends Singleton{
     }
 
     /**
-     * Log notice data. This function is used to log anormal non blocking usage
+     * Log notice data.
+     * This function is used to log anormal non blocking usage
+     *
      * @param string $message The message to write
      */
     public function notice($message){
@@ -119,7 +133,9 @@ final class Logger extends Singleton{
     }
 
     /**
-     * Log warning data. this function is used to log actions that didn't work because of user bad action (eg form badly completed)
+     * Log warning data.
+     * This function is used to log actions that didn't work because of user bad action (eg form badly completed)
+     *
      * @param string $message The message to write
      */
     public function warning($message){
@@ -127,7 +143,9 @@ final class Logger extends Singleton{
     }
 
     /**
-     * Log error data. This function is used to log actions that didn't work because of a script error
+     * Log error data.
+     * This function is used to log actions that didn't work because of a script error
+     *
      * @param string $message The message to write
      */
     public function error($message){

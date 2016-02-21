@@ -1,7 +1,23 @@
 <?php
+/**
+ * SearchThemeWidget.php
+ *
+ * @author  Elvyrra SAS
+ * @license http://rem.mit-license.org/ MIT
+ */
 namespace Hawk\Plugins\Admin;
 
+/**
+ * SearchThemeWidget
+ *
+ * @package Plugins\Admin
+ */
 class SearchThemeWidget extends Widget{
+    /**
+     * Display the widget
+     *
+     * @return string The generated HTML
+     */
     public function display(){
 
         $form = new Form(array(
@@ -15,7 +31,6 @@ class SearchThemeWidget extends Widget{
                     'default' => App::request()->getParams('search'),
                     'placeholder' => Lang::get('admin.search-theme-form-search-label'),
                 )),
-
                 new SubmitInput(array(
                     'name' => 'valid',
                     'value' => Lang::get('admin.search-theme-form-submit-btn'),

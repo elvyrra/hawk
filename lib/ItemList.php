@@ -2,7 +2,8 @@
 /**
  * ItemList.php
  *
- * @author Elvyrra SAS
+ * @author  Elvyrra SAS
+ * @license http://rem.mit-license.org/ MIT
  */
 
 namespace Hawk;
@@ -12,8 +13,7 @@ namespace Hawk;
  *
  * @package List
  */
-class ItemList
-{
+class ItemList {
     use Utils;
 
     // Class constants
@@ -24,152 +24,203 @@ class ItemList
     /**
      * The possible choices for the number of lines to display
      */
-    public static $lineChoice = array(
-                                 10,
-                                 20,
-                                 50,
-                                 100,
-                                );
+    public static $lineChoice = array(10, 20, 50, 100);
 
     /**
-     * @var string The list id
+     * The list id
+     *
+     * @var string
      */
     public $id,
 
-    /*
-        * @var array The list control buttons
+    /**
+     * The list control buttons
+     *
+     * @var array
      */
     $controls = array(),
 
-    /*
-        * @var array The list fields. This corresponds to the properties of each column in the list
+    /**
+     * The list fields. This corresponds to the properties of each column in the list
+     *
+     * @var array
      */
     $fields = array(),
 
-    /*
-        * @var array The user researches in the list
+    /**
+     * The user researches in the list
+     *
+     * @var array
      */
     $searches = array(),
 
-    /*
-        * @var array The user sorts
+    /**
+     * The user sorts
+     *
+     * @var array
      */
     $sorts = array(),
 
-    /*
-        * @var array The binded values for the SQL queries
+    /**
+     * The binded values for the SQL queries
+     *
+     * @var array
      */
     $binds = array(),
 
-    /*
-        * @var int The number of lines to display
+    /**
+     * The number of lines to display
+     *
+     * @var int
      */
     $lines = self::DEFAULT_LINE_CHOICE,
 
-    /*
-        * @var int The page number to display
+    /**
+     * The page number to display
+     *
+     * @var int
      */
     $page = 1,
 
-    /*
-        * @var string The URI called to refresh the list
+    /**
+     * The URI called to refresh the list
+     *
+     * @var string
      */
     $action,
 
-    /*
-        * @var string The model used to get the data in the database
+    /**
+     * The model used to get the data in the database
+     *
+     * @var string
      */
     $model = self::DEFAULT_MODEL,
 
-    /*
-        * @var string The table where to get the data if "model" is not set
+    /**
+     * The table where to get the data if "model" is not set
+     *
+     * @var string
      */
     $table,
 
-    /*
-        * @var string The default reference field, used to index the list result table
+    /**
+     * The default reference field, used to index the list result table
+     *
+     * @var string
      */
     $reference,
 
-    /*
-        * @var string The list filter
+    /**
+     * The list filter
+     *
+     * @var string
      */
     $filter,
 
-    /*
-        * @var  string The default db instance name
+    /**
+     * The default db instance name
+     *
+     * @var string
      */
     $dbname = MAINDB,
 
-    /*
-        * @var  array The raw data to display in the list (overrides table, model, dbname and reference properties)
+    /**
+     * The raw data to display in the list (overrides table, model, dbname and reference properties)
+     *
+     * @var array
      */
     $data = null,
 
-    /*
-        * @var array The fields group in the search query
+    /**
+     * The fields group in the search query
+     *
+     * @var array
      */
     $group = array(),
 
-    /*
-        * @var mixed The id of the selected line
+    /**
+     * The id of the selected line
+     *
+     * @var mixed
      */
     $selected = null,
 
-    /*
-        * @var string|function The class to apply to the list lines
+    /**
+     * The class to apply to the list lines
+     *
+     * @var string|function
      */
     $lineClass = null,
 
-    /*
-        * @var bool Defines if the navigation bar of the list must be displayed
+    /**
+     * Defines if the navigation bar of the list must be displayed
+     *
+     * @var bool
      */
     $navigation = true,
 
-    /*
-        * @var bool If set to true, the columns headers are not displayed
+    /**
+     * If set to true, the columns headers are not displayed
+     *
+     * @var bool
      */
     $noHeader = false,
 
-    /*
-        * @var string If not empty, define the CSS selector of the node where to display the list refreshing result
+    /**
+     * If not empty, define the CSS selector of the node where to display the list refreshing result
+     *
+     * @var string
      */
     $target = '',
 
-    /*
-        * @var string Define the message to display if no result are found for the list
+    /**
+     * Define the message to display if no result are found for the list
+     *
+     * @var string
      */
     $emptyMessage,
 
 
-    /*
-        * @var string The whole list (list + navigation bar) view filename
+    /**
+     * The whole list (list + navigation bar) view filename
+     *
+     * @var string
      */
     $tpl,
 
-    /*
-        * @var  string The navigation bar view filename
+    /**
+     * The navigation bar view filename
+     *
+     * @var string
      */
     $navigationBarTpl,
 
-    /*
-        * @var  string The list view filename
+    /**
+     * The list view filename
+     *
+     * @var string
      */
     $listTpl,
 
-    /*
-        * @var string The result view filename
+    /**
+     * The result view filename
+     *
+     * @var string
      */
     $resultTpl;
 
 
     /**
-     * @var  DB The DB instance used to make the database queries to get the list results
+     * The DB instance used to make the database queries to get the list results
+     *
+     * @var DB
      */
     private $dbo,
 
-    /*
-        * @var boolean Define if the list refreshing or displayed for the first time
+    /**
+     * Define if the list refreshing or displayed for the first time
+     *
+     * @var boolean
      */
     $refresh = false;
 
@@ -179,8 +230,7 @@ class ItemList
      *
      * @param arary $params The parameter of the list
      */
-    public function __construct($params)
-    {
+    public function __construct($params) {
         // Default values
         $this->emptyMessage = Lang::get('main.list-no-result');
         $this->action       = getenv('REQUEST_URI');
@@ -205,7 +255,7 @@ class ItemList
                     $this->reference = 'id';
                 }
             }
-            else{
+            else {
                 $model = $this->model;
 
                 if(!isset($this->reference)) {
@@ -217,44 +267,44 @@ class ItemList
                 }
 
                 $this->dbname = $model::getDbName();
-            }//end if
+            }
 
             $this->refAlias = is_array($this->reference) ? reset($this->reference) : $this->reference;
             $this->refField = is_array($this->reference) ? reset(array_keys($this->reference)) : $this->reference;
 
             $this->dbo = DB::get($this->dbname);
-        }//end if
+        }
 
         // initialize controls
-        foreach($this->controls as &$button){
+        foreach($this->controls as &$button) {
             if(!empty($button['template'])) {
-                switch($button['template']){
-                case 'refresh' :
-                    $button = array(
-                               'icon'    => 'refresh',
-                               'type'    => 'button',
-                               'onclick' => 'app.lists["'.$this->id.'"].refresh();',
-                              );
-                    break;
+                switch($button['template']) {
+                    case 'refresh' :
+                        $button = array(
+                        'icon'    => 'refresh',
+                        'type'    => 'button',
+                        'onclick' => 'app.lists["'.$this->id.'"].refresh();',
+                        );
+                        break;
 
-                case 'print' :
-                    $button = array(
-                               'icon'    => 'print',
-                               'type'    => 'button',
-                               'onclick' => 'app.lists["'.$this->id.'"].print();',
-                              );
-                    break;
+                    case 'print' :
+                        $button = array(
+                        'icon'    => 'print',
+                        'type'    => 'button',
+                        'onclick' => 'app.lists["'.$this->id.'"].print();',
+                        );
+                        break;
                 }
             }
-        }//end foreach
+        }
 
         // Get the filters sent by POST or registered in COOKIES
         $parameters = array(
-                       'searches',
-                       'sorts',
-                       'lines',
-                       'page',
-                      );
+            'searches',
+            'sorts',
+            'lines',
+            'page',
+        );
 
         if(App::request()->getHeaders('X-List-Filter-'.$this->id)) {
             App::session()->getUser()->setOption('main.list-'.$this->id, App::request()->getHeaders('X-List-Filter-'.$this->id));
@@ -262,14 +312,14 @@ class ItemList
 
         $this->userParam = json_decode(App::session()->getUser()->getOptions('main.list-'.$this->id), true);
 
-        foreach($parameters as $name){
+        foreach($parameters as $name) {
             if(isset($this->userParam[$name])) {
                 $this->$name = $this->userParam[$name];
             }
         }
 
         // initialize fields default values
-        foreach($this->fields as $name => &$field){
+        foreach($this->fields as $name => &$field) {
             $field = new ItemListField($name, $field, $this);
             if(isset($this->searches[$name])) {
                 $field->searchValue = $this->searches[$name];
@@ -280,13 +330,10 @@ class ItemList
             }
         }
 
-        $event = new Event(
-            'list.'.$this->id.'.instanciated',
-            array('list' => $this)
-        );
+        $event = new Event('list.'.$this->id.'.instanciated', array('list' => $this));
         $event->trigger();
 
-    }//end __construct()
+    }
 
 
     /**
@@ -294,8 +341,7 @@ class ItemList
      *
      * @return array The data to display
      */
-    public function get()
-    {
+    public function get() {
         if(isset($this->data) && is_array($this->data)) {
             return $this->getFromArray($this->data);
         }
@@ -303,7 +349,7 @@ class ItemList
             return $this->getFromDatabase();
         }
 
-    }//end get()
+    }
 
 
     /**
@@ -311,8 +357,7 @@ class ItemList
      *
      * @return array The data taken from the databases
      */
-    private function getFromDatabase()
-    {
+    private function getFromDatabase() {
         $fields = array();
 
         $where = array();
@@ -334,8 +379,8 @@ class ItemList
             $this->fields[$this->refAlias] = new ItemListField(
                 $this->refAlias,
                 array(
-                 'field'  => $this->refField,
-                 'hidden' => true,
+                    'field'  => $this->refField,
+                    'hidden' => true,
                 ),
                 $this
             );
@@ -374,17 +419,17 @@ class ItemList
 
             // Get the data from the database
             $request = array(
-                        'fields'  => $fields,
-                        'from'    => $this->table,
-                        'where'   => $where,
-                        'binds'   => $this->binds,
-                        'orderby' => $this->sorts,
-                        'group'   => $this->group,
-                        'start'   => $this->start,
-                        'limit'   => $this->lines,
-                        'index'   => $this->refAlias,
-                        'return'  => $this->model,
-                       );
+                'fields'  => $fields,
+                'from'    => $this->table,
+                'where'   => $where,
+                'binds'   => $this->binds,
+                'orderby' => $this->sorts,
+                'group'   => $this->group,
+                'start'   => $this->start,
+                'limit'   => $this->lines,
+                'index'   => $this->refAlias,
+                'return'  => $this->model,
+            );
 
             $this->results = $this->dbo->select($request);
 
@@ -392,9 +437,9 @@ class ItemList
         }
         catch(DBException $e){
             exit(DEBUG_MODE ? $e->getMessage() : Lang::get('main.list-error'));
-        }//end try
+        }
 
-    }//end getFromDatabase()
+    }
 
 
     /**
@@ -429,7 +474,7 @@ class ItemList
                     }
                 );
             }
-        }//end foreach
+        }
 
         $this->recordNumber = count($data);
 
@@ -451,7 +496,7 @@ class ItemList
 
         return $this->results;
 
-    }//end getFromArray()
+    }
 
 
     /**
@@ -459,18 +504,16 @@ class ItemList
      *
      * @param array $data The data to set
      */
-    public function set($data)
-    {
+    public function set($data) {
         $this->getFromArray($data);
 
-    }//end set()
+    }
 
 
     /**
      * Get the list views files
      */
-    private function getViews()
-    {
+    private function getViews() {
         if(empty($this->tpl)) {
             $this->tpl = Theme::getSelected()->getView('item-list/container.tpl');
         }
@@ -487,7 +530,7 @@ class ItemList
             $this->resultTpl = Theme::getSelected()->getView('item-list/result.tpl');
         }
 
-    }//end getViews()
+    }
 
 
     /**
@@ -495,25 +538,23 @@ class ItemList
      *
      * @return string The HTML result of displaying
      */
-    public function __toString()
-    {
+    public function __toString() {
         return $this->display();
 
-    }//end __toString()
+    }
 
 
     /**
-     * display the list
+     * Display the list
      *
      * @return string The HTML result of displaying
      */
-    public function display()
-    {
+    public function display() {
         try{
-            // get the data to display
+            // Get the data to display
             $this->get();
 
-            // get the total number of pages
+            // Get the total number of pages
             $pages = (ceil($this->recordNumber / $this->lines) > 0) ? ceil($this->recordNumber / $this->lines) : 1;
 
             // At least one result to display
@@ -537,69 +578,34 @@ class ItemList
                         $data[$id][$name] = $field->displayCell($id);
                     }
                 }
-            }//end if
+            }
 
+            // Get the list views files
             $this->getViews();
 
-            // Generate the script to insert the list in the application , client side
-            if($this->refresh) {
-                $tplFile = $this->resultTpl;
-                $script  = 'app.ready(function(){
-				        if(list = app.lists["'.$this->id.'"]){
-				            list.selected = '.($this->selected !== false ? '"'.$this->selected.'"' : 'null').'
-							list.maxPages('.$pages.');
-							list.recordNumber('.$this->recordNumber.');
-				        }
-				    });';
-            }
-            else{
-                $script = 'require(["app"], function(){
-						app.ready(function(){
-							var list = new List({
-								id : "'.$this->id.'",
-								action : "'.$this->action.'",
-								target : "'.$this->target.'",
-								fields : '.json_encode(array_keys($this->fields)).',
-								userParam : '.json_encode($this->userParam, JSON_FORCE_OBJECT).'
-							});
-
-							list.selected = '.($this->selected !== false ? '"'.$this->selected.'"' : 'null').'
-							list.maxPages('.$pages.');
-							list.recordNumber('.$this->recordNumber.');
-
-							app.lists["'.$this->id.'"] = list;
-						});
-					});';
-
-                $tplFile = $this->tpl;
-            }//end if
-
             return
-            View::make(
-                $tplFile,
-                array(
-                 'list'            => $this,
-                 'data'            => $data,
-                 'linesParameters' => $param,
-                 'pages'           => $pages,
-                )
-            ).'<script type="text/javascript">'.$script.'</script>';
+            View::make($this->refresh ? $this->resultTpl : $this->tpl, array(
+                'list' => $this,
+                'data' => $data,
+                'linesParameters' => $param,
+                'pages' => $pages,
+            )).
+            View::make(Plugin::get('main')->getView('list.js.tpl'), array(
+                'list' => $this,
+                'pages' => $pages
+            ));
+            // .'<script type="text/javascript">'.$script.'</script>';
         }
         catch(\Exception $e){
             App::errorHandler()->exception($e);
-        }//end try
-
-    }//end display()
+        }
+    }
 
 
     /**
      * Check if the list is refreshing or displayed for the first time
      */
-    public function isRefreshing()
-    {
+    public function isRefreshing() {
         return $this->refresh;
-
-    }//end isRefreshing()
-
-
-}//end class
+    }
+}
