@@ -233,8 +233,8 @@ class ItemList {
     public function __construct($params) {
         // Default values
         $this->emptyMessage = Lang::get('main.list-no-result');
-        $this->action       = getenv('REQUEST_URI');
-        $this->refresh      = !!App::request()->getParams('refresh');
+        $this->action = getenv('REQUEST_URI');
+        $this->refresh = !!App::request()->getParams('refresh');
 
         // Get the values from the parameters array
         $this->map($params);
@@ -589,12 +589,11 @@ class ItemList {
                 'data' => $data,
                 'linesParameters' => $param,
                 'pages' => $pages,
-            )).
+            )) .
             View::make(Plugin::get('main')->getView('list.js.tpl'), array(
                 'list' => $this,
                 'pages' => $pages
             ));
-            // .'<script type="text/javascript">'.$script.'</script>';
         }
         catch(\Exception $e){
             App::errorHandler()->exception($e);

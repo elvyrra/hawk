@@ -17,11 +17,11 @@
 							{if(is_file($theme->getPreviewFilename()))}
 								<img src="{{ $theme->getPreviewUrl() }}" alt="Theme preview : {{ $theme->getTitle() }}"/>
 							{else}
-								<span class="icon icon-picture-o icon-5x"></span>
+								{icon icon="picture-o" size="5x"}
 							{/if}
 						</div>
 						{if($name === $selectedTheme->getName())}
-							<i class="text-success icon icon-check-circle theme-selected icon-2x"></i>
+							{icon icon="check-circle" class="theme-selected text-success" size="2x"}
 						{/if}
 						<div class="actions">
 							{if($name != $selectedTheme->getName())}

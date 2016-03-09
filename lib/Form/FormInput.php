@@ -84,6 +84,12 @@ class FormInput{
     public $id;
 
     /**
+     * The default input value
+     *
+     * @var string
+     */
+
+    /**
      * Field value
      *
      * @var string

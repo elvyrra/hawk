@@ -5,7 +5,7 @@
                 <h4 class="panel-title">
                     <a data-toggle="collapse" data-parent="#{{$id}}" href="#{{$panel['id']}}" aria-controls="{{$panel['id']}}" class="{{ $selected == $i ? '' :'collapsed'}}">
                         {{$panel['title']}}
-                        <i class="icon icon-caret-down pull-right collapse-icon"></i>
+                        {icon icon="caret-down" class="pull-right collapse-icon"}
                     </a>
                 </h4>
             </div>

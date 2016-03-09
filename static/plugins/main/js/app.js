@@ -1,22 +1,23 @@
+/* global Tab */
 'use strict';
 
 /**
- *  Start by configure requirejs paths and shim
+ * Start by configure requirejs paths and shim
  */
 require.config(
     {
         paths : {
-            jquery : 'ext/jquery-2.1.3.min',
-            cookie : 'ext/jquery.cookie',
-            mask : 'ext/jquery.mask.min',
-            sortable : 'ext/jquery-sortable',
-            bootstrap : 'ext/bootstrap.min',
+            jquery      : 'ext/jquery-2.1.3.min',
+            cookie      : 'ext/jquery.cookie',
+            mask        : 'ext/jquery.mask.min',
+            sortable    : 'ext/jquery-sortable',
+            bootstrap   : 'ext/bootstrap.min',
             colorpicker : 'ext/bootstrap-colorpicker.min',
-            datepicker : 'ext/bootstrap-datepicker.min',
-            ko : 'ext/knockout-3.3.0',
-            ckeditor : 'ext/ckeditor/ckeditor',
-            ace : 'ext/ace/ace',
-            less : 'ext/less'
+            datepicker  : 'ext/bootstrap-datepicker.min',
+            ko          : 'ext/knockout-3.3.0',
+            ckeditor    : 'ext/ckeditor/ckeditor',
+            ace         : 'ext/ace/ace',
+            less        : 'ext/less'
         },
         shim : {
             jquery : {
@@ -26,7 +27,7 @@ require.config(
                 exports : 'ko'
             },
             cookie : {
-                deps : ['jquery'],
+                deps : ['jquery']
             },
             mask : {
                 deps : ['jquery']
@@ -59,22 +60,36 @@ require.config(
 
 define(
     'app',
-    ['jquery' ,'ko', 'tabs', 'form', 'list', 'lang', 'cookie','mask', 'sortable', 'bootstrap', 'colorpicker' , 'datepicker', 'ko-extends'],
+    [
+        'jquery',
+        'ko',
+        'tabs',
+        'form',
+        'list',
+        'lang',
+        'cookie',
+        'mask',
+        'sortable',
+        'bootstrap',
+        'colorpicker',
+        'datepicker',
+        'ko-extends'
+    ],
     function($, ko, Tabset, Form, List, Lang) {
         // export libraries to global context
-        window.$      = $;
-        window.ko     = ko;
+        window.$ = $;
+        window.ko = ko;
         window.Tabset = Tabset;
-        window.Form   = Form;
-        window.List   = List;
-        window.Lang   = Lang;
+        window.Form = Form;
+        window.List = List;
+        window.Lang = Lang;
 
         /**
-     * This class describes the behavior of the application
-     *
-     * @class App
-     */
-        var App = function(){
+         * This class describes the behavior of the application
+         *
+         * @class App
+         */
+        var App = function() {
             this.conf = window.appConf;
 
             this.language = '';
@@ -94,11 +109,11 @@ define(
         };
 
         /**
-     * The URI to return for non existing route
-     *
-     * @constant
-     * @memberOf App
-     */
+         * The URI to return for non existing route
+         *
+         * @constant
+         * @memberOf App
+         */
         App.INVALID_URI = window.appConf.basePath + '/INVALID_URI';
 
         /**
@@ -106,13 +121,13 @@ define(
          *
          * @memberOf App
          */
-        App.prototype.start = function(){
+        App.prototype.start = function() {
             // Set the configuration data
             this.setLanguage(this.conf.Lang.language);
             this.setRoutes(this.conf.routes);
             this.setRootUrl(this.conf.rooturl);
             Lang.init(this.conf.Lang.keys);
-            this.baseUrl  = require.toUrl('');
+            this.baseUrl = require.toUrl('');
             this.isLogged = this.conf.user.logged;
 
             // Manage the notification area
@@ -120,117 +135,118 @@ define(
                 display : ko.observable(false),
                 level : ko.observable(),
                 message : ko.observable()
-            }
+            };
 
             this.tabset = new Tabset();
 
             /**
-         * Call URIs by AJAX on click on links
-         */
+             * Call URIs by AJAX on click on links
+             */
             var linkSelector = '[href]:not(.real-link):not([href^="#"]):not([href^="javascript:"])';
-            $("body").on(
+
+            $('body').on(
                 'click',
                 linkSelector,
-                function(event){
+                function(event) {
                     var node = $(event.currentTarget);
                     var url  = $(node).attr('href');
 
                     event.preventDefault();
-                    var data = {};
+                    var data = {},
+                        target = $(node).attr('target');
 
-                    var target = $(node).attr('target');
-                    if((event.which == 2 || !this.tabset.tabs().length) && ! target) {
-                        target = "newtab";
+                    if ((event.which === 2 || !this.tabset.tabs().length) && !target) {
+                        target = 'newtab';
                     }
 
-                    switch(target) {
-                    case 'newtab' :
-                        // Load the page in a new tab of the application
-                        data = {newtab : true};
-                        this.load(url, data);
-                      break;
+                    switch (target) {
+                        case 'newtab' :
+                            // Load the page in a new tab of the application
+                            data = {newtab : true};
+                            this.load(url, data);
+                            break;
 
-                    case 'dialog' :
-                        this.dialog(url);
-                      break;
+                        case 'dialog' :
+                            this.dialog(url);
+                            break;
 
-                    case '_blank' :
-                        // Load the whole page in a new browser tab
-                        window.open(url);
-                      break;
+                        case '_blank' :
+                            // Load the whole page in a new browser tab
+                            window.open(url);
+                            break;
 
-                    case undefined :
-                    case '' :
-                        // Open the url in the current application tab
-                        this.load(url);
-                      break;
+                        case undefined :
+                        case '' :
+                            // Open the url in the current application tab
+                            this.load(url);
+                            break;
 
-                    case 'window' :
-                        // Open the URL in the current web page
-                        location = url;
-                      break
+                        case 'window' :
+                            // Open the URL in the current web page
+                            location.href = url;
+                            break;
 
-                    default :
-                        // Open the url in a given DOM node, represented by it CSS selector
-                        this.load(url, {selector : $(node).attr('target')});
-                      break;
-                    }//end switch
+                        default :
+                            // Open the url in a given DOM node, represented by it CSS selector
+                            this.load(url, {selector : $(node).attr('target')});
+                            break;
+                    }
                 }.bind(this)
             )
 
             // Open a link in a new tab of the application
-            .on(
-                "mousedown",
-                linkSelector,
-                function(event){
-                    if(event.which == 2) {
-                        if(! $(this).attr('target')) {
-                            event.type = "click";
+            .on('mousedown', linkSelector, function(event) {
+                if (event.which === 2) {
+                    if (!$(this).attr('target')) {
+                        event.type = 'click';
 
-                            var clickEvent   = new Event("click", event);
-                            clickEvent.which = 2;
-                            $(this).get(0).dispatchEvent(clickEvent);
-                        }
+                        var clickEvent   = new Event('click', event);
 
-                        event.preventDefault();
-                        event.stopPropagation();
-                        event.stopImmediatePropagation();
-                        return false;
+                        clickEvent.which = 2;
+                        $(this).get(0).dispatchEvent(clickEvent);
                     }
+
+                    event.preventDefault();
+                    event.stopPropagation();
+                    event.stopImmediatePropagation();
+
+                    return false;
                 }
-            );
+
+                return true;
+            });
 
             /**
-         * Treat back button
-         */
-            window.onpopstate = function(event){
+             * Treat back button
+             *
+             * @param {Event} event The popstate event
+             */
+            window.onpopstate = function(event) {
                 event.preventDefault();
-                if(this.tabset.activeTab()) {
+                if (this.tabset.activeTab()) {
                     var history = this.tabset.activeTab().history;
-                    if(event.state) {
+
+                    if (event.state) {
                         // call back button
-                        if(history.length > 1) {
+                        if (history.length > 1) {
                             history.pop();
-                            var url = history[(history.length - 1)];
-                            this.load(url);
+                            this.load(history[history.length - 1]);
                         }
-                        else{
-                            this.load(this.getUri("new-tab"));
+                        else {
+                            this.load(this.getUri('new-tab'));
                         }
                     }
-                    else{
-                        if(location.hash.match(/^#\!(\/.*?)$/)) {
-                            // Load a new page in the current tab
-                            var hash = location.hash.replace(/^#\!(\/.*?)$/, '$1');
-                            app.load(hash);
-                        }
-                        else{
-                            // Click on a link with an anchor as href
-                            var url = history[(history.length - 1)];
-                            window.history.replaceState({}, '', "#!" + url);
-                        }
-                    }//end if
-                }//end if
+                    else if (location.hash.match(/^#\!(\/.*?)$/)) {
+                        // Load a new page in the current tab
+                        var hash = location.hash.replace(/^#\!(\/.*?)$/, '$1');
+
+                        this.load(hash);
+                    }
+                    else {
+                        // Click on a link with an anchor as href
+                        window.history.replaceState({}, '', '#!' + history[history.length - 1]);
+                    }
+                }
             }.bind(this);
 
             this.loading = {
@@ -241,77 +257,85 @@ define(
                 /**
                  * Display loading
                  */
-                start : function(){
+                start : function() {
                     this.display(true);
                 },
 
                 /**
-                 * show loading progression
+                 * Show loading progression
+                 *
+                 * @param {Float} purcentage The advancement purcentage on the progress bar
                  */
-                progress : function(purcentage){
+                progress : function(purcentage) {
                     this.purcentage(purcentage);
-                    this.progressing(purcentage ? true : false);
+                    this.progressing(Boolean(purcentage));
                 },
 
                 /**
                  * Hide loading
                  */
-                stop : function(){
+                stop : function() {
                     this.display(false);
                     this.progress(0);
                 }
             };
 
             // trigger the application is ready
-            var evt = document.createEvent("Event");
-            evt.initEvent("app-ready", true, false);
+            var evt = document.createEvent('Event');
+
+            evt.initEvent('app-ready', true, false);
             dispatchEvent(evt);
 
             /**
-         * Customize app HttpRequestObject
-         */
-            this.xhr = function(){
+             * Customize app HttpRequestObject
+             *
+             * @returns {XMLHttpRequest} The xhr object
+             */
+            this.xhr = function() {
                 var xhr = new window.XMLHttpRequest();
 
-                this.computeProgession = function(evt){
+                this.computeProgession = function(evt) {
                     if (evt.lengthComputable) {
-                        var percentComplete = parseInt((evt.loaded / evt.total * 100));
+                        var percentComplete = parseInt(evt.loaded / evt.total * 100);
+
                         // Do something with upload progress here
                         this.loading.progress(percentComplete);
                     }
                 }.bind(this);
 
                 /**
-             * Compute progression on upload AJAX requests
-             */
-                xhr.upload.addEventListener("progress", this.computeProgession);
+                 * Compute progression on upload AJAX requests
+                 */
+                xhr.upload.addEventListener('progress', this.computeProgession);
 
                 /**
-             * Compute progression on AJAX requests
-             */
-                xhr.addEventListener("progress", this.computeProgession);
+                 * Compute progression on AJAX requests
+                 */
+                xhr.addEventListener('progress', this.computeProgession);
 
                 return xhr;
             }.bind(this);
 
             /**
-         * Open the last tabs
-         */
-            var onload = null;
-            var hash   = location.hash.replace(/^#\!/, '');
-            if(hash) {
+             * Open the last tabs
+             */
+            var onload = null,
+                hash   = location.hash.replace(/^#\!/, '');
+
+            if (hash) {
                 var index = this.conf.tabs.open.indexOf(hash);
-                if(index === -1) {
-                    if(this.conf.tabs.open.length === 1) {
+
+                if (index === -1) {
+                    if (this.conf.tabs.open.length === 1) {
                         this.conf.tabs.open = [hash];
                     }
-                    else{
+                    else {
                         this.conf.tabs.open.push(hash);
                     }
                 }
 
-                index  = this.conf.tabs.open.indexOf(hash);
-                onload = function(){
+                index = this.conf.tabs.open.indexOf(hash);
+                onload = function() {
                     this.tabset.activeTab(this.tabset.tabs()[index]);
                 }.bind(this);
             }
@@ -322,17 +346,17 @@ define(
         /**
          * Add a callback when the application is ready to run
          *
-         * @param    {Function} callback The action to perform when the application is ready to run
+         * @param {Function} callback The action to perform when the application is ready to run
          * @memberOf App
          */
-        App.prototype.ready = function(callback){
+        App.prototype.ready = function(callback) {
             if (this.isReady) {
                 callback();
             }
-            else{
+            else {
                 addEventListener(
-                    "app-ready",
-                    function(){
+                    'app-ready',
+                    function() {
                         this.isReady = true;
                         callback();
                     }.bind(this)
@@ -343,17 +367,18 @@ define(
         /**
          * Load a page in the current tab, or a new tab, or a given html node
          *
-         * @param    {string} url The url to load
-         * @param    {object} data, the options. This object can hasve the following data :
+         * @param {string} url The url to load
+         * @param {Object} data, the options. This object can hasve the following data :
          *     - newtab (default false) : if set to true, the page will be loaded in a new tab of the application
          *    - onload (default null) : A callback function to execute when the page is loaded
          *    - post (default null) : an object of POST data to send in the URL
+         *
          * @memberOf App
          */
-        App.prototype.load = function(url, data){
-            /***
-    * Default options
-    ***/
+        App.prototype.load = function(url, data) {
+            /**
+             * Default options
+             */
             var options = {
                 newtab : false,
                 onload : null,
@@ -362,22 +387,25 @@ define(
                 headers : {}
             };
 
-            for(var i in data){
-                options[i] = data[i];
+            for (var i in data) {
+                if (data.hasOwnProperty(i)) {
+                    options[i] = data[i];
+                }
             }
 
-            if(url) {
-                /***
-    * we first check that page does not already exist in a tab
-    ***/
+            if (url) {
+                /**
+                 * We first check that page does not already exist in a tab
+                 */
                 var route = this.getRouteFromUri(url);
 
-                if(route === 'new-tab') {
+                if (route === 'new-tab') {
                     url = this.conf.tabs.new.url;
                 }
 
-                for(var i = 0; i < this.tabset.tabs().length; i++){
-                    var tab = this.tabset.tabs()[i];
+                for (var j = 0; j < this.tabset.tabs().length; j++) {
+                    var tab = this.tabset.tabs()[j];
+
                     if (tab.uri() === url || tab.route() === route) {
                         if (tab !== this.tabset.activeTab()) {
                             this.tabset.activeTab(tab);
@@ -391,195 +419,171 @@ define(
 
                 this.loading.start();
 
-                /***
-    * A new tab has been asked
-    ***/
-                if(options.newtab) {
+                /**
+                 * A new tab has been asked
+                 */
+                if (options.newtab) {
                     this.tabset.push();
                 }
 
+                // Get the element the page will be loaded in
                 var element = options.selector ? $(options.selector).get(0) : this.tabset.activeTab();
 
-                /***
-    * DETERMINE THE NODE THAT WILL BE LOADED THE PAGE
-    ***/
-                if(element) {
-                    $.ajax(
-                        {
-                            xhr : this.xhr,
-                            url : url,
-                            type : options.post ? 'post' : 'get',
-                            data : options.post,
-                            dataType : 'text',
-                            headers : options.headers
+                // Load the page
+                if (element) {
+                    $.ajax({
+                        xhr : this.xhr,
+                        url : url,
+                        type : options.post ? 'post' : 'get',
+                        data : options.post,
+                        dataType : 'text',
+                        headers : options.headers
+                    })
+                    .done(function(response) {
+                        this.loading.stop();
+                        if (element instanceof Tab) {
+                            // The page has been loaded in a whole tab
+                            // Register the tab url
+                            element.uri(url);
+                            element.route(route);
+
+                            element.content(response);
+
+                            // Regiter the tabs in the cookie
+                            if (this.isLogged) {
+                                this.tabset.registerTabs();
+                            }
+
+                            // register the url in the tab history
+                            element.history.push(url);
+
+                            history.pushState({}, '', '#!' + url);
                         }
-                    )
-                    .done(
-                        function(response){
-                            this.loading.stop();
-                            if(element instanceof Tab) {
-                                // The page has been loaded in a whole tab
-                                // Register the tab url
-                                element.uri(url);
-                                element.route(route);
+                        else {
+                            $(element).html(response);
+                        }
 
-                                element.content(response);
+                        if (options.onload) {
+                            /**
+                             * A 'onload' callback has been asked
+                             */
+                            options.onload();
+                        }
+                    }.bind(this))
 
-                                // Regiter the tabs in the cookie
-                                if(this.isLogged) {
-                                    this.tabset.registerTabs();
-                                }
+                    .fail(function(xhr) {
+                        var code = xhr.status;
 
-                                // register the url in the tab history
-                                element.history.push(url);
+                        if (code === 403) {
+                            // The page is not accessible for the user
+                            var response;
 
-                                history.pushState({}, '', '#!' + url);
+                            try {
+                                response = JSON.parse(xhr.responseText);
                             }
-                            else{
-                                $(element).html(response);
-                            }//end if
-
-                            if(options.onload) {
-                                /***
-                        * A 'onload' callback has been asked
-                        ****/
-                                options.onload();
+                            catch (e) {
+                                response = {
+                                    message : Lang.get('main.access-forbidden')
+                                };
                             }
-                        }.bind(this)
-                    )
 
-                    .fail(
-                        function(xhr,
-                        status,
-                        error){
-                            var code = xhr.status;
-                            if(code === 403) {
-                                // The page is not accessible for the user
-                                var response;
-                                try{
-                                    response = JSON.parse(xhr.responseText);
-                                }
-                                catch(e){
-                                    response = {
-                                        message : Lang.get('main.access-forbidden')
-                                    };
-                                }
-
-                                if(response.reason == "login") {
-                                    // The user is not connected, display the login form
-                                    this.dialog(this.getUri('login') + '?redirect=' + url + '&code=' + code);
-                                }
-                                else{
-                                    // Other reason, display the message in a notification
-                                    var message = response.message;
-                                    this.notify("danger", message);
-                                }
+                            if (response.reason === 'login') {
+                                // The user is not connected, display the login form
+                                this.dialog(this.getUri('login') + '?redirect=' + url + '&code=' + code);
                             }
-                            else{
-                                var message = xhr.responseText;
-                                this.notify("danger", message);
-                            }//end if
+                            else {
+                                // Other reason, display the message in a notification
+                                this.notify('danger', response.message);
+                            }
+                        }
+                        else {
+                            this.notify('danger', xhr.responseText);
+                        }
 
-                            this.loading.stop();
-                        }.bind(this)
-                    );
+                        this.loading.stop();
+                    }.bind(this));
                 }
-                else{
-                    /***
-    * The selector to home the loaded url doesn't exist
-    ***/
+                else {
+                    /**
+                     * The selector to home the loaded url doesn't exist
+                     */
                     this.loading.stop();
-                    this.notify("danger", Lang.get('main.loading-page-selector-not-exists'));
-                }//end if
+                    this.notify('danger', Lang.get('main.loading-page-selector-not-exists'));
+                }
             }
-            else{
-                return false;
-            }//end if
         };
 
         /**
          * Open a set of pages
          *
-         * @param    {array} uris The uris to open, each one in a tab
-         * @param    {function} onload The callback to execute when all the tabs are loaded
+         * @param {Array} uris The uris to open, each one in a tab
+         * @param {Function} onload The callback to execute when all the tabs are loaded
          * @memberOf App
          */
-        App.prototype.openLastTabs = function(uris, onload){
+        App.prototype.openLastTabs = function(uris, onload) {
             var loaded = ko.observable(0);
 
-            loaded.subscribe(
-                function(value){
-                    if(value === uris.length) {
-                        this.loading.stop();
-                        if(onload) {
-                            onload(uris);
-                        }
+            loaded.subscribe(function(value) {
+                if (value === uris.length) {
+                    this.loading.stop();
+                    if (onload) {
+                        onload(uris);
                     }
-                }.bind(this)
-            );
+                }
+            }.bind(this));
 
-            uris.forEach(
-                function(uri){
-                    this.load(
-                        uri,
-                        {
-                            newtab : true,
-                            onload : function(){
-                                this.loading.start();
-                                loaded(loaded() + 1);
-                            }.bind(this)
-                        }
-                    );
-                }.bind(this)
-            );
+            uris.forEach(function(uri) {
+                this.load(uri, {
+                    newtab : true,
+                    onload : function() {
+                        this.loading.start();
+                        loaded(loaded() + 1);
+                    }.bind(this)
+                });
+            }.bind(this));
         };
 
         /**
          * Display a notification on the application or on the user desktop
          *
-         * @param    {string} level - The notification level (info, success, warning, danger or desktop)
-         * @param    {string} message - The message to display in the notification
-         * @param    {object} options - The options for desktop notifications
+         * @param {string} level   The notification level (info, success, warning, danger or desktop)
+         * @param {string} message The message to display in the notification
+         * @param {Object} options The options for desktop notifications
          * @memberOf App
          */
-        App.prototype.notify = function(level, message, options){
-            if(level === "error") {
-                level = "danger";
+        App.prototype.notify = function(level, message, options) {
+            if (level === 'error') {
+                level = 'danger';
             }
 
-            if(level == "desktop") {
+            if (level === 'desktop') {
                 // this is a desktop notification
-                if(! ('Notification' in window)) {
+                if (!('Notification' in window)) {
                     this.notify('success', message);
                 }
-                else if(Notification.permission === 'granted') {
-                    var notification = new Notification(message, options);
+                else if (Notification.permission === 'granted') {
+                    var notif = new Notification(message, options);
                 }
-                else if(Notification.permission !== 'denied') {
+                else if (Notification.permission !== 'denied') {
                     // Ask for user permission to display notifications
-                    Notification.requestPermission(
-                        function(permission){
-                            Notification.permission = permission;
-                            this.notify(level, message, options);
-                        }.bind(this)
-                    );
+                    Notification.requestPermission(function(permission) {
+                        Notification.permission = permission;
+                        this.notify(level, message, options);
+                    }.bind(this));
                 }
             }
-            else{
+            else {
                 // Display an advert message in the application
                 this.notification.display(true);
                 this.notification.message(message);
                 this.notification.level(level);
 
-                if(level != "danger") {
-                    this.notification.timeout = setTimeout(
-                        function(){
-                            this.hideNotification();
-                        }.bind(this),
-                        5000
-                    );
+                if (level !== 'danger') {
+                    this.notification.timeout = setTimeout(function() {
+                        this.hideNotification();
+                    }.bind(this), 5000);
                 }
-            }//end if
+            }
         };
 
         /**
@@ -587,123 +591,124 @@ define(
          *
          * @memberOf App
          */
-        App.prototype.hideNotification = function(){
+        App.prototype.hideNotification = function() {
             clearTimeout(this.notification.timeout);
             this.notification.display(false);
-        }
+        };
 
         /**
          * Load a URL in a dialog box
          *
-         * @param    {string} action - The action to perform. If "close", it will wlose the current dialog box, else it will load the action in the dialog box and open it
+         * @param    {string} action The action to perform. If "close", it will wlose the current dialog box,
+         *                           else it will load the action in the dialog box and open it
          * @memberOf App
          */
-        App.prototype.dialog = function(action){
-            var container = $("#dialogbox");
+        App.prototype.dialog = function(action) {
+            var container = $('#dialogbox');
+
             container.modal('hide');
 
-            if(action == "close") {
+            if (action === 'close') {
                 return;
             }
 
             // Load the content from an url
             this.loading.start();
-            $.ajax(
-                {
-                    url : action,
-                    type : 'get',
-                    data : {
-                        _dialog: true
-                    },
+            $.ajax({
+                url : action,
+                type : 'get',
+                data : {
+                    _dialog: true
                 }
-            )
-            .done(
-                function(content){
-                    // Page successfully loaded
-                    container.html(content).modal("show");
-                }
-            )
+            })
 
-            .fail(
-                function(xhr,
-                status,
-                error){
-                    // Page load failed
-                    var code    = xhr.status;
-                    var message = xhr.responseText;
-                    this.notify("danger", message);
-                }.bind(this)
-            )
+            .done(function(content) {
+                // Page successfully loaded
+                container.html(content).modal('show');
+            })
 
-            .always(
-                function(){
-                    this.loading.stop();
-                }.bind(this)
-            );
+            .fail(function(xhr) {
+                // Page load failed
+                var message = xhr.responseText;
+
+                this.notify('danger', message);
+            }.bind(this))
+
+            .always(function() {
+                this.loading.stop();
+            }.bind(this));
         };
 
         /**
          * Get uri for a given route name or the controller of the route
          *
-         * @param    {string} method - The route name or the controller method executed by this route
-         * @param    {object} args - The route parameters
-         * @return   {string} - the computed URI
+         * @param {string} method - The route name or the controller method executed by this route
+         * @param {Object} args - The route parameters
+         * @returns {string} - the computed URI
          * @memberOf App
          */
-        App.prototype.getUri = function(method, args){
+        App.prototype.getUri = function(method, args) {
             var route = null;
-            if(method in this.routes) {
+
+            if (method in this.routes) {
                 route = this.routes[method];
             }
-            else{
-                for(var i in this.routes){
-                    if(this.routes[i].action === method) {
+            else {
+                for (var i in this.routes) {
+                    if (this.routes[i].action === method) {
                         route = this.routes[i];
                         break;
                     }
                 }
             }
 
-            if(route !== null) {
+            if (route !== null) {
                 var url = route.url;
-                if(args) {
-                    for(var j in args){
-                        url = url.replace("{" + j + "}", args[j]);
+
+                if (args) {
+                    for (var j in args) {
+                        if (args.hasOwnProperty(j)) {
+                            url = url.replace('{' + j + '}', args[j]);
+                        }
                     }
                 }
 
                 return this.conf.basePath + url;
             }
-            else{
-                return App.INVALID_URI;
-            }
+
+            return App.INVALID_URI;
         };
 
         /**
          * Get the route name corresponding to an URI
          *
          * @param    {string} uri - The uri to look the corresponding route for
-         * @return   {Object} The found route
+         * @returns   {Object} The found route
          * @memberOf App
          */
-        App.prototype.getRouteFromUri = function(uri){
+        App.prototype.getRouteFromUri = function(uri) {
             var path = uri.replace(/\/?\?.*$/, '');
 
-            for(var i in this.routes){
-                var regex = new RegExp('^' + this.routes[i].pattern + '$');
-                if(path.match(regex)) {
-                    return i;
+            for (var i in this.routes) {
+                if (this.routes.hasOwnProperty(i)) {
+                    var regex = new RegExp('^' + this.routes[i].pattern + '$');
+
+                    if (path.match(regex)) {
+                        return i;
+                    }
                 }
             }
+
+            return null;
         };
 
         /**
          * Set the existing routes of the application
          *
-         * @param    {object} routes - The routes to set
+         * @param {Object} routes - The routes to set
          * @memberOf App
          */
-        App.prototype.setRoutes = function(routes){
+        App.prototype.setRoutes = function(routes) {
             this.routes = routes;
         };
 
@@ -713,7 +718,7 @@ define(
          * @param    {string} language - The language tag
          * @memberOf App
          */
-        App.prototype.setLanguage = function(language){
+        App.prototype.setLanguage = function(language) {
             this.language = language;
         };
 
@@ -723,7 +728,7 @@ define(
          * @param    {string} url - The root url to set
          * @memberOf App
          */
-        App.prototype.setRootUrl = function(url){
+        App.prototype.setRootUrl = function(url) {
             this.rootUrl = url;
         };
 
@@ -732,30 +737,29 @@ define(
          *
          * @memberOf App
          */
-        App.prototype.refreshMenu = function(){
-            $.get(
-                this.getUri('refresh-menu'),
-                function(response){
-                    $("#main-menu").replaceWith(response);
+        App.prototype.refreshMenu = function() {
+            $.get(this.getUri('refresh-menu'), function(response) {
+                $('#main-menu').replaceWith(response);
 
-                    this.notify('warning', Lang.get('main.main-menu-changed'));
-                }.bind(this)
-            );
+                this.notify('warning', Lang.get('main.main-menu-changed'));
+            }.bind(this));
         };
 
         /**
          * Print a part of the page (or the whole page)
          *
-         * @param    {NodeElement} element The DOM element to print. If not set or null, then this will print the whole page
+         * @param {NodeElement} element The DOM element to print.
+         *                              If not set or null, then this will print the whole page
          * @memberOf App
          */
-        App.prototype.print = function(element){
-            if(!element) {
+        App.prototype.print = function(element) {
+            if (!element) {
                 window.print();
             }
-            else{
+            else {
                 // Create a frame to wrap the content to print
                 var frame = document.createElement('iframe');
+
                 document.body.appendChild(frame);
 
                 // Add the content to the page
@@ -763,33 +767,34 @@ define(
 
                 // Add the css
                 var style    = document.createElement('link');
-                style.rel    = "stylesheet";
-                style.href   = document.getElementById("theme-base-stylesheet").href;
-                style.type   = "text/css";
-                style.media  = "print";
-                style.onload = function(){
+
+                style.rel = 'stylesheet';
+                style.href = document.getElementById('theme-base-stylesheet').href;
+                style.type = 'text/css';
+                style.media = 'print';
+                style.onload = function() {
                     frame.contentWindow.print();
                     frame.contentWindow.close();
                     frame.remove();
-                }
+                };
                 frame.contentDocument.head.appendChild(style);
-            }//end if
+            }
         };
 
         // Instanciate the application
-        if(!window.app) {
+        if (!window.app) {
             window.app = new App();
         }
 
-        app.ready(
-            function(){
-                ko.applyBindings(app);
+        window.app.ready(
+            function() {
+                ko.applyBindings(window.app);
             }
         );
 
-        app.start();
+        window.app.start();
     }
 );
 
 
-require(["app"]);
+require(['app']);

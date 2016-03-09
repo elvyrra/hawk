@@ -80,11 +80,24 @@ class UserController extends Controller{
                             'target' => 'dialog'
                         ));
                         if($user->isRemovable()) {
-                            $return .= "<i class='icon icon-close text-danger delete-user' data-user='{$user->username}'></i>";
+                            $return .= Icon::make(array(
+                                'icon' => 'close',
+                                'class' => 'text-danger delete-user',
+                                'data-user' => $user->username
+                            ));
 
                             $return .= $user->active ?
-                                    "<i class='icon icon-lock text-warning lock-user' data-user='{$user->username}'></i>":
-                                    "<i class='icon icon-unlock text-success unlock-user' data-user='{$user->username}'></i>";
+                                Icon::make(array(
+                                    'icon' => 'lock',
+                                    'class' => 'text-warning lock-user',
+                                    'data-user' => $user->username
+                                )) :
+
+                                Icon::make(array(
+                                    'icon' => 'unlock',
+                                    'class' => 'text-success unlock-user',
+                                    'data-user' => $user->username
+                                ));
                         }
 
                         return $return;

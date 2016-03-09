@@ -1,3 +1,3 @@
 {if($updates)}
-    <span class="available-updates alert-warning pointer icon icon-exclamation" title="{{ $title }}"></span>
+    {icon icon="exclamation" class="available-updates alert-warning pointer" title="{$title}"}
 {/if}

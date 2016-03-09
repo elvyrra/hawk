@@ -217,7 +217,7 @@ class View{
                         }
                         else{
                             // The value is a static string
-                            $value = $quote .addcslashes($value, '\\') . $quote;
+                            $value = '\'' .addcslashes($lbrace . $value . $rbrace, '\\\'') . '\'';
                         }
 
                         $parameters[$name] = '\'' . $name . '\' => ' . $value;

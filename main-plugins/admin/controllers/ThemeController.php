@@ -316,7 +316,10 @@ class ThemeController extends Controller{
                     default :
                         $medias[$category]['files'][] = array(
                             'url' => $url,
-                            'display' => "<i class='icon icon-{$medias[$category]['icon']}'></i>" . basename($file)
+                            'display' => Icon::make(array(
+                                'icon' => $medias[$category]['icon']
+                            )) .
+                            basename($file)
                         );
                         break;
                 }

@@ -1,8 +1,11 @@
-<div id="{{ !empty($tabId) ? $tabId  : ''}}" class="left-sidebar-tab">	
-	<input type="hidden" class="page-name" value="<i class='icon icon-{{$icon}}'></i> {{ isset($tabTitle) ? $tabTitle : $title }}"/>
-	<div>	
+<div id="{{ !empty($tabId) ? $tabId  : ''}}" class="left-sidebar-tab">
+	{if(!empty($icon))}
+		<input type="hidden" class="page-icon" value="{{ $icon }}" />
+	{/if}
+	<input type="hidden" class="page-name" value='{{ htmlentities(isset($tabTitle) ? $tabTitle : $title, ENT_QUOTES) }}'/>
+	<div>
 		{if(!empty($title))}
-			<h2 class="page-title">{{ $title }}</h2>	
+			<h2 class="page-title">{{ $title }}</h2>
 		{/if}
 		{if(!empty($top))}
 			<div>
@@ -15,9 +18,9 @@
 					{foreach($sidebar['widgets'] as $widget)}
 						{{ $widget->display() }}
 					{/foreach}
-				{/if}			
+				{/if}
 			</div>
-			<div class="tab-content {{ $page['class'] }}">			
+			<div class="tab-content {{ $page['class'] }}">
 				{if(!empty($page['content']))}
 					{{ $page['content'] }}
 				{/if}
@@ -28,5 +31,5 @@
 				{{ $bottom }}
 			</div>
 		{/if}
-	</div>	
+	</div>
 </div>

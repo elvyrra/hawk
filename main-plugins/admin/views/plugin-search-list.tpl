@@ -11,7 +11,7 @@
                                 {if($plugin->logo)}
                                     <img src="{{ $plugin->logo }}" alt="{{ $plugin->title }}" class="pull-left plugin-logo" />
                                 {else}
-                                    <span class="pull-left plugin-logo icon icon-plug icon-fw"></span>
+                                    {icon icon="plug" size="fw" class="pull-left plugin-logo"}
                                 {/if}
                             </a>
                         </div>
@@ -26,7 +26,7 @@
                     <div class="plugin-item-footer">
                         <span class="plugin-rate" title="{{ $plugin->rate }}">
                             {foreach(range(1, 5) as $i)}
-                                <i class="icon icon-lg icon-{{ $plugin->rate < $i - 1 + 0.25 ? 'star-o' : ($plugin->rate < $i - 1 + 0.75 ? 'star-half-o' : 'star') }} text-success"></i>
+                                {icon icon="{$plugin->rate < $i - 1 + 0.25 ? 'star-o' : ($plugin->rate < $i - 1 + 0.75 ? 'star-half-o' : 'star')}" class="text-success" size="lg"}
                             {/foreach}
                         </span>
 

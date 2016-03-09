@@ -8,7 +8,7 @@
         title="{{ addcslashes($param['label'], '"') }}"
     {/if} >
 	{if($icon)}
-		<span class="icon icon-{{ $icon }}"></span>
+		{icon icon="{$icon}"}
 	{/if}
 	<span class="btn-label">{{ $label }}</span>
 </button>

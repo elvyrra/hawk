@@ -11,7 +11,7 @@
                                 {if($theme->logo)}
                                     <img src="{{ $theme->logo }}" alt="{{ $theme->title }}" class="pull-left theme-logo" />
                                 {else}
-                                    <span class="pull-left theme-logo icon icon-plug icon-fw"></span>
+                                    {icon icon="plug" class="pull-left theme-logo" size="fw"}
                                 {/if}
                             </a>
                         </div>
@@ -26,7 +26,7 @@
                     <div class="theme-item-footer">
                         <span class="theme-rate" title="{{ $theme->rate }}">
                             {foreach(range(1, 5) as $i)}
-                                <i class="icon icon-lg icon-{{ $theme->rate < $i - 1 + 0.25 ? 'star-o' : ($theme->rate < $i - 1 + 0.75 ? 'star-half-o' : 'star') }} text-success"></i>
+                                {icon icon="{ $theme->rate < $i - 1 + 0.25 ? 'star-o' : ($theme->rate < $i - 1 + 0.75 ? 'star-half-o' : 'star') }" size="lg" class="text-success"}
                             {/foreach}
                         </span>
 

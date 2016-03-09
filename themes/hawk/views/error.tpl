@@ -1,6 +1,6 @@
 <div class="alert alert-{{ $level }}">
 	<div class="error-title">
-		<i class="icon icon-{{ $icon }}"></i>
+		{icon icon="{$icon}"}
 		{{ $title }}
 	</div>
 	<div class="error-content">
@@ -9,7 +9,7 @@
 
 {foreach($trace as $i => $line)}
 	#{{ $i }} {{ empty($line['file']) ? '' : $line['file'] }}{{ empty($line['line']) ? '' : ':' . $line['line'] }}
-    
+
 {/foreach}
 </pre>
 	</div>

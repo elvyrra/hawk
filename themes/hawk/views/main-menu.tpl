@@ -5,7 +5,7 @@
 			<h1 class="visible-xs app-title vertical-center text-center">{{ App::conf()->has('db') ? Option::get('main.page-title-' . LANGUAGE) : DEFAULT_HTML_TITLE }}</h1>
 			<div class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-menu-collapse" >
 		        <span class="sr-only">Toggle navigation</span>
-		        <span class="icon icon-bars"></span>
+		        {icon icon="bars"}
 	      	</div>
 		</div>
 
@@ -17,7 +17,7 @@
 							<li class="dropdown main-menu" id="main-menu-{{ $menu->id }}">
 								<div class="dropdown-toggle main-menu-title" type="button" id="main-menu-title-{{ $menu->id }}" data-toggle="dropdown">
 									{{ $menu->label }}
-									<i class="icon icon-caret-down"></i>
+									{icon icon="caret-down"}
 								</div>
 								<ul class="dropdown-menu" role="menu" aria-labelledby="main-menu-title-{{ $menu->id }}" id="main-menu-items-{{ $menu->id }}">
 									{foreach($menu->visibleItems as $item)}

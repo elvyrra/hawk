@@ -186,7 +186,14 @@ class ItemListField {
      */
     public function getSearchCondition(&$binds){
         if($this->searchValue !== null) {
-            return DBExample::make(array($this->field => array('$like' => '%' . $this->getInput()->dbvalue() . '%')), $binds);
+            return DBExample::make(
+                array(
+                    $this->field => array(
+                        '$like' => '%' . $this->getInput()->dbvalue() . '%'
+                    )
+                ),
+                $binds
+            );
         }
     }
 
@@ -199,61 +206,62 @@ class ItemListField {
     public function getInput(){
         if(!is_array($this->search)) {
             $this->search = array(
-            'type' => 'text'
+                'type' => 'text'
             );
         }
 
         switch($this->search['type']){
             case 'select' :
-                $input = new SelectInput(
-                    array(
+                $input = new SelectInput(array(
                     'options' => $this->search['options'],
                     'invitation' => isset($this->search['invitation']) ? $this->search['invitation'] : null,
                     'emptyValue' => isset($this->search['emptyValue']) ? $this->search['emptyValue'] : null,
                     'attributes' => array(
-                    'ko-value' => 'search',
-                    'ko-class' => "search() ? 'alert-info not-empty' : 'empty'"
+                        'ko-value' => 'search',
+                        'ko-class' => "search() ? 'alert-info not-empty' : 'empty'"
                     )
-                    )
-                );
+                ));
                 break;
 
             case 'checkbox' :
-                $input = new CheckboxInput(
-                    array(
+                $input = new CheckboxInput(array(
                     'attributes' => array(
-                    'ko-checked' => 'search'
-
+                        'ko-checked' => 'search'
                     )
-                    )
-                );
+                ));
                 break;
 
             case 'date' :
-                $input = new DatetimeInput(
-                    array(
+                $input = new DatetimeInput(array(
                     'id' => uniqid(),
-                    'after' => '<i class="icon icon-times-circle clean-search" ko-click="function(data){ data.search(null); }" ko-visible="search()"></i>',
+                    'after' => Icon::make(array(
+                        'icon' => 'times-circle',
+                        'class' => 'clean-search',
+                        'ko-click' => 'function(data){ data.search(null); }',
+                        'ko-visible' => 'search()'
+                    )),
                     'attributes' => array(
-                    'ko-value' => 'search',
-                    'ko-class' => "search() ? 'alert-info not-empty' : 'empty'"
+                        'ko-value' => 'search',
+                        'ko-class' => "search() ? 'alert-info not-empty' : 'empty'"
                     )
-                    )
-                );
+                ));
                 break;
 
 
             case 'text' :
             default :
-                $input = new TextInput(
-                    array(
-                    'after' => '<i class="icon icon-times-circle clean-search" ko-click="function(data){ data.search(null); }" ko-visible="search()"></i>',
+                $input = new TextInput(array(
+                    'after' => Icon::make(array(
+                        'icon' => 'times-circle',
+                        'class' => 'clean-search',
+                        'ko-click' => 'function(data){ data.search(null); }',
+                        'ko-visible' => 'search()'
+                    )),
                     'attributes' => array(
-                    'ko-textInput' => 'search',
-                    'ko-class' => "search() ? 'alert-info not-empty' : 'empty'"
+                        'ko-textInput' => 'search',
+                        'ko-class' => "search() ? 'alert-info not-empty' : 'empty'"
                     )
-                    )
-                );
+                ));
                 break;
         }
         $input->attributes['data-field'] = $this->name;
@@ -286,11 +294,9 @@ class ItemListField {
      * @return string The HTML result to display
      */
     public function displayHeader(){
-        return View::make(
-            Theme::getSelected()->getView('item-list/field-header.tpl'), array(
-            'field' => $this,
-            )
-        );
+        return View::make(Theme::getSelected()->getView('item-list/field-header.tpl'), array(
+            'field' => $this
+        ));
     }
 
     /**
@@ -328,12 +334,10 @@ class ItemListField {
             $cell->content .= ' ' . $cell->unit;
         }
 
-        return View::make(
-            Theme::getSelected()->getView('item-list/result-cell.tpl'), array(
+        return View::make(Theme::getSelected()->getView('item-list/result-cell.tpl'), array(
             'cell' => $cell,
             'field' => $this
-            )
-        );
+        ));
     }
 
 }

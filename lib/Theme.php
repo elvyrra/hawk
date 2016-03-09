@@ -514,7 +514,7 @@ class Theme{
      * @return string
      */
     public function getStaticUserfilesUrl($filename = ''){
-        return $this->getRootUrl() . 'userfiles/' . $filename . '?' . filemtime($this->getStaticDir() . 'userfiles/' . $filename);
+        return $this->getRootUrl() . 'userfiles/' . $filename;
     }
 
 

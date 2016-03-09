@@ -104,12 +104,6 @@ class Form{
      */
     $class = '',
 
-    /**
-     * Defines the target where to submit the form
-     *
-     * @var string
-     */
-    $target = '',
 
     /**
      * Defines if the form can autocompleted (Default true)
@@ -118,12 +112,13 @@ class Form{
      */
     $autocomplete = true,
 
+
     /**
-     * Defines the attribute 'enctype' of the form
+     * The form fieldsets
      *
-     * @var string
+     * @var array
      */
-    $enctype = '',
+    $fieldsets = array(),
 
     /**
      * The form inputs
@@ -263,8 +258,11 @@ class Form{
                 foreach($fieldset as $key => &$field){
                     if($field instanceof FormInput) {
                         $this->addInput($field, $name);
+                        if($field instanceof FileInput) {
+                            $this->upload = true;
+                        }
                     }
-                    else{
+                    else {
                         $this->fieldsets[$name]->setParam($key, $field);
                     }
                 }
@@ -275,6 +273,10 @@ class Form{
             foreach($this->inputs as &$field){
                 if($field instanceof FormInput) {
                     $this->addInput($field, 'form');
+
+                    if($field instanceof FileInput) {
+                        $this->upload = true;
+                    }
                 }
             }
         }

@@ -21,12 +21,12 @@
                         <span class="line-by-page-label">{text key="main.list-line-per-page"}</span>
                     </td>
                     <td class='list-page-choice'>
-                        <span class='list-previous-page icon icon-chevron-circle-left' ko-click="function(data){ data.page(parseInt(data.page()) - 1); }" ko-visible="page() > 1" title="{text key='main.list-previous-page'}" ></span>
+                        {icon icon="chevron-circle-left" class="list-previous-page" ko-click="function(data){ data.page(parseInt(data.page()) - 1); }" ko-visible="page() > 1" title="{text key='main.list-previous-page'}"}
 
 
                         <input type='text' class='list-page-number' ko-value="page" /> / <span ko-text="maxPages" ></span>
 
-                        <span class="list-next-page icon icon-chevron-circle-right" ko-click="function(data){ data.page(parseInt(data.page()) + 1); }" ko-visible="maxPages() > 1 && page() < maxPages()" title="{text key="main.list-next-page"}"></span>
+                        {icon icon="chevron-circle-right" class="list-next-page" ko-click="function(data){data.page(parseInt(data.page()) + 1);} " ko-visible="maxPages() > 1 && page() < maxPages()" title="{text key='main.list-next-page'}"}
                     </td>
                 </tr>
             </table>

@@ -12,17 +12,20 @@
 					ko-class="{active : $parent.activeTab() == $data }"
 					ko-style="{ width: 'calc((100% - 25px )/ ' + $parent.tabs().length + ' - 2px )' }"
 					data-toggle="tooltip" data-placement="bottom" >
-					<a role="tab" data-toggle="tab" ko-attr="{ href: '#main-tab-' + id() }" ko-html="title" ></a>
+					<a role="tab" data-toggle="tab" ko-attr="{ href: '#main-tab-' + id() }">
+						<i class="icon" ko-class="'icon-' + icon()"></i>
+						<span ko-text="title"></span>
+					</a>
 
 					<span class="main-tab-close pull-right" ko-attr="{ 'data-tab' : $index }" ko-visible="$parent.tabs().length > 1" ko-click="function(){ $parent.remove($index()) }">
-						<span class="icon icon-times-circle"></span>
+						{icon icon="times-circle"}
 					</span>
 				</li>
 				<!-- /ko -->
 
 				<li class="add-tab-button corner-top-left corner-bottom-right" href="{uri action='new-tab'}" target="newtab">
 					<span class="" id="main-tab-add">
-						<span class="icon icon-plus open-new-tab" title="{text key='main.open-new-tab'}" ></span>
+						{icon icon="plus" class="open-new-tab" title="{text key='main.open-new-tab'}"}
 					</span>
 				</li>
 			</ul>
@@ -50,14 +53,14 @@
 	{text key='main.hawk-powered'}
 	{if(DEV_MODE)}
 		<a href="{uri action='clear-cache'}" class="real-link pull-right" title="{text key="main.clear-cache"}">
-			<i class="icon icon-calendar-times-o icon-lg clear-cache-btn"></i>
+			{icon icon="calendat-times-o" size="lg" class="clear-cache-btn"}
 		</a>
 	{/if}
 </div>
 
 
 <div id='loading' ko-visible="loading.display">
-	<span class='icon icon-spinner icon-spin icon-5x center'></span>
+	{icon icon="spinner" size="5x" class="center icon-spin"}
 	<div id="loading-bar" ko-class="{processing: loading.processing}">
 		<span id='loading-purcentage' ko-style="{ width: loading.purcentage() + '%'}"></span>
 	</div>
