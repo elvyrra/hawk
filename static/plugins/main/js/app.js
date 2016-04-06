@@ -1,4 +1,5 @@
 /* global Tab */
+
 'use strict';
 
 /**
@@ -9,7 +10,7 @@ var baseUrl = document.getElementById('app-main-script').src;
 baseUrl = baseUrl.replace(/^(.+\/).+$/, '$1');
 require.config(
     {
-        basePath : baseUrl,
+        baseUrl : baseUrl,
 
         paths : {
             jquery      : 'ext/jquery-2.1.3.min',
