@@ -77,8 +77,7 @@ class DatetimeInput extends TextInput{
             $picker['startDate'] = $this->min;
         }
 
-        Controller::current()->addJavaScriptInline('$("#' . $this->id . '").datepicker(' . json_encode($picker) . ');');
-        return parent::display();
+        return parent::display() . '<script>require(["app"], function(){ $("#' . $this->id . '").datepicker(' . json_encode($picker) . '); });</script>';
     }
 
 

@@ -48,7 +48,7 @@ INSERT IGNORE INTO `{{ $prefix }}MenuItem` (`id`, `plugin`, `name`, `parentId`, 
 (6, 'admin', 'themes', 2, 'main.menu-admin-display-title', 'manage-themes', '', '', 3, 3, 1),
 (7, 'admin', 'plugins', 2, 'main.menu-admin-plugins-title', 'manage-plugins', '', '', 4, 1, 1),
 (8, 'admin', 'translations', 2, 'main.menu-admin-language-title', 'manage-languages', '', '', 5, 5, 1),
-(9, 'user', 'profile', 1, 'main.menu-my-profile', 'edit-profile', '', 'dialog', 0, 6, 1),
+(9, 'user', 'profile', 1, 'main.menu-my-profile', 'edit-profile', '', '', 0, 6, 1),
 (10, 'user', 'change-password', 1, 'main.menu-change-password', 'change-password', '', 'dialog', 1, 6, 1),
 (11, 'user', 'logout', 1, 'main.menu-logout', 'javascript: location = app.getUri(''logout'');', '', '', 2, 6, 1);
 /*!40000 ALTER TABLE `{{ $prefix }}MenuItem` ENABLE KEYS */;
@@ -198,7 +198,7 @@ CREATE TABLE IF NOT EXISTS `{{ $prefix }}User` (
 /*!40000 ALTER TABLE `{{ $prefix }}User` DISABLE KEYS */;
 INSERT IGNORE INTO `{{ $prefix }}User` (`id`, `email`, `username`, `password`, `active`, `createTime`, `createIp`, `roleId`) VALUES
 	(0, '', 'guest', '', 0, 0, '', 0),
-	(1, {{ $email }}, {{ $login }}, {{ $password }}, 1, UNIX_TIMESTAMP(), {{ $ip }}, 1);	
+	(1, {{ $email }}, {{ $login }}, {{ $password }}, 1, UNIX_TIMESTAMP(), {{ $ip }}, 1);
 /*!40000 ALTER TABLE `{{ $prefix }}User` ENABLE KEYS */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;

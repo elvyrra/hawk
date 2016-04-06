@@ -40,14 +40,14 @@ define('ko-extends', ['jquery', 'ko'], function($, ko) {
 
         var Autocomplete = function() {};
 
-        Autocomplete.prototype.init = function(element, valueAccessor, allBindings, viewModel) {
+        Autocomplete.prototype.update = function(element, valueAccessor, allBindings, viewModel) {
             var parameters = ko.unwrap(valueAccessor()),
                 options = {
                     search : parameters.search || 'label',
                     label : parameters.label || 'label',
                     source : parameters.source,
                     change : parameters.change,
-                    delay : parameters.delay || 400
+                    delay : parameters.delay || 400,
                 };
 
             options.value = parameters.value || options.label;
@@ -147,10 +147,10 @@ define('ko-extends', ['jquery', 'ko'], function($, ko) {
                         return;
                     }
 
-                    // Search on an array
-                    if (ko.isObservable(options.source) || options.source instanceof Array) {
-                        var source = ko.isObservable(options.source) ? options.source() : options.source;
+                    var source = ko.isObservable(options.source) ? options.source() : options.source;
 
+                    // Search on an array
+                    if (source instanceof Array) {
                         // Filter the source by the
                         var filters = ko.utils.arrayFilter(source, function(item) {
                             return item[options.search].match(element.value);
@@ -167,14 +167,14 @@ define('ko-extends', ['jquery', 'ko'], function($, ko) {
                         // Display the result to the user
                         model.result(displayed);
                     }
-                    else if (typeof options.source === 'string') {
+                    else if (typeof source === 'string') {
                         clearTimeout(ajaxTimeout);
 
                         ajaxTimeout = setTimeout(function() {
                             // Load the result by AJAX request.
                             // In this case, search, value, and label parameters are not used
                             $.ajax({
-                                url : options.source,
+                                url : source,
                                 type : 'get',
                                 dataType : 'json',
                                 data : {
@@ -343,6 +343,7 @@ define('ko-extends', ['jquery', 'ko'], function($, ko) {
 
                     if (document.getElementById('theme-base-stylesheet')) {
                         editor.addContentsCss(document.getElementById('theme-base-stylesheet').href);
+                        editor.addContentsCss('body { background: white; color: #333}');
                     }
                 }
             });
@@ -359,7 +360,7 @@ define('ko-extends', ['jquery', 'ko'], function($, ko) {
 
         for (var name in ko.bindingHandlers) {
             if (ko.bindingHandlers.hasOwnProperty(name)) {
-                var attrName = 'ko-' + name;
+                var attrName = 'ko-' + name.toLowerCase();
 
                 if (node.getAttribute && node.getAttribute(attrName)) {
                     dataBind += (dataBind ? ',' : '') + name + ': ' + node.getAttribute(attrName);

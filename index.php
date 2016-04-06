@@ -33,9 +33,6 @@ try{
     Event::on(
         'after-routing', function ($event) {
             $route = $event->getData('route');
-            $controllerClass = $route->getActionClassname();
-            $controller = $controllerClass::getInstance();
-
 
             if(!App::conf()->has('db') && App::request()->getUri() == App::router()->getUri('index')) {
                 // The application is not installed yet

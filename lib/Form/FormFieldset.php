@@ -29,7 +29,7 @@ class FormFieldset{
     /**
      * The inputs in this fieldset
      */
-    $inputs,
+    $inputs = array(),
 
     /**
      * The form this fieldset is associated to
@@ -53,11 +53,15 @@ class FormFieldset{
         $this->name = $name;
         $this->form = $form;
         $this->id = $form->id . '-' . $this->name . '-fieldset';
-        $this->inputs = $inputs;
         $this->map($params);
 
         if($this->legend) {
             $this->legendId = $form->id . '-' . $this->name . '-legend';
+        }
+
+        foreach($inputs as &$input){
+            $form->addInput($input, $this->name);
+            $this->inputs[$input->name] = $input;
         }
     }
 
@@ -78,10 +82,8 @@ class FormFieldset{
      * @return string The HTML result to display
      */
     public function __toString(){
-        return View::make(
-            Theme::getSelected()->getView(Form::VIEWS_DIR . 'form-fieldset.tpl'), array(
+        return View::make(Theme::getSelected()->getView(Form::VIEWS_DIR . 'form-fieldset.tpl'), array(
             'fieldset' => $this,
-            )
-        );
+        ));
     }
 }

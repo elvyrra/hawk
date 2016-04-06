@@ -7,12 +7,14 @@
 		{if(!empty($title))}
 			<h2 class="page-title">{{ $title }}</h2>
 		{/if}
+
 		{if(!empty($top))}
-			<div>
+			<div class="row">
 				{{ $top }}
 			</div>
 		{/if}
-		<div>
+
+		<div class="row">
 			<div class="tab-sidebar {{ $sidebar['class'] }}">
 				{if(!empty($sidebar['widgets']))}
 					{foreach($sidebar['widgets'] as $widget)}
@@ -26,8 +28,9 @@
 				{/if}
 			</div>
 		</div>
+
 		{if(!empty($bottom))}
-			<div>
+			<div class="row">
 				{{ $bottom }}
 			</div>
 		{/if}

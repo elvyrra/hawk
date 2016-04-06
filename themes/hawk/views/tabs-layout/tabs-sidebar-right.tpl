@@ -7,12 +7,14 @@
 		{if(!empty($title))}
 			<h2 class="page-title">{{ $title }}</h2>
 		{/if}
+
 		{if(!empty($top))}
-			<div>
-				{{ $top }}
-			</div>
+		<div class="row">
+			{{ $top }}
+		</div>
 		{/if}
-		<div>
+
+		<div class="row">
 			<div class="tab-content {{ $page['class'] }}">
 				{if(!empty($page['content']))}
 					{{ $page['content'] }}
@@ -26,10 +28,11 @@
 				{/if}
 			</div>
 		</div>
+
 		{if(!empty($bottom))}
-			<div>
-				{{ $bottom }}
-			</div>
+		<div class="row">
+			{{ $bottom }}
+		</div>
 		{/if}
 	</div>
 </div>

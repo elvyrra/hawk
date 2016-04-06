@@ -6,12 +6,15 @@ define('tabs', ['jquery', 'ko'], function($, ko) {
      *
      * @class Tab
      * @param {int} id The unique tab id
+     * @param {Object} data The initial data to put in the tab
      */
-    function Tab(id) {
+    function Tab(id, data) {
+        data = data || {};
+
         this.id = ko.observable(id);
-        this.uri = ko.observable('');
-        this.content = ko.observable('');
-        this.route = ko.observable('');
+        this.uri = ko.observable(data.uri || '');
+        this.content = ko.observable(data.content || '');
+        this.route = ko.observable(data.route || '');
 
         this.title = ko.computed({
             read : function() {
@@ -82,9 +85,9 @@ define('tabs', ['jquery', 'ko'], function($, ko) {
      *
      * @memberOf Tabset
      */
-    Tabset.prototype.push = function() {
+    Tabset.prototype.push = function(data) {
         // Create the tab
-        var tab = new Tab(Tabset.index ++);
+        var tab = new Tab(Tabset.index ++, data);
 
         this.tabs.push(tab);
 

@@ -88,13 +88,14 @@ class FormInput{
      *
      * @var string
      */
+    public $default;
 
     /**
      * Field value
      *
      * @var string
      */
-    public $value = '';
+    public $value;
 
     /**
      * HTML placeholder attribute

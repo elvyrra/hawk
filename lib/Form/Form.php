@@ -343,7 +343,10 @@ class Form{
                 $data[$name] = $field->default;
             }
 
-            if(!$this->submitted() && isset($this->object->$name)) {
+            if(isset($field->value)) {
+                $data[$name] = $field->value;
+            }
+            elseif(!$this->submitted() && isset($this->object->$name)) {
                 $data[$name] = $this->object->$name;
             }
         }
@@ -437,7 +440,7 @@ class Form{
         $this->inputs[$input->name] = &$input;
 
         if($fieldset) {
-            $this->fieldsets[$fieldset]->inputs[$input->name] = $input;
+            $this->fieldsets[$fieldset]->inputs[$input->name] = &$input;
         }
     }
 
@@ -480,7 +483,9 @@ class Form{
             'minimum',
             'maximum',
             'compare',
-            'errorAt'
+            'errorAt',
+            'label',
+            'invitation'
         );
         $clientInputs = array();
         foreach($this->inputs as $field){
@@ -598,7 +603,7 @@ class Form{
         try{
             $this->dbaction = self::ACTION_REGISTER;
 
-            if($this->model == self::DEFAULT_MODEL || !$this->reference) {
+            if((!isset($this->object) && $this->model == self::DEFAULT_MODEL) || !$this->reference) {
                 throw new \Exception("The method register of the class Form can be called only if model and reference properties are set");
             }
             if(!$this->object) {

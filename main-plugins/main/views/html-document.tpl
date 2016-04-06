@@ -22,7 +22,8 @@
 		<!-- Customized file of the theme -->
 		<link rel="stylesheet" href="{{ Theme::getSelected()->getCustomCssUrl() }}" id="theme-custom-stylesheet"/>
 
-		<script type="text/javascript" src="{{ Plugin::get('main')->getJsUrl('ext/require.js') }}" data-main="{{ Plugin::get('main')->getJsUrl(DEV_MODE ? 'app.js' : 'app.min.js') }}"></script>
+		<script type="text/javascript" src="{{ Plugin::get('main')->getJsUrl('ext/require.js') }}" ></script>
+		<script type="text/javascript" src="{{ Plugin::get('main')->getJsUrl(DEV_MODE ? 'app.js' : 'app.min.js') }}" id="app-main-script"></script>
 	</head>
 
 	<body>

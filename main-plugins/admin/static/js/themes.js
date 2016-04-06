@@ -324,6 +324,7 @@ setTimeout(function(){
 
     // Manage when a new menu item is created
     app.forms['set-menus-form'].node.on('register-custom-item', function(event, data){
+        debugger;
         var item = model.getItemById(data.id);
         if(!item){
             model.items.push(data);

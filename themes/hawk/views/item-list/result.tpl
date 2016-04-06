@@ -1,8 +1,11 @@
 {if($list->recordNumber)}
     {foreach($data as $id => $line)}
-        <tr class="list-line list-line-{{ $list->id }} {{ $linesParameters[$id]['class'] }}" value="{{ $id }}" >                    
+        <tr class="list-line list-line-{{ $list->id }} {{ $linesParameters[$id]['class'] }}" value="{{ $id }}" >
+            {if($list->selectableLines)}
+                <td><input type="checkbox" class="list-select-line" value="{{ $id }}" /></td>
+            {/if}
             {foreach($line as $name => $cell)}
-                {{ $cell }}                     
+                {{ $cell }}
             {/foreach}
         </tr>
     {/foreach}

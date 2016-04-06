@@ -333,11 +333,9 @@ final class Router extends Singleton{
                 $this->currentRoute = &$route;
 
                 // Emit an event, saying the routing action is finished
-                $event = new Event(
-                    'after-routing', array(
+                $event = new Event('after-routing', array(
                     'route' => $route,
-                    )
-                );
+                ));
                 $event->trigger();
 
                 $route = $event->getData('route');
@@ -389,10 +387,15 @@ final class Router extends Singleton{
             }
         }
 
-        // The route was not found
         App::logger()->warning('The URI ' . App::request()->getUri() . ' has not been routed');
         App::response()->setStatus(404);
         App::response()->setBody(Lang::get('main.404-message', array('uri' => $path)));
+
+        // The route was not found
+        $event = new Event('after-routing', array(
+            'route' => null,
+        ));
+        $event->trigger();
     }
 
 

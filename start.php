@@ -35,7 +35,7 @@ define("ROOT_URL",  preg_replace('#/?$#', '', (string) App::conf()->get('rooturl
 define('BASE_PATH', str_replace('//', '/', parse_url(ROOT_URL, PHP_URL_PATH)));
 
 /*** Define the main paths ***/
-define('STATIC_URL', BASE_PATH . '/static/');
+define('STATIC_URL', ROOT_URL . '/static/');
 define('THEMES_ROOT_URL', STATIC_URL . 'themes/');
 define('PLUGINS_ROOT_URL', STATIC_URL . 'plugins/');
 

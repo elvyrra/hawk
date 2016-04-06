@@ -61,11 +61,11 @@ class UserProfileController extends Controller{
                         'value' => Lang::get($this->_plugin . '.valid-button')
                     )),
 
-                    new ButtonInput(array(
-                        'name' => 'cancel',
-                        'value' => Lang::get($this->_plugin . '.cancel-button'),
-                        'onclick' => 'app.dialog("close")'
-                    ))
+                    // new ButtonInput(array(
+                    //     'name' => 'cancel',
+                    //     'value' => Lang::get($this->_plugin . '.cancel-button'),
+                    //     'onclick' => 'app.dialog("close")'
+                    // ))
                 ),
             ),
 
@@ -119,10 +119,11 @@ class UserProfileController extends Controller{
 
         $form = new Form($param);
         if(!$form->submitted()) {
-            return View::make(Theme::getSelected()->getView("dialogbox.tpl"), array(
-                'page' => $form,
+            return NoSidebarTab::make(array(
                 'title' => Lang::get('admin.user-form-title'),
-                'icon' => 'user',
+                'page' => array(
+                    'content' => $form
+                )
             ));
         }
         else{

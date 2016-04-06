@@ -4,8 +4,13 @@
 /**
  * Start by configure requirejs paths and shim
  */
+var baseUrl = document.getElementById('app-main-script').src;
+
+baseUrl = baseUrl.replace(/^(.+\/).+$/, '$1');
 require.config(
     {
+        baseUrl : baseUrl,
+
         paths : {
             jquery      : 'ext/jquery-2.1.3.min',
             cookie      : 'ext/jquery.cookie',
@@ -431,6 +436,20 @@ define(
 
                 // Load the page
                 if (element) {
+                    var query = '';
+
+                    if (options.query) {
+                        var params = [];
+
+                        Object.keys(options.query).forEach(function(param) {
+                            params.push(param + '=' + encodeURIComponent(options.query[param]));
+                        });
+
+                        query = '?' + params.join('&');
+
+                        url = url + query;
+                    }
+
                     $.ajax({
                         xhr : this.xhr,
                         url : url,
@@ -764,6 +783,7 @@ define(
 
                 // Add the content to the page
                 frame.contentDocument.body.innerHTML = element.outerHTML;
+                frame.style.display = 'none';
 
                 // Add the css
                 var style    = document.createElement('link');

@@ -52,6 +52,12 @@ define('list', ['jquery', 'ko'], function($, ko) {
             return Lang.get('main.list-results-number', {number : this.recordNumber()}, this.recordNumber());
         }.bind(this));
 
+
+        this.selection = {
+            all : ko.observable(false),
+            none : ko.observable(true)
+        };
+
         this.initControls();
     }
 
@@ -105,10 +111,6 @@ define('list', ['jquery', 'ko'], function($, ko) {
             refresh : 1
         };
 
-        if (this.selected) {
-            get.selected = this.selected;
-        }
-
         // Load the new data from the server
         $.ajax({
             url: this.action,
@@ -147,18 +149,22 @@ define('list', ['jquery', 'ko'], function($, ko) {
         /**
          * Select all the lines
          */
-        this.node.find('.list-checkbox-all').change(function() {
-            self.node.find('.list-checkbox').prop('checked', $(this).is(':checked')).trigger('change');
-        });
+        this.node.find('.list-select-all-lines').change(function(event) {
+            var checkbox = event.target;
+
+            this.selection.all($(checkbox).is(':checked'));
+            this.selection.none(!this.selection.all());
+
+            this.node.find('.list-select-line').prop('checked', this.selection.all()).trigger('change');
+        }.bind(this));
 
         /**
          * Select a line
          */
-        this.node.find('.list-checkbox').change(function() {
-            self.node.find('.list-checkbox-all').prop({
-                checked : self.node.find('.list-checkbox:not(:checked)').length === 0
-            });
-        });
+        this.node.find('.list-select-line').change(function() {
+            this.selection.none(this.node.find('.list-select-line:checked').length === 0);
+            this.selection.all(this.node.find('.list-select-line:not(:checked)').length === 0);
+        }.bind(this));
 
 
         /**
@@ -247,6 +253,10 @@ define('list', ['jquery', 'ko'], function($, ko) {
                 );
             }.bind(this));
         }.bind(this));
+    };
+
+    List.prototype.print = function() {
+        app.print(this.node.get(0));
     };
 
     return List;

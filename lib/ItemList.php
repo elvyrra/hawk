@@ -139,13 +139,6 @@ class ItemList {
     $group = array(),
 
     /**
-     * The id of the selected line
-     *
-     * @var mixed
-     */
-    $selected = null,
-
-    /**
      * The class to apply to the list lines
      *
      * @var string|function
@@ -207,7 +200,16 @@ class ItemList {
      *
      * @var string
      */
-    $resultTpl;
+    $resultTpl,
+
+
+    /**
+     * Define if lines can be selectable (with a checkbox).
+     * If set to true, the a check box will be display in each line, and a global checkbox to select / unselect each line
+     *
+     * @var boolean
+     */
+    $selectableLines = false;
 
 
     /**
@@ -281,17 +283,17 @@ class ItemList {
                 switch($button['template']) {
                     case 'refresh' :
                         $button = array(
-                        'icon'    => 'refresh',
-                        'type'    => 'button',
-                        'onclick' => 'app.lists["'.$this->id.'"].refresh();',
+                            'icon'    => 'refresh',
+                            'type'    => 'button',
+                            'onclick' => 'app.lists["'.$this->id.'"].refresh();',
                         );
                         break;
 
                     case 'print' :
                         $button = array(
-                        'icon'    => 'print',
-                        'type'    => 'button',
-                        'onclick' => 'app.lists["'.$this->id.'"].print();',
+                            'icon'    => 'print',
+                            'type'    => 'button',
+                            'onclick' => 'app.lists["' . $this->id . '"].print();',
                         );
                         break;
                 }
@@ -320,13 +322,18 @@ class ItemList {
 
         // initialize fields default values
         foreach($this->fields as $name => &$field) {
-            $field = new ItemListField($name, $field, $this);
-            if(isset($this->searches[$name])) {
-                $field->searchValue = $this->searches[$name];
-            }
+            if(is_array($field)) {
+                $field = new ItemListField($name, $field, $this);
+                if(isset($this->searches[$name])) {
+                    $field->searchValue = $this->searches[$name];
+                }
 
-            if(!empty($this->sorts[$name])) {
-                $field->sortValue = $this->sorts[$name];
+                if(!empty($this->sorts[$name])) {
+                    $field->sortValue = $this->sorts[$name];
+                }
+            }
+            else{
+                unset($this->fields[$name]);
             }
         }
 
@@ -564,10 +571,6 @@ class ItemList {
                 foreach($this->results as $id => $line){
                     $data[$id]  = array();
                     $param[$id] = array('class' => '');
-
-                    if($this->selected === $id) {
-                        $param[$id]['class'] .= 'selected ';
-                    }
 
                     if($this->lineClass) {
                         $function = $this->lineClass;

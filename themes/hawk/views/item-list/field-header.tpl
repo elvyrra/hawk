@@ -1,5 +1,5 @@
 {if(! $field->hidden)}
-    <th class="list-column-title" ko-with="fields['{{ $field->name }}']">
+    <th class="list-column-title" data-field="{{ $field->name }}" ko-with="fields['{{ $field->name }}']">
         <div class="list-label-sorts">
             {if($field->sort)}
                 <div class='list-sort-block pull-right'>

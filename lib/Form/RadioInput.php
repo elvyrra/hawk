@@ -21,6 +21,11 @@ class RadioInput extends FormInput{
      *
      * @var string
      */
-    public $layout = 'horizontal';
+    public $layout = 'horizontal',
+
+    /**
+     * The radio button options
+     */
+    $options = array();
 
 }
