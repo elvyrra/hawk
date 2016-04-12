@@ -27,6 +27,13 @@ App::router()->auth(App::session()->isLogged(), function () {
     ));
 });
 
+App::router()->get('validate-new-email', '/profile/change-email/{token}', array(
+    'where' => array(
+        'token' => '[\w\=]+'
+    ),
+    'action' => 'UserProfileController.validateNewEmail'
+));
+
 App::router()->auth(!App::session()->isLogged(), function () {
     //Login
     App::router()->any('login', '/login', array('action' => 'LoginController.login'));

@@ -18,8 +18,29 @@ class Mail{
 
     /**
      * The PHPMailer instance
+     *
+     * @var PHPMailer
      */
-    private $mailer;
+    private $mailer,
+
+    /**
+     * Use the default template, from the theme
+     *
+     * @var boolean
+     */
+    $useDefaultTemplate = true,
+
+    /**
+     * The title in the default template
+     *
+     * @var string
+     */
+    $title = '',
+
+    /**
+     * The content in the default template
+     */
+    $content = '';
 
     /**
      * Default mailing engine
@@ -211,6 +232,72 @@ class Mail{
         return $this;
     }
 
+    /**
+     * Defaultly, the theme template email.tpl is used to send emails. Calling this function with $set=false
+     * will override the default behavior and you will be able to set your own content HTML
+     *
+     * @param boolean $set True to keep the default HTML template, else false
+     *
+     * @return Mail The instance itself, to permit chained actions
+     */
+    public function setDefaultTemplate($set = true) {
+        $this->useDefaultTemplate = $set;
+
+        return $this;
+    }
+
+
+    /**
+     * Set the title in the default HTML template
+     * @param  string $title The title to set
+     *
+     * @return Mail The instance itself, to permit chained actions
+     */
+    public function title($title) {
+        $this->title = $title;
+
+        return $this;
+    }
+
+
+    /**
+     * Set the content in the default HTML template
+     *
+     * @param  string $content The content to set
+     *
+     * @return Mail The instance itself, to permit chained actions
+     */
+    public function content($content) {
+        $this->content = $content;
+
+        return $this;
+    }
+
+
+    private function prepareContent() {
+        if($this->useDefaultTemplate) {
+            // Create the email content
+            $cssVariables = Theme::getSelected()->getEditableVariables();
+            $values = Theme::getSelected()->getVariablesCustomValues();
+            $css = array();
+
+            foreach($cssVariables as $var) {
+                $css[$var['name']] = isset($values[$var['name']]) ? $values[$var['name']] : $var['default'];
+            }
+
+            // Format the email
+            $emailHtml = View::make(Theme::getSelected()->getView('email.tpl'), array(
+                'css' => $css,
+                'title' => $this->title,
+                'content' => $this->content,
+                'logo' => Option::get('main.logo') ?
+                    Plugin::current()->getUserfilesUrl(Option::get('main.logo')) :
+                    Plugin::get('main')->getStaticUrl('img/hawk-logo.png')
+            ));
+
+            $this->html($emailHtml);
+        }
+    }
 
     /**
      * Send the mail
@@ -218,6 +305,8 @@ class Mail{
      * @throws MailException
      */
     public function send(){
+        $this->prepareContent();
+
         if(!$this->mailer->send()) {
             App::logger()->error('The mail could not be sent because : ' . $this->mailer->ErrorInfo);
             throw new MailException($this->mailer->ErrorInfo);

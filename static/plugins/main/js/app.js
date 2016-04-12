@@ -11,7 +11,7 @@ baseUrl = baseUrl.replace(/^(.+\/).+$/, '$1');
 require.config(
     {
         // Workaround to be optimized by r.js
-        baseUrl :  typeof baseUrl === "undefined" ? './' : baseUrl,
+        baseUrl :  typeof baseUrl === 'undefined' ? './' : baseUrl,
 
         paths : {
             jquery      : 'ext/jquery-2.1.3.min',
@@ -807,12 +807,6 @@ define(
         if (!window.app) {
             window.app = new App();
         }
-
-        window.app.ready(
-            function() {
-                ko.applyBindings(window.app);
-            }
-        );
 
         window.app.start();
     }

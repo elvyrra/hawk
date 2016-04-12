@@ -1,4 +1,5 @@
 {widget class="Hawk\Plugins\Main\MainMenuWidget"}
+<script type="text/javascript" src="{{ Theme::getSelected()->getFileUrl('js/theme-hawk.js') }}"></script>
 
 {if(empty($content))}
 	<div id="main-content" role="tabpanel" ko-with="tabset">

@@ -42,6 +42,8 @@ class DatabaseSessionHandler implements \SessionHandlerInterface{
         // Clean expired sessions
         $this->gc(0);
 
+        $_SESSION = array();
+
         return !!$this->db->delete($this->table, 'id = :id', array('id' => $sessionId));
     }
 

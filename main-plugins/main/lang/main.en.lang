@@ -42,7 +42,7 @@ list-results-number[p] = "{number} results"
 
 ; Login form
 login-menu-title = "<i class=\"icon icon-sign-in\"></i> Connect"
-login-error-authentication = "The login or the password is not correct"
+login-error-authentication = "The email address or the password is not correct"
 login-error-inactive-user = "This account is not active on this application"
 login-form-title = "Connection"
 login-label = "Email / Login"
@@ -107,7 +107,16 @@ update-password-success = "Your password has been successfully updated."
 
 ; User profile form
 user-profile-update-success = "Your profile was successfully updated"
+user-profile-update-success-with-email = "Your profile has been successfully updated. An email was sent to validate your new email address."
 user-profile-update-error = "An error occured while updating your profile"
+
+; Change email address email
+reset-email-already-used = "This email is already used by another user on this application."
+reset-email-title = "Reset your email - {sitename}"
+reset-email-content = "You asked to change your email on the application {sitename}. To confirm your new email, please click on the following link :"
+reset-email-ending = "Best regards, <br /> {sitename}"
+reset-email-invalid-token = "The information of this page are not correct to reset your email address."
+reset-email-success = "Your email has been successfully reset. YOU can now connect with it."
 
 ; Permissions
 permission-name-user-actions = "Action on his own account"

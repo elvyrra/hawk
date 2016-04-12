@@ -1,5 +1,5 @@
-<div class="row">
-	<div class="col-md-6 col-md-offset-3">
+<!-- <div class="row"> -->
+	<!-- <div class="col-md-6 col-md-offset-3"> -->
 		{{ $fields["valid"] }}
 		<table class="table">
 			{foreach($permissions as $group => $data)}
@@ -26,8 +26,8 @@
 				{/foreach}
 			{/foreach}
 		</table>
-	</div>
-</div>
+	<!-- </div> -->
+<!-- </div> -->
 
 <script type="text/javascript">
 	$(".select-all").change(function(){

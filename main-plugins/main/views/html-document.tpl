@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 	<head>
-		<meta charset="{{ ENCODING }}" />
-		<meta http-equiv="Content-Type" content="text/html; charset={{ ENCODING }}" />
+		<meta charset="utf8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 
 		<title>{{ $title }}</title>
