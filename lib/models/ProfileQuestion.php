@@ -78,5 +78,32 @@ class ProfileQuestion extends Model{
         return self::getListByExample(new DBExample($example), self::$primaryColumn, array(), array('order' => DB::SORT_ASC));
     }
 
+     public static function getRoles($name){
+        $question = self::getByName($name);
+        
+        if(!$question)
+            return array();
+         
+         $params = json_decode($question->parameters, true);
 
+        if(!empty($params['roles']))
+            return $params['roles'];
+        else
+            return array();
+    }
+
+    public static function allowToRole($name, $roleId){
+        $question = self::getByName($name);
+        
+        $params = json_decode($question->parameters, true);
+
+        if(!empty($params['roles'])){
+            if(in_array($roleId, $params['roles']))
+                return true;
+            else
+                return false;
+        }
+        else
+            return false;
+    }
 }

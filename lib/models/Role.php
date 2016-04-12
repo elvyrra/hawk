@@ -67,4 +67,15 @@ class Role extends Model{
     public function getLabel(){
         return Lang::get('roles.role-' . $this->id . '-label');
     }
+
+    /**
+     * Get role form his name
+     *
+     * @return role
+     */
+    public static function getByName($name){
+        return self::getByExample(new DBExample(array(
+            'name' => $name,
+        )));
+    }
 }

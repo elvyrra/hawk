@@ -95,10 +95,7 @@ class LoginController extends Controller{
 
                 $example = new DBExample(array(
                     '$and' => array(
-                        '$or' => array(
-                            array('email' => $form->getData('login')),
-                            array('username' => $form->getData('login'))
-                        ),
+                        array('email' => $form->getData('login')),
                         array('password' => $hash),
                     )
                 ));

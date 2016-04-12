@@ -59,13 +59,7 @@ class UserProfileController extends Controller{
                     new SubmitInput(array(
                         'name' => 'valid',
                         'value' => Lang::get($this->_plugin . '.valid-button')
-                    )),
-
-                    // new ButtonInput(array(
-                    //     'name' => 'cancel',
-                    //     'value' => Lang::get($this->_plugin . '.cancel-button'),
-                    //     'onclick' => 'app.dialog("close")'
-                    // ))
+                    ))
                 ),
             ),
 
@@ -75,50 +69,52 @@ class UserProfileController extends Controller{
         // Get the user profile questions
         $questions = ProfileQuestion::getAll('name', array(), array('order' => DB::SORT_ASC));
 
-
-
-
         // Generate the question fields
         foreach($questions as $question){
-            $classname = '\Hawk\\' . ucwords($question->type) . 'Input';
-            $field = json_decode($question->parameters, true);
-            $field['name'] = $question->name;
-            $field['id'] = 'user-form-' . $question->name. '-input';
-            $field['independant'] = true;
-            $field['label'] = Lang::get('admin.profile-question-' . $question->name . '-label');
+            if($question->displayInProfile && ProfileQuestion::allowToRole($question->name, $user->roleId)){
+                $classname = '\Hawk\\' . ucwords($question->type) . 'Input';
+                $field = json_decode($question->parameters, true);
+                $field['name'] = $question->name;
+                $field['id'] = 'user-form-' . $question->name. '-input';
+                $field['independant'] = true;
+                $field['label'] = Lang::get('admin.profile-question-' . $question->name . '-label');
 
-            if($user) {
-                if($question->type == "file") {
-                    $field['after'] = sprintf(
-                        '<img src="%s" class="profile-image" />',
-                        $user->getProfileData($question->name) ? $user->getProfileData($question->name) : ''
-                    );
+                if($question->editable == 0)
+                    $field['readonly'] = true;
+
+                if($user) {
+                    if($question->type == "file") {
+                        $field['after'] = sprintf(
+                            '<img src="%s" class="profile-image" />',
+                            $user->getProfileData($question->name) ? $user->getProfileData($question->name) : ''
+                        );
+                    }
+                    else{
+                        $field['default'] = $user->getProfileData($question->name);
+                    }
                 }
-                else{
-                    $field['default'] = $user->getProfileData($question->name);
+
+                if($question->name == 'language') {
+                    // Get language options
+                    $languages = Language::getAllActive();
+                    $options = array();
+                    foreach($languages as $language){
+                        $options[$language->tag] = $language->label;
+                    }
+                    $field['options'] = $options;
+                    if(!$field['default']) {
+                        $field['default'] = Option::get($this->_plugin . '.language');
+                    }
                 }
+
+
+                $param['fieldsets']['profile'][] = new $classname($field);
             }
-
-            if($question->name == 'language') {
-                // Get language options
-                $languages = Language::getAllActive();
-                $options = array();
-                foreach($languages as $language){
-                    $options[$language->tag] = $language->label;
-                }
-                $field['options'] = $options;
-                if(!$field['default']) {
-                    $field['default'] = Option::get($this->_plugin . '.language');
-                }
-            }
-
-
-            $param['fieldsets']['profile'][] = new $classname($field);
-
         }
 
         $form = new Form($param);
         if(!$form->submitted()) {
+
             return NoSidebarTab::make(array(
                 'title' => Lang::get('admin.user-form-title'),
                 'page' => array(
@@ -129,24 +125,26 @@ class UserProfileController extends Controller{
         else{
             try{
                 foreach($questions as $question){
-                    if($question->type === 'file') {
-                        $upload = Upload::getInstance($question->name);
+                    if($question->displayInProfile && ProfileQuestion::allowToRole($question->name, $user->roleId)){
+                        if($question->type === 'file') {
+                            $upload = Upload::getInstance($question->name);
 
-                        if($upload) {
-                            $file = $upload->getFile(0);
-                            $dir = Plugin::current()->getPublicUserfilesDir()  . 'img/';
-                            $url = Plugin::current()->getUserfilesUrl() . 'img/';
-                            if(!is_dir($dir)) {
-                                mkdir($dir, 0755, true);
+                            if($upload) {
+                                $file = $upload->getFile(0);
+                                $dir = Plugin::current()->getPublicUserfilesDir()  . 'img/';
+                                $url = Plugin::current()->getUserfilesUrl() . 'img/';
+                                if(!is_dir($dir)) {
+                                    mkdir($dir, 0755, true);
+                                }
+
+                                $basename = uniqid() . $file->extension;
+                                $upload->move($file, $dir, $basename);
+                                $user->setProfileData($question->name, $url . $basename);
                             }
-
-                            $basename = uniqid() . $file->extension;
-                            $upload->move($file, $dir, $basename);
-                            $user->setProfileData($question->name, $url . $basename);
                         }
-                    }
-                    else{
-                        $user->setProfileData($question->name, $form->inputs[$question->name]->dbvalue());
+                        else{
+                            $user->setProfileData($question->name, $form->inputs[$question->name]->dbvalue());
+                        }
                     }
                 }
 

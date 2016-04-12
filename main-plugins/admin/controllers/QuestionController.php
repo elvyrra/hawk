@@ -17,7 +17,13 @@ class QuestionController extends Controller{
      * Display the list of the profile questions
      */
     public function listQuestions(){
+        // Get all ProfileQuestions
         $questions = ProfileQuestion::getAll();
+
+        // Get all Roles
+        $roles = Role::getAll();
+        
+        // Create parameters for form
         $param = array(
             'id' => 'display-questions-form',
             'action' => App::router()->getUri('profile-questions'),
@@ -42,6 +48,7 @@ class QuestionController extends Controller{
             )
         );
 
+        // For each ProfileQuestion add roles, displayInRegister and displayInProfile
         foreach($questions as $question){
             // Add the input to display in register form
             $param['fieldsets']['form'][] = new CheckboxInput(array(
@@ -56,11 +63,26 @@ class QuestionController extends Controller{
                 'default' => $question->displayInProfile,
                 'nl' => false
             ));
+        
+            // Get roles associate to this ProfileQuestion in json parameters
+            $attributesRoles = ProfileQuestion::getRoles($question->name);
+
+            // For each roles create a Checkbox
+            foreach($roles as $role){
+                // Add the input to display in the user profile
+                $param['fieldsets']['form'][] = new CheckboxInput(array(
+                    'name' => "role-$role->name-question-$question->name",
+                    'default' => in_array($role->id, $attributesRoles) ? 1 : 0,
+                    'nl' => false
+                ));
+            }
         }
 
+        // Create form
         $form = new Form($param);
 
-        $list = new ItemList(array(
+        // Create parameters for the list to display
+        $paramList = array(
             'id' => 'profile-questions-list',
             'model' => 'ProfileQuestion',
             'lines' => 'all',
@@ -125,7 +147,24 @@ class QuestionController extends Controller{
                     }
                 )
             ),
-        ));
+        );
+
+        // For each roles create a checkbox by line profileQuestion!
+        foreach($roles as $role){
+            // Add the input to display in register form
+            $paramList['fields'][$role->name] = array(
+                'independant' => true,
+                'label' => Lang::get("roles.role-{$role->id}-label"),
+                'search' => false,
+                'sort' => false,
+                'display' => function($value, $field, $line) use ($form){
+                    return $form->inputs["role-$field->name-question-$line->name"];
+                },
+            );
+        }
+
+        // Create List
+        $list = new ItemList($paramList);
 
         if(!$form->submitted()) {
             $this->addKeysToJavaScript($this->_plugin . ".confirm-delete-question");
@@ -138,8 +177,14 @@ class QuestionController extends Controller{
         }
         else{
             try{
+
+                // Extract from form, all infos abour roles associate to ProfileQuestion
+                $listRoles = array();
+                $roles = Role::getAll('name');
                 $save = array();
+
                 foreach($form->inputs as $name => $field){
+                    // Manage displayInRegister and displayInProfile
                     if(preg_match("/^(register|profile)\-display\-(\w+)$/", $name, $match)) {
                         $qname = $match[2];
                         $func = $match[1] == "register" ? 'displayInRegister' : 'displayInProfile';
@@ -149,9 +194,34 @@ class QuestionController extends Controller{
                         }
                         $save[$qname]->set($func, (int) App::request()->getBody($name));
                     }
-                }
+                    // Manage roles
+                    else if(preg_match("/^role\-(\w+)\-question\-(\w+)$/", $name, $match)) {
+                        $qname = $match[2];
+                        $roleName = $match[1];
+                        
+                        // If tab doesn't exit create it to avoid exception
+                        if(!isset($listRoles[$qname]))
+                            $listRoles[$qname] = array();
 
+                        $role = $roles[$roleName];
+
+                        // If checkbox is tag, add roleId
+                        if($field->dbvalue())
+                            array_push($listRoles[$qname], intval($role->id));
+                    }
+                }
+                
                 foreach($save as $question){
+                    $question->update();
+                }
+                
+                // Save each ProfileQuestions
+                foreach($questions as $question){
+                    $params = json_decode($question->parameters, true);
+
+                    $params['roles'] = $listRoles[$question->name];
+
+                    $question->set('parameters', json_encode($params));
                     $question->update();
                 }
 
@@ -168,6 +238,11 @@ class QuestionController extends Controller{
      */
     public function edit(){
         $q = ProfileQuestion::getByName($this->name);
+        $roles = Role::getAll();
+
+        // Get roles associate to this ProfileQuestion in json parameters
+        $attributesRoles = ProfileQuestion::getRoles($this->name);
+
         if(!$q || $q->editable) {
 
             $allowedTypes = ProfileQuestion::$allowedTypes;
@@ -189,9 +264,10 @@ class QuestionController extends Controller{
                             'required' => true,
                         )),
 
-                        new HiddenInput(array(
+                        new CheckboxInput(array(
                             'name' => 'editable',
                             'default' => 1,
+                            'label' => Lang::get($this->_plugin . '.profile-question-form-editable-label'),
                         )),
 
                         new SelectInput(array(
@@ -289,6 +365,13 @@ class QuestionController extends Controller{
                         ))
                     ),
 
+                    /*
+                    // Not use for now
+                    'roles' => array(
+                        'legend' => Lang::get($this->_plugin . '.profile-question-form-roles-legend'),
+                    ),
+                    */
+
                     '_submits' => array(
                         new SubmitInput(array(
                             'name' => 'valid',
@@ -311,6 +394,20 @@ class QuestionController extends Controller{
                 ),
                 'onsuccess' => 'app.dialog("close"); app.load(app.getUri("profile-questions"), {selector : "#admin-questions-tab"})',
             );
+
+            /*
+            // For each roles create a Checkbox
+            foreach($roles as $role){
+                // Add the input to display in the user profile
+                $param['fieldsets']['roles'][] = new CheckboxInput(array(
+                    'name' => "role-$role->name-question-$this->name",
+                    'label' => $role->name, 
+                    'default' => in_array($role->id, $attributesRoles) ? 1 : 0,
+                    'attributes' => array(
+                        'ko-value' => 'roles'
+                    )
+                ));
+            }*/
 
             $form = new Form($param);
 
@@ -391,5 +488,4 @@ class QuestionController extends Controller{
             }
         }
     }
-
 }
