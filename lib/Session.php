@@ -154,5 +154,30 @@ class Session extends Singleton{
             return $tmp;
         }
     }
+
+    /**
+     * Remove session data
+     *
+     * @param string $name The name of the session variable to remove
+     */
+    public function removeData($name = '') {
+        $this->getData();
+
+        if($name) {
+            // remove the variable $name from the session
+            $fields = explode('.', $name);
+            $tmp = &$this->data;
+            foreach(array_slice($fields, 0,-1) as $field){
+                $tmp = &$tmp[$field];
+            }
+            unset($tmp[end($fields)]);
+        }
+        else {
+            $this->data = array();
+        }
+
+        $_SESSION = $this->data;
+    }
+
 }
 

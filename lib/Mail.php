@@ -291,7 +291,7 @@ class Mail{
                 'title' => $this->title,
                 'content' => $this->content,
                 'logo' => Option::get('main.logo') ?
-                    Plugin::current()->getUserfilesUrl(Option::get('main.logo')) :
+                    Plugin::get('main')->getUserfilesUrl(Option::get('main.logo')) :
                     Plugin::get('main')->getStaticUrl('img/hawk-logo.png')
             ));
 

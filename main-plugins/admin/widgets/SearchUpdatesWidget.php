@@ -65,5 +65,7 @@ class SearchUpdatesWidget extends Widget{
                 ));
             }
         }
+
+        return '';
     }
 }

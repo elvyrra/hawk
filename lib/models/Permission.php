@@ -20,6 +20,26 @@ class Permission extends Model{
     protected static $tablename = "Permission";
 
     /**
+     * The model fields
+     */
+    protected static $fields = array(
+        'id' => array(
+            'type' => 'INT(11)',
+            'auto_increment' => true
+        ),
+        'plugin' => array(
+            'type' => 'VARCHAR(32)'
+        ),
+        'key' => array(
+            'type' => 'VARCHAR(64)'
+        ),
+        'availableForGuests' => array(
+            'type' => 'TINYINT(1)',
+            'default' => '0'
+        )
+    );
+
+    /**
      * The id of the permission giving rights on all permissions
      */
     const ALL_PRIVILEGES_ID = 1;
@@ -81,23 +101,23 @@ class Permission extends Model{
      *
      * @param string $name              The permission name, formatted as "<plugin>.<key>"
      * @param int    $default           The default value for this permission
-     * @param int    $availableForGuest Defines if the permission can be set to true for guest users
+     * @param int    $availableForGuests Defines if the permission can be set to true for guest users
      *
      * @return Permission The created permission
      */
-    public static function add($name, $default = 1, $availableForGuest = 0){
+    public static function add($name, $default = 1, $availableForGuests = 0){
         list($plugin, $key) = explode('.', $name);
         $permission = parent::add(
             array(
             'plugin' => $plugin,
             'key' => $key,
-            'availableForGuests' => $availableForGuest
+            'availableForGuests' => $availableForGuests
             )
         );
 
         $roles = Role::getAll();
         foreach($roles as $role){
-            $value = $role->id == Role::GUEST_ROLE_ID ? ($availableForGuest ? $default : 0) : $default;
+            $value = $role->id == Role::GUEST_ROLE_ID ? ($availableForGuests ? $default : 0) : $default;
             RolePermission::add(
                 array(
                 'roleId' => $role->id,

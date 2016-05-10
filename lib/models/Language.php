@@ -30,6 +30,28 @@ class Language extends Model{
      */
     private static $instances = array();
 
+    /**
+     * The model fields
+     */
+    protected static $fields = array(
+        'tag' => array(
+            'type' => 'VARCHAR(2)',
+        ),
+
+        'label' => array(
+            'type' => 'VARCHAR(64)'
+        ),
+
+        'isDefault' => array(
+            'type' => 'TINYINT(1)'
+        ),
+
+        'active' => array(
+            'type' => 'TINYINT(1)',
+            'default' => '1'
+        )
+    );
+
 
     /**
      * Find a language by it tag

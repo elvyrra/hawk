@@ -36,7 +36,7 @@ plugin-active-status = "Activé"
 
 profile-question-avatar-label = "Avatar"
 profile-question-language-label = "Langue"
-profile-question-form-displayInProfile-label = "Afficher sur le profil"
+profile-question-form-displayInProfile-label = "Donnée publique"
 profile-question-form-displayInRegister-label = "Afficher sur le formulaire d'inscription"
 profile-question-form-general-legend = "Données générales"
 profile-question-form-label-description = "(apparaîtra dans les formulaires)"

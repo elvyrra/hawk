@@ -35,7 +35,7 @@ plugin-active-status = "Active"
 
 profile-question-avatar-label = "Avatar"
 profile-question-language-label = "Language"
-profile-question-form-displayInProfile-label = "Display on the profile"
+profile-question-form-displayInProfile-label = "Public parameter"
 profile-question-form-displayInRegister-label = "Display on the register form"
 profile-question-form-general-legend = "Global data"
 profile-question-form-label-description = "(Will appear in the forms)"

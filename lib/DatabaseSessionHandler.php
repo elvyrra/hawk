@@ -44,7 +44,9 @@ class DatabaseSessionHandler implements \SessionHandlerInterface{
 
         $_SESSION = array();
 
-        return !!$this->db->delete($this->table, 'id = :id', array('id' => $sessionId));
+        SessionModel::deleteByExample(new DBExample(array(
+            'id' => $sessionId
+        )));
     }
 
     /**
@@ -56,7 +58,10 @@ class DatabaseSessionHandler implements \SessionHandlerInterface{
         if(!$maxlifetime) {
             $maxlifetime = max(App::conf()->get('session.lifetime'), ini_get('session.gc_maxlifetime'));
         }
-        return !! $this->db->delete($this->table, ':lifetime AND mtime + :lifetime < UNIX_TIMESTAMP()', array('lifetime' => $maxlifetime));
+
+        return (bool) SessionModel::deleteBySQL(':lifetime AND mtime + :lifetime < UNIX_TIMESTAMP()', array(
+            'lifetime' => $maxlifetime
+        ));
     }
 
 
@@ -72,7 +77,15 @@ class DatabaseSessionHandler implements \SessionHandlerInterface{
 
         // Update the session mtime
         if(App::request()->getCookies($name)) {
-            $this->db->update($this->table, new DBExample(array('id' => App::request()->getCookies($name))), array('mtime' => time()));
+            SessionModel::getDbInstance()->update(
+                SessionModel::getTable(),
+                new DBExample(array(
+                    'id' => App::request()->getCookies($name)
+                )),
+                array(
+                    'mtime' => time()
+                )
+            );
         }
 
         // Clean expired sessions
@@ -88,16 +101,9 @@ class DatabaseSessionHandler implements \SessionHandlerInterface{
      * @return string The session data, serialized
      */
     public function read($sessionId){
-        $line = $this->db->select(
-            array(
-            'from' => $this->table,
-            'where' => 'id = :id',
-            'binds' => array('id' => $sessionId),
-            'one' => true
-            )
-        );
+        $session = SessionModel::getById($sessionId);
 
-        return $line['data'];
+        return $session ? $session->data : array();
     }
 
 
@@ -107,12 +113,13 @@ class DatabaseSessionHandler implements \SessionHandlerInterface{
      * @param string $sessionId The session id, corresponding to the session cookie
      * @param string $data      The data session to write, serialized
      */
-    public function write($sessionId, $data){
-        $sql = 'REPLACE INTO ' . $this->table . ' (id, data, mtime) VALUES (:id, :data, UNIX_TIMESTAMP())';
-        return $this->db->query(
-            $sql, array(
-            'id' => $sessionId,
-            'data' => $data,
+    public function write($sessionId, $data) {
+        SessionModel::getDbInstance()->replace (
+            SessionModel::getTable(),
+            array(
+                'id' => $sessionId,
+                'data' => $data,
+                'mtime' => '\\UNIX_TIMESTAMP()'
             )
         );
     }

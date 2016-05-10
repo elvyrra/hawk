@@ -144,12 +144,8 @@ define('list', ['jquery', 'ko'], function($, ko) {
             ko.applyBindings(this, this.titleLine[0]);
         }
 
-        var self = this;
-
-        /**
-         * Select all the lines
-         */
-        this.node.find('.list-select-all-lines').change(function(event) {
+        // Select all the lines
+        this.node.on('change', '.list-select-all-lines', function(event) {
             var checkbox = event.target;
 
             this.selection.all($(checkbox).is(':checked'));
@@ -158,10 +154,9 @@ define('list', ['jquery', 'ko'], function($, ko) {
             this.node.find('.list-select-line').prop('checked', this.selection.all()).trigger('change');
         }.bind(this));
 
-        /**
-         * Select a line
-         */
-        this.node.find('.list-select-line').change(function() {
+
+        // Select a line
+        this.node.on('change', '.list-select-line', function() {
             this.selection.none(this.node.find('.list-select-line:checked').length === 0);
             this.selection.all(this.node.find('.list-select-line:not(:checked)').length === 0);
         }.bind(this));

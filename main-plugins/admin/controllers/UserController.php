@@ -20,9 +20,9 @@ class UserController extends Controller{
      */
     public function index(){
         $tabs = array(
-            'users' => $this->compute('listUsers'),
-            'roles' => RoleController::getInstance()->compute('listRoles'),
-            'questions' => QuestionController::getInstance()->compute('listQuestions')
+            'users' => $this->listUsers(),
+            'roles' => RoleController::getInstance()->listRoles(),
+            'questions' => QuestionController::getInstance()->listQuestions()
         );
 
         $this->addCss(Plugin::current()->getCssUrl('users.less'));
@@ -276,7 +276,7 @@ class UserController extends Controller{
         }
         else{
             if($form->submitted() == "delete") {
-                $this->compute('remove');
+                $this->remove();
             }
             else{
                 if($form->check()) {

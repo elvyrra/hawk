@@ -44,15 +44,15 @@ class DBExample{
      * @var array
      */
     private static $binaryOperators = array(
-    '$ne' => '<>',
-    '$lt' => '<',
-    '$lte' => '<=',
-    '$gt' => '>',
-    '$gte' => '>=',
-    '$like' => 'LIKE',
-    '$nlike' => 'NOT LIKE',
-    '$in' => 'IN',
-    '$nin' => 'NOT IN'
+        '$ne' => '<>',
+        '$lt' => '<',
+        '$lte' => '<=',
+        '$gt' => '>',
+        '$gte' => '>=',
+        '$like' => 'LIKE',
+        '$nlike' => 'NOT LIKE',
+        '$in' => 'IN',
+        '$nin' => 'NOT IN'
     );
 
     /**
@@ -61,8 +61,8 @@ class DBExample{
      * @var array
      */
     private static $unaryOperators = array(
-    '$null'  => 'IS NULL',
-    '$notnull' => 'IS NOT NULl'
+        '$null'  => 'IS NULL',
+        '$notnull' => 'IS NOT NULl'
     );
 
     /**
@@ -134,8 +134,6 @@ class DBExample{
         $elements = array();
 
         foreach($example as $key => $value){
-            $bindKey = uniqid();
-
             // Binary operations (= , <, >, LIKE, IN, NOT IN, .. etc)
             if(isset(self::$binaryOperators[$key])) {
                 $op = self::$binaryOperators[$key];
@@ -143,17 +141,29 @@ class DBExample{
                     throw new DBExampleException("The operation '$op' needs to be in a array associated to a field");
                 }
                 if(is_array($value)) {
-                    $keys = array();
-                    foreach($value as $val){
-                        $bindKey = uniqid();
-                        $binds[$bindKey] = $val;
-                        $keys[] = ':'.$bindKey;
+                    $values = array();
+                    foreach($value as $unitValue) {
+                        if($unitValue{0} !== '\\') {
+                            $bindKey = uniqid();
+                            $binds[$bindKey] = $unitValue;
+                            $values[] = ':'.$bindKey;
+                        }
+                        else {
+                            $values[] = substr($val, 1);
+                        }
                     }
-                    $elements[] = DB::formatField($upperKey) . " $op (" . implode(',', $keys) . ")";
+                    $elements[] = DB::formatField($upperKey) . " $op (" . implode(',', $values) . ")";
                 }
                 else{
-                    $binds[$bindKey] = $value;
-                    $elements[] = DB::formatField($upperKey) . " $op :$bindKey";
+                    if($value{0} !== '\\') {
+                        $bindKey = uniqid();
+                        $binds[$bindKey] = $value;
+                        $val = ':' . $bindKey;
+                    }
+                    else {
+                        $val = substr($value, 1);
+                    }
+                    $elements[] = DB::formatField($upperKey) . " $op $val";
                 }
             }
 
@@ -187,8 +197,15 @@ class DBExample{
 
                     default :
                         if(is_scalar($value)) {
-                            $binds[$bindKey] = $value;
-                            $elements[] = DB::formatField($key) . " = :$bindKey";
+                            if($value{0} !== '\\') {
+                                $bindKey = uniqid();
+                                $binds[$bindKey] = $value;
+                                $val = ':' . $bindKey;
+                            }
+                            else {
+                                $val = substr($value, 1);
+                            }
+                            $elements[] = DB::formatField($key) . ' = ' . $val;
                         }
                         elseif(is_array($value)) {
                             $elements[] = $this->parseElements($binds, $value, $operator, $key);

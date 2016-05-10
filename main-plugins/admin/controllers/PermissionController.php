@@ -42,24 +42,26 @@ class PermissionController extends Controller{
         );
 
         foreach($roles as $role){
-            foreach($permissionGroups as $group => $permissions){
-                foreach($permissions as $permission){
-                    if($role->id == Role::ADMIN_ROLE_ID) {
-                        $default = 1;
+            foreach($permissionGroups as $group => $permissions) {
+                if (Plugin::get($group)) {
+                    foreach($permissions as $permission){
+                        if($role->id == Role::ADMIN_ROLE_ID) {
+                            $default = 1;
+                        }
+                        elseif(isset($values[$permission->id][$role->id])) {
+                            $default = $values[$permission->id][$role->id];
+                        }
+                        else{
+                            $default = 0;
+                        }
+                        $param['fieldsets']['form'][] = new CheckboxInput(array(
+                            'name' => "permission-{$permission->id}-{$role->id}",
+                            'disabled' => $role->id == Role::ADMIN_ROLE_ID || ($role->id == Role::GUEST_ROLE_ID && !$permission->availableForGuests),
+                            'default' => $default,
+                            'class' => $permission->id == Permission::ALL_PRIVILEGES_ID ? 'select-all' : '',
+                            'nl' => false,
+                        ));
                     }
-                    elseif(isset($values[$permission->id][$role->id])) {
-                        $default = $values[$permission->id][$role->id];
-                    }
-                    else{
-                        $default = 0;
-                    }
-                    $param['fieldsets']['form'][] = new CheckboxInput(array(
-                        'name' => "permission-{$permission->id}-{$role->id}",
-                        'disabled' => $role->id == Role::ADMIN_ROLE_ID || ($role->id == Role::GUEST_ROLE_ID && !$permission->availableForGuests),
-                        'default' => $default,
-                        'class' => $permission->id == Permission::ALL_PRIVILEGES_ID ? 'select-all' : '',
-                        'nl' => false,
-                    ));
                 }
             }
         }

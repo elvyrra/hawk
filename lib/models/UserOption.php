@@ -1,0 +1,76 @@
+<?php
+/**
+ * UserOption.php
+ *
+ * @author  Elvyrra SAS
+ * @license http://rem.mit-license.org/ MIT
+ */
+
+namespace Hawk;
+
+
+/**
+ * This model describes the user options
+ *
+ * @package BaseModels
+ */
+class UserOption extends Model{
+    /**
+     * The associated table
+     *
+     * @var string
+     */
+    protected static $tablename = "UserOption";
+
+    /**
+     * The primary column
+     */
+    protected static $primaryColumn = null;
+
+    /**
+     * The model fields
+     *
+     * @var array
+     */
+    protected static $fields = array(
+        'userId' => array(
+            'type' => 'INT(11)'
+        ),
+        'userIp' => array(
+            'type' => 'VARCHAR(15)'
+        ),
+        'plugin' => array(
+            'type' => 'VARCHAR(32)'
+        ),
+        'key' => array(
+            'type' => 'VARCHAR(64)'
+        ),
+        'value' => array(
+            'type' => 'VARCHAR(4096)'
+        )
+    );
+
+    /**
+     * The model constraints
+     *
+     * @var array
+     */
+    protected static $constraints = array(
+        'userId' => array(
+            'type' => 'unique',
+            'fields' => array(
+                'userId',
+                'plugin',
+                'key'
+            )
+        ),
+        'userIp' => array(
+            'type' => 'unique',
+            'fields' => array(
+                'userIp',
+                'plugin',
+                'key'
+            )
+        )
+    );
+}

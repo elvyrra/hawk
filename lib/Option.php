@@ -30,9 +30,10 @@ class Option{
      *
      * @return string the value og the option
      */
-    public static function get($name){
+    public static function get($name) {
         list($plugin, $key) = explode('.', $name);
-        if(! isset(self::$options[$plugin][$key])) {
+
+        if(!isset(self::$options[$plugin][$key])) {
             self::getPluginOptions($plugin);
         }
 
@@ -52,16 +53,13 @@ class Option{
         }
 
         if(!isset(self::$options[$plugin])) {
-            $options = App::db()->select(
-                array(
-                'from' => DB::getFullTablename('Option'),
-                'where' => new DBExample(array('plugin' => $plugin))
-                )
-            );
+            $options = OptionModel::getListByExample(new DBExample(array(
+                'plugin' => $plugin
+            )));
 
             self::$options[$plugin] = array();
             foreach($options as $option){
-                self::$options[$plugin][$option['key']] = $option['value'];
+                self::$options[$plugin][$option->key] = $option->value;
             }
         }
         return self::$options[$plugin];
@@ -78,11 +76,12 @@ class Option{
         list($plugin, $key) = explode('.', $name);
         self::$options[$plugin][$key] = $value;
 
-        App::db()->replace(
-            DB::getFullTablename('Option'), array(
-            'plugin' => $plugin,
-            'key' => $key,
-            'value' => $value
+        OptionModel::getDbInstance()->replace(
+            OptionModel::getTable(),
+            array(
+                'plugin' => $plugin,
+                'key' => $key,
+                'value' => $value
             )
         );
     }
@@ -95,14 +94,11 @@ class Option{
      */
     public static function delete($name){
         list($plugin, $key) = explode('.', $name);
-        App::db()->delete(
-            DB::getFullTablename('Option'), new DBExample(
-                array(
-                'plugin' => $plugin,
-                'key' => $key
-                )
-            )
-        );
+
+        OptionModel::deleteByExample(new DBExample(array(
+            'plugin' => $plugin,
+            'key' => $key
+        )));
     }
 
     /**
@@ -110,7 +106,7 @@ class Option{
      *
      * @return array The array containing all options
      */
-    public static function getAll(){
+    public static function getAll() {
         return self::$options;
     }
 }

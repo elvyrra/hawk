@@ -48,13 +48,20 @@ class Button extends \Hawk\ViewPlugin{
      * @return string The html result describing the button
      */
     public function display(){
-        return \Hawk\View::make(
-            \Hawk\Theme::getSelected()->getView('button.tpl'), array(
+        if(!empty($this->params['href'])) {
+            $this->params['data-href'] = $this->params['href'];
+            unset($this->params['href']);
+        }
+        if(!empty($this->params['target'])) {
+            $this->params['data-target'] = $this->params['target'];
+            unset($this->params['target']);
+        }
+
+        return \Hawk\View::make(\Hawk\Theme::getSelected()->getView('button.tpl'), array(
             'class' => $this->class,
             'icon' => $this->icon,
             'label' => $this->label,
             'param' => $this->params
-            )
-        );
+        ));
     }
 }

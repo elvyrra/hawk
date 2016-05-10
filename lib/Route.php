@@ -158,7 +158,7 @@ class Route{
             return $this->data;
         }
         else{
-            return $this->data[$prop];
+            return isset($this->data[$prop]) ? $this->data[$prop] : null;
         }
     }
 
@@ -208,8 +208,8 @@ class Route{
      * @return bool True if the route is accessible, False in other case
      */
     public function isAccessible(){
-        foreach($this->auth as $auth){
-            if(!$auth) {
+        foreach($this->auth as $auth) {
+            if(is_callable($auth) && !$auth($this) || !$auth) {
                 return false;
             }
         }

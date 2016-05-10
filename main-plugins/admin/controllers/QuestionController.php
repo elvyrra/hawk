@@ -22,7 +22,7 @@ class QuestionController extends Controller{
 
         // Get all Roles
         $roles = Role::getAll();
-        
+
         // Create parameters for form
         $param = array(
             'id' => 'display-questions-form',
@@ -63,7 +63,7 @@ class QuestionController extends Controller{
                 'default' => $question->displayInProfile,
                 'nl' => false
             ));
-        
+
             // Get roles associate to this ProfileQuestion in json parameters
             $attributesRoles = ProfileQuestion::getRoles($question->name);
 
@@ -98,8 +98,7 @@ class QuestionController extends Controller{
                 'actions' => array(
                     'independant' => true,
                     'display' => function ($value, $field, $line) {
-                        if($line->editable) {
-                            return
+                        return
                             Icon::make(array(
                                 'icon' => 'pencil',
                                 'class' => 'text-info',
@@ -114,10 +113,6 @@ class QuestionController extends Controller{
                                 'data-question' => $line->name,
                                 'title' => Lang::get($this->_plugin . 'delete-profile-question')
                             ));
-                        }
-                        else {
-                            return '';
-                        }
                     },
                     'sort' => false,
                     'search' => false,
@@ -198,7 +193,7 @@ class QuestionController extends Controller{
                     else if(preg_match("/^role\-(\w+)\-question\-(\w+)$/", $name, $match)) {
                         $qname = $match[2];
                         $roleName = $match[1];
-                        
+
                         // If tab doesn't exit create it to avoid exception
                         if(!isset($listRoles[$qname]))
                             $listRoles[$qname] = array();
@@ -210,11 +205,11 @@ class QuestionController extends Controller{
                             array_push($listRoles[$qname], intval($role->id));
                     }
                 }
-                
+
                 foreach($save as $question){
                     $question->update();
                 }
-                
+
                 // Save each ProfileQuestions
                 foreach($questions as $question){
                     $params = json_decode($question->parameters, true);
@@ -243,219 +238,215 @@ class QuestionController extends Controller{
         // Get roles associate to this ProfileQuestion in json parameters
         $attributesRoles = ProfileQuestion::getRoles($this->name);
 
-        if(!$q || $q->editable) {
 
-            $allowedTypes = ProfileQuestion::$allowedTypes;
-            $param = array(
-                'id' => 'profile-question-form',
-                'model' => 'ProfileQuestion',
-                'reference' => array('name' => $this->name),
-                'labelWidth' => '200px',
-                'fieldsets' => array(
-                    'general' => array(
-                        'legend' => Lang::get($this->_plugin . '.profile-question-form-general-legend'),
 
-                        new TextInput(array(
-                            'name' => 'name',
-                            'unique' => true,
-                            'maxlength' => 32,
-                            'label' =>  Lang::get($this->_plugin . '.profile-question-form-name-label') . ' ' .
-                                        Lang::get($this->_plugin . '.profile-question-form-name-description'),
-                            'required' => true,
-                        )),
+        $allowedTypes = ProfileQuestion::$allowedTypes;
+        $param = array(
+            'id' => 'profile-question-form',
+            'model' => 'ProfileQuestion',
+            'reference' => array('name' => $this->name),
+            'labelWidth' => '200px',
+            'fieldsets' => array(
+                'general' => array(
+                    'legend' => Lang::get($this->_plugin . '.profile-question-form-general-legend'),
 
-                        new CheckboxInput(array(
-                            'name' => 'editable',
-                            'default' => 1,
-                            'label' => Lang::get($this->_plugin . '.profile-question-form-editable-label'),
-                        )),
+                    new TextInput(array(
+                        'name' => 'name',
+                        'unique' => true,
+                        'maxlength' => 32,
+                        'label' =>  Lang::get($this->_plugin . '.profile-question-form-name-label') . ' ' .
+                                    Lang::get($this->_plugin . '.profile-question-form-name-description'),
+                        'required' => true,
+                    )),
 
-                        new SelectInput(array(
-                            'name' => 'type',
-                            'required' => true,
-                            'options' => array_combine($allowedTypes, array_map(function ($type) {
-                                return Lang::get($this->_plugin . '.profile-question-form-type-' . $type);
-                            }, $allowedTypes)),
-                            'label' => Lang::get($this->_plugin . '.profile-question-form-type-label'),
-                            'attributes' => array(
-                                'ko-value' => 'type',
-                            )
-                        )),
+                    new CheckboxInput(array(
+                        'name' => 'editable',
+                        'default' => 1,
+                        'label' => Lang::get($this->_plugin . '.profile-question-form-editable-label'),
+                    )),
 
-                        new CheckboxInput(array(
-                            'name' => 'displayInRegister',
-                            'label' => Lang::get($this->_plugin . '.profile-question-form-displayInRegister-label')
-                        )),
+                    new SelectInput(array(
+                        'name' => 'type',
+                        'required' => true,
+                        'options' => array_combine($allowedTypes, array_map(function ($type) {
+                            return Lang::get($this->_plugin . '.profile-question-form-type-' . $type);
+                        }, $allowedTypes)),
+                        'label' => Lang::get($this->_plugin . '.profile-question-form-type-label'),
+                        'attributes' => array(
+                            'ko-value' => 'type',
+                        )
+                    )),
 
-                        new CheckboxInput(array(
-                            'name' => 'displayInProfile',
-                            'label' => Lang::get($this->_plugin . '.profile-question-form-displayInProfile-label')
-                        ))
-                    ),
+                    new CheckboxInput(array(
+                        'name' => 'displayInRegister',
+                        'label' => Lang::get($this->_plugin . '.profile-question-form-displayInRegister-label')
+                    )),
 
-                    'parameters' => array(
-                        'legend' => Lang::get($this->_plugin . '.profile-question-form-parameters-legend'),
-
-                        new ObjectInput(array(
-                            'name' => 'parameters',
-                            'id' => 'question-form-parameters',
-                            'hidden' => true,
-                            'attributes' => array(
-                                'ko-value' => 'parameters'
-                            )
-                        )),
-
-                        new CheckboxInput(array(
-                            'name' => 'required',
-                            'independant' => true,
-                            'label' => Lang::get($this->_plugin . '.profile-question-form-required-label'),
-                            'attributes' => array(
-                                'ko-checked' => "required",
-                            )
-                        )),
-
-                        new DatetimeInput(array(
-                            'name' => 'minDate',
-                            'independant' => true,
-                            'label' => Lang::get($this->_plugin . '.profile-question-form-minDate-label'),
-                            'attributes' => array(
-                                'ko-value' => "minDate"
-                            ),
-                        )),
-
-                        new DatetimeInput(array(
-                            'name' => 'maxDate',
-                            'independant' => true,
-                            'label' => Lang::get($this->_plugin . '.profile-question-form-maxDate-label'),
-                            'attributes' => array(
-                                'ko-value' => "maxDate"
-                            ),
-                        )),
-
-                        new HtmlInput(array(
-                            'name' => 'parameters-description',
-                            'value' => '<p class="alert alert-info">' .
-                                            Icon::make(array(
-                                                'icon' => 'exclamation-circle'
-                                            )) .
-                                            Lang::get($this->_plugin . '.profile-question-form-translation-description') .
-                                        '</p>'
-                        )),
-
-                        new TextInput(array(
-                            'name' => 'label',
-                            'required' => true,
-                            'independant' => true,
-                            'label' => Lang::get($this->_plugin . '.profile-question-form-label-label'),
-                            'default' => $this->name != '_new' ? Lang::get($this->_plugin . '.profile-question-' . $this->name . '-label') : ''
-                        )),
-
-                        new TextareaInput(array(
-                            'name' => 'options',
-                            'independant' => true,
-                            'required' => App::request()->getBody('type') == 'select' || App::request()->getBody('type') == 'radio',
-                            'label' =>  Lang::get($this->_plugin . '.profile-question-form-options-label') . '<br />' .
-                                        Lang::get($this->_plugin . '.profile-question-form-options-description'),
-                            'labelClass' => 'required',
-                            'attributes' => array(
-                                'ko-value' => "options",
-                            ),
-                            'cols' => 20,
-                            'rows' => 10
-                        ))
-                    ),
-
-                    /*
-                    // Not use for now
-                    'roles' => array(
-                        'legend' => Lang::get($this->_plugin . '.profile-question-form-roles-legend'),
-                    ),
-                    */
-
-                    '_submits' => array(
-                        new SubmitInput(array(
-                            'name' => 'valid',
-                            'value' => Lang::get('main.valid-button')
-                        )),
-
-                        new DeleteInput(array(
-                            'name' => 'delete',
-                            'value' => Lang::get('main.delete-button'),
-                            'notDisplayed' => $this->name == '_new'
-                        )),
-
-                        new ButtonInput(array(
-                            'name' => 'cancel',
-                            'value' => Lang::get('main.cancel-button'),
-                            'onclick' => 'app.dialog("close")'
-                        ))
-                    )
-
+                    new CheckboxInput(array(
+                        'name' => 'displayInProfile',
+                        'label' => Lang::get($this->_plugin . '.profile-question-form-displayInProfile-label')
+                    ))
                 ),
-                'onsuccess' => 'app.dialog("close"); app.load(app.getUri("profile-questions"), {selector : "#admin-questions-tab"})',
-            );
 
-            /*
-            // For each roles create a Checkbox
-            foreach($roles as $role){
-                // Add the input to display in the user profile
-                $param['fieldsets']['roles'][] = new CheckboxInput(array(
-                    'name' => "role-$role->name-question-$this->name",
-                    'label' => $role->name, 
-                    'default' => in_array($role->id, $attributesRoles) ? 1 : 0,
-                    'attributes' => array(
-                        'ko-value' => 'roles'
-                    )
-                ));
-            }*/
+                'parameters' => array(
+                    'legend' => Lang::get($this->_plugin . '.profile-question-form-parameters-legend'),
 
-            $form = new Form($param);
+                    new ObjectInput(array(
+                        'name' => 'parameters',
+                        'id' => 'question-form-parameters',
+                        'hidden' => true,
+                        'attributes' => array(
+                            'ko-value' => 'parameters'
+                        )
+                    )),
 
-            if(!$form->submitted()) {
-                $content = View::make(Plugin::current()->getView("question-form.tpl"), array(
-                    'form' => $form
-                ));
+                    new CheckboxInput(array(
+                        'name' => 'required',
+                        'independant' => true,
+                        'label' => Lang::get($this->_plugin . '.profile-question-form-required-label'),
+                        'attributes' => array(
+                            'ko-checked' => "required",
+                        )
+                    )),
 
-                return View::make(Theme::getSelected()->getView("dialogbox.tpl"), array(
-                    'title' => Lang::get($this->_plugin . ".users-questions-title"),
-                    'icon' => 'file-word-o',
-                    'page' => $content
-                ));
+                    new DatetimeInput(array(
+                        'name' => 'minDate',
+                        'independant' => true,
+                        'label' => Lang::get($this->_plugin . '.profile-question-form-minDate-label'),
+                        'attributes' => array(
+                            'ko-value' => "minDate"
+                        ),
+                    )),
+
+                    new DatetimeInput(array(
+                        'name' => 'maxDate',
+                        'independant' => true,
+                        'label' => Lang::get($this->_plugin . '.profile-question-form-maxDate-label'),
+                        'attributes' => array(
+                            'ko-value' => "maxDate"
+                        ),
+                    )),
+
+                    new HtmlInput(array(
+                        'name' => 'parameters-description',
+                        'value' => '<p class="alert alert-info">' .
+                                        Icon::make(array(
+                                            'icon' => 'exclamation-circle'
+                                        )) .
+                                        Lang::get($this->_plugin . '.profile-question-form-translation-description') .
+                                    '</p>'
+                    )),
+
+                    new TextInput(array(
+                        'name' => 'label',
+                        'required' => true,
+                        'independant' => true,
+                        'label' => Lang::get($this->_plugin . '.profile-question-form-label-label'),
+                        'default' => $this->name != '_new' ? Lang::get($this->_plugin . '.profile-question-' . $this->name . '-label') : ''
+                    )),
+
+                    new TextareaInput(array(
+                        'name' => 'options',
+                        'independant' => true,
+                        'required' => App::request()->getBody('type') == 'select' || App::request()->getBody('type') == 'radio',
+                        'label' =>  Lang::get($this->_plugin . '.profile-question-form-options-label') . '<br />' .
+                                    Lang::get($this->_plugin . '.profile-question-form-options-description'),
+                        'labelClass' => 'required',
+                        'attributes' => array(
+                            'ko-value' => "options",
+                        ),
+                        'cols' => 20,
+                        'rows' => 10
+                    ))
+                ),
+
+                /*
+                // Not use for now
+                'roles' => array(
+                    'legend' => Lang::get($this->_plugin . '.profile-question-form-roles-legend'),
+                ),
+                */
+
+                '_submits' => array(
+                    new SubmitInput(array(
+                        'name' => 'valid',
+                        'value' => Lang::get('main.valid-button')
+                    )),
+
+                    new DeleteInput(array(
+                        'name' => 'delete',
+                        'value' => Lang::get('main.delete-button'),
+                        'notDisplayed' => $this->name == '_new'
+                    )),
+
+                    new ButtonInput(array(
+                        'name' => 'cancel',
+                        'value' => Lang::get('main.cancel-button'),
+                        'onclick' => 'app.dialog("close")'
+                    ))
+                )
+
+            ),
+            'onsuccess' => 'app.load(app.getUri("profile-questions"), {selector : "#admin-questions-tab"})',
+        );
+
+        /*
+        // For each roles create a Checkbox
+        foreach($roles as $role){
+            // Add the input to display in the user profile
+            $param['fieldsets']['roles'][] = new CheckboxInput(array(
+                'name' => "role-$role->name-question-$this->name",
+                'label' => $role->name,
+                'default' => in_array($role->id, $attributesRoles) ? 1 : 0,
+                'attributes' => array(
+                    'ko-value' => 'roles'
+                )
+            ));
+        }*/
+
+        $form = new Form($param);
+
+        if(!$form->submitted()) {
+            $content = View::make(Plugin::current()->getView("question-form.tpl"), array(
+                'form' => $form
+            ));
+
+            return View::make(Theme::getSelected()->getView("dialogbox.tpl"), array(
+                'title' => Lang::get($this->_plugin . ".users-questions-title"),
+                'icon' => 'file-word-o',
+                'page' => $content
+            ));
+        }
+        else{
+            if($form->submitted() == "delete") {
+                $this->delete();
+
+                return $form->response(Form::STATUS_SUCCESS);
             }
             else{
-                if($form->submitted() == "delete") {
-                    $this->compute('delete');
+                if($form->check()) {
+                    $form->register(Form::NO_EXIT);
+
+                    Language::current()->saveTranslations(array(
+                        'admin' => array(
+                            'profile-question-' . $form->getData("name") . '-label' => App::request()->getBody('label')
+                        )
+                    ));
+
+                    // Create the lang options
+                    if($form->inputs['options']->required) {
+                        $keys = array('admin'=> array());
+                        foreach(explode(PHP_EOL, $form->getData("options")) as $i => $option){
+                            if(!empty($option)) {
+                                $keys['admin']['profile-question-' . $form->getData("name") . '-option-' . $i] = trim($option);
+                            }
+                        }
+                        Language::current()->saveTranslations($keys);
+                    }
 
                     return $form->response(Form::STATUS_SUCCESS);
                 }
-                else{
-                    if($form->check()) {
-                        $form->register(Form::NO_EXIT);
-
-                        Language::current()->saveTranslations(array(
-                            'admin' => array(
-                                'profile-question-' . $form->getData("name") . '-label' => App::request()->getBody('label')
-                            )
-                        ));
-
-                        // Create the lang options
-                        if($form->inputs['options']->required) {
-                            $keys = array('admin'=> array());
-                            foreach(explode(PHP_EOL, $form->getData("options")) as $i => $option){
-                                if(!empty($option)) {
-                                    $keys['admin']['profile-question-' . $form->getData("name") . '-option-' . $i] = trim($option);
-                                }
-                            }
-                            Language::current()->saveTranslations($keys);
-                        }
-
-                        return $form->response(Form::STATUS_SUCCESS);
-                    }
-                }
             }
-        }
-        else{
-            return '';
         }
     }
 

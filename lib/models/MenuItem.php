@@ -29,6 +29,45 @@ class MenuItem extends Model{
     protected static $primaryColumn = 'id';
 
     /**
+     * The model fields
+     *
+     * @var array
+     */
+    protected static $fields = array(
+        'id' => array(
+            'type' => 'INT(11)',
+            'auto_increment' => true
+        ),
+        'plugin' => array(
+            'type' => 'VARCHAR(32)',
+            'default' => ''
+        ),
+        'name' => array(
+            'type' => 'VARCHAR(64)'
+        ),
+        'parentId' => array(
+            'type' => 'INT(11)',
+            'default' => 0
+        ),
+        'labelKey' => array(
+            'type' => 'VARCHAR(128)'
+        ),
+        'action' => array(
+            'type' => 'VARCHAR(128)'
+        ),
+        'actionParameters' => array(
+            'type' => 'VARCHAR(1024)'
+        ),
+        'target' => array(
+            'type' => 'VARCHAR(64)'
+        ),
+        'order' => array(
+            'type' => 'INT(2)'
+        ),
+        'active' => 'TINYINT(1)'
+    );
+
+    /**
      * The id of the user menu
      */
     const USER_ITEM_ID = 1;
@@ -113,9 +152,8 @@ class MenuItem extends Model{
                 $route = App::router()->getRouteByName($item->action);
                 if($route) {
                     return $route->isAccessible();
-                }
-                else{
-                    return !$item->permissionId || $user->isAllowed($item->permissionId);
+                } else {
+                    return true;
                 }
             }
         );

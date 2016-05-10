@@ -9,8 +9,6 @@ namespace {{ $namespace }};
  * This class describes the behavio of the installer for the plugin {{ $name }}
  */
 class Installer extends PluginInstaller{
-    const PLUGIN_NAME = '{{ $name }}';
-
     /**
      * Install the plugin. This method is called on plugin installation, after the plugin has been inserted in the database
      */

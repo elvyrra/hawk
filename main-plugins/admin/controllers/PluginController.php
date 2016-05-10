@@ -23,7 +23,7 @@ class PluginController extends Controller{
      */
     public function index($content = '', $title = ''){
         if(!$content) {
-            $content = $this->compute('availablePlugins');
+            $content = $this->availablePlugins();
         }
         if(!$title) {
             $title = Lang::get($this->_plugin . '.available-plugins-title');
@@ -71,7 +71,7 @@ class PluginController extends Controller{
             $updates = array();
         }
 
-        $param = array(
+        $list = new ItemList(array(
             'id' => 'available-plugins-list',
             'reference' => 'name',
             'action' => App::router()->getUri('plugins-list'),
@@ -113,7 +113,7 @@ class PluginController extends Controller{
 
                             $status = Lang::get($this->_plugin . '.plugin-uninstalled-status');
                         }
-                        else{
+                        else {
                             if(! $plugin->isActive()) {
                                 // The plugin is installed but not activated
                                 $buttons = array(
@@ -200,11 +200,9 @@ class PluginController extends Controller{
                     }
                 )
             )
-        );
+        ));
 
-        $list = new ItemList($param);
-
-        return $list;
+        return $list->display();
     }
 
 
@@ -230,7 +228,7 @@ class PluginController extends Controller{
             ));
 
             if(DEBUG_MODE) {
-                $response['messahe'] .= preg_replace('/\s/', ' ', $e->getMessage());
+                $response['message'] .= preg_replace('/\s/', ' ', $e->getMessage());
             }
             App::response()->setStatus(500);
         }
@@ -334,8 +332,7 @@ class PluginController extends Controller{
             return $list->display();
         }
         else{
-            return $this->compute(
-                'index',
+            return $this->index(
                 $list->display(),
                 Lang::get($this->_plugin . '.search-plugins-result-title', array(
                     'search' => htmlentities($search)
@@ -482,7 +479,7 @@ class PluginController extends Controller{
                         throw new \Exception('Impossible to create the directory ' . $dir);
                     }
 
-                    foreach(array('controllers', 'models', 'classes', 'lang', 'views', 'static', 'widgets') as $subdir){
+                    foreach(array('controllers', 'models', 'lib', 'lang', 'views', 'static', 'widgets') as $subdir){
                         if(!mkdir($dir . $subdir)) {
                             throw new \Exception('Impossible to create the directory ' . $dir . $subdir);
                         }
@@ -531,7 +528,7 @@ class PluginController extends Controller{
                         ),
                         file_get_contents(Plugin::current()->getRootDir() . 'templates/installer.tpl')
                     );
-                    if(file_put_contents($dir . 'classes/Installer.php', $installer) === false) {
+                    if(file_put_contents($dir . 'Installer.php', $installer) === false) {
                         throw new \Exception('Impossible to create the file classes/Installer.php');
                     }
 

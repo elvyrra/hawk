@@ -46,7 +46,7 @@ class LanguageController extends Controller{
             'icon' => 'flag',
             'title' => Lang::get('language.lang-page-name'),
             'page' => array(
-                'content' => $this->compute('editKeys')
+                'content' => $this->editKeys()
             ),
             'sidebar' => array(
                 'widgets' => array(new LanguageFilterWidget($filters), new NewLanguageKeyWidget())
@@ -73,7 +73,7 @@ class LanguageController extends Controller{
 
         if(!$form->submitted()) {
             // Display the form
-            return $form->wrap($this->compute('listKeys'));
+            return $form->wrap($this->listKeys());
         }
         else{
             // Register the translations

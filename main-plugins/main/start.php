@@ -19,7 +19,10 @@ App::router()->auth(App::session()->isLogged(), function () {
         'default' => array(
             'userId' => App::session()->getUser()->id
         ),
-        'action' => 'UserProfileController.edit'
+        'action' => 'UserProfileController.edit',
+        'auth' => function($route) {
+            return !$route->getData('userId') || $route->getData('userId') === App::session()->getUser()->id;
+        }
     ));
 
     App::router()->any('change-password', '/profile/change-password', array(

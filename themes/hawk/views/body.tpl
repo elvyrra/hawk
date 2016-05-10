@@ -24,7 +24,7 @@
 				</li>
 				<!-- /ko -->
 
-				<li class="add-tab-button corner-top-left corner-bottom-right" href="{uri action='new-tab'}" target="newtab">
+				<li class="add-tab-button corner-top-left corner-bottom-right" data-href="{uri action='new-tab'}" data-target="newtab">
 					<span class="" id="main-tab-add">
 						{icon icon="plus" class="open-new-tab" title="{text key='main.open-new-tab'}"}
 					</span>

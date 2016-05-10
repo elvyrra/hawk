@@ -18,18 +18,14 @@ class UserProfileController extends Controller{
      * Create or edit an user
      */
     public function edit(){
-        if(!$this->userId) {
-            $user = Session::getUser();
-        }
-        else{
-            $user = User::getById($this->userId);
-        }
+        $user = App::session()->getUser();
+
         $roles = array_map(function ($role) {
             return $role->getLabel();
         }, Role::getAll('id'));
 
         $param = array(
-            'id' => 'user-form',
+            'id' => 'user-profile-form',
             'upload' => true,
             'object' => $user,
             'fieldsets' => array(
@@ -251,7 +247,7 @@ class UserProfileController extends Controller{
             });'
         );
 
-        return MainController::getInstance()->compute('main');
+        return MainController::getInstance()->main();
     }
 
     /**

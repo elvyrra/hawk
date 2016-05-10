@@ -54,7 +54,7 @@ class MainController extends Controller{
      *
      * @param string $content A content to set to override the default index content
      */
-    public function main($content = ""){
+    public function main($content = '', $title = '', $description = '', $keywords = ''){
         $canAccessApplication = App::session()->getUser()->canAccessApplication();
 
         $body = View::make(Theme::getSelected()->getView('body.tpl'), array(
@@ -62,9 +62,35 @@ class MainController extends Controller{
             'content' => $content
         ));
 
-        $title = App::conf()->has('db') ? Option::get($this->_plugin . '.page-title-' . LANGUAGE) : DEFAULT_HTML_TITLE;
-        $description = App::conf()->has('db') ? Option::get($this->_plugin . '.page-description-' . LANGUAGE) : '';
-        $keywords = App::conf()->has('db') ? Option::get($this->_plugin . '.page-keywords-' . LANGUAGE) : '';
+        if(!$title) {
+            $title = App::conf()->has('db') ? Option::get($this->_plugin . '.page-title-' . LANGUAGE) : DEFAULT_HTML_TITLE;
+        }
+
+        if(!$description) {
+            $description = App::conf()->has('db') ? Option::get($this->_plugin . '.page-description-' . LANGUAGE) : '';
+        }
+
+        if(!$keywords) {
+            $keywords = App::conf()->has('db') ? Option::get($this->_plugin . '.page-keywords-' . LANGUAGE) : '';
+        }
+
+        /**
+         * Treat notifications
+         */
+        if(App::session()->getData('notification')) {
+            $status = App::session()->getData('notification.status');
+            if(!$status) {
+                $status = 'success';
+            }
+
+            $this->addJavaScriptInline('
+                require(["app"], function(){
+                    app.notify("' . $status . '", "' . addcslashes(App::session()->getData('notification.message'), '"') . '");
+                });'
+            );
+
+            App::session()->removeData('notification');
+        }
 
         return $this->index($body, $title, $description, $keywords);
     }
@@ -143,7 +169,7 @@ class MainController extends Controller{
     public function terms(){
         $content = Option::get($this->_plugin . '.terms');
 
-        return $this->compute('main', $content);
+        return $this->main($content);
     }
 
 

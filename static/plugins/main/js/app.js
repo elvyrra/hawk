@@ -149,18 +149,19 @@ define(
             /**
              * Call URIs by AJAX on click on links
              */
-            var linkSelector = '[href]:not(.real-link):not([href^="#"]):not([href^="javascript:"])';
+            var linkSelector =  '[href]:not([href^="#"]):not([href^="javascript:"]),' +
+                                '[data-href]:not([data-href^="#"]):not([data-href^="javascript:"])';
 
             $('body').on(
                 'click',
                 linkSelector,
                 function(event) {
                     var node = $(event.currentTarget);
-                    var url  = $(node).attr('href');
+                    var url  = $(node).attr('href') || $(node).data('href');
 
                     event.preventDefault();
                     var data = {},
-                        target = $(node).attr('target');
+                        target = $(node).attr('target') || $(node).data('target');
 
                     if ((event.which === 2 || !this.tabset.tabs().length) && !target) {
                         target = 'newtab';

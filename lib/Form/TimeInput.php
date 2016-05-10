@@ -16,13 +16,44 @@ namespace Hawk;
 class TimeInput extends FormInput{
     const TYPE = "time";
 
+    const FORMAT = 'H:i';
+
+    public $mask = '99:99',
+
+    $pattern = '/^\d{2}\:\d{2}$/';
+
     /**
-     * Constructor
+     * Display the input
      *
-     * @param array $param The input parameters
+     * @return string The HTML result of displaying
      */
-    public function __construct($param){
-        parent::__construct($param);
-        $this->pattern = "/^\d{2}\:\d{2}$/";
+    public function display(){
+
+        if(is_numeric($this->value)) {
+            $this->timestamp = $this->value;
+        }
+        else{
+            $this->timestamp = strtotime($this->value);
+        }
+
+        $this->value = $this->timestamp ? date(self::FORMAT, $this->timestamp) : '';
+
+        return parent::display();
+    }
+
+    /**
+     * Return the input value in the database format
+     *
+     * @return string The formatted value
+     */
+    public function dbvalue(){
+        if($this->dataType == 'int') {
+            list($hours, $minutes) = explode(':', $this->value);
+
+            return $hours * 3600 + $minutes * 60;
+        }
+        else{
+            return $this->value;
+        }
     }
 }

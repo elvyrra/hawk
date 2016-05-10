@@ -211,16 +211,14 @@ class LoginController extends Controller{
 
         $questions = ProfileQuestion::getRegisterQuestions();
         foreach($questions as $question){
-            $classname = 'Hawk\\' . ucwords($question->type) . 'Input';
             $field = json_decode($question->parameters, true);
-            $field['name'] = $question->name;
-            $field['independant'] = true;
-            $field['label'] = Lang::get('admin.profile-question-' . $question->name . '-label');
+            if(!empty($field->roles) && in_array(Option::get('roles.default-role'), $field->roles)) {
+                $classname = 'Hawk\\' . ucwords($question->type) . 'Input';
+                $field['name'] = $question->name;
+                $field['independant'] = true;
+                $field['label'] = Lang::get('admin.profile-question-' . $question->name . '-label');
 
-            $param['fieldsets']['profile'][] = new $classname($field);
-
-            if($question->type === 'file') {
-                $param['upload'] = true;
+                $param['fieldsets']['profile'][] = new $classname($field);
             }
         }
 
@@ -350,14 +348,12 @@ class LoginController extends Controller{
             }
         }
 
-        $this->addJavaScriptInline('
-            require(["app"], function(){
-                app.notify("' . $status . '", "' . addcslashes(Lang::get($messageKey), '"') . '");
-            });'
-        );
+        App::session()->setData('notification', array(
+            'status' => $status,
+            'message' => Lang::get($messageKey)
+        ));
 
-        return MainController::getInstance()->compute('main');
-
+        App::response()->redirectToAction('index');
     }
 
     /**
