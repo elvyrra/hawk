@@ -23,27 +23,27 @@ class ThemeController extends Controller{
             'select' => array(
                 'id' => 'admin-themes-select-tab',
                 'title' => Lang::get($this->_plugin . '.theme-tab-select-title'),
-                'content' => $this->compute('listThemes'),
+                'content' => $this->listThemes()
             ),
             'customize' => array(
                 'id' => 'admin-themes-customize-tab',
                 'title' => Lang::get($this->_plugin . '.theme-tab-basic-custom-title'),
-                'content' => $this->compute('customize'),
+                'content' => $this->customize(),
             ),
             'css' => array(
                 'id' => 'admin-themes-css-tab',
                 'title' => Lang::get($this->_plugin . '.theme-tab-advanced-custom-title'),
-                'content' => $this->compute('css'),
+                'content' => $this->css(),
             ),
             'medias' => array(
                 'id' => 'admin-themes-medias-tab',
                 'title' => Lang::get($this->_plugin . '.theme-tab-medias-title'),
-                'content' => $this->compute('medias'),
+                'content' => $this->medias(),
             ),
             'menu' => array(
                 'id' => 'admin-themes-menu-tab',
                 'title' => Lang::get($this->_plugin . '.theme-tab-menu-title'),
-                'content' => MenuController::getInstance()->compute('index')
+                'content' => MenuController::getInstance()->index()
             )
         );
 
@@ -640,7 +640,7 @@ class ThemeController extends Controller{
         $theme = Theme::get($this->theme);
         if($theme) {
             App::fs()->remove($theme->getRootDir());
-            return $this->compute('download');
+            return $this->download();
         }
     }
 }

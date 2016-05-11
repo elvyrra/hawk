@@ -69,7 +69,33 @@ class ButtonInput extends FormInput{
         }
         $param['type'] = static::TYPE;
 
-        $param = array_intersect_key($param, array_flip(array('id', 'class', 'icon', 'label', 'type', 'name', 'onclick', 'style', 'href', 'target', 'title')));
+        if(!empty($param['href'])) {
+            $param['data-href'] = $param['href'];
+            unset($param['href']);
+        }
+
+        if(!empty($param['target'])) {
+            $param['data-target'] = $param['target'];
+            unset($param['target']);
+        }
+
+
+        $param = array_intersect_key(
+            $param,
+            array_flip(array(
+                'id',
+                'class',
+                'icon',
+                'label',
+                'type',
+                'name',
+                'onclick',
+                'style',
+                'data-href',
+                'data-target',
+                'title'
+            ))
+        );
         $param = array_merge($param, $this->attributes);
 
         /*** Set the attribute and text to the span inside the button ***/

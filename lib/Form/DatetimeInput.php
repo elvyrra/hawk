@@ -62,14 +62,15 @@ class DatetimeInput extends TextInput{
             $this->timestamp = strtotime($this->value);
         }
 
-        $this->value = date($this->format, $this->timestamp);
-        $this->class .= " datetime";
+        $this->value = $this->timestamp ? date($this->format, $this->timestamp) : '';
+        $this->class .= ' datetime';
 
         /*** Format the value ***/
         $picker = array(
-        'format' => Lang::get('main.date-mask'),
-        'orientation' => 'right'
+            'format' => Lang::get('main.date-mask'),
+            'orientation' => 'right'
         );
+
         if($this->max) {
             $picker['endDate'] = $this->max;
         }
@@ -97,6 +98,7 @@ class DatetimeInput extends TextInput{
         if($this->value!="") {
             // Check the format of the given date
             $tmp = date_parse_from_format($this->format, $this->value);
+
             if(empty($tmp)) {
                 $form->error($this->errorAt, Lang::get('form.date-format'));
                 return false;
@@ -119,6 +121,7 @@ class DatetimeInput extends TextInput{
      */
     public function dbvalue(){
         $date = \DateTime::createFromFormat($this->format, $this->value);
+
         if($this->dataType == 'int') {
             return $date->getTimestamp();
         }

@@ -347,7 +347,8 @@ final class Router extends Singleton{
                     list($classname, $method) = explode(".", $route->action);
 
                     // call a controller method
-                    $this->currentController = new $classname($route->getData());
+                    // $this->currentController = new $classname($route->getData());
+                    $this->currentController = $classname::getInstance($route->getData());
                     App::logger()->debug(sprintf(
                         'URI %s has been routed => %s::%s',
                         App::request()->getUri(),
@@ -356,7 +357,7 @@ final class Router extends Singleton{
                     ));
 
                     // Set the controller result to the HTTP response
-                    App::response()->setBody($this->currentController->compute($method));
+                    App::response()->setBody($this->currentController->$method());
                 }
                 else{
 

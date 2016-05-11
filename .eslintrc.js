@@ -178,7 +178,6 @@ module.exports = {
         'sort-vars'                   : 0,
         'space-before-blocks'         : 2,
         'space-before-function-paren' : [2, 'never'], // voir ce que fait google
-        'keyword-spacing'             : [2, {"before": true, "after": true, "overrides": {else : {before : false}}}],
         'space-in-parens'             : [2, 'never'],
         'space-infix-ops'             : 2,
         'space-unary-ops'             : [1, {'words' : true, 'nonwords' : false}],

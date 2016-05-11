@@ -34,7 +34,7 @@ class DB{
     /**
      * The hosname of the connection
      */
-    private $host,
+    public $host,
 
     /**
      * The user connected to the database
@@ -436,17 +436,27 @@ class DB{
         $values = array();
         $binds = array();
 
-        foreach($insert as $key => $value){
-            $uniq = uniqid();
-            $values[] = ':'.$uniq;
+        foreach($insert as $key => $value) {
             $keys[] = self::formatField($key);
-            $binds[$uniq] = $value;
+
+            if(substr($value, 0, 1) !== '\\') {
+                $uniq = uniqid();
+                $values[] = ':'.$uniq;
+                $binds[$uniq] = $value;
+            }
+            else {
+                $values[] = substr($value, 1);
+            }
         }
 
         $keys = implode(',', $keys);
         $values = implode(',', $values);
 
-        $sql="INSERT $flag INTO ".$table." (".$keys.") VALUES (".$values.") " . ($onduplicatekey ? "ON DUPLICATE KEY UPDATE $onduplicatekey" : "");
+        $sql= 'INSERT ' . $flag . ' INTO ' . $table . ' (' . $keys . ') VALUES (' . $values . ')';
+
+        if($onduplicatekey) {
+            $sql .= ' ON DUPLICATE KEY UPDATE ' . $onduplicatekey;
+        }
 
         return $this->query($sql, $binds, array('return' => self::RETURN_LAST_INSERT_ID));
     }
@@ -465,16 +475,24 @@ class DB{
         $binds = array();
 
         foreach($insert as $key => $value){
-            $uniq = uniqid();
-            $values[] = ':' . $uniq;
             $keys[] = self::formatField($key);
-            $binds[$uniq] = $value;
+
+
+            if(substr($value, 0, 1) !== '\\') {
+                $uniq = uniqid();
+                $values[] = ':'.$uniq;
+                $binds[$uniq] = $value;
+            }
+            else {
+                $values[] = substr($value, 1);
+            }
         }
 
         $keys = implode(',', $keys);
         $values = implode(' , ', $values);
 
-        $sql="REPLACE INTO ".$table." (".$keys.") VALUES (".$values.")";
+        $sql = 'REPLACE INTO ' . $table . ' (' . $keys . ') VALUES (' . $values  .')';
+
         return $this->query($sql, $binds, array('return' => self::RETURN_LAST_INSERT_ID));
     }
 
@@ -498,12 +516,17 @@ class DB{
 
         $updates = array();
         foreach($update as $key => $value) {
-            $bind = uniqid();
-            $updates[] = self::formatField($key) . " = :$bind";
-            $binds[$bind] = $value;
+            if(substr($value, 0, 1) !== '\\') {
+                $bind = uniqid();
+                $updates[] = self::formatField($key) . ' = :' . $bind;
+                $binds[$bind] = $value;
+            }
+            else {
+                $updates[] = self::formatField($key) . ' = ' . substr($value, 1);
+            }
         }
 
-        $sql = "UPDATE $table SET ". implode(',', $updates) . $where;
+        $sql = 'UPDATE ' . $table . ' SET '. implode(',', $updates) . $where;
 
         return $this->query($sql, $binds, array('return' => self::RETURN_AFFECTED_ROWS));
     }
@@ -525,7 +548,7 @@ class DB{
             $where = 'WHERE ' . $where;
         }
 
-        $sql = "DELETE FROM $table $where";
+        $sql = 'DELETE FROM ' . $table . ' ' . $where;
 
         return $this->query($sql, $binds, array('return' => self::RETURN_AFFECTED_ROWS));
     }

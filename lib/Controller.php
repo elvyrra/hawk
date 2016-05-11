@@ -52,17 +52,18 @@ class Controller{
     /**
      * Constructor
      *
-     * @param array $param The parameters of the controller. T
-     *                     his parameter is set by the router with the parameters defined in the routes as '{paramName}'
+     * @param array $param The parameters of the controller.
+     *                     This parameter is set by the router with the parameters defined in the routes as '{paramName}'
      */
-    public function __construct($param = array()){
+    protected function __construct($param = array()){
         $this->map($param);
 
         $this->_plugin = $this->getPlugin()->getName();
 
         self::$currentInstance = $this;
-    }
 
+        $this->clone = clone $this;
+    }
 
     /**
      * Get a controller instance
@@ -71,8 +72,8 @@ class Controller{
      *
      * @return Controller The controller instance
      */
-    public static function getInstance($param = array()){
-        return new static($param);
+    public final static function getInstance($param = array()){
+        return new ControllerProcessor(new static($param));
     }
 
 
@@ -81,49 +82,8 @@ class Controller{
      *
      * @return Controller The current controller
      */
-    public static function current(){
+    public final static function current(){
         return self::$currentInstance;
-    }
-
-
-    /**
-     * Execute a controller method. This method is called by the router.
-     * It execute the controller method, and triggers events before and after the method has been executed,
-     * to add widgets or other functionnalities from another plugin than the controller's one.
-     *
-     * @param string $method The method to execute
-     *
-     * @return mixed The result of the controller method execution
-     */
-    public function compute($method){
-        /*** Load widgets before calling the controller method ***/
-        $class = $this->getClassname();
-
-        $eventBasename = $this->_plugin . '.' . $class . '.' . $method . '.';
-
-        $event = new Event($eventBasename . self::BEFORE_ACTION, array('controller' => $this));
-        $event->trigger();
-
-
-        /*** Call the controller method ***/
-        $args = array_splice(func_get_args(), 1);
-        $result = call_user_func_array(array($this, $method), $args);
-        if(App::response()->getContentType() == 'html') {
-            // Create a phpQuery object to be modified by event listeners (widgets)
-            $result = \phpQuery::newDocument($result);
-        }
-
-        /*** Load the widgets after calling the controller method ***/
-        $event = new Event($eventBasename . self::AFTER_ACTION, array('controller' => $this, 'result' => $result));
-        $event->trigger();
-
-        $result = $event->getData('result');
-        if($result instanceof \phpQuery) {
-            return $result->htmlOuter();
-        }
-        else{
-            return $result;
-        }
     }
 
 
@@ -132,7 +92,7 @@ class Controller{
      *
      * @param string $content The content to add
      */
-    private function addContentAtEnd($content){
+    private final function addContentAtEnd($content){
         $action = App::router()->getCurrentAction();
         list($tmp, $method) = explode('.', $action);
 
@@ -156,7 +116,7 @@ class Controller{
      *
      * @param string $content The content to add
      */
-    private function addContentAtStart($content){
+    private final function addContentAtStart($content){
         $action = App::router()->getCurrentAction();
         list($tmp, $method) = explode('.', $action);
 
@@ -180,7 +140,7 @@ class Controller{
      *
      * @param string $url The URL of the css file to load
      */
-    public function addCss($url){
+    public final function addCss($url){
         $this->addContentAtStart('<link rel="stylesheet" property="stylesheet" type="text/css" href="' . $url . '" />');
     }
 
@@ -189,7 +149,7 @@ class Controller{
      *
      * @param string $style The CSS code to insert
      */
-    public function addCssInline($style){
+    public final function addCssInline($style){
         $this->addContentAtStart('<style type="text/css">' . $style . '</style>');
     }
 
@@ -198,7 +158,7 @@ class Controller{
      *
      * @param string $url The URL of the JavaScript file to load
      */
-    public function addJavaScript($url){
+    public final function addJavaScript($url){
         $this->addContentAtEnd('<script type="text/javascript" src="' . $url . '"></script>');
     }
 
@@ -208,7 +168,7 @@ class Controller{
      *
      * @param string $script The JavaScript code to insert
      */
-    public function addJavaScriptInline($script){
+    public final function addJavaScriptInline($script){
         $this->addContentAtEnd('<script type="text/javascript">' . $script . '</script>');
     }
 
@@ -220,7 +180,7 @@ class Controller{
      *
      * @param string ...$keys The keys to add
      */
-    public function addKeysToJavascript(...$keys){
+    public final function addKeysToJavascript(...$keys){
         $instructions = array();
         foreach($keys as $key){
             list($plugin, $langKey) = explode(".", $key);
@@ -238,7 +198,7 @@ class Controller{
      *
      * @return string the controller namespace
      */
-    public function getNamespace(){
+    public final function getNamespace(){
         $reflection = new \ReflectionClass(get_called_class());
 
         return $reflection->getNamespaceName();
@@ -250,7 +210,7 @@ class Controller{
      *
      * @return string the controller class
      */
-    public function getClassname(){
+    public final function getClassname(){
         $reflection = new \ReflectionClass(get_called_class());
         return $reflection->getShortName();
     }
@@ -260,7 +220,7 @@ class Controller{
      *
      * @return Plugin The plugin contaning the controller
      */
-    public function getPlugin(){
+    public final function getPlugin(){
         if(isset($this->_pluginInstance)) {
             return $this->_pluginInstance;
         }
@@ -273,5 +233,55 @@ class Controller{
         }
 
         return null;
+    }
+}
+
+/**
+ * This class is used to apply preprocessor and postprocessor to controller methods
+ */
+class ControllerProcessor extends Controller{
+
+    /**
+     * Create a new instance of ControllerProcessor
+     * @param Controller $object The controller instance that is wrapped in the processor
+     */
+    public function __construct($object) {
+        $this->controller = $object;
+    }
+
+    /**
+     * Call a method of the controller
+     * @param  string $method    The method to call
+     * @param  array  $arguments The arguments of the method call
+     * @return mixed             The result of the method call
+     */
+    public function __call($method, $arguments) {
+        /*** Load widgets before calling the controller method ***/
+        $class = $this->controller->getClassname();
+
+        $eventBasename = $this->controller->_plugin . '.' . $class . '.' . $method . '.';
+
+        $event = new Event($eventBasename . Controller::BEFORE_ACTION, array('controller' => $this->controller));
+        $event->trigger();
+
+        /*** Call the controller method ***/
+        $result = call_user_func_array(array($this->controller, $method), $arguments);
+        if(App::response()->getContentType() == 'html' && is_string($result) ) {
+            // Create a phpQuery object to be modified by event listeners (widgets)
+            $result = \phpQuery::newDocument($result);
+        }
+
+        /*** Load the widgets after calling the controller method ***/
+        $event = new Event($eventBasename . Controller::AFTER_ACTION, array('controller' => $this->controller, 'result' => $result));
+        $event->trigger();
+
+        // Return the result of the action
+        $result = $event->getData('result');
+        if($result instanceof \phpQuery || $result instanceof \phpQueryObject) {
+            return $result->htmlOuter();
+        }
+        else{
+            return $result;
+        }
     }
 }

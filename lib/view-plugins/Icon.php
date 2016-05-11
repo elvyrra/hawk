@@ -19,7 +19,16 @@ class Icon extends \Hawk\ViewPlugin{
      *
      * @return string The html result describing the button
      */
-    public function display(){
+    public function display() {
+        if(!empty($this->params['href'])) {
+            $this->params['data-href'] = $this->params['href'];
+            unset($this->params['href']);
+        }
+        if(!empty($this->params['target'])) {
+            $this->params['data-target'] = $this->params['target'];
+            unset($this->params['target']);
+        }
+
         return \Hawk\Icon::make($this->params);
     }
 }

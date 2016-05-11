@@ -1,4 +1,5 @@
 {widget class="Hawk\Plugins\Main\MainMenuWidget"}
+<script type="text/javascript" src="{{ Theme::getSelected()->getFileUrl('js/theme-hawk.js') }}"></script>
 
 {if(empty($content))}
 	<div id="main-content" role="tabpanel" ko-with="tabset">
@@ -23,7 +24,7 @@
 				</li>
 				<!-- /ko -->
 
-				<li class="add-tab-button corner-top-left corner-bottom-right" href="{uri action='new-tab'}" target="newtab">
+				<li class="add-tab-button corner-top-left corner-bottom-right" data-href="{uri action='new-tab'}" data-target="newtab">
 					<span class="" id="main-tab-add">
 						{icon icon="plus" class="open-new-tab" title="{text key='main.open-new-tab'}"}
 					</span>

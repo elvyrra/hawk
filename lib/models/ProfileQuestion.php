@@ -29,6 +29,34 @@ class ProfileQuestion extends Model{
     protected static $primaryColumn = 'name';
 
     /**
+     * The model fields
+     */
+    protected static $fields = array(
+        'name' => array(
+            'type' => 'VARCHAR(32)'
+        ),
+        'type' => array(
+            'type' => 'VARCHAR(16)'
+        ),
+        'parameters' => array(
+            'type' => 'TEXT'
+        ),
+        'editable' => array(
+            'TINYINT(1)'
+        ),
+        'displayInRegister' => array(
+            'TINYINT(1)'
+        ),
+        'displayInProfile' => array(
+            'TINYINT(1)',
+            'default' => '0'
+        ),
+        'order' => array(
+            'INT(11)'
+        )
+    );
+
+    /**
      * The allowed input types for customization of profile questions
      *
      * @var array
@@ -61,7 +89,7 @@ class ProfileQuestion extends Model{
      */
     public static function getRegisterQuestions(){
         $example = array(
-        'displayInRegister' => 1
+            'displayInRegister' => 1
         );
         return self::getListByExample(new DBExample($example), self::$primaryColumn, array(), array('order' => DB::SORT_ASC));
     }
@@ -80,10 +108,10 @@ class ProfileQuestion extends Model{
 
      public static function getRoles($name){
         $question = self::getByName($name);
-        
+
         if(!$question)
             return array();
-         
+
          $params = json_decode($question->parameters, true);
 
         if(!empty($params['roles']))
@@ -94,7 +122,7 @@ class ProfileQuestion extends Model{
 
     public static function allowToRole($name, $roleId){
         $question = self::getByName($name);
-        
+
         $params = json_decode($question->parameters, true);
 
         if(!empty($params['roles'])){

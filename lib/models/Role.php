@@ -18,7 +18,39 @@ class Role extends Model{
      *
      * @var string
      */
-    public static $tablename = "Role";
+    protected static $tablename = "Role";
+
+    /**
+     * The model fields
+     */
+    protected static $fields = array(
+        'id' => array(
+            'type' => 'INT(11)',
+            'auto_increment' => true
+        ),
+        'name' => array(
+            'type' => 'VARCHAR(32)'
+        ),
+        'removable' => array(
+            'type' => 'TINYINT(11)',
+            'default' => '1'
+        ),
+        'color' => array(
+            'type' => 'VARCHAR(32)'
+        )
+    );
+
+    /**
+     * The model constraints
+     */
+    protected static $constraints = array(
+        'name' => array(
+            'type' => 'unique',
+            'fields' => array(
+                'name'
+            )
+        )
+    );
 
     /**
      * The id corresponding to the 'Guest' role

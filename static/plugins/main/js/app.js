@@ -11,7 +11,7 @@ baseUrl = baseUrl.replace(/^(.+\/).+$/, '$1');
 require.config(
     {
         // Workaround to be optimized by r.js
-        baseUrl :  typeof baseUrl === "undefined" ? './' : baseUrl,
+        baseUrl :  typeof baseUrl === 'undefined' ? './' : baseUrl,
 
         paths : {
             jquery      : 'ext/jquery-2.1.3.min',
@@ -149,18 +149,19 @@ define(
             /**
              * Call URIs by AJAX on click on links
              */
-            var linkSelector = '[href]:not(.real-link):not([href^="#"]):not([href^="javascript:"])';
+            var linkSelector =  '[href]:not([href^="#"]):not([href^="javascript:"]),' +
+                                '[data-href]:not([data-href^="#"]):not([data-href^="javascript:"])';
 
             $('body').on(
                 'click',
                 linkSelector,
                 function(event) {
                     var node = $(event.currentTarget);
-                    var url  = $(node).attr('href');
+                    var url  = $(node).attr('href') || $(node).data('href');
 
                     event.preventDefault();
                     var data = {},
-                        target = $(node).attr('target');
+                        target = $(node).attr('target') || $(node).data('target');
 
                     if ((event.which === 2 || !this.tabset.tabs().length) && !target) {
                         target = 'newtab';
@@ -807,12 +808,6 @@ define(
         if (!window.app) {
             window.app = new App();
         }
-
-        window.app.ready(
-            function() {
-                ko.applyBindings(window.app);
-            }
-        );
 
         window.app.start();
     }

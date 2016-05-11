@@ -29,7 +29,8 @@ class Widget extends \Hawk\ViewPlugin{
      */
     public function display(){
         $classname = $this->class;
-        $component = new $classname($this->params);
+        $component = $classname::getInstance($this->params);
+
         return $component->display();
     }
 }

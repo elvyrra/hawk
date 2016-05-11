@@ -129,7 +129,7 @@ class Plugin{
             $this->active = true;
             $this->removable = false;
             $this->definition = array(
-            'title' => Lang::get($this->name . '.plugin-name'),
+                'title' => Lang::get($this->name . '.plugin-name'),
             );
         }
     }
@@ -216,13 +216,7 @@ class Plugin{
         $dirs = $includeMain ? array(MAIN_PLUGINS_DIR, PLUGINS_DIR) : array(PLUGINS_DIR);
 
         if($loadConf && App::conf()->has('db')) {
-            $configs = App::db()->select(
-                array(
-                'from' => DB::getFullTablename(self::TABLE),
-                'index' => 'name',
-                'return' => DB::RETURN_OBJECT
-                )
-            );
+            $configs = PluginModel::getAll(PluginModel::getPrimaryColumn());
         }
         else{
             $configs = array();
@@ -235,7 +229,7 @@ class Plugin{
 
                 $plugin = self::get($name);
                 if(!$plugin->isMainPlugin()) {
-                    $plugin->active = isset($config->active) ? $config->active : false;
+                    $plugin->active = isset($config->active) ? (bool) $config->active : false;
                 }
                 $plugins[$name] = $plugin;
             }
@@ -255,11 +249,9 @@ class Plugin{
     public static function getActivePlugins($includeMain = true){
         $plugins = self::getAll($includeMain, true);
 
-        return array_filter(
-            $plugins, function ($plugin) {
-                return $plugin->active;
-            }
-        );
+        return array_filter($plugins, function ($plugin) {
+            return $plugin->active;
+        });
     }
 
 
@@ -269,11 +261,9 @@ class Plugin{
      * @return array The list of plugin instances
      */
     public static function getMainPlugins(){
-        return array_map(
-            function ($name) {
-                return new self($name);
-            }, self::$mainPlugins
-        );
+        return array_map(function ($name) {
+            return new self($name);
+        }, self::$mainPlugins);
     }
 
 
@@ -618,8 +608,10 @@ class Plugin{
      *
      * @return boolean True if the plugin is installed, False else
      */
-    public function isInstalled(){
-        return (bool) App::db()->count(DB::getFullTablename(self::TABLE), 'name = :name', array('name' => $this->name));
+    public function isInstalled() {
+        return (bool) PluginModel::countElementsByExample(new DBExample(array(
+            'name' => $this->name
+        )));
     }
 
 
@@ -672,19 +664,21 @@ class Plugin{
      * Install the plugin
      */
     public function install(){
-        App::db()->insert(
-            DB::getFullTablename(self::TABLE), array(
+        $model = new PluginModel(array(
             'name' => $this->name,
             'active' => 0
-            ), 'IGNORE'
-        );
+        ));
+
+        $model->save();
 
         try{
             $this->getInstallerInstance()->install();
             App::logger()->notice('The plugin ' . $this->name . ' has been installed');
         }
         catch(\Exception $e){
-            App::db()->delete(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)));
+            PluginModel::deleteByExample(new DBExample(array(
+                'name' => $this->name
+            )));
 
             App::logger()->error('En error occured while installing plugin ' . $this->name . ' : ' . $e->getMessage());
             throw $e;
@@ -696,19 +690,21 @@ class Plugin{
      * Uninstall the plugin
      */
     public function uninstall(){
-        App::db()->delete(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)));
+        PluginModel::deleteByExample(new DBExample(array(
+            'name' => $this->name
+        )));
 
         try{
             $this->getInstallerInstance()->uninstall();
             App::logger()->notice('The plugin ' . $this->name . ' has been uninstalled');
         }
         catch(\Exception $e){
-            App::db()->insert(
-                DB::getFullTablename(self::TABLE), array(
+            $model = new PluginModel(array(
                 'name' => $this->name,
                 'active' => 0
-                ), 'IGNORE'
-            );
+            ));
+
+            $model->save();
 
             App::logger()->error('En error occured while uninstalling plugin ' . $this->name . ' : ' . $e->getMessage());
             throw $e;
@@ -730,15 +726,23 @@ class Plugin{
      */
     public function activate(){
         // Activate the plugin
-        $this->active = 1;
-        App::db()->update(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)), array('active' => 1));
+        $this->active = true;
+
+        $model = new PluginModel(array(
+            'name' => $this->name,
+            'active' => 1
+        ));
+        $model->update();
 
         try{
             $this->getInstallerInstance()->activate();
             App::logger()->notice('The plugin ' . $this->name . ' has been activated');
         }
         catch(\Exception $e){
-            App::db()->update(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)), array('active' => 0));
+            $this->active = false;
+
+            $model->active = 0;
+            $model->update();
 
             App::logger()->error('En error occured while activating plugin ' . $this->name . ' : ' . $e->getMessage());
             throw $e;
@@ -751,15 +755,23 @@ class Plugin{
      */
     public function deactivate(){
         // Deactivate the plugin
-        $this->active = 0;
-        App::db()->update(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)), array('active' => 0));
+        $this->active = false;
+
+        $model = new PluginModel(array(
+            'name' => $this->name,
+            'active' => 0
+        ));
+        $model->update();
 
         try{
             $this->getInstallerInstance()->deactivate();
             App::logger()->notice('The plugin ' . $this->name . ' has been deactivated');
         }
         catch(\Exception $e){
-            App::db()->update(DB::getFullTablename(self::TABLE), new DBExample(array('name' => $this->name)), array('active' => 1));
+            $this->active = true;
+
+            $model->active = 1;
+            $model->update();
 
             App::logger()->error('En error occured while deactivating plugin ' . $this->name . ' : ' . $e->getMessage());
             throw $e;

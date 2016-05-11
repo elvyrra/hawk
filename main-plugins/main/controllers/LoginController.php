@@ -65,7 +65,7 @@ class LoginController extends Controller{
                     ))
                 ),
             ),
-            'onsuccess' => 'location = location.pathname;',
+            'onsuccess' => 'location = app.getUri("index");',
         );
 
         return new Form($param);
@@ -211,16 +211,14 @@ class LoginController extends Controller{
 
         $questions = ProfileQuestion::getRegisterQuestions();
         foreach($questions as $question){
-            $classname = 'Hawk\\' . ucwords($question->type) . 'Input';
             $field = json_decode($question->parameters, true);
-            $field['name'] = $question->name;
-            $field['independant'] = true;
-            $field['label'] = Lang::get('admin.profile-question-' . $question->name . '-label');
+            if(!empty($field->roles) && in_array(Option::get('roles.default-role'), $field->roles)) {
+                $classname = 'Hawk\\' . ucwords($question->type) . 'Input';
+                $field['name'] = $question->name;
+                $field['independant'] = true;
+                $field['label'] = Lang::get('admin.profile-question-' . $question->name . '-label');
 
-            $param['fieldsets']['profile'][] = new $classname($field);
-
-            if($question->type === 'file') {
-                $param['upload'] = true;
+                $param['fieldsets']['profile'][] = new $classname($field);
             }
         }
 
@@ -303,7 +301,8 @@ class LoginController extends Controller{
                         $mail->from(Option::get($this->_plugin . '.mailer-from'))
                             ->fromName(Option::get($this->_plugin . '.mailer-from-name'))
                             ->to($user->email)
-                            ->html($mailContent)
+                            ->title(Lang::get('main.register-email-title', array('sitename' => Option::get('main.sitename'))))
+                            ->content($mailContent)
                             ->subject(Lang::get($this->_plugin . '.register-email-title', array('sitename' => Option::get($this->_plugin . '.sitename'))))
                             ->send();
 
@@ -349,16 +348,12 @@ class LoginController extends Controller{
             }
         }
 
-        $this->addJavaScriptInline('
-            require(["app"], function(){
-                app.ready(function(){
-                    app.notify("' . $status . '", "' . addcslashes(Lang::get($messageKey), '"') . '");
-                });
-            });'
-        );
+        App::session()->setData('notification', array(
+            'status' => $status,
+            'message' => Lang::get($messageKey)
+        ));
 
-        return MainController::getInstance()->compute('main');
-
+        App::response()->redirectToAction('index');
     }
 
     /**
@@ -441,14 +436,10 @@ class LoginController extends Controller{
                         ->subject(Lang::get($this->_plugin . '.reset-pwd-email-title', array(
                             'sitename' => Option::get($this->_plugin . '.sitename')
                         )))
-                        ->html(View::make(
+                        ->title(Lang::get('main.reset-pwd-email-title', array('sitename' => Option::get('main.sitename'))))
+                        ->content(View::make(
                             Plugin::current()->getView('reset-password-email.tpl'),
                             array(
-                                'themeBaseCss' => Theme::getSelected()->getBaseCssUrl(),
-                                'themeCustomCss' => Theme::getSelected()->getCustomCssUrl(),
-                                'logoUrl' =>  Option::get($this->_plugin . '.logo') ?
-                                    Plugin::current()->getUserfilesUrl(Option::get($this->_plugin . '.logo')) :
-                                    Plugin::current()->getStaticUrl('img/hawk-logo.png'),
                                 'sitename' => Option::get($this->_plugin . '.sitename'),
                                 'code' => $code
                             )

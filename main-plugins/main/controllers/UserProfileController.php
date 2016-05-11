@@ -18,18 +18,14 @@ class UserProfileController extends Controller{
      * Create or edit an user
      */
     public function edit(){
-        if(!$this->userId) {
-            $user = Session::getUser();
-        }
-        else{
-            $user = User::getById($this->userId);
-        }
+        $user = App::session()->getUser();
+
         $roles = array_map(function ($role) {
             return $role->getLabel();
         }, Role::getAll('id'));
 
         $param = array(
-            'id' => 'user-form',
+            'id' => 'user-profile-form',
             'upload' => true,
             'object' => $user,
             'fieldsets' => array(
@@ -47,7 +43,6 @@ class UserProfileController extends Controller{
                         'name' => 'email',
                         'required' => true,
                         'label' => Lang::get('admin.user-form-email-label'),
-                        'disabled' => true,
                     ))
                 ),
 
@@ -149,13 +144,110 @@ class UserProfileController extends Controller{
                 }
 
                 $user->saveProfile();
+
+                if($form->getData('email') !== $user->email) {
+                    // The user asked to reset it email
+                    // Check this email is not used by another user on the application
+                    $existingUser = User::getByExample(new DBExample(array(
+                        'id' => array(
+                            '$ne' => $user->id
+                        ),
+                        'email' => $form->getData('email')
+                    )));
+
+                    if($existingUser) {
+                        return $form->response(Form::STATUS_CHECK_ERROR, Lang::get($this->_plugin . '.reset-email-already-used'));
+                    }
+
+                    // Send the email to validate the new email
+
+                    // Create the token to validate the new email
+                    $tokenData = array(
+                        'userId' => $user->id,
+                        'currentEmail' => $user->email,
+                        'newEmail' => $form->getData('email'),
+                        'createTime' => time()
+                    );
+
+                    $token = base64_encode(Crypto::aes256Encode(json_encode($tokenData)));
+
+                    // Create the email content
+                    $emailContent = View::make($this->getPlugin()->getView('change-email-validation.tpl'), array(
+                        'sitename' => Option::get($this->_plugin . '.sitename'),
+                        'validationUrl' => App::router()->getUrl('validate-new-email', array(
+                            'token' => $token
+                        ))
+                    ));
+
+                    $email = new Mail();
+                    $email  ->to($form->getData('email'))
+                            ->from(Option::get('main.mailer-from'), Option::get('main.mailer-from-name'))
+                            ->title(Lang::get($this->_plugin . '.reset-email-title', array(
+                                'sitename' => Option::get($this->_plugin . '.sitename')
+                            )))
+                            ->content($emailContent)
+                            ->subject(Lang::get($this->_plugin . '.reset-email-title', array(
+                                'sitename' => Option::get($this->_plugin . '.sitename')
+                            )))
+                            ->send();
+
+                    return $form->response(Form::STATUS_SUCCESS, Lang::get($this->_plugin . '.user-profile-update-success-with-email'));
+                }
+
                 return $form->response(Form::STATUS_SUCCESS, Lang::get($this->_plugin . '.user-profile-update-success'));
             }
             catch(Exception $e){
                 return $form->response(Form::STATUS_ERROR, Lang::get($this->_plugin . '.user-profile-update-error'));
             }
         }
+    }
 
+    /**
+     * Validate the new email for a user
+     */
+    public function validateNewEmail() {
+        $tokenData = json_decode(Crypto::aes256Decode(base64_decode($this->token)), true);
+
+        try {
+            if(!$tokenData) {
+                // Token format is not valid
+                throw new \Exception();
+            }
+
+            $user = User::getById($tokenData['userId']);
+
+            if($user->email !== $tokenData['currentEmail']) {
+                // Token does not have the correct email corresponding to the user email
+                throw new \Exception();
+            }
+
+            if($tokenData['createTime'] < time() - 86400) {
+                // Token has expired
+                throw new \Exception();
+            }
+
+            // Everything OK, change the user's email address
+            $user->set('email', $tokenData['newEmail']);
+            $user->save();
+
+            // Disconnect the user
+            session_destroy();
+
+            $status = 'success';
+            $messageKey = 'main.reset-email-success';
+        }
+        catch(\Exception $e) {
+            $messageKey = 'main.reset-email-invalid-token';
+            $status = 'error';
+        }
+
+        $this->addJavaScriptInline('
+            require(["app"], function(){
+                app.notify("' . $status . '", "' . addcslashes(Lang::get($messageKey), '"') . '");
+            });'
+        );
+
+        return MainController::getInstance()->main();
     }
 
     /**

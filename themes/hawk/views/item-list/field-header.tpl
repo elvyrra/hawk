@@ -2,7 +2,7 @@
     <th class="list-column-title" data-field="{{ $field->name }}" ko-with="fields['{{ $field->name }}']">
         <div class="list-label-sorts">
             {if($field->sort)}
-                <div class='list-sort-block pull-right'>
+                <div class='list-sort-block'>
                     <!-- Sort ascending -->
                     <span class="list-sort-column list-sort-asc" ko-class="{'list-sort-active' : sort() == 'ASC'}" ko-click="function(data, event){ data.sort(data.sort() == 'ASC' ? '' : 'ASC'); }">
                         {icon icon="sort-alpha-asc" title="{text key='main.list-sort-asc'}"}

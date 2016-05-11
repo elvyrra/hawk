@@ -315,7 +315,7 @@ class ItemList {
         $this->userParam = json_decode(App::session()->getUser()->getOptions('main.list-'.$this->id), true);
 
         foreach($parameters as $name) {
-            if(isset($this->userParam[$name])) {
+            if(!empty($this->userParam[$name])) {
                 $this->$name = $this->userParam[$name];
             }
         }
@@ -339,7 +339,6 @@ class ItemList {
 
         $event = new Event('list.'.$this->id.'.instanciated', array('list' => $this));
         $event->trigger();
-
     }
 
 
@@ -454,8 +453,7 @@ class ItemList {
      *
      * @param array $data The array where to take the data to display
      */
-    private function getFromArray($data)
-    {
+    private function getFromArray($data) {
         foreach($this->fields as $name => &$field){
             $pattern = isset($this->searches[$name]) ? $this->searches[$name] : null;
             if($pattern) {
@@ -547,7 +545,6 @@ class ItemList {
      */
     public function __toString() {
         return $this->display();
-
     }
 
 

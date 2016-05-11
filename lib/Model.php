@@ -37,6 +37,30 @@ class Model{
      */
     protected static $dbname = MAINDB;
 
+    /**
+     * The default charset of the table
+     */
+    const CHARSET = 'utf8';
+
+    /**
+     * The table engine
+     */
+    const ENGINE = 'InnoDB';
+
+    /**
+     * The model fields
+     *
+     * @var array
+     */
+    protected static $fields = array();
+
+    /**
+     * The model constraints
+     *
+     * @var array
+     */
+    protected static $constraints = array();
+
 
     /**
      * Constructor : Instanciate a new Model object
@@ -73,7 +97,9 @@ class Model{
      * @return Model The found Model instance
      */
     public static function getById($id, $fields = array()){
-        $example = new DBExample(array(static::$primaryColumn => $id));
+        $example = new DBExample(array(
+            static::$primaryColumn => $id
+        ));
         return self::getByExample($example, $fields);
     }
 
@@ -112,16 +138,14 @@ class Model{
      * @return Model[] The array containing found models
      */
     public static function getListByExample(DBExample $example = null, $index = null, $fields = array(), $order = array()){
-        return self::getDbInstance()->select(
-            array(
+        return self::getDbInstance()->select(array(
             'fields' => $fields,
             'from' => static::getTable(),
             'where' => $example,
             'index' => $index,
             'return' => get_called_class(),
             'orderby' => $order
-            )
-        );
+        ));
     }
 
 
@@ -135,16 +159,14 @@ class Model{
      * @return Model The found Model instance
      */
     public static function getBySQL($where = null, $binds = array(), $fields = array()){
-        return self::getDbInstance()->select(
-            array(
+        return self::getDbInstance()->select(array(
             'fields' => $fields,
             'from' => static::getTable(),
             'where' => $where,
             'binds' => $binds,
             'return' => get_called_class(),
             'one' => true,
-            )
-        );
+        ));
     }
 
 
@@ -162,8 +184,7 @@ class Model{
      * @return Model[] the array containing found models instances
      */
     public static function getListBySQL($where = null, $binds = array(), $index = null, $fields = array(), $order = array()){
-        return self::getDbInstance()->select(
-            array(
+        return self::getDbInstance()->select(array(
             'fields' => $fields,
             'from' => static::getTable(),
             'where' => $where,
@@ -171,8 +192,7 @@ class Model{
             'index' => $index,
             'return' => get_called_class(),
             'orderby' => $order
-            )
-        );
+        ));
     }
 
 
@@ -210,7 +230,7 @@ class Model{
      * @return int The number of found elements in the database
      */
     public static function countElementsByExample(DBExample $example = null, $group = array()){
-        return self::getDbInstance()->count(static::getTable(), $example, array(), self::$primaryColumn, $group);
+        return self::getDbInstance()->count(static::getTable(), $example, array(), self::getPrimaryColumn(), $group);
     }
 
 
@@ -224,7 +244,7 @@ class Model{
      * @return int The number of found elements in the database
      */
     public static function countElementsBySQL($where = null, $binds = array(),  $group = array()){
-        return self::getDbInstance()->count(static::getTable(), $where, $binds, self::$primaryColumn, $group);
+        return self::getDbInstance()->count(static::getTable(), $where, $binds, self::getPrimaryColumn(), $group);
     }
 
 
@@ -384,7 +404,7 @@ class Model{
      * @return string The primary column of the model
      */
     public static function getPrimaryColumn(){
-        return static::$primaryColumn;
+        return isset(static::$primaryColumn) ? static::$primaryColumn : self::$primaryColumn;
     }
 
 
@@ -433,5 +453,300 @@ class Model{
      */
     public static function setDbName($name){
         static::$dbname = $name;
+    }
+
+    /**
+     * Create the model corresponding table. This method bases on the static properties
+     * $tablename, $fields, $constraints
+     */
+    public static function createTable() {
+        /**
+         * Create the table
+         */
+        $createTableSql = 'CREATE TABLE IF NOT EXISTS ' . self::getTable() . '(';
+        $fieldsInstructions = array();
+
+        // Add field definitions
+        foreach(static::$fields as $fieldname => $options) {
+            if(empty($options['type'])) {
+                trigger_error('The field ' . $fieldname . ' must have a defined type');
+            }
+
+            $fieldsInstructions[] = self::getFieldDefinition($fieldname, $options);
+        }
+
+        // Add primary key definition
+        $primaryColumn = static::getPrimaryColumn();
+        if(!$primaryColumn !== null) {
+            if(is_array($primaryColumn)) {
+                $primaryColumn = implode(
+                    ',',
+                    array_map(function($field) {
+                        return DB::formatField($field);
+                    }, $primaryColumn)
+                );
+            }
+            else {
+                $primaryColumn = DB::formatField($primaryColumn);
+            }
+            $fieldsInstructions[] .= 'PRIMARY KEY (' . $primaryColumn . ')';
+        }
+
+        // Add constraints
+        if(!empty(static::$constraints)) {
+            foreach(static::$constraints as $name => $constraint) {
+                $fieldsInstructions[] = self::getConstraintDefinition($name, $constraint);
+            }
+        }
+
+        $createTableSql .=  implode(',', $fieldsInstructions) .
+                            ') ENGINE=' . static::ENGINE . ' DEFAULT CHARSET=' . static::CHARSET;
+
+        self::getDbInstance()->query($createTableSql);
+    }
+
+    /**
+     * Drop the model table
+     */
+    public static function dropTable() {
+        self::getDbInstance()->query('DROP TABLE IF EXISTS ' . static::getTable());
+    }
+
+
+    /**
+     * Update the model table structure
+     */
+    // public static function updateTable() {
+    //     // Get the fields currently in the database
+    //     $dbFields = static::getDbInstance()->query(
+    //         'SHOW COLUMNS FROM ' . static::getTable(),
+    //         array(),
+    //         array(
+    //             'index' => 'Field',
+    //             'return' => DB::RETURN_ARRAY
+    //         )
+    //     );
+
+    //     $dbFields = array_map(function($field) {
+    //         return array(
+    //             'type' => $field['Type'],
+    //             'null' => $field['Null'] == 'YES',
+    //             'default' => $field['Default'],
+    //             'auto_increment' => $field['Extra'] === 'auto_increment'
+    //         );
+    //     });
+
+    //     $modelFields = static::$fields;
+
+    //     // Build the instructions to execute to update the table
+    //     $instructions = array();
+
+    //     // Build the instructions about fields structures
+    //     foreach($dbFields as $fieldname => $dbField) {
+    //         if(!isset($modelFields[$fieldname])) {
+    //             // The field does not exists anymore
+
+    //             // Try to find if it has been renamed
+    //             $renamed = array_filter($modelFields, function($field) use($fieldname) {
+    //                 return !empty($field['oldName']) && $field['oldName'] === $fieldname;
+    //             });
+
+    //             if (!empty($renamed)) {
+    //                 // The field has been renamed
+    //                 $newName = reset(array_keys($renamed));
+    //                 $renamed = $renamed[$newName];
+
+    //                 $instruction = 'ALTER TABLE ' . DB::formatField(self::getTable()) . ' CHANGE ' .
+    //                                 DB::formatField($fieldname) . ' ' . self::getFieldDefinition($newName, $renamed);
+
+    //                 $instructions[] = $instruction;
+
+    //                 // Remove the field from the model fields, because it has been treated
+    //                 unset($modelFields[$newName]);
+    //             }
+    //             else {
+    //                 // The field has been removed
+    //                 $instructions[] = 'ALTER TABLE ' . DB::formatField(self::getTable()) . ' DROP COLUMN ' . DB::formatField($fieldname);
+
+    //                 // Remove the field from the model fields, because it has been treated
+    //                 unset($modelFields[$fieldname]);
+    //             }
+
+    //         }
+    //         else {
+    //             // The field exists, check if it has been modified
+    //             $modelField = $modelFields[$fieldname];
+
+    //             if(!isset($modelField['null'])) {
+    //                 $modelField['null'] = false;
+    //             }
+
+    //             if(!isset($modelField['default'])) {
+    //                 $modelField['default'] = null;
+    //             }
+
+    //             if($modelField != $dbField) {
+    //                 // The field has been modified
+    //                 $instructions[] = 'ALTER TABLE ' . DB::formatField(self::getTable()) . ' MODIFY ' .
+    //                                     self::getFieldDefinition($fieldname, $modelFields[$fieldname]);
+
+    //                 // Remove the field from the model fields, because it has been treated
+    //                 unset($modelFields[$fieldname]);
+    //             }
+    //         }
+    //     }
+
+    //     // Now check if new fields have to be created
+    //     foreach($modeFields as $fieldname => $properties) {
+    //         $instructions[] = 'ALTER TABLE ' . DB::formatField(self::getTable()) . ' ADD COLUMN ' .
+    //                             self::getFieldDefinition($fieldname, $modelFields[$fieldname]);
+    //     }
+
+
+    //     // Build instructions about constraints
+    //     // Get constaints currently saved in th database
+    //     $indexes = App::db()->query(
+    //         'SHOW INDEXES FROM ' . self::getTable() . 'WHERE Key_name <> "PRIMARY"',
+    //         array(),
+    //         array(
+    //             'return' => DB::RETURN_ARRAY
+    //         )
+    //     );
+
+    //     $dbKeys = array();
+    //     foreach($indexes as $index) {
+    //         if(!isset($dbKeys[$index['Key_name']])) {
+    //             $dbKeys[$index['Key_name']] = array (
+    //                 'fields' => array(
+    //                     $index['Column_name']
+    //                 )
+    //             );
+    //             if ($index['Index_type'] === 'FULLTEXT') {
+    //                 $dbKeys[$index['Key_name']]['type'] = 'fulltext';
+    //             }
+    //         }
+    //         else {
+    //             $dbKeys[$index['Key_name']]['fields'][] = $index['Column_name'];
+    //         }
+    //     }
+
+
+
+    //     // Execute the SQL insctructions
+    //     $sql = implode(';', $insctructions);
+
+    //     self::getDbInstance()->query($sql);
+    // }
+
+
+    /**
+     * Generate a SQL expression for a field definition
+     *
+     * @param string $fieldname The name of the field
+     * @param array $properties The field properties
+     *
+     * @return string The SQL expression
+     */
+    private static function getFieldDefinition($fieldname, $properties) {
+        $definition = DB::formatField($fieldname);
+
+        $definition .= ' ' . $properties['type'] ;
+
+        if(!isset($properties['null'])) {
+            $properties['null'] = false;
+        }
+        $definition .= $properties['null'] ? ' NULL' : ' NOT NULL';
+
+        if(isset($properties['default'])) {
+            $default = $properties['default'] === null ? 'NULL' : App::db()->quote($properties['default']);
+            $definition .= ' DEFAULT ' . $default;
+        }
+
+        if(!empty($properties['auto_increment'])) {
+            $definition .= ' AUTO_INCREMENT';
+        }
+
+        return $definition;
+    }
+
+
+    /**
+     * Generate a SQL expression for a constraint definition
+     *
+     * @param string $name The constraint name
+     * @param array $properties The constraint properties. This array can contains the following properties :
+     *                          <ul>
+     *                              <li>type (string) : The constraint type. Must be 'index', 'unique', 'foreign', 'fulltext' or empty</li>
+     *                              <li>fields (array) : The fields the constraints is applied on</li>
+     *                              <li>references(array) : For a 'foreign' constraint, this array defines :
+     *                                  <ul>
+     *                                      <li>model (string) : The model class defining the table the constraints references</li>
+     *                                      <li>fields (array) : The fields the constaints references </li>
+     *                                  </ul>
+     *                              <li>on_update (string) : For 'a foreign' constaints, define the action to perform ON UPDATE</li>
+     *                              <li>on_delete (string) : For 'a foreign' constaints, define the action to perform ON DELETE</li>
+     *                          </ul>
+     *
+     * @return string The SQL expression
+     */
+    private static function getConstraintDefinition($name, $properties) {
+        $sql = '';
+        $constraintName = self::getTable() . $name;
+
+        if(empty($properties['type'])) {
+            $properties['type'] = 'index';
+        }
+
+        if($properties['type'] === 'foreign') {
+            $referencedModel = $properties['references']['model'];
+            if(!class_exists($referencedModel)) {
+                $reflection  = new \ReflectionClass(get_called_class());
+                $referencedModel = $reflection->getNamespaceName() . '\\'. $referencedModel;
+            }
+
+            $constaintName = DB::formatField($constraintName);
+
+            $onFields = implode(',', array_map(function($field) {
+                return DB::formatField($field);
+            }, $properties['fields']));
+
+            $referenceTable =   DB::formatField($referencedModel::getDbInstance()->dbname) . '.' .
+                                DB::formatField($referencedModel::getTable());
+
+            $referenceFields = implode(',', array_map(function($field) {
+                return DB::formatField($field);
+            }, $properties['references']['fields']));
+
+            $onUpdate = isset($properties['on_update']) ? $properties['on_update'] : 'RESTRICT';
+
+            $onDelete = isset($properties['on_delete']) ? $properties['on_delete'] : 'RESTRICT';
+
+            return 'CONSTRAINT ' . $constraintName . ' ' .
+                    'FOREIGN KEY (' . $onFields . ') '.
+                    'REFERENCES ' . $referenceTable . ' (' . $referenceFields . ') ' .
+                    'ON UPDATE ' . $onUpdate . ' ' .
+                    'ON DELETE ' . $onDelete;
+        }
+        else {
+            switch($properties['type']) {
+                case 'unique' :
+                    $keyword =  'UNIQUE KEY';
+                    break;
+
+                case 'fulltext' :
+                    $keyword = 'FULLTEXT';
+                    break;
+
+                default :
+                    $keyword = 'KEY';
+                    break;
+            }
+
+            $onFields =  implode(',', array_map(function($field) {
+                return DB::formatField($field);
+            }, $properties['fields']));
+
+            return  $keyword . DB::formatField($constraintName) . '(' . $onFields . ')';
+        }
     }
 }

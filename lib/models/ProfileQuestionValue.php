@@ -20,4 +20,48 @@ class ProfileQuestionValue extends Model{
      */
     protected static $tablename = "ProfileQuestionValue";
 
+    /**
+     * The model fields
+     */
+    protected static $fields = array(
+        'id' => array(
+            'type' => 'INT(11)',
+            'auto_increment' => true
+        ),
+        'question' => array(
+            'type' => 'VARCHAR(32)'
+        ),
+        'userId' => array(
+            'type' => 'INT(11)'
+        ),
+        'value' => array(
+            'type' => 'TEXT'
+        )
+    );
+
+    /**
+     * The model constraints
+     */
+    protected static $constraints = array(
+        'question' => array(
+            'type' => 'foreign',
+            'fields' => array(
+                'question'
+            ),
+            'references' => array(
+                'model' => 'ProfileQuestion',
+                'fields' => array('name')
+            ),
+            'on_update' => 'CASCADE',
+            'on_delete' => 'CASCADE'
+        ),
+
+        'question_2' => array(
+            'type' => 'unique',
+            'fields' => array(
+                'question',
+                'userId'
+            )
+        )
+    );
 }

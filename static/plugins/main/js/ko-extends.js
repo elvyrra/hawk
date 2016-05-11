@@ -48,6 +48,7 @@ define('ko-extends', ['jquery', 'ko'], function($, ko) {
                     source : parameters.source,
                     change : parameters.change,
                     delay : parameters.delay || 400,
+                    minLength : parameters.minLength || 2
                 };
 
             options.value = parameters.value || options.label;
@@ -110,7 +111,7 @@ define('ko-extends', ['jquery', 'ko'], function($, ko) {
              * Initialize element
              * @type {String}
              */
-            element.autocomplete = 'off';
+            element.autocomplete = 'false';
             $(element)
                 .wrap('<div class="ko-autocomplete"></div')
                 .after(
@@ -141,7 +142,7 @@ define('ko-extends', ['jquery', 'ko'], function($, ko) {
                     element.autocompleteData = null;
                     var value = element.value;
 
-                    if (!value) {
+                    if (!value || value.length < options.minLength) {
                         model.result([]);
                         model.selectedItem(null);
                         return;

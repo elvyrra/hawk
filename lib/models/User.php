@@ -22,6 +22,59 @@ class User extends Model{
      */
     protected static $tablename = "User";
 
+    /**
+     * The model fields
+     *
+     * @var array
+     */
+    protected static $fields = array(
+        'id' => array(
+            'type' => 'INT(11)',
+            'auto_increment' => true
+        ),
+        'username' => array(
+            'type' => 'VARCHAR(64)'
+        ),
+        'email' => array(
+            'type' => 'VARCHAR(128)'
+        ),
+        'password' => array(
+            'type' => 'VARCHAR(512)'
+        ),
+        'active' => array(
+            'type' => 'TINYINT(1)'
+        ),
+        'createTime' => array(
+            'type' => 'INT(11)'
+        ),
+        'createIp' => array(
+            'type' => 'VARCHAR(15)'
+        ),
+        'roleId' => array(
+            'type' => 'INT(11)'
+        )
+    );
+
+    /**
+     * The model constraints
+     *
+     * @var array
+     */
+    protected static $constraints = array(
+        'email' => array(
+            'type' => 'unique',
+            'fields' => array(
+                'email'
+            )
+        ),
+        'username' => array(
+            'type' => 'unique',
+            'fields' => array(
+                'username'
+            )
+        )
+    );
+
 
     /**
      * The user profile data
@@ -77,9 +130,9 @@ class User extends Model{
      */
     public static function getAll($index = null, $fields = array(), $order = array()){
         $example = array(
-        'id' => array(
-        '$ne' => self::GUEST_USER_ID
-        )
+            'id' => array(
+                '$ne' => self::GUEST_USER_ID
+            )
         );
         return self::getListByExample(new DBExample($example), $index, $fields, $order);
     }
@@ -209,16 +262,11 @@ class User extends Model{
         if(!isset($this->options)) {
             $example = $this->isLogged() ? array('userId' => $this->id) : array('userIp' => App::request()->clientIp());
 
-            $options = App::db()->select(
-                array(
-                'from' => DB::getFullTablename('UserOption'),
-                'where' => new DBExample($example)
-                )
-            );
+            $options = UserOption::getListByExample(new DBExample($example));
 
             $this->options = array();
             foreach($options as $option){
-                $this->options[$option['plugin'] . '.' . $option['key']] = $option['value'];
+                $this->options[$option->plugin . '.' . $option->key] = $option->value;
             }
         }
 
@@ -244,9 +292,9 @@ class User extends Model{
 
         list($plugin, $key) = explode('.', $name, 2);
         $data = array(
-        'plugin' => $plugin,
-        'key' => $key,
-        'value' => $value
+            'plugin' => $plugin,
+            'key' => $key,
+            'value' => $value
         );
 
         if($this->isLogged()) {
@@ -255,7 +303,8 @@ class User extends Model{
         else{
             $data['userIp'] = App::request()->clientIp();
         }
-        App::db()->replace(DB::getFullTablename('UserOption'), $data);
+
+        UserOption::getDbInstance()->replace(UserOption::getTable(), $data);
     }
 
 

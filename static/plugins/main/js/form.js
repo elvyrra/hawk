@@ -292,6 +292,8 @@ define('form', ['jquery'], function($) {
      * @param {string} action - The action value to set
      */
     Form.prototype.setObjectAction = function(action) {
+        $(this.node).find('[name="_submittedForm"]').val(action);
+
         if (action.toLowerCase() === 'delete') {
             this.method = action;
         }

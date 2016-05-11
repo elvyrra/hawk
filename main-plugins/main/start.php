@@ -19,13 +19,23 @@ App::router()->auth(App::session()->isLogged(), function () {
         'default' => array(
             'userId' => App::session()->getUser()->id
         ),
-        'action' => 'UserProfileController.edit'
+        'action' => 'UserProfileController.edit',
+        'auth' => function($route) {
+            return !$route->getData('userId') || $route->getData('userId') === App::session()->getUser()->id;
+        }
     ));
 
     App::router()->any('change-password', '/profile/change-password', array(
         'action' => 'UserProfileController.changePassword'
     ));
 });
+
+App::router()->get('validate-new-email', '/profile/change-email/{token}', array(
+    'where' => array(
+        'token' => '[\w\=]+'
+    ),
+    'action' => 'UserProfileController.validateNewEmail'
+));
 
 App::router()->auth(!App::session()->isLogged(), function () {
     //Login
