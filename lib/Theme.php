@@ -447,15 +447,6 @@ class Theme{
         $variables = array();
         foreach($matches as $match){
 
-            preg_match_all('#^{a-z}{/a-z}$#', $match[3], $matches_description, PREG_SET_ORDER);
-
-            App::logger()->error('match=');
-            $description = array();
-            foreach($matches_description as $match_description){
-                App::logger()->error('match=' . $match_description[1] . "=" . $match_description[2]);
-                $description[$match_description[1]] = $match_description[2];
-            }
-
             $variables[] = array(
                 'name' => $match[1],
                 'default' => $match[2],
