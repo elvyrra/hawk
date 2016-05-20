@@ -249,22 +249,22 @@ class HTTPRequest{
     public function send(){
         $data = $this->build();
 
-        $opts = array('http' =>
-        array(
-        'method'  => strtoupper($this->method),
-        'ignore_errors' => '1',
-        'header'  => implode(
-            PHP_EOL,
-            array_map(
-                function ($key, $value) {
+        $opts = array(
+            'http' => array(
+                'method'  => strtoupper($this->method),
+                'ignore_errors' => '1',
+                'header'  => implode(
+                    PHP_EOL,
+                    array_map(
+                        function ($key, $value) {
                             return "$key: $value";
-                },
-                array_keys($this->headers),
-                $this->headers
+                        },
+                        array_keys($this->headers),
+                        $this->headers
+                    )
+                ),
+                'content' => $data
             )
-        ),
-        'content' => $data
-        )
         );
 
         $context  = stream_context_create($opts);

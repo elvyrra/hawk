@@ -14,7 +14,12 @@
 					ko-style="{ width: 'calc((100% - 25px )/ ' + $parent.tabs().length + ' - 2px )' }"
 					data-toggle="tooltip" data-placement="bottom" >
 					<a role="tab" data-toggle="tab" ko-attr="{ href: '#main-tab-' + id() }">
+						<!-- ko if: icon -->
 						<i class="icon" ko-class="'icon-' + icon()"></i>
+						<!-- /ko -->
+						<!-- ko if: favicon -->
+						<img ko-attr="{src : favicon}" alt="tab-favicon" class="main-tab-favicon" />
+						<!-- /ko -->
 						<span ko-text="title"></span>
 					</a>
 

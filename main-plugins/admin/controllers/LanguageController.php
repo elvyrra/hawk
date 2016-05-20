@@ -49,7 +49,7 @@ class LanguageController extends Controller{
                 'content' => $this->editKeys()
             ),
             'sidebar' => array(
-                'widgets' => array(new LanguageFilterWidget($filters), new NewLanguageKeyWidget())
+                'widgets' => array(LanguageFilterWidget::getInstance($filters), NewLanguageKeyWidget::getInstance())
             ),
             'tabId' => 'language-manage-page'
         ));

@@ -53,13 +53,11 @@ class Tabs extends \Hawk\ViewPlugin{
             $this->selected = array_keys($this->tabs)[0];
         }
 
-        return \Hawk\View::make(
-            \Hawk\Theme::getSelected()->getView('tabs.tpl'), array(
+        return \Hawk\View::make(\Hawk\Theme::getSelected()->getView('tabs.tpl'), array(
             'id' => $this->id,
             'tabs' => $this->tabs,
             'selected' => $this->selected
-            )
-        );
+        ));
 
     }
 }

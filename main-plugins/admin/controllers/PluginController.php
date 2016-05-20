@@ -28,7 +28,7 @@ class PluginController extends Controller{
         if(!$title) {
             $title = Lang::get($this->_plugin . '.available-plugins-title');
         }
-        $widgets = array(new SearchPluginWidget());
+        $widgets = array(SearchPluginWidget::getInstance());
 
         $this->addCss(Plugin::current()->getCssUrl('plugins.less'));
 

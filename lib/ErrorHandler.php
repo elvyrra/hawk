@@ -102,12 +102,14 @@ final class ErrorHandler extends Singleton{
      */
     public function exception($e){
         $param = array(
-        'level' => 'danger',
-        'icon' => 'excalamation-circle',
-        'title' => get_class($e),
-        'message' => $e->getMessage(),
-        'trace' => $e->getTrace()
+            'level' => 'danger',
+            'icon' => 'excalamation-circle',
+            'title' => get_class($e),
+            'message' => $e->getMessage(),
+            'trace' => $e->getTrace()
         );
+
+        App::response()->setStatus(500);
 
         App::logger()->error($e->getMessage());
         if(App::response()->getContentType() === "json") {

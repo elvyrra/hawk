@@ -575,6 +575,14 @@ class Plugin{
 
 
     /**
+     * Return the full path of a plugin private userfile
+     */
+    public function getUserfile($filename) {
+        return $this->getUserfilesDir() . $filename;
+    }
+
+
+    /**
      * Return the directory containing the public (accessible by HTTP requests) plugin files due to user actions
      *
      * @return string The directory contaning the user files of the plugin
@@ -600,6 +608,44 @@ class Plugin{
         else{
             return $baseUrl . $basename . '?' . filemtime($this->getPublicUserfilesDir() . $basename);
         }
+    }
+
+
+    /**
+     * This method get the favicon file of the plugin, convert it to a valid .ico file, copy it in the static directory
+     * and returns the URL of the created .ico file
+     */
+    public function getFaviconUrl() {
+        $file = $this->getDefinition('favicon') ? $this->getDefinition('favicon') : $this->getDefinition('logo');
+        if(!$file) {
+            return null;
+        }
+
+        $privateFilename = $this->getRootDir() . $file;
+        if(!is_file($privateFilename)) {
+            return null;
+        }
+
+        $basename = 'favicon.ico';
+        $publicFilename = $this->getPublicStaticDir() . $basename;
+
+        if(!is_file($publicFilename) || filemtime($privateFilename) > filemtime($publicFilename)) {
+            // Get the icon and conevrt it to .ico file if it's not
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mimeType = finfo_file($finfo, $privateFilename);
+
+            if($mimeType !== 'image/vnd.microsoft.icon') {
+                $generator = new \PHPICO($privateFilename, array(
+                    array(16, 16),
+                    array(32, 32),
+                    array(48, 48),
+                    array(64, 64),
+                ));
+                $generator->save_ico($publicFilename);
+            }
+        }
+
+        return $this->getStaticUrl() . $basename . '?' . filemtime($publicFilename);
     }
 
 
@@ -671,6 +717,16 @@ class Plugin{
 
         $model->save();
 
+        if(!is_dir($this->getUserfilesDir())) {
+            mkdir($this->getUserfilesDir(), 0755, true);
+        }
+        if(!is_dir($this->getPublicStaticDir())) {
+            mkdir($this->getPublicStaticDir(), 0755, true);
+        }
+        if(!is_dir($this->getPublicUserfilesDir())) {
+            mkdir($this->getPublicUserfilesDir(), 0755, true);
+        }
+
         try{
             $this->getInstallerInstance()->install();
             App::logger()->notice('The plugin ' . $this->name . ' has been installed');
@@ -693,6 +749,18 @@ class Plugin{
         PluginModel::deleteByExample(new DBExample(array(
             'name' => $this->name
         )));
+
+        if(is_dir($this->getUserfilesDir())) {
+            App::fs()->remove($this->getUserfilesDir());
+        }
+
+        if(is_dir($this->getPublicStaticDir())) {
+            App::fs()->remove($this->getPublicStaticDir());
+        }
+
+        if(is_dir($this->getPublicUserfilesDir())) {
+            App::fs()->remove($this->getPublicUserfilesDir());
+        }
 
         try{
             $this->getInstallerInstance()->uninstall();

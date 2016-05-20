@@ -46,6 +46,36 @@ try{
     /*** Compute the routage ***/
     App::router()->route();
 }
+catch(PageNotFoundException $e) {
+    App::response()->setStatus(404);
+
+    $response = array(
+        'message' => $e->getMessage()
+    );
+
+    if(App::request()->isAjax()) {
+        App::response()->setContentType('json');
+        App::response()->setBody($response);
+    }
+    else{
+        App::response()->setBody($response['message']);
+    }
+}
+catch(ForbiddenException $e) {
+    App::response()->setStatus(403);
+    $response = array(
+        'message' => $e->getMessage(),
+        'reason' => $e->getReason()
+    );
+
+    if(App::request()->isAjax()) {
+        App::response()->setContentType('json');
+        App::response()->setBody($response);
+    }
+    else{
+        App::response()->setBody($response['message']);
+    }
+}
 catch(AppStopException $e){
 }
 

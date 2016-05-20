@@ -638,13 +638,12 @@ class Form{
 
             $id = $this->object->getPrimaryColumn();
 
-            $this->addReturn(
-                array(
+            $this->addReturn(array(
                 'primary' => $this->object->$id,
                 'action' => self::ACTION_REGISTER,
                 'new' => $this->new
-                )
-            );
+            ));
+
             $this->status = self::STATUS_SUCCESS;
 
             App::logger()->info(App::session()->getUser()->username . ' has updated the data on the form ' . $this->id);

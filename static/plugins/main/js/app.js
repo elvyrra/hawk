@@ -437,101 +437,102 @@ define(
                 // Get the element the page will be loaded in
                 var element = options.selector ? $(options.selector).get(0) : this.tabset.activeTab();
 
-                // Load the page
-                if (element) {
-                    var query = '';
-
-                    if (options.query) {
-                        var params = [];
-
-                        Object.keys(options.query).forEach(function(param) {
-                            params.push(param + '=' + encodeURIComponent(options.query[param]));
-                        });
-
-                        query = '?' + params.join('&');
-
-                        url = url + query;
-                    }
-
-                    $.ajax({
-                        xhr : this.xhr,
-                        url : url,
-                        type : options.post ? 'post' : 'get',
-                        data : options.post,
-                        dataType : 'text',
-                        headers : options.headers
-                    })
-                    .done(function(response) {
-                        this.loading.stop();
-                        if (element instanceof Tab) {
-                            // The page has been loaded in a whole tab
-                            // Register the tab url
-                            element.uri(url);
-                            element.route(route);
-
-                            element.content(response);
-
-                            // Regiter the tabs in the cookie
-                            if (this.isLogged) {
-                                this.tabset.registerTabs();
-                            }
-
-                            // register the url in the tab history
-                            element.history.push(url);
-
-                            history.pushState({}, '', '#!' + url);
-                        }
-                        else {
-                            $(element).html(response);
-                        }
-
-                        if (options.onload) {
-                            /**
-                             * A 'onload' callback has been asked
-                             */
-                            options.onload();
-                        }
-                    }.bind(this))
-
-                    .fail(function(xhr) {
-                        var code = xhr.status;
-
-                        if (code === 403) {
-                            // The page is not accessible for the user
-                            var response;
-
-                            try {
-                                response = JSON.parse(xhr.responseText);
-                            }
-                            catch (e) {
-                                response = {
-                                    message : Lang.get('main.access-forbidden')
-                                };
-                            }
-
-                            if (response.reason === 'login') {
-                                // The user is not connected, display the login form
-                                this.dialog(this.getUri('login') + '?redirect=' + url + '&code=' + code);
-                            }
-                            else {
-                                // Other reason, display the message in a notification
-                                this.notify('danger', response.message);
-                            }
-                        }
-                        else {
-                            this.notify('danger', xhr.responseText);
-                        }
-
-                        this.loading.stop();
-                    }.bind(this));
-                }
-                else {
+                if (!element) {
                     /**
                      * The selector to home the loaded url doesn't exist
                      */
                     this.loading.stop();
                     this.notify('danger', Lang.get('main.loading-page-selector-not-exists'));
+
+                    return;
                 }
+
+                // Load the page
+                var query = '';
+
+                if (options.query) {
+                    var params = [];
+
+                    Object.keys(options.query).forEach(function(param) {
+                        params.push(param + '=' + encodeURIComponent(options.query[param]));
+                    });
+
+                    query = '?' + params.join('&');
+
+                    url = url + query;
+                }
+
+                $.ajax({
+                    xhr : this.xhr,
+                    url : url,
+                    type : options.post ? 'post' : 'get',
+                    data : options.post,
+                    dataType : 'text',
+                    headers : options.headers
+                })
+                .done(function(response) {
+                    this.loading.stop();
+                    if (element instanceof Tab) {
+                        // The page has been loaded in a whole tab
+                        // Register the tab url
+                        element.uri(url);
+                        element.route(route);
+
+                        element.content(response);
+
+                        // Regiter the tabs in the cookie
+                        if (this.isLogged) {
+                            this.tabset.registerTabs();
+                        }
+
+                        // register the url in the tab history
+                        element.history.push(url);
+
+                        history.pushState({}, '', '#!' + url);
+                    }
+                    else {
+                        $(element).html(response);
+                    }
+
+                    if (options.onload) {
+                        /**
+                         * A 'onload' callback has been asked
+                         */
+                        options.onload();
+                    }
+                }.bind(this))
+
+                .fail(function(xhr) {
+                    var code = xhr.status;
+
+                    if (code === 403) {
+                        // The page is not accessible for the user
+                        var response;
+
+                        try {
+                            response = JSON.parse(xhr.responseText);
+                        }
+                        catch (e) {
+                            response = {
+                                message : Lang.get('main.access-forbidden')
+                            };
+                        }
+
+                        if (response.reason === 'login') {
+                            // The user is not connected, display the login form
+                            this.dialog(this.getUri('login') + '?redirect=' + url + '&code=' + code);
+                        }
+                        else {
+                            // Other reason, display the message in a notification
+                            this.notify('danger', response.message);
+                        }
+                    }
+                    else {
+                        this.notify('danger', xhr.responseText);
+                    }
+
+                    this.loading.stop();
+                }.bind(this));
             }
         };
 
@@ -621,11 +622,15 @@ define(
         /**
          * Load a URL in a dialog box
          *
-         * @param    {string} action The action to perform. If "close", it will wlose the current dialog box,
+         * @param {string} action The action to perform. If "close", it will wlose the current dialog box,
          *                           else it will load the action in the dialog box and open it
+         * @param {Object} options The options object :
+         *                             - onload : A callback function, executed after the dialogbox has been displayed
          * @memberOf App
          */
-        App.prototype.dialog = function(action) {
+        App.prototype.dialog = function(action, options) {
+            options = options || {};
+
             var container = $('#dialogbox');
 
             container.modal('hide');
@@ -647,6 +652,10 @@ define(
             .done(function(content) {
                 // Page successfully loaded
                 container.html(content).modal('show');
+
+                if (options.onload) {
+                    options.onload();
+                }
             })
 
             .fail(function(xhr) {

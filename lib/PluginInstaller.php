@@ -57,4 +57,11 @@ abstract class PluginInstaller {
      * Deactivate the plugin
      */
     abstract public function deactivate();
+
+    /**
+     * Get the installer plugin
+     */
+    protected function getPlugin(){
+        return $this->plugin;
+    }
 }

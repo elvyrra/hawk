@@ -368,35 +368,14 @@ final class Router extends Singleton{
                         App::request()->getUri()
                     ));
 
-                    App::response()->setStatus(403);
-                    $response = array(
-                        'message' => Lang::get('main.403-message'),
-                        'reason' => !App::session()->isLogged() ? 'login' : 'permission'
-                    );
-
-                    if(App::request()->isAjax()) {
-                        App::response()->setContentType('json');
-                        App::response()->setBody($response);
-                    }
-                    else{
-                        App::response()->setBody($response['message']);
-                    }
-
-                    throw new AppStopException();
+                    throw new ForbiddenException(null, !App::session()->isLogged() ? 'login' : 'permission');
                 }
                 return;
             }
         }
 
         App::logger()->warning('The URI ' . App::request()->getUri() . ' has not been routed');
-        App::response()->setStatus(404);
-        App::response()->setBody(Lang::get('main.404-message', array('uri' => $path)));
-
-        // The route was not found
-        $event = new Event('after-routing', array(
-            'route' => null,
-        ));
-        $event->trigger();
+        throw new PageNotFoundException();
     }
 
 
