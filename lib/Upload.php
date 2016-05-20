@@ -113,11 +113,3 @@ class Upload{
         return move_uploaded_file($file->tmpFile, $directory . '/' . $basename);
     }
 }
-
-/**
- * This class describes the exceptions throwed by Upload class
- *
- * @package Exceptions
- */
-class UploadException extends \Exception{
-}

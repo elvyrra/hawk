@@ -52,7 +52,10 @@ class MainController extends Controller{
     /**
      * Display the main page
      *
-     * @param string $content A content to set to override the default index content
+     * @param string $content     A content to set to override the default index content
+     * @param string $title       The title to display in the tag <title>
+     * @param string $description The description meta data
+     * @param string $keywords    The keywords meta data
      */
     public function main($content = '', $title = '', $description = '', $keywords = ''){
         $canAccessApplication = App::session()->getUser()->canAccessApplication();

@@ -50,6 +50,7 @@ class Controller{
 
     /**
      * This variable is set when a controller method is executed
+     *
      * @var string
      */
     public $executingMethod = null;
@@ -243,10 +244,13 @@ class Controller{
 
 /**
  * This class is used to apply preprocessor and postprocessor to controller methods
+ *
+ * @package Core
  */
 class ControllerProcessor extends Controller{
     /**
      * Create a new instance of ControllerProcessor
+     *
      * @param Controller $object The controller instance that is wrapped in the processor
      */
     public function __construct($object) {
@@ -255,9 +259,11 @@ class ControllerProcessor extends Controller{
 
     /**
      * Call a method of the controller
-     * @param  string $method    The method to call
-     * @param  array  $arguments The arguments of the method call
-     * @return mixed             The result of the method call
+     *
+     * @param string $method    The method to call
+     * @param array  $arguments The arguments of the method call
+     *
+     * @return mixed The result of the method call
      */
     public function __call($method, $arguments) {
         $this->controller->executingMethod = $method;
@@ -272,7 +278,7 @@ class ControllerProcessor extends Controller{
 
         /*** Call the controller method ***/
         $result = call_user_func_array(array($this->controller, $method), $arguments);
-        if(App::response()->getContentType() == 'html' && is_string($result) ) {
+        if(App::response()->getContentType() == 'html' && is_string($result)) {
             // Create a phpQuery object to be modified by event listeners (widgets)
             $result = \phpQuery::newDocument($result);
         }

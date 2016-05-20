@@ -93,7 +93,4 @@ class Cache extends Singleton{
     public function clear($cacheFile = '*'){
         App::fs()->remove($this->getCacheFilePath($cacheFile));
     }
-
-
-
 }

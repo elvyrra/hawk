@@ -481,7 +481,7 @@ class Model{
             if(is_array($primaryColumn)) {
                 $primaryColumn = implode(
                     ',',
-                    array_map(function($field) {
+                    array_map(function ($field) {
                         return DB::formatField($field);
                     }, $primaryColumn)
                 );
@@ -642,8 +642,8 @@ class Model{
     /**
      * Generate a SQL expression for a field definition
      *
-     * @param string $fieldname The name of the field
-     * @param array $properties The field properties
+     * @param string $fieldname  The name of the field
+     * @param array  $properties The field properties
      *
      * @return string The SQL expression
      */
@@ -673,9 +673,9 @@ class Model{
     /**
      * Generate a SQL expression for a constraint definition
      *
-     * @param string $name The constraint name
-     * @param array $properties The constraint properties. This array can contains the following properties :
-     *                          <ul>
+     * @param string $name       The constraint name
+     * @param array  $properties The constraint properties. This array can contains the following properties :
+     *                           <ul>
      *                              <li>type (string) : The constraint type. Must be 'index', 'unique', 'foreign', 'fulltext' or empty</li>
      *                              <li>fields (array) : The fields the constraints is applied on</li>
      *                              <li>references(array) : For a 'foreign' constraint, this array defines :
@@ -706,14 +706,14 @@ class Model{
 
             $constaintName = DB::formatField($constraintName);
 
-            $onFields = implode(',', array_map(function($field) {
+            $onFields = implode(',', array_map(function ($field) {
                 return DB::formatField($field);
             }, $properties['fields']));
 
             $referenceTable =   DB::formatField($referencedModel::getDbInstance()->dbname) . '.' .
                                 DB::formatField($referencedModel::getTable());
 
-            $referenceFields = implode(',', array_map(function($field) {
+            $referenceFields = implode(',', array_map(function ($field) {
                 return DB::formatField($field);
             }, $properties['references']['fields']));
 
@@ -742,7 +742,7 @@ class Model{
                     break;
             }
 
-            $onFields =  implode(',', array_map(function($field) {
+            $onFields =  implode(',', array_map(function ($field) {
                 return DB::formatField($field);
             }, $properties['fields']));
 

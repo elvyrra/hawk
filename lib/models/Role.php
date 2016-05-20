@@ -103,7 +103,9 @@ class Role extends Model{
     /**
      * Get role form his name
      *
-     * @return role
+     * @param string $name The role name
+     *
+     * @return Role
      */
     public static function getByName($name){
         return self::getByExample(new DBExample(array(

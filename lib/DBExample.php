@@ -229,12 +229,3 @@ class DBExample{
         }
     }
 }
-
-
-/**
- * This class describes the behavior of the exceptions throwed by DBExample class
- *
- * @package Exceptions
- */
-class DBExampleException extends \Exception{
-}

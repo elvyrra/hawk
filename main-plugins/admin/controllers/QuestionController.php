@@ -65,7 +65,7 @@ class QuestionController extends Controller{
             ));
 
             // Get roles associate to this ProfileQuestion in json parameters
-            $attributesRoles = ProfileQuestion::getRoles($question->name);
+            $attributesRoles = ProfileQuestion::getByName($question->name)->getRoles();
 
             // For each roles create a Checkbox
             foreach($roles as $role){
@@ -152,7 +152,7 @@ class QuestionController extends Controller{
                 'label' => Lang::get("roles.role-{$role->id}-label"),
                 'search' => false,
                 'sort' => false,
-                'display' => function($value, $field, $line) use ($form){
+                'display' => function ($value, $field, $line) use ($form) {
                     return $form->inputs["role-$field->name-question-$line->name"];
                 },
             );
@@ -236,9 +236,7 @@ class QuestionController extends Controller{
         $roles = Role::getAll();
 
         // Get roles associate to this ProfileQuestion in json parameters
-        $attributesRoles = ProfileQuestion::getRoles($this->name);
-
-
+        $attributesRoles = ProfileQuestion::getByName($this->name)->getRoles();
 
         $allowedTypes = ProfileQuestion::$allowedTypes;
         $param = array(

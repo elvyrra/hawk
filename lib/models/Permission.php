@@ -99,8 +99,8 @@ class Permission extends Model{
     /**
      * Add a new permission in the database
      *
-     * @param string $name              The permission name, formatted as "<plugin>.<key>"
-     * @param int    $default           The default value for this permission
+     * @param string $name               The permission name, formatted as "<plugin>.<key>"
+     * @param int    $default            The default value for this permission
      * @param int    $availableForGuests Defines if the permission can be set to true for guest users
      *
      * @return Permission The created permission

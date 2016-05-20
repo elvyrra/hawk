@@ -170,12 +170,3 @@ final class FileSystem extends Singleton{
         }
     }
 }
-
-
-/**
- * This class describes exceptions throwed by FileSystem class
- *
- * @package Exceptions
- */
-class FileSystemException extends \Exception{
-}

@@ -1,9 +1,17 @@
 <?php
+/**
+ * PageNotFoundException.php
+ *
+ * @author  Elvyrra SAS
+ * @license http://rem.mit-license.org/ MIT
+ */
 
 namespace Hawk;
 
 /**
  * This class describes the exceptions thrown when the page (or a resource) is not found
+ *
+ * @package Exceptions
  */
 class PageNotFoundException extends \Exception {
     /**
@@ -13,6 +21,7 @@ class PageNotFoundException extends \Exception {
 
     /**
      * Constructor
+     *
      * @param string $message The exception message
      */
     public function __construct($message = '') {
@@ -25,7 +34,11 @@ class PageNotFoundException extends \Exception {
         parent::__construct($message);
     }
 
-
+    /**
+     * Get the not found URL
+     *
+     * @return string
+     */
     public function getUrl() {
         return $this->url;
     }

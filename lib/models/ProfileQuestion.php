@@ -106,32 +106,32 @@ class ProfileQuestion extends Model{
         return self::getListByExample(new DBExample($example), self::$primaryColumn, array(), array('order' => DB::SORT_ASC));
     }
 
-     public static function getRoles($name){
-        $question = self::getByName($name);
 
-        if(!$question)
-            return array();
+    /**
+     * Get the roles the question is configured for
+     *
+     * @return [type]       [description]
+     */
+    public function getRoles(){
+        $params = json_decode($this->parameters, true);
 
-         $params = json_decode($question->parameters, true);
-
-        if(!empty($params['roles']))
+        if(!empty($params['roles'])) {
             return $params['roles'];
-        else
-            return array();
+        }
+
+        return array();
     }
 
-    public static function allowToRole($name, $roleId){
-        $question = self::getByName($name);
+    /**
+     * Check if a question is allowed for a given role
+     *
+     * @param int $roleId The role id
+     *
+     * @return boolean
+     */
+    public function isAllowedForRole($roleId){
+        $roles = $this->getRoles();
 
-        $params = json_decode($question->parameters, true);
-
-        if(!empty($params['roles'])){
-            if(in_array($roleId, $params['roles']))
-                return true;
-            else
-                return false;
-        }
-        else
-            return false;
+        return in_array($roleId, $roles);
     }
 }

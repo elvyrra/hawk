@@ -19,6 +19,7 @@ abstract class Widget extends Controller{
 
     /**
      * Constructor
+     *
      * @param array $param The widget parameters
      */
     protected function __construct($param = array()) {

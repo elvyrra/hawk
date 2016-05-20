@@ -76,6 +76,9 @@ catch(ForbiddenException $e) {
         App::response()->setBody($response['message']);
     }
 }
+catch(InternalErrorException $e) {
+    App::response()->setStatus(500);
+}
 catch(AppStopException $e){
 }
 

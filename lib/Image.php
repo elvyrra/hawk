@@ -317,12 +317,3 @@ class GifImage extends Image{
         return Image::getInstance($filename);
     }
 }
-
-/**
- * This class describes the execptions throwed by Image class
- *
- * @package Exceptions
- */
-class ImageException extends \Exception{
-
-}

@@ -249,7 +249,8 @@ class Mail{
 
     /**
      * Set the title in the default HTML template
-     * @param  string $title The title to set
+     *
+     * @param string $title The title to set
      *
      * @return Mail The instance itself, to permit chained actions
      */
@@ -263,7 +264,7 @@ class Mail{
     /**
      * Set the content in the default HTML template
      *
-     * @param  string $content The content to set
+     * @param string $content The content to set
      *
      * @return Mail The instance itself, to permit chained actions
      */
@@ -273,7 +274,9 @@ class Mail{
         return $this;
     }
 
-
+    /**
+     * Prepare the content to send in the email
+     */
     private function prepareContent() {
         if($this->useDefaultTemplate) {
             // Create the email content
@@ -313,13 +316,4 @@ class Mail{
         }
         App::logger()->info('An email was sent to ' . implode(', ', $this->mailer->getAllRecipientAddresses()));
     }
-}
-
-/**
- * MailException
- *
- * @package Exceptions
- */
-class MailException extends \Exception{
-
 }

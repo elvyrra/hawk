@@ -20,7 +20,7 @@ App::router()->auth(App::session()->isLogged(), function () {
             'userId' => App::session()->getUser()->id
         ),
         'action' => 'UserProfileController.edit',
-        'auth' => function($route) {
+        'auth' => function ($route) {
             return !$route->getData('userId') || $route->getData('userId') === App::session()->getUser()->id;
         }
     ));

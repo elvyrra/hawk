@@ -576,6 +576,10 @@ class Plugin{
 
     /**
      * Return the full path of a plugin private userfile
+     *
+     * @param string $filename The filename, relative to the userfiles directory
+     *
+     * @return string
      */
     public function getUserfile($filename) {
         return $this->getUserfilesDir() . $filename;
@@ -612,8 +616,20 @@ class Plugin{
 
 
     /**
+     * Get the plugin logo URL
+     *
+     * @return string The logo url
+     */
+    public function getLogoUrl() {
+
+    }
+
+
+    /**
      * This method get the favicon file of the plugin, convert it to a valid .ico file, copy it in the static directory
      * and returns the URL of the created .ico file
+     *
+     * @return string the plugin favicon url
      */
     public function getFaviconUrl() {
         $file = $this->getDefinition('favicon') ? $this->getDefinition('favicon') : $this->getDefinition('logo');
