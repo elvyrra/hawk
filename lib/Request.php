@@ -88,6 +88,9 @@ final class Request extends Singleton{
         // Get the request uri
         $this->uri = getenv('REQUEST_URI');
 
+        // Get the full request URL
+        $this->url = getenv('REQUEST_SCHEME') . '://' . getenv('HTTP_HOST') . getenv('REQUEST_URI');
+
         // Get the request headers
         $this->headers = getallheaders();
 
@@ -152,6 +155,16 @@ final class Request extends Singleton{
      */
     public function getUri(){
         return $this->uri;
+    }
+
+
+    /**
+     * Get the HTTP request full URL
+     *
+     * @return string The HTTP request full URL
+     */
+    public function getFullUrl() {
+        return $this->url;
     }
 
 

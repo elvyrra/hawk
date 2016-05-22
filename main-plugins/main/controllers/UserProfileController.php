@@ -66,7 +66,7 @@ class UserProfileController extends Controller{
 
         // Generate the question fields
         foreach($questions as $question){
-            if($question->displayInProfile && ProfileQuestion::allowToRole($question->name, $user->roleId)){
+            if($question->displayInProfile && $question->isAllowedForRole($user->roleId)) {
                 $classname = '\Hawk\\' . ucwords($question->type) . 'Input';
                 $field = json_decode($question->parameters, true);
                 $field['name'] = $question->name;
@@ -120,7 +120,7 @@ class UserProfileController extends Controller{
         else{
             try{
                 foreach($questions as $question){
-                    if($question->displayInProfile && ProfileQuestion::allowToRole($question->name, $user->roleId)){
+                    if($question->displayInProfile && $question->isAllowedForRole($user->roleId)) {
                         if($question->type === 'file') {
                             $upload = Upload::getInstance($question->name);
 
@@ -181,15 +181,15 @@ class UserProfileController extends Controller{
 
                     $email = new Mail();
                     $email  ->to($form->getData('email'))
-                            ->from(Option::get('main.mailer-from'), Option::get('main.mailer-from-name'))
-                            ->title(Lang::get($this->_plugin . '.reset-email-title', array(
+                        ->from(Option::get('main.mailer-from'), Option::get('main.mailer-from-name'))
+                        ->title(Lang::get($this->_plugin . '.reset-email-title', array(
                                 'sitename' => Option::get($this->_plugin . '.sitename')
                             )))
-                            ->content($emailContent)
-                            ->subject(Lang::get($this->_plugin . '.reset-email-title', array(
+                        ->content($emailContent)
+                        ->subject(Lang::get($this->_plugin . '.reset-email-title', array(
                                 'sitename' => Option::get($this->_plugin . '.sitename')
                             )))
-                            ->send();
+                        ->send();
 
                     return $form->response(Form::STATUS_SUCCESS, Lang::get($this->_plugin . '.user-profile-update-success-with-email'));
                 }

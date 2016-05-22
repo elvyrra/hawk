@@ -76,13 +76,16 @@ final class ErrorHandler extends Singleton{
         }
 
         $param = array(
-        'level' => $level,
-        'icon' => $icon,
-        'title' => $title,
-        'message' => $str,
-        'trace' => array(
-        array('file' => $file, 'line' => $line)
-        )
+            'level' => $level,
+            'icon' => $icon,
+            'title' => $title,
+            'message' => $str,
+            'trace' => array(
+                array(
+                    'file' => $file,
+                    'line' => $line
+                )
+            )
         );
 
         if(!App::response()->getContentType() === "json") {
@@ -102,11 +105,11 @@ final class ErrorHandler extends Singleton{
      */
     public function exception($e){
         $param = array(
-        'level' => 'danger',
-        'icon' => 'excalamation-circle',
-        'title' => get_class($e),
-        'message' => $e->getMessage(),
-        'trace' => $e->getTrace()
+            'level' => 'danger',
+            'icon' => 'excalamation-circle',
+            'title' => get_class($e),
+            'message' => $e->getMessage(),
+            'trace' => $e->getTrace()
         );
 
         App::logger()->error($e->getMessage());
@@ -115,8 +118,9 @@ final class ErrorHandler extends Singleton{
         }
         else{
             App::response()->setBody(View::make(Theme::getSelected()->getView('error.tpl'), $param));
-            App::response()->end();
         }
+
+        throw new InternalErrorException($e->getMessage(), $e->getCode());
     }
 
     /**

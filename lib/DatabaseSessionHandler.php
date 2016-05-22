@@ -114,7 +114,7 @@ class DatabaseSessionHandler implements \SessionHandlerInterface{
      * @param string $data      The data session to write, serialized
      */
     public function write($sessionId, $data) {
-        SessionModel::getDbInstance()->replace (
+        SessionModel::getDbInstance()->replace(
             SessionModel::getTable(),
             array(
                 'id' => $sessionId,

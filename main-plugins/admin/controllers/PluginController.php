@@ -28,7 +28,7 @@ class PluginController extends Controller{
         if(!$title) {
             $title = Lang::get($this->_plugin . '.available-plugins-title');
         }
-        $widgets = array(new SearchPluginWidget());
+        $widgets = array(SearchPluginWidget::getInstance());
 
         $this->addCss(Plugin::current()->getCssUrl('plugins.less'));
 
@@ -89,7 +89,6 @@ class PluginController extends Controller{
                 'controls' => array(
                     'display' => function ($value, $field, $plugin) use ($updates) {
                         $buttons = array();
-
                         $installer = $plugin->getInstallerInstance();
                         if(!$plugin->isInstalled()) {
                             // the plugin is not installed
@@ -190,7 +189,6 @@ class PluginController extends Controller{
                     'search' => false,
                     'sort' => false,
                 ),
-
                 'description' => array(
                     'search' => false,
                     'sort' => false,

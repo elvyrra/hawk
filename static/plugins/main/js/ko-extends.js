@@ -302,13 +302,22 @@ define('ko-extends', ['jquery', 'ko'], function($, ko) {
 
                 var editor = ace.edit(element.id);
 
+                if(parameters.value) {
+                    editor.setValue(ko.isObservable(parameters.value) ? parameters.value() : parameters.value);
+                }
+
                 editor.setTheme('ace/theme/' + (parameters.theme || 'chrome'));
                 editor.getSession().setMode('ace/mode/' + parameters.language);
                 editor.setShowPrintMargin(false);
                 editor.setReadOnly(parameters.readonly || false);
 
+
                 editor.getSession().on('change', function() {
                     var value = editor.getValue();
+
+                    if(parameters.value && ko.isObservable(parameters.value)) {
+                        parameters.value(value);
+                    }
 
                     if (parameters.change) {
                         parameters.change(value);

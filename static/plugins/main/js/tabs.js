@@ -24,7 +24,31 @@ define('tabs', ['jquery', 'ko'], function($, ko) {
 
         this.icon = ko.computed({
             read : function() {
-                return $('.page-icon', this.content()).first().val() || '';
+                var value = $('.page-icon', this.content()).first().val() || null;
+
+                try {
+                    var url = new URL(value);
+
+                    return null;
+                }
+                catch(e) {
+                    return value;
+                }
+            }.bind(this)
+        });
+
+        this.favicon = ko.computed({
+            read : function() {
+                var value = $('.page-icon', this.content()).first().val() || null;
+
+                try {
+                    var url = new URL(value);
+
+                    return url;
+                }
+                catch(e) {
+                    return null;
+                }
             }.bind(this)
         });
 

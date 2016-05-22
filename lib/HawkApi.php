@@ -406,11 +406,3 @@ class HawkApi{
         );
     }
 }
-
-/**
- * This class describes Exceptions throwed by a request to the A.P.I
- *
- * @package Exceptions
- */
-class HawkApiException extends \Exception{
-}

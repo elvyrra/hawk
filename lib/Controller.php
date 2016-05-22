@@ -48,6 +48,13 @@ class Controller{
      */
     public $_plugin;
 
+    /**
+     * This variable is set when a controller method is executed
+     *
+     * @var string
+     */
+    public $executingMethod = null;
+
 
     /**
      * Constructor
@@ -88,13 +95,35 @@ class Controller{
 
 
     /**
+     * Add static content at start of the DOM
+     *
+     * @param string $content The content to add
+     */
+    private final function addContentAtStart($content) {
+        $method = $this->executingMethod;
+
+        Event::on(
+            $this->_plugin . '.' . $this->getClassname() . '.' . $method . '.' . self::AFTER_ACTION, function ($event) use ($content) {
+                if(App::response()->getContentType() === 'html') {
+                    $dom = $event->getData('result');
+                    if($dom->find('body')->length) {
+                        $dom->find('body')->prepend($content);
+                    }
+                    else{
+                        $dom->find("*:first")->parent()->prepend($content);
+                    }
+                }
+            }
+        );
+    }
+
+    /**
      * Add static content at the end of the DOM
      *
      * @param string $content The content to add
      */
-    private final function addContentAtEnd($content){
-        $action = App::router()->getCurrentAction();
-        list($tmp, $method) = explode('.', $action);
+    private final function addContentAtEnd($content) {
+        $method = $this->executingMethod;
 
         Event::on(
             $this->_plugin . '.' . $this->getClassname() . '.' . $method . '.' . self::AFTER_ACTION, function ($event) use ($content) {
@@ -111,29 +140,6 @@ class Controller{
         );
     }
 
-    /**
-     * Add static content at start of the DOM
-     *
-     * @param string $content The content to add
-     */
-    private final function addContentAtStart($content){
-        $action = App::router()->getCurrentAction();
-        list($tmp, $method) = explode('.', $action);
-
-        Event::on(
-            $this->_plugin . '.' . $this->getClassname() . '.' . $method . '.' . self::AFTER_ACTION, function ($event) use ($content) {
-                if(App::response()->getContentType() === 'html') {
-                    $dom = $event->getData('result');
-                    if($dom->find('body')->length) {
-                        $dom->find('body')->prepend($content);
-                    }
-                    else{
-                        $dom->find("*:first")->parent()->prepend($content);
-                    }
-                }
-            }
-        );
-    }
 
     /**
      * Add a link tag for CSS inclusion at the end of the HTML result to return to the client
@@ -238,11 +244,13 @@ class Controller{
 
 /**
  * This class is used to apply preprocessor and postprocessor to controller methods
+ *
+ * @package Core
  */
 class ControllerProcessor extends Controller{
-
     /**
      * Create a new instance of ControllerProcessor
+     *
      * @param Controller $object The controller instance that is wrapped in the processor
      */
     public function __construct($object) {
@@ -251,11 +259,15 @@ class ControllerProcessor extends Controller{
 
     /**
      * Call a method of the controller
-     * @param  string $method    The method to call
-     * @param  array  $arguments The arguments of the method call
-     * @return mixed             The result of the method call
+     *
+     * @param string $method    The method to call
+     * @param array  $arguments The arguments of the method call
+     *
+     * @return mixed The result of the method call
      */
     public function __call($method, $arguments) {
+        $this->controller->executingMethod = $method;
+
         /*** Load widgets before calling the controller method ***/
         $class = $this->controller->getClassname();
 
@@ -266,7 +278,7 @@ class ControllerProcessor extends Controller{
 
         /*** Call the controller method ***/
         $result = call_user_func_array(array($this->controller, $method), $arguments);
-        if(App::response()->getContentType() == 'html' && is_string($result) ) {
+        if(App::response()->getContentType() == 'html' && is_string($result)) {
             // Create a phpQuery object to be modified by event listeners (widgets)
             $result = \phpQuery::newDocument($result);
         }
@@ -283,5 +295,7 @@ class ControllerProcessor extends Controller{
         else{
             return $result;
         }
+
+        $this->controller->executingMethod = null;
     }
 }

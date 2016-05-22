@@ -167,7 +167,7 @@ class Session extends Singleton{
             // remove the variable $name from the session
             $fields = explode('.', $name);
             $tmp = &$this->data;
-            foreach(array_slice($fields, 0,-1) as $field){
+            foreach(array_slice($fields, 0, -1) as $field) {
                 $tmp = &$tmp[$field];
             }
             unset($tmp[end($fields)]);
