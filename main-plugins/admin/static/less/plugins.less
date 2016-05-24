@@ -3,20 +3,66 @@
 #available-plugins-list{
     .list-cell-available-plugins-list-controls {
         white-space: nowrap;
-        button{
-            opacity: 0.7;
-            transition: opacity .6s ease;
-        }
+        position: relative;
+        vertical-align: top;
 
-        &:hover{
-            button{
-                opacity: 1;
+        .plugin-controls {
+            position: relative;
+            height: 100%;
+            width: 100%;
+
+            .plugin-definition {
+                display: block;
+                width: 100%;
+                margin-bottom: 5rem;
+
+                .plugin-logo {
+                    display: inline-block;
+                    width: 7rem;
+                    height: auto;
+                    margin-right: .5rem;
+                    vertical-align: top;
+                }
+
+                .plugin-name {
+                    font-size: 1.3rem;
+                }
+            }
+
+            .plugin-actions {
+                display: block;
+                position: absolute;
+                bottom: 0;
+
+                button{
+                    opacity: 0.7;
+                    transition: opacity .6s ease;
+                }
+            }
+
+             &:hover{
+                .plugin-actions button{
+                    opacity: 1;
+                }
             }
         }
     }
 
-    .meta-data{
-        margin-top: 3rem;
+    .plugin-details {
+        vertical-align: top;
+        position: relative;
+        height: 100%;
+        width: 100%;
+
+        .plugin-description {
+            margin-bottom: 3rem;
+        }
+
+        .meta-data{
+            position: absolute;
+            display: block;
+            bottom: 0;
+        }
     }
 }
 

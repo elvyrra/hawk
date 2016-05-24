@@ -207,6 +207,15 @@ App::router()->prefix('/admin/', function () {
 
             // List all available plugins on file system
             App::router()->get('plugins-list', 'plugins/list', array('action' => 'PluginController.availablePlugins'));
+
+            // The details page of a plugin
+            App::router()->get('plugin-details', '/plugins/{plugin}/details', array(
+                'where' => array(
+                    'plugin' => Plugin::NAME_PATTERN
+                ),
+                'action' => 'PluginController.details'
+            ));
+
             // Install a plugin
             App::router()->get('install-plugin', 'plugins/{plugin}/install', array(
                 'where' => array(

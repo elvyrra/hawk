@@ -205,6 +205,45 @@ class PluginController extends Controller{
 
 
     /**
+     * Display the details page of the plugin
+     */
+    public function details() {
+        $plugin = Plugin::get($this->plugin);
+
+        if(is_file($plugin->getReadmeFile())) {
+            $mdParser = new Parsedown();
+            $plugin->readme = $mdParser->text(file_get_contents($plugin->getReadmeFile()));
+        }
+        else {
+            $plugin->readme = '';
+        }
+
+
+        $pageContent = View::make($this->getPlugin()->getView('plugin-details-page.tpl'), array(
+            'plugin' => $plugin
+        ));
+
+        $this->addJavaScript($this->getPlugin()->getJsUrl('plugins.js'));
+
+        return LeftSidebarTab::make(array(
+            'tabId' => 'plugin-details-page',
+            'icon' => $plugin->getFaviconUrl() ? $plugin->getFaviconUrl() : 'plug',
+            'title' => $plugin->getDefinition('title'),
+            'sidebar' => array(
+                'widgets' => array(
+                    PluginActionsWidget::getInstance(array(
+                        'plugin' => $plugin
+                    ))
+                )
+            ),
+            'page' => array(
+                'content' => $pageContent
+            )
+        ));
+    }
+
+
+    /**
      * Compute an action on a plugin (install, uninstal, activate, deactivate)
      *
      * @param string $action The action to perform : 'install', 'uninstall', 'activate', 'deactivate'

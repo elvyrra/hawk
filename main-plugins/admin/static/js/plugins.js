@@ -11,7 +11,7 @@ require(['app'], function() {
      */
     function computeAction(url, confirmation) {
         if (confirmation && !confirm(confirmation)) {
-            return false;
+            return;
         }
 
         app.loading.start();
@@ -21,10 +21,12 @@ require(['app'], function() {
             if (response.menuUpdated) {
                 app.refreshMenu();
             }
-            app.lists['available-plugins-list'].refresh();
+
+            app.load(app.tabset.activeTab().uri());
+            // app.lists['available-plugins-list'].refresh();
         })
 
-        .fail(function(xhr, code) {
+        .fail(function(xhr) {
             app.notify('error', xhr.responseJSON && xhr.responseJSON.message || xhr.responseText);
         })
 
@@ -47,7 +49,7 @@ require(['app'], function() {
     ];
 
     classes.forEach(function(classname) {
-        $('#available-plugins-list').on('click', '.' + classname, function() {
+        $('#available-plugins-list, #plugin-details-page').on('click', '.' + classname, function() {
             var confirmation = '';
 
             if (classname === 'uninstall-plugin' || classname === 'delete-plugin') {

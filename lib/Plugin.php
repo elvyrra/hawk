@@ -86,7 +86,7 @@ class Plugin{
      *
      * @var array
      */
-    private static $instances = array();
+    public static $instances = array();
 
 
     /**
@@ -228,7 +228,7 @@ class Plugin{
                 $config = isset($configs[$name]) ? $configs[$name] : null;
 
                 $plugin = self::get($name);
-                if(!$plugin->isMainPlugin()) {
+                if($loadConf && !$plugin->isMainPlugin()) {
                     $plugin->active = isset($config->active) ? (bool) $config->active : false;
                 }
                 $plugins[$name] = $plugin;
@@ -337,6 +337,16 @@ class Plugin{
      */
     public function getStartFile(){
         return $this->getRootDir() . 'start.php';
+    }
+
+
+    /**
+     * Return the readme file of the plugin.
+     * The readme file is the file README.md, written in markdown, that contains the complete description
+     * of the plugin
+     */
+    public function getReadmeFile() {
+        return $this->getRootDir() . 'README.md';
     }
 
 
@@ -616,12 +626,52 @@ class Plugin{
 
 
     /**
+     * Get the folder containing the plugin img
+     *
+     * @return string The directory path
+     */
+    public function getImgDir() {
+        return $this->getStaticDir() . 'img/';
+    }
+
+
+    /**
+     * Return the directory containing the plugin public img files
+     *
+     * @return string The directory path
+     */
+    public function getPublicImgDir(){
+        return $this->getPublicStaticDir() . 'img/';
+    }
+
+
+    /**
+     * Get the URL of an image, or the url of the image directory
+     *
+     * @param string $basename The image file basename
+     *
+     * @return string The URL
+     */
+    public function getImgUrl($basename) {
+        if(empty($basename)) {
+            return $this->getStaticUrl() . 'img/';
+        }
+        else{
+            return $this->getStaticUrl('img/' . $basename);
+        }
+    }
+
+
+    /**
      * Get the plugin logo URL
      *
      * @return string The logo url
      */
     public function getLogoUrl() {
-
+        if($this->getDefinition('logo')) {
+            return $this->getImgUrl($this->getDefinition('logo'));
+        }
+        return null;
     }
 
 
@@ -637,16 +687,16 @@ class Plugin{
             return null;
         }
 
-        $privateFilename = $this->getRootDir() . $file;
+        $privateFilename = $this->getImgDir() . $file;
         if(!is_file($privateFilename)) {
             return null;
         }
 
         $basename = 'favicon.ico';
-        $publicFilename = $this->getPublicStaticDir() . $basename;
+        $publicFilename = $this->getPublicImgDir() . $basename;
 
         if(!is_file($publicFilename) || filemtime($privateFilename) > filemtime($publicFilename)) {
-            // Get the icon and conevrt it to .ico file if it's not
+            // Get the icon and convert it to .ico file if it's not
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
             $mimeType = finfo_file($finfo, $privateFilename);
 
@@ -661,7 +711,7 @@ class Plugin{
             }
         }
 
-        return $this->getStaticUrl() . $basename . '?' . filemtime($publicFilename);
+        return $this->getImgUrl($basename);
     }
 
 
@@ -801,6 +851,13 @@ class Plugin{
      * @return boolean True if the plugin is active, False else
      */
     public function isActive(){
+        if(!isset($this->active)) {
+            $this->active = (bool) PluginModel::countElementsByExample(new DBExample(array(
+                'name' => $this->name,
+                'active' => 1
+            )));
+        }
+
         return $this->active;
     }
 

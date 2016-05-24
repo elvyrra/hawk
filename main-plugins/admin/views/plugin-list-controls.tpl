@@ -1,4 +1,16 @@
-<h4> {{ $plugin->getDefinition("title") }} ({{ $status }}) </h4>
-{foreach($buttons as $button)}
-    {{ $button }}
-{/foreach}
+<div class="plugin-controls">
+    <div class="plugin-definition">
+        <a href="{uri action='plugin-details' plugin='{$plugin->getName()}'}">
+            {if($plugin->getLogoUrl())}
+                <img src="{{ $plugin->getLogoUrl() }}" class="plugin-logo"/>
+            {/if}
+            <span class="plugin-name"> {{ $plugin->getDefinition("title") }} ({{ $status }}) </span>
+        </a>
+    </div>
+
+    <div class="plugin-actions pull-left">
+        {foreach($buttons as $button)}
+            {{ $button }}
+        {/foreach}
+    </div>
+</div>
