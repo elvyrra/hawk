@@ -84,11 +84,13 @@ require(['app'], function() {
     $('.download-plugin').click(function() {
         app.loading.start();
 
-        $.get($(this).attr('href')).success(function() {
+        $.get($(this).data('href'))
+
+        .done(function() {
             app.load(location.hash.substr(2));
         })
 
-        .error(function(xhr, status, error) {
+        .fail(function(xhr, status, error) {
             app.loading.stop();
             app.notify('error', error.message);
         });
