@@ -143,26 +143,16 @@ class DBExample{
                 if(is_array($value)) {
                     $values = array();
                     foreach($value as $unitValue) {
-                        if($unitValue{0} !== '\\') {
-                            $bindKey = uniqid();
-                            $binds[$bindKey] = $unitValue;
-                            $values[] = ':'.$bindKey;
-                        }
-                        else {
-                            $values[] = substr($val, 1);
-                        }
+                        $bindKey = uniqid();
+                        $binds[$bindKey] = $unitValue;
+                        $values[] = ':'.$bindKey;
                     }
                     $elements[] = DB::formatField($upperKey) . " $op (" . implode(',', $values) . ")";
                 }
                 else{
-                    if($value{0} !== '\\') {
-                        $bindKey = uniqid();
-                        $binds[$bindKey] = $value;
-                        $val = ':' . $bindKey;
-                    }
-                    else {
-                        $val = substr($value, 1);
-                    }
+                    $bindKey = uniqid();
+                    $binds[$bindKey] = $value;
+                    $val = ':' . $bindKey;
                     $elements[] = DB::formatField($upperKey) . " $op $val";
                 }
             }
@@ -197,14 +187,10 @@ class DBExample{
 
                     default :
                         if(is_scalar($value)) {
-                            if($value{0} !== '\\') {
-                                $bindKey = uniqid();
-                                $binds[$bindKey] = $value;
-                                $val = ':' . $bindKey;
-                            }
-                            else {
-                                $val = substr($value, 1);
-                            }
+                            $bindKey = uniqid();
+                            $binds[$bindKey] = $value;
+                            $val = ':' . $bindKey;
+
                             $elements[] = DB::formatField($key) . ' = ' . $val;
                         }
                         elseif(is_array($value)) {

@@ -32,7 +32,7 @@ class Role extends Model{
             'type' => 'VARCHAR(32)'
         ),
         'removable' => array(
-            'type' => 'TINYINT(11)',
+            'type' => 'TINYINT(1)',
             'default' => '1'
         ),
         'color' => array(

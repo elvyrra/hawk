@@ -26,7 +26,7 @@ class LoginController extends Controller{
             "fieldsets" => array(
                 "form" => array(
 
-                    new TextInput(array(
+                    new EmailInput(array(
                         "field" => "login",
                         "required" => true,
                         "label" => Lang::get($this->_plugin . '.login-label'),

@@ -187,10 +187,10 @@ class DB{
      */
     public function query($sql, $binds = array(), $options = array()){
         $default = array(
-        'return' => self::RETURN_STATUS,
-        'onerow' => false,
-        'index' => null,
-        'args' => array()
+            'return' => self::RETURN_STATUS,
+            'onerow' => false,
+            'index' => null,
+            'args' => array()
         );
 
         foreach($default as $name => $value){
@@ -439,14 +439,9 @@ class DB{
         foreach($insert as $key => $value) {
             $keys[] = self::formatField($key);
 
-            if(substr($value, 0, 1) !== '\\') {
-                $uniq = uniqid();
-                $values[] = ':'.$uniq;
-                $binds[$uniq] = $value;
-            }
-            else {
-                $values[] = substr($value, 1);
-            }
+            $uniq = uniqid();
+            $values[] = ':'.$uniq;
+            $binds[$uniq] = $value;
         }
 
         $keys = implode(',', $keys);
@@ -477,15 +472,9 @@ class DB{
         foreach($insert as $key => $value){
             $keys[] = self::formatField($key);
 
-
-            if(substr($value, 0, 1) !== '\\') {
-                $uniq = uniqid();
-                $values[] = ':'.$uniq;
-                $binds[$uniq] = $value;
-            }
-            else {
-                $values[] = substr($value, 1);
-            }
+            $uniq = uniqid();
+            $values[] = ':'.$uniq;
+            $binds[$uniq] = $value;
         }
 
         $keys = implode(',', $keys);
@@ -516,14 +505,9 @@ class DB{
 
         $updates = array();
         foreach($update as $key => $value) {
-            if(substr($value, 0, 1) !== '\\') {
-                $bind = uniqid();
-                $updates[] = self::formatField($key) . ' = :' . $bind;
-                $binds[$bind] = $value;
-            }
-            else {
-                $updates[] = self::formatField($key) . ' = ' . substr($value, 1);
-            }
+            $bind = uniqid();
+            $updates[] = self::formatField($key) . ' = :' . $bind;
+            $binds[$bind] = $value;
         }
 
         $sql = 'UPDATE ' . $table . ' SET '. implode(',', $updates) . $where;
@@ -615,10 +599,10 @@ class DB{
      */
     private function addLog($query, $result, $start, $end){
         $this->logs[] = array(
-        'query' => $query,
-        'start' => $start - SCRIPT_START_TIME,
-        'end' => $end - SCRIPT_START_TIME,
-        'time' => $end - $start
+            'query' => $query,
+            'start' => $start - SCRIPT_START_TIME,
+            'end' => $end - SCRIPT_START_TIME,
+            'time' => $end - $start
         );
     }
 
