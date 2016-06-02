@@ -42,17 +42,17 @@ class ProfileQuestion extends Model{
             'type' => 'TEXT'
         ),
         'editable' => array(
-            'TINYINT(1)'
+            'type' => 'TINYINT(1)'
         ),
         'displayInRegister' => array(
-            'TINYINT(1)'
+            'type' => 'TINYINT(1)'
         ),
         'displayInProfile' => array(
-            'TINYINT(1)',
+            'type' => 'TINYINT(1)',
             'default' => '0'
         ),
         'order' => array(
-            'INT(11)'
+            'type' => 'INT(11)'
         )
     );
 

@@ -477,7 +477,7 @@ class Model{
 
         // Add primary key definition
         $primaryColumn = static::getPrimaryColumn();
-        if(!$primaryColumn !== null) {
+        if($primaryColumn !== null) {
             if(is_array($primaryColumn)) {
                 $primaryColumn = implode(
                     ',',
