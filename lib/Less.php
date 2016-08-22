@@ -101,6 +101,10 @@ class Less{
      * @param array  $variables Less variables to set before compiling the Less file
      */
     public static function compile($source, $dest, $force = false, $variables = array()){
+        if(!is_file($dest)) {
+            $force = true;
+        }
+
         $less = new self($source);
 
         $less->build($dest, $force, $variables);

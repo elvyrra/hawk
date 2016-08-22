@@ -43,7 +43,8 @@ class EmailInput extends TextInput{
             }
             return true;
         }
-        else
-        return false;
+        else {
+            return false;
+        }
     }
 }

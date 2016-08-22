@@ -63,6 +63,12 @@ class Model{
 
 
     /**
+     * The model instances, by their id
+     */
+    protected static $instancesById = array();
+
+
+    /**
      * Constructor : Instanciate a new Model object
      *
      * @param array $data The initial data to set.
@@ -96,11 +102,15 @@ class Model{
      *
      * @return Model The found Model instance
      */
-    public static function getById($id, $fields = array()){
-        $example = new DBExample(array(
-            static::$primaryColumn => $id
-        ));
-        return self::getByExample($example, $fields);
+    public static function getById($id, $fields = array()) {
+        if(!isset(static::$instancesById[get_called_class()][$id])) {
+            $example = new DBExample(array(
+                static::$primaryColumn => $id
+            ));
+            static::$instancesById[get_called_class()][$id] = self::getByExample($example, $fields);
+        }
+
+        return static::$instancesById[get_called_class()][$id];
     }
 
 
@@ -253,7 +263,8 @@ class Model{
      *
      * @return array The data to be inserted for method save or update
      */
-    private function prepareDatabaseData(){
+    protected function prepareDatabaseData() {
+        // TODO using the model fields property
         $fields = self::getDbInstance()->query('SHOW COLUMNS FROM ' . self::getTable(), array(), array('index' => 'Field', 'return' => DB::RETURN_ARRAY));
 
         $insert = array();

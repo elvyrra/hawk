@@ -76,20 +76,12 @@ class Autoload{
             $dirs = $searchDirectories[$namespace];
         }
         elseif(strpos($namespace, 'Hawk\\Plugins\\') === 0) {
-            $alias = '\\Hawk\\' . $class;
-            if(class_exists($alias) || trait_exists($alias)) {
-                class_alias($alias, $classname);
-
-                return true;
-            }
-            else{
-                // Find the plugins associated to this namespace
-                $plugins = Plugin::getAll();
-                foreach($plugins as $plugin){
-                    if($plugin->getNamespace() === $namespace) {
-                        $dirs = array($plugin->getRootDir());
-                        break;
-                    }
+            // Find the plugins associated to this namespace
+            $plugins = Plugin::getAll();
+            foreach($plugins as $plugin){
+                if($plugin->getNamespace() === $namespace) {
+                    $dirs = array($plugin->getRootDir());
+                    break;
                 }
             }
         }
@@ -110,6 +102,15 @@ class Autoload{
                 // Register this file, associated to the class name, in cache
                 self::$cache[$classname] = $file;
                 self::$cacheUpdated = true;
+
+                return true;
+            }
+        }
+
+        if(strpos($namespace, 'Hawk\\Plugins\\') === 0) {
+            $alias = '\\Hawk\\' . $class;
+            if(class_exists($alias) || trait_exists($alias)) {
+                class_alias($alias, $classname);
 
                 return true;
             }

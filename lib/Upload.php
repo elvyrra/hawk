@@ -53,11 +53,11 @@ class Upload{
                 }
 
                 $this->files[$i]  = (object) array(
-                'basename' => $files[$name]['name'][$i],
-                'tmpFile' => $files[$name]['tmp_name'][$i],
-                'mime' => $files[$name]['type'][$i],
-                'size' => $files[$name]['size'][$i],
-                'extension' => pathinfo($files[$name]['name'][$i], PATHINFO_EXTENSION)
+                    'basename' => $files[$name]['name'][$i],
+                    'tmpFile' => $files[$name]['tmp_name'][$i],
+                    'mime' => $files[$name]['type'][$i],
+                    'size' => $files[$name]['size'][$i],
+                    'extension' => pathinfo($files[$name]['name'][$i], PATHINFO_EXTENSION)
                 );
             }
         }
@@ -67,11 +67,11 @@ class Upload{
             }
 
             $this->files[] = (object) array(
-            'basename' => $files[$name]['name'],
-            'tmpFile' => $files[$name]['tmp_name'],
-            'mime' => $files[$name]['type'],
-            'size' => $files[$name]['size'],
-            'extension' => pathinfo($files[$name]['name'], PATHINFO_EXTENSION)
+                'basename' => $files[$name]['name'],
+                'tmpFile' => $files[$name]['tmp_name'],
+                'mime' => $files[$name]['type'],
+                'size' => $files[$name]['size'],
+                'extension' => pathinfo($files[$name]['name'], PATHINFO_EXTENSION)
             );
         }
     }

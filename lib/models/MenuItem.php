@@ -182,15 +182,13 @@ class MenuItem extends Model{
             $data['parentId'] = 0;
         }
 
-        $data['order'] = App::db()->select(
-            array(
+        $data['order'] = App::db()->select(array(
             'fields' => array('COALESCE(MAX(`order`), 0) + 1' => 'newOrder'),
             'from' => self::getTable(),
             'where' => new DBExample(array('parentId' => $data['parentId'])),
             'one' => true,
             'return' => DB::RETURN_OBJECT
-            )
-        )->newOrder;
+        ))->newOrder;
 
         // Insert the menu item
         $item = parent::add($data);
@@ -235,13 +233,9 @@ class MenuItem extends Model{
      * @return array
      */
     public static function getPluginMenuItems($plugin){
-        return self::getListByExample(
-            new DBExample(
-                array(
-                'plugin' => $plugin
-                )
-            )
-        );
+        return self::getListByExample(new DBExample(array(
+            'plugin' => $plugin
+        )));
     }
 
 
@@ -251,7 +245,9 @@ class MenuItem extends Model{
     public function delete(){
         App::db()->update(
             self::getTable(),
-            new DBExample(array('parentId' => $this->id)),
+            new DBExample(array(
+                'parentId' => $this->id
+            )),
             array('parentId' => 0)
         );
 

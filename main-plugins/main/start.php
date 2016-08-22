@@ -9,7 +9,7 @@ namespace Hawk\Plugins\Main;
 
 App::router()->get('index', '/', array('action' => 'MainController.main'));
 App::router()->get('new-tab', '/newtab', array('action' => 'MainController.newTab'));
-App::router()->get('logout', '/logout', array('action' => 'LoginController.logout'));
+
 
 App::router()->auth(App::session()->isLogged(), function () {
     App::router()->any('edit-profile', '/profile/edit/{userId}', array(
@@ -28,6 +28,8 @@ App::router()->auth(App::session()->isLogged(), function () {
     App::router()->any('change-password', '/profile/change-password', array(
         'action' => 'UserProfileController.changePassword'
     ));
+
+    App::router()->get('logout', '/logout', array('action' => 'LoginController.logout'));
 });
 
 App::router()->get('validate-new-email', '/profile/change-email/{token}', array(

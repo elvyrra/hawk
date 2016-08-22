@@ -186,6 +186,7 @@ class ItemListField {
      */
     public function getSearchCondition(&$binds){
         if($this->searchValue !== null) {
+            Utils::debug($this->searchValue);
             return DBExample::make(
                 array(
                     $this->field => array(

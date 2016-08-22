@@ -141,8 +141,8 @@ require(['app'], function() {
             });
 
 
-            for(var i in form.inputs){
-                if(i !== 'compiled'){
+            for(var i in form.inputs) {
+                if(i !== 'compiled') {
                     var input = form.inputs[i];
                     model.vars[input.name] = ko.observable(input.val());
 

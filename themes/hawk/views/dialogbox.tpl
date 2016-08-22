@@ -1,3 +1,4 @@
+<div class="modal-backdrop fade in"></div>
 <div class="modal-dialog center" style="{{ !empty($width) ? "width:$width;" : ""}}{{!empty($height) ? "height:$height;" : ""}}">
 	<div class="modal-content">
 		<div class="modal-header">

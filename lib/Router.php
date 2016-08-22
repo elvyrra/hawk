@@ -450,7 +450,7 @@ final class Router extends Singleton{
                 $replace = $route->default[$arg];
             }
             else{
-                throw new \Exception("The URI built from '$method' needs the argument : $arg");
+                throw new \Exception("The URI built from '$name' needs the argument : $arg");
             }
             $url = str_replace("{{$arg}}", $replace, $url);
         }
