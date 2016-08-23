@@ -24,7 +24,7 @@ require.config(
             ko          : 'ext/knockout-3.3.0',
             ckeditor    : 'ext/ckeditor/ckeditor',
             ace         : 'ext/ace/ace',
-            less        : 'ext/less'
+            less        : 'ext/less',
         },
         shim : {
             jquery : {
@@ -80,7 +80,7 @@ define(
         'bootstrap',
         'colorpicker',
         'datepicker',
-        'ko-extends'
+        'ko-extends',
     ],
     function($, ko, Tabset, Form, List, Lang) {
         // export libraries to global context
@@ -99,20 +99,20 @@ define(
         var App = function() {
             this.conf = window.appConf;
 
-            this.language = '';
             // The application language
-            this.rootUrl = '';
+            this.language = '';
             // The application root url
-            this.isLogged = false;
+            this.rootUrl = '';
             // The user is connected or not ?
-            this.routes = [];
+            this.isLogged = false;
             // The application routes
-            this.forms = {};
+            this.routes = [];
             // The instanciated forms
-            this.lists = {};
+            this.forms = {};
             // The instanciated lists
-            this.isReady = false;
+            this.lists = {};
             // The ready state of the application
+            this.isReady = false;
         };
 
         /**
@@ -196,7 +196,7 @@ define(
 
                         default :
                             // Open the url in a given DOM node, represented by it CSS selector
-                            this.load(url, {selector : $(node).attr('target')});
+                            this.load(url, {selector : target});
                             break;
                     }
                 }.bind(this)

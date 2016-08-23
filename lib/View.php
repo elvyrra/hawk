@@ -78,7 +78,7 @@ class View{
     /**
      * The regular expression to match view plugins attributes
      */
-    const PLUGIN_ARGUMENTS_REGEX = '#([\w\-]+)\=([\'"])(\{?)((?:[^\2\\\\]|\\\\.)*?)(\}?)\\2#sm';
+    const PLUGIN_ARGUMENTS_REGEX = '#([\w\-\:]+)\=([\'"])(\{?)((?:[^\2\\\\]|\\\\.)*?)(\}?)\\2#sm';
 
     /**
      * The regular expresison to match translations

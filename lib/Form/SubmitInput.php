@@ -29,16 +29,4 @@ class SubmitInput extends ButtonInput{
         $this->class .= " btn-primary";
         return parent::display();
     }
-
-    /**
-     * Check the value of the input. This method is overrides the one in FormInput class,
-     * and returns always <b>true</b> because no data can be submitted for this type of input
-     *
-     * @param Form $form The for this input is associated with
-     *
-     * @return boolean True
-     */
-    public function check(&$form = null){
-        return true;
-    }
 }

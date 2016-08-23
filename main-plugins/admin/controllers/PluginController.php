@@ -212,7 +212,23 @@ class PluginController extends Controller{
 
         if(is_file($plugin->getReadmeFile())) {
             $mdParser = new Parsedown();
-            $plugin->readme = $mdParser->text(file_get_contents($plugin->getReadmeFile()));
+
+            $md = file_get_contents($plugin->getReadmeFile());
+
+            // Replace img sources
+            $md = preg_replace_callback("#\!\[(.*?)\]\((.+?)( .+)?\)#", function($matches) use($plugin) {
+                $alt = $matches[1];
+                $src = $matches[2];
+                $attributes = empty($matches[3]) ? '' : $matches[3];
+
+                if(substr($src, 0, 4) !== 'http' && substr($src, 0, 2) !== '//') {
+                    $src = $plugin->getImgUrl('readme/' . $src);
+                }
+
+                return '![' . $alt . '](' . $src . $attributes . ')';
+            }, $md);
+
+            $plugin->readme = $mdParser->text($md);
         }
         else {
             $plugin->readme = '';
@@ -224,6 +240,7 @@ class PluginController extends Controller{
         ));
 
         $this->addJavaScript($this->getPlugin()->getJsUrl('plugins.js'));
+        $this->addCss($this->getPlugin()->getCssUrl('plugins.less'));
 
         return LeftSidebarTab::make(array(
             'tabId' => 'plugin-details-page',
@@ -516,11 +533,12 @@ class PluginController extends Controller{
                         throw new \Exception('Impossible to create the directory ' . $dir);
                     }
 
-                    foreach(array('controllers', 'models', 'lib', 'lang', 'views', 'static', 'widgets') as $subdir){
-                        if(!mkdir($dir . $subdir)) {
+                    foreach(array('controllers', 'models', 'lib', 'lang', 'views', 'static', 'static/less', 'static/js', 'static/img', 'widgets') as $subdir){
+                        if(!mkdir($dir . $subdir, 0755, true)) {
                             throw new \Exception('Impossible to create the directory ' . $dir . $subdir);
                         }
                     }
+
 
                     // Create the file manifest.json
                     $conf = array(
@@ -583,6 +601,11 @@ class PluginController extends Controller{
                     $language = file_get_contents(Plugin::current()->getRootDir() . 'templates/lang.tpl');
                     if(file_put_contents($dir . 'lang/' . $plugin->getName() . '.en.lang', $language) === false) {
                         throw new \Exception('Impossible to create the file lang/' . $plugin->getName() . '.en.lang');
+                    }
+
+                    // Create the README file
+                    if(touch($dir . 'README.md') === false) {
+                        throw new \Exception('Impossible to create the README file');
                     }
 
                     return $form->response(Form::STATUS_SUCCESS, Lang::get($this->_plugin . '.new-plugin-success'));
@@ -655,8 +678,10 @@ class PluginController extends Controller{
             }
         }
         catch(\Exception $e){
-            $this->addJavaScriptInline('app.notify("error", "' . addcslashes($e->getMessage(), '"') . '");');
             App::response()->setStatus(500);
+            App::response()->setBody(array(
+                'message' => $e->getMessage()
+            ));
         }
 
 

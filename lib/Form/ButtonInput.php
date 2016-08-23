@@ -58,11 +58,9 @@ class ButtonInput extends FormInput{
         if(empty($param['icon']) && isset(self::$defaultIcons[$this->name]))
         $param['icon'] = self::$defaultIcons[$this->name];
 
-        $param = array_filter(
-            $param, function ($v) {
-                return !empty($v);
-            }
-        );
+        $param = array_filter($param, function ($v) {
+            return !empty($v);
+        });
 
         if(!isset($param['label'])) {
             $param['label'] = $this->value;

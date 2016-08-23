@@ -28,7 +28,7 @@ class ForbiddenException extends \Exception {
      * @param string $message The exception message
      * @param string $reason  The exception reason
      */
-    public function __construct($message, $reason) {
+    public function __construct($message, $reason = '') {
         if(!$message) {
             $message = Lang::get('main.403-message');
         }

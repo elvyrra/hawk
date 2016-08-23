@@ -172,7 +172,14 @@ class Form{
      *
      * @var array
      */
-    $reference = array();
+    $reference = array(),
+
+    /**
+     * Additional HTML attributes to set on the form tag
+     *
+     * @var array
+     */
+    $attributes = array();
 
     /**
      * The database example, generated from the reference, to find the object to display and treat in the database
@@ -565,8 +572,9 @@ class Form{
      * @return bool true if the data is valid, false else.
      */
     public function check($exit = self::EXIT_JSON){
-        if(empty($this->errors))
-        $this->errors = array();
+        if(empty($this->errors)) {
+            $this->errors = array();
+        }
 
         foreach($this->inputs as $name => $field){
             $field->check($this);
@@ -691,8 +699,8 @@ class Form{
 
             $this->addReturn(
                 array(
-                'primary' => $this->object->$id,
-                'action' => self::ACTION_DELETE
+                    'primary' => $this->object->$id,
+                    'action' => self::ACTION_DELETE
                 )
             );
             $this->status = self::STATUS_SUCCESS;
@@ -733,9 +741,15 @@ class Form{
      * @param string $message The value to apply
      */
     public function addReturn($name, $message= ""){
-        if(is_array($name)) {
-            foreach($name as $key => $value)
-            $this->addReturn($key, $value);
+        if(is_object($name)) {
+            foreach(get_object_vars($name) as $key => $value) {
+                $this->addReturn($key, $value);
+            }
+        }
+        elseif(is_array($name)) {
+            foreach($name as $key => $value) {
+                $this->addReturn($key, $value);
+            }
         }
         else{
             $this->returns[$name] = $message;

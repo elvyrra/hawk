@@ -314,6 +314,6 @@ class Mail{
             App::logger()->error('The mail could not be sent because : ' . $this->mailer->ErrorInfo);
             throw new MailException($this->mailer->ErrorInfo);
         }
-        App::logger()->info('An email was sent to ' . implode(', ', $this->mailer->getAllRecipientAddresses()));
+        App::logger()->info('An email was sent to ' . implode(', ', array_keys($this->mailer->getAllRecipientAddresses())));
     }
 }

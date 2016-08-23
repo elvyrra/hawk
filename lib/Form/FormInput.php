@@ -360,25 +360,21 @@ class FormInput{
                 unset($this->errorAt);
             }
 
-            $inputLabel = $this->label ? View::make(
-                Theme::getSelected()->getView(Form::VIEWS_DIR . 'form-input-label.tpl'), array(
-                'input' => $this
-                )
-            ) : '';
+            $inputLabel = $this->label ?
+                View::make($theme->getView(Form::VIEWS_DIR . 'form-input-label.tpl'), array(
+                    'input' => $this
+                )) :
+                '';
 
-            $inputDisplay = View::make(
-                $this->tpl, array(
+            $inputDisplay = View::make($this->tpl, array(
                 'input' => $this
-                )
-            );
+            ));
 
-            return View::make(
-                Theme::getSelected()->getView(Form::VIEWS_DIR . 'form-input-block.tpl'), array(
+            return View::make($theme->getView(Form::VIEWS_DIR . 'form-input-block.tpl'), array(
                 'input' => $this,
                 'inputLabel' => $inputLabel,
                 'inputDisplay' => $inputDisplay
-                )
-            );
+            ));
         }
         catch(\Exception $e){
             App::errorHandler()->exception($e);
@@ -429,12 +425,10 @@ class FormInput{
 
         // If the value of this field must be unique in the database, check this unicity is not compromised
         if(!empty($this->value) && $this->unique && $form) {
-            $example = new DBExample(
-                array(
+            $example = new DBExample(array(
                 '$not' => $form->reference,
                 array($this->name => $this->dbvalue())
-                )
-            );
+            ));
 
             $model = $form->model;
             if($model::getByExample($example)) {

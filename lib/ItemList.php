@@ -414,7 +414,7 @@ class ItemList {
 
             // Get the number of the page
             if($this->lines == self::ALL_LINES) {
-                $this->lines = $this->recordNumber;
+                $this->lines = $this->recordNumber ? $this->recordNumber : 1;
             }
 
             if($this->page > 1 && $this->page > ceil($this->recordNumber / $this->lines)) {
@@ -464,24 +464,44 @@ class ItemList {
                     }
                 );
             }
+        }
 
-            $sort = isset($this->sorts[$name]) ? $this->sorts[$name] : null;
-            if($sort) {
-                usort(
-                    $data,
-                    function ($a, $b) use ($sort, $name) {
-                        if($sort > 0) {
-                            return $a[$name] < $b[$name];
+        if(!empty($this->sorts)) {
+            usort(
+                $data,
+                function ($a, $b) {
+                    foreach($this->sorts as $name => $sort) {
+
+                        if(!$sort) {
+                            continue;
+                        }
+                        if(is_array($a) && is_array($b)) {
+                            if($a[$name] == $b[$name]) {
+                                continue;
+                            }
+                        }
+                        else {
+                            if($a->$name == $b->$name) {
+                                continue;
+                            }
+                        }
+
+                        if($sort === DB::SORT_ASC) {
+                            return (is_array($a) ? $a[$name] < $b[$name] : $a->$name < $b->$name) ? -1 : 1;
                         }
                         else{
-                            return $b[$name] < $a[$name];
+                            return (is_array($a) ? $b[$name] < $a[$name] : $b->$name < $a->$name) ? -1 : 1;
                         }
                     }
-                );
-            }
+                }
+            );
         }
 
         $this->recordNumber = count($data);
+
+        if($this->lines == self::ALL_LINES) {
+            $this->lines = $this->recordNumber ? $this->recordNumber : 1;
+        }
 
         if($this->page > ceil($this->recordNumber / $this->lines) && $this->page > 1) {
             $this->page = (ceil($this->recordNumber / $this->lines) > 0) ? ceil($this->recordNumber / $this->lines) : 1;

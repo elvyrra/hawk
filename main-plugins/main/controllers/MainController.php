@@ -159,10 +159,10 @@ class MainController extends Controller{
         }
 
         if(empty($favicon)) {
-            return Plugin::current()->getStaticUrl('img/hawk-favicon.ico');
+            return $this->getPlugin()->getStaticUrl('img/hawk-favicon.ico');
         }
         else{
-            return Plugin::current()->getUserfilesUrl($favicon);
+            return $this->getPlugin()->getUserfilesUrl($favicon);
         }
     }
 

@@ -551,19 +551,16 @@ class Plugin{
 
             if(is_file($privateFilename)) {
 
-                Event::on(
-                    'built-less', function (Event $event) use ($privateFilename) {
-                        if($event->getData('source') === $privateFilename) {
-                            // Copy all static files except less and JS
-                            foreach(glob($this->getStaticDir() . '*') as $elt){
-                                if(! in_array(basename($elt), array('less', 'js'))) {
-                                    App::fs()->copy($elt, $this->getPublicStaticDir());
-                                }
+                Event::on('built-less', function (Event $event) use ($privateFilename) {
+                    if($event->getData('source') === $privateFilename) {
+                        // Copy all static files except less and JS
+                        foreach(glob($this->getStaticDir() . '*') as $elt){
+                            if(! in_array(basename($elt), array('less', 'js'))) {
+                                App::fs()->copy($elt, $this->getPublicStaticDir());
                             }
                         }
                     }
-                );
-
+                });
                 Less::compile($privateFilename, $publicFilename);
             }
 
@@ -652,7 +649,7 @@ class Plugin{
      *
      * @return string The URL
      */
-    public function getImgUrl($basename) {
+    public function getImgUrl($basename = '') {
         if(empty($basename)) {
             return $this->getStaticUrl() . 'img/';
         }
@@ -792,6 +789,9 @@ class Plugin{
         if(!is_dir($this->getPublicUserfilesDir())) {
             mkdir($this->getPublicUserfilesDir(), 0755, true);
         }
+        if(!is_dir($this->getUserfilesDir())) {
+            mkdir($this->getUserfilesDir(), 0755, true);
+        }
 
         try{
             $this->getInstallerInstance()->install();
@@ -826,6 +826,10 @@ class Plugin{
 
         if(is_dir($this->getPublicUserfilesDir())) {
             App::fs()->remove($this->getPublicUserfilesDir());
+        }
+
+        if(is_dir($this->getUserfilesDir())) {
+            App::fs()->remove($this->getUserfilesDir());
         }
 
         try{
@@ -935,7 +939,7 @@ class Plugin{
     }
 
     /**
-     * Compelete deletion of plugin
+     * Complete deletion of plugin
      */
     public function delete(){
         if($this->removable) {
@@ -943,5 +947,21 @@ class Plugin{
 
             App::fs()->remove($directory);
         }
+    }
+
+
+    /**
+     * Get the permissions declared for this plugin
+     */
+    public function getPermissions() {
+        return Permission::getPluginPermissions($this->getName());
+    }
+
+
+    /**
+     * Get the menu items declared for this plugin
+     */
+    public function getMenuItems() {
+        return MenuItem::getPluginMenuItems($this->getName());
     }
 }

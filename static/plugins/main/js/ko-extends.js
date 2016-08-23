@@ -292,7 +292,7 @@ define('ko-extends', ['jquery', 'ko'], function($, ko) {
      * @module  ko-ace
      */
     ko.bindingHandlers.ace = {
-        update : function(element, valueAccessor) {
+        update : function(element, valueAccessor, allBindings, viewModel) {
             require(['ace'], function(ace) {
                 var parameters = ko.unwrap(valueAccessor());
 
@@ -302,15 +302,28 @@ define('ko-extends', ['jquery', 'ko'], function($, ko) {
 
                 var editor = ace.edit(element.id);
 
+                editor.setTheme('ace/theme/' + (ko.unwrap(parameters.theme) || 'chrome'));
+                editor.getSession().setMode('ace/mode/' + ko.unwrap(parameters.language));
+                editor.setShowPrintMargin(true);
+                editor.setReadOnly(ko.unwrap(parameters.readonly) || false);
+
                 if(parameters.value) {
-                    editor.setValue(ko.isObservable(parameters.value) ? parameters.value() : parameters.value);
+                    editor.setValue(ko.unwrap(parameters.value));
                 }
 
-                editor.setTheme('ace/theme/' + (parameters.theme || 'chrome'));
-                editor.getSession().setMode('ace/mode/' + parameters.language);
-                editor.setShowPrintMargin(false);
-                editor.setReadOnly(parameters.readonly || false);
-
+                if(parameters.save) {
+                    editor.commands.addCommand({
+                        name: 'saveFile',
+                        bindKey: {
+                            win : 'Ctrl-S',
+                            mac : 'Command-S',
+                            sender : 'editor|cli'
+                        },
+                        exec: function() {
+                            parameters.save(viewModel, editor.getValue());
+                        }
+                    });
+                }
 
                 editor.getSession().on('change', function() {
                     var value = editor.getValue();
@@ -366,6 +379,11 @@ define('ko-extends', ['jquery', 'ko'], function($, ko) {
      * @param {NodeElement} node The node to process knockout on
      */
     ko.bindingProvider.instance.preprocessNode = function(node) {
+        if ($(node).hasClass('ko-template')) {
+            ko.templates[node.id] = node.innerHTML;
+            $(node).remove();
+        }
+
         var dataBind = node.dataset && node.dataset.bind || '';
 
         for (var name in ko.bindingHandlers) {
@@ -381,4 +399,63 @@ define('ko-extends', ['jquery', 'ko'], function($, ko) {
             node.dataset.bind = dataBind;
         }
     };
+
+
+
+    //define a template source that tries to key into an object first to find a template string
+    var templates = {},
+        data = {},
+        engine = new ko.nativeTemplateEngine();
+
+    ko.templateSources.stringTemplate = function(template) {
+        this.templateName = template;
+    };
+
+    ko.utils.extend(ko.templateSources.stringTemplate.prototype, {
+        data: function(key, value) {
+            data[this.templateName] = data[this.templateName] || {};
+
+            if (arguments.length === 1) {
+                return data[this.templateName][key];
+            }
+
+            data[this.templateName][key] = value;
+        },
+        text: function(value) {
+            if (arguments.length === 0) {
+                var template = templates[this.templateName];
+
+                if (typeof (template) === 'undefined') {
+                    throw Error("Template not found: " + this.templateName);
+                }
+
+                return template;
+            }
+
+            templates[this.templateName] = value;
+        }
+    });
+
+    engine.makeTemplateSource = function(template, doc) {
+        var elem;
+
+        if (typeof template === "string") {
+            elem = (doc || document).getElementById(template);
+
+            if (elem) {
+                return new ko.templateSources.domElement(elem);
+            }
+
+            return new ko.templateSources.stringTemplate(template);
+        }
+        else if (template && (template.nodeType === 1) || (template.nodeType === 8)) {
+            return new ko.templateSources.anonymousTemplate(template);
+        }
+    };
+
+    //make the templates accessible
+    ko.templates = templates;
+
+    //make this new template engine our default engine
+    ko.setTemplateEngine(engine);
 });

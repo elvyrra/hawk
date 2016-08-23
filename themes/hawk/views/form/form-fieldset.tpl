@@ -1,8 +1,11 @@
 {if($fieldset->legend)}
-	<fieldset id="{{ $fieldset->id }}">
+	<fieldset id="{{ $fieldset->id }}"
+                {foreach($fieldset->attributes as $key => $value)}
+                    {if($value !== null)} {{ $key }}="{{ htmlentities($value, ENT_COMPAT) }}" {/if}
+                {/foreach}>
 		<legend id="{{ $fieldset->legendId }}">{{ $fieldset->legend }}</legend>
 {else}
-	<div>								
+	<div>
 {/if}
 
 {foreach($fieldset->inputs as $field)}
@@ -12,5 +15,5 @@
 {if($fieldset->legend)}
 	</fieldset>
 {else}
-	</div>						
+	</div>
 {/if}

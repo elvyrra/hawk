@@ -39,7 +39,13 @@ class FormFieldset{
     /**
      * The id of the legend tag
      */
-    $legendId = '';
+    $legendId = '',
+
+    /**
+     * HTML attibutes to set on the fieldset tag
+     * @var array
+     */
+    $attributes = array();
 
     /**
      * Constructor

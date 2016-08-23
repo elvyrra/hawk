@@ -59,10 +59,10 @@ abstract class Image{
     public static function getInstance($filename){
         $info = getimagesize($filename);
         $data = array(
-        'width' => $info[0],
-        'height' => $info[1],
-        'type' => $info[2],
-        'mime' => $info['mime']
+            'width' => $info[0],
+            'height' => $info[1],
+            'type' => $info[2],
+            'mime' => $info['mime']
         );
         if(!isset(self::$types[$data['type']])) {
             throw new ImageException("The type of the file $filename is not supported");
