@@ -98,21 +98,27 @@ class QuestionController extends Controller{
                 'actions' => array(
                     'independant' => true,
                     'display' => function ($value, $field, $line) {
-                        return
-                            Icon::make(array(
-                                'icon' => 'pencil',
-                                'class' => 'text-info',
-                                'href' => App::router()->getUri('edit-profile-question', array('name' => $line->name)),
-                                'target' => 'dialog',
-                                'title' => Lang::get($this->_plugin . 'edit-profile-question')
-                            )) .
 
-                            Icon::make(array(
-                                'icon' => 'times',
-                                'class' => 'text-danger delete-question',
-                                'data-question' => $line->name,
-                                'title' => Lang::get($this->_plugin . 'delete-profile-question')
-                            ));
+                        if($line->editable){
+                            return
+                                Icon::make(array(
+                                    'icon' => 'pencil',
+                                    'class' => 'text-info',
+                                    'href' => App::router()->getUri('edit-profile-question', array('name' => $line->name)),
+                                    'target' => 'dialog',
+                                    'title' => Lang::get($this->_plugin . '.edit-profile-question')
+                                )) .
+
+                                Icon::make(array(
+                                    'icon' => 'times',
+                                    'class' => 'text-danger delete-question',
+                                    'data-question' => $line->name,
+                                    'title' => Lang::get($this->_plugin . '.delete-profile-question')
+                                ));
+                        }
+                        else{
+                            return '';
+                        }
                     },
                     'sort' => false,
                     'search' => false,
@@ -235,8 +241,11 @@ class QuestionController extends Controller{
         $q = ProfileQuestion::getByName($this->name);
         $roles = Role::getAll();
 
-        // Get roles associate to this ProfileQuestion in json parameters
-        $attributesRoles = ProfileQuestion::getByName($this->name)->getRoles();
+                // Get roles associate to this ProfileQuestion in json parameters
+        if($q)
+            $attributesRoles = $q->getRoles();
+        else
+            $attributesRoles = array();
 
         $allowedTypes = ProfileQuestion::$allowedTypes;
         $param = array(
@@ -256,13 +265,7 @@ class QuestionController extends Controller{
                                     Lang::get($this->_plugin . '.profile-question-form-name-description'),
                         'required' => true,
                     )),
-
-                    new CheckboxInput(array(
-                        'name' => 'editable',
-                        'default' => 1,
-                        'label' => Lang::get($this->_plugin . '.profile-question-form-editable-label'),
-                    )),
-
+                    
                     new SelectInput(array(
                         'name' => 'type',
                         'required' => true,
@@ -283,7 +286,12 @@ class QuestionController extends Controller{
                     new CheckboxInput(array(
                         'name' => 'displayInProfile',
                         'label' => Lang::get($this->_plugin . '.profile-question-form-displayInProfile-label')
-                    ))
+                    )),
+
+                    new HiddenInput(array(
+                        'name' => 'editable',
+                        'value' => 1,
+                    )),
                 ),
 
                 'parameters' => array(
@@ -304,6 +312,15 @@ class QuestionController extends Controller{
                         'label' => Lang::get($this->_plugin . '.profile-question-form-required-label'),
                         'attributes' => array(
                             'ko-checked' => "required",
+                        )
+                    )),
+
+                    new CheckboxInput(array(
+                        'name' => 'readonly',
+                        'independant' => true,
+                        'label' => Lang::get($this->_plugin . '.profile-question-form-readonly-label'),
+                        'attributes' => array(
+                            'ko-checked' => "readonly",
                         )
                     )),
 
@@ -385,7 +402,7 @@ class QuestionController extends Controller{
                 )
 
             ),
-            'onsuccess' => 'app.load(app.getUri("profile-questions"), {selector : "#admin-questions-tab"})',
+            'onsuccess' => 'app.dialog("close"); app.load(app.getUri("profile-questions"), {selector : "#admin-questions-tab"})',
         );
 
         /*

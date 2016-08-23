@@ -74,8 +74,10 @@ class UserProfileController extends Controller{
                 $field['independant'] = true;
                 $field['label'] = Lang::get('admin.profile-question-' . $question->name . '-label');
 
-                if($question->editable == 0)
-                    $field['readonly'] = true;
+                if(isset($field['readonly'])){
+                    if($field['readonly'])
+                        $field['required'] = false;
+                }
 
                 if($user) {
                     if($question->type == "file") {

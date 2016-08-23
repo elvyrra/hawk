@@ -210,14 +210,19 @@ class LoginController extends Controller{
         );
 
         $questions = ProfileQuestion::getRegisterQuestions();
+
         foreach($questions as $question){
             $field = json_decode($question->parameters, true);
-            if(!empty($field->roles) && in_array(Option::get('roles.default-role'), $field->roles)) {
+
+            //if(!empty($field->roles) && in_array(Option::get('roles.default-role'), $field->roles)) {
+            if($question->isAllowedForRole(Option::get('roles.default-role') ) ){
                 $classname = 'Hawk\\' . ucwords($question->type) . 'Input';
                 $field['name'] = $question->name;
                 $field['independant'] = true;
                 $field['label'] = Lang::get('admin.profile-question-' . $question->name . '-label');
 
+                // At register, no field is readonly!
+                $field['readonly'] = false;
                 $param['fieldsets']['profile'][] = new $classname($field);
             }
         }

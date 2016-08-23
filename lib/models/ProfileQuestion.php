@@ -101,7 +101,7 @@ class ProfileQuestion extends Model{
      */
     public static function getDisplayProfileQuestions(){
         $example = array(
-        'displayInProfile' => 1
+            'displayInProfile' => 1
         );
         return self::getListByExample(new DBExample($example), self::$primaryColumn, array(), array('order' => DB::SORT_ASC));
     }

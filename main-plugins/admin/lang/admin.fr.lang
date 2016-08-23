@@ -60,6 +60,7 @@ profile-question-form-type-text = "Champ texte"
 profile-question-form-type-textarea = "Texte libre"
 profile-question-realname-label = "Nom complet"
 search-plugins-title = "Résultats : {search}"
+profile-question-form-readonly-label = "Lecture seule"
 
 settings-sitename-label = "Nom de l'application"
 settings-allow-guest-label = "Ouvrir l'application au invités"

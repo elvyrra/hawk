@@ -446,10 +446,6 @@ class Theme{
         preg_match_all(self::EDITABLE_VARS_PATTERN, $less, $matches, PREG_SET_ORDER);
         $variables = array();
         foreach($matches as $match){
-<<<<<<< HEAD
-
-=======
->>>>>>> 65d5ba05d20d1c7d21a0bae7af72583597fa6b95
             $variables[] = array(
                 'name' => $match[1],
                 'default' => $match[2],

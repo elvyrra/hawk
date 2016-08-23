@@ -125,6 +125,9 @@ class DatetimeInput extends TextInput{
         if($this->dataType == 'int') {
             return $date->getTimestamp();
         }
+        else if($this->value == ""){
+            return '';
+        }
         else{
             return $date->format($this->dbformat);
         }
