@@ -65,6 +65,12 @@ class View{
      */
     const ECHO_REGEX = '#\{{2}\s*(.+?)\}{2}#is';
 
+
+    /**
+     * The regular expression to echo a variable, html encoded
+     */
+    const ECHO_SAFE_REGEX = '#\{{3}\s*(.+?)\}{3}#is';
+
     /**
      * The regular expression for assignations
      */
@@ -156,20 +162,23 @@ class View{
     private function parse(){
         // Parse PHP Structures
         $replaces = array(
+            // echo safe
+            self::ECHO_SAFE_REGEX => "<?= htmlentities($1, ENT_QUOTES) ?>",
+
             // structure starts
             self::BLOCK_START_REGEX => "<?php $1 $2 : ?>",
 
             // structures ends
-            self::BLOCK_END_REGEX   => "<?php end$1; ?>",
+            self::BLOCK_END_REGEX => "<?php end$1; ?>",
 
             // echo
-            self::ECHO_REGEX        => "<?= $1 ?>",
+            self::ECHO_REGEX => "<?= $1 ?>",
 
             // Support translations in views
             self::TRANSLATION_REGEX => "<?php if(LANGUAGE == '$1'): ?>$2<?php endif; ?>",
 
             // assign template part in variable
-            self::ASSIGN_REGEX      => "<?php ob_start(); ?>$3<?php \$$2 = ob_get_clean(); ?>"
+            self::ASSIGN_REGEX => "<?php ob_start(); ?>$3<?php \$$2 = ob_get_clean(); ?>"
         );
 
         $this->parsed = preg_replace(array_keys($replaces), $replaces, $this->content);

@@ -22,7 +22,7 @@
 								<ul class="dropdown-menu" role="menu" aria-labelledby="main-menu-title-{{ $menu->id }}" id="main-menu-items-{{ $menu->id }}">
 									{foreach($menu->visibleItems as $item)}
 										<li role="presentation" class="main-menu-item" id="main-menu-item-{{ $item->id }}" data-item="{{ $item->name }}">
-											<a role="menuitem" href="{{ htmlentities($item->url, ENT_QUOTES) }}" {if(!empty($item->target))} target="{{ $item->target }}" {/if}>
+											<a role="menuitem" href="{{{ $item->url }}}" {if(!empty($item->target))} target="{{ $item->target }}" {/if}>
 												{{ $item->label }}
 											</a>
 										</li>

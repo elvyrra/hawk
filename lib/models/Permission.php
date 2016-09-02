@@ -107,24 +107,20 @@ class Permission extends Model{
      */
     public static function add($name, $default = 1, $availableForGuests = 0){
         list($plugin, $key) = explode('.', $name);
-        $permission = parent::add(
-            array(
+        $permission = parent::add(array(
             'plugin' => $plugin,
             'key' => $key,
             'availableForGuests' => $availableForGuests
-            )
-        );
+        ));
 
         $roles = Role::getAll();
         foreach($roles as $role){
             $value = $role->id == Role::GUEST_ROLE_ID ? ($availableForGuests ? $default : 0) : $default;
-            RolePermission::add(
-                array(
+            RolePermission::add(array(
                 'roleId' => $role->id,
                 'permissionId' => $permission->id,
                 'value' => $value
-                )
-            );
+            ));
         }
 
         return $permission;

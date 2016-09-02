@@ -505,31 +505,26 @@ define(
                 .fail(function(xhr) {
                     var code = xhr.status;
 
-                    if (code === 403) {
-                        // The page is not accessible for the user
-                        var response;
+                    // The page is not accessible for the user
+                    var response;
 
-                        try {
-                            response = JSON.parse(xhr.responseText);
-                        }
-                        catch (e) {
-                            response = {
-                                message : Lang.get('main.access-forbidden')
-                            };
-                        }
+                    try {
+                        response = JSON.parse(xhr.responseText);
+                    }
+                    catch (e) {
+                        response = {
+                            message : xhr.responseText
+                        };
+                    }
 
-                        if (response.reason === 'login') {
-                            // The user is not connected, display the login form
-                            this.dialog(this.getUri('login') + '?redirect=' + url + '&code=' + code);
-                        }
-                        else {
-                            // Other reason, display the message in a notification
-                            this.notify('danger', response.message);
-                        }
+                    if (code === 403 && response.reason === 'login') {
+                        // The user is not connected, display the login form
+                        this.dialog(this.getUri('login') + '?redirect=' + url + '&code=' + code);
+
+                        return;
                     }
-                    else {
-                        this.notify('danger', xhr.responseText);
-                    }
+
+                    this.notify('danger', response.message);
 
                     this.loading.stop();
                 }.bind(this));
@@ -693,21 +688,21 @@ define(
                 }
             }
 
-            if (route !== null) {
-                var url = route.url;
-
-                if (args) {
-                    for (var j in args) {
-                        if (args.hasOwnProperty(j)) {
-                            url = url.replace('{' + j + '}', args[j]);
-                        }
-                    }
-                }
-
-                return this.conf.basePath + url;
+            if(!route) {
+                return App.INVALID_URI;
             }
 
-            return App.INVALID_URI;
+            var url = route.url;
+
+            if (args) {
+                for (var j in args) {
+                    if (args.hasOwnProperty(j)) {
+                        url = url.replace('{' + j + '}', args[j]);
+                    }
+                }
+            }
+
+            return this.conf.basePath + url;
         };
 
         /**

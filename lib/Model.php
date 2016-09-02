@@ -75,6 +75,12 @@ class Model{
      */
     public function __construct($data = array()){
         $this->map($data);
+
+        foreach(get_object_vars($this) as $key => $value) {
+            if(!empty(self::$fields[$key]['json'])) {
+                $this->$key = json_decode($this->key);
+            }
+        }
     }
 
 
@@ -265,12 +271,27 @@ class Model{
      */
     protected function prepareDatabaseData() {
         // TODO using the model fields property
-        $fields = self::getDbInstance()->query('SHOW COLUMNS FROM ' . self::getTable(), array(), array('index' => 'Field', 'return' => DB::RETURN_ARRAY));
+        $fields = !empty(static::$fields) ?
+            static::$fields :
+            self::getDbInstance()->query(
+                'SHOW COLUMNS FROM ' . self::getTable(),
+                array(),
+                array(
+                    'index' => 'Field',
+                    'return' => DB::RETURN_ARRAY
+                )
+            );
 
         $insert = array();
         foreach(get_object_vars($this) as $key => $value){
             if(isset($fields[$key])) {
-                $insert[$key] = $value;
+                if(!empty($fields[$key]['json'])) {
+                    // Format JSON objects
+                    $insert[$key] = json_encode($value);
+                }
+                else {
+                    $insert[$key] = $value;
+                }
             }
         }
 

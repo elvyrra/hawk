@@ -108,6 +108,8 @@ class Autoload{
         }
 
         if(strpos($namespace, 'Hawk\\Plugins\\') === 0) {
+            // If the class is an hawk class called from a plugin ,
+            // create an alias from the Hawk class to the plugin namespace
             $alias = '\\Hawk\\' . $class;
             if(class_exists($alias) || trait_exists($alias)) {
                 class_alias($alias, $classname);
