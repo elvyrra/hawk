@@ -18,12 +18,17 @@ require(['app'], function() {
         $.getJSON(url)
 
         .done(function(response) {
-            if (response.menuUpdated) {
-                app.refreshMenu();
-            }
+            $.getJSON(app.getUri('all-routes'))
+
+            .done(function(routes) {
+                app.setRoutes(routes);
+
+                if (response.menuUpdated) {
+                    app.refreshMenu();
+                }
+            });
 
             app.load(app.tabset.activeTab().uri());
-            // app.lists['available-plugins-list'].refresh();
         })
 
         .fail(function(xhr) {

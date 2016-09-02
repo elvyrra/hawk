@@ -683,7 +683,26 @@ class PluginController extends Controller{
                 'message' => $e->getMessage()
             ));
         }
+    }
 
+    /**
+     * Reload all routes
+     * @returns Array The application routes
+     */
+    public function getRoutes() {
+        $routes = array();
+        foreach(App::router()->getRoutes() as $name => $route){
+            if($route->isAccessible()) {
+                $routes[$name] = array(
+                    'url' => $route->url,
+                    'where' => $route->where,
+                    'default' => $route->default,
+                    'pattern' => $route->pattern
+                );
+            }
+        }
 
+        App::response()->setContentType('json');
+        return $routes;
     }
 }

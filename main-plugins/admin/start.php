@@ -286,6 +286,11 @@ App::router()->prefix('/admin/', function () {
                 'action' => 'PluginController.update'
             ));
 
+            // Reload the application routes for JavaScript
+            App::router()->get('all-routes', 'routes', array(
+                'action' => 'PluginController.getRoutes'
+            ));
+
             // Display number of updates in menu
             if(App::session()->isAllowed('admin.all')) {
                 Event::on(\Hawk\Plugins\Main\MainMenuWidget::EVENT_AFTER_GET_MENUS, function (Event $event) {
