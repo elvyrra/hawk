@@ -1,7 +1,7 @@
 <?php
 
 /**
- * BaseController.class.php
+ * BaseController.php
  */
 
 namespace {{ $namespace }};

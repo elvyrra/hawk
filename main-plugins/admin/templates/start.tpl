@@ -1,4 +1,9 @@
 <?php
+/**
+ * start.php
+ *
+ * This file is launched for each request. It initialize the plugin routes and event listeners
+ */
 
 namespace {{ $namespace }};
 

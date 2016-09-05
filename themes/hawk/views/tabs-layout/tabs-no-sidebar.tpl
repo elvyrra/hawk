@@ -2,7 +2,7 @@
 	{if(!empty($icon))}
 		<input type="hidden" class="page-icon" value="{{ $icon }}" />
 	{/if}
-	<input type="hidden" class="page-name" value="{{ htmlentities(isset($tabTitle) ? $tabTitle : $title, ENT_QUOTES) }}"/>
+	<input type="hidden" class="page-name" value="{{{ isset($tabTitle) ? $tabTitle : $title }}}"/>
 	{if(!empty($title))}
 		<h2 class="page-title">{{ $title }}</h2>
 	{/if}

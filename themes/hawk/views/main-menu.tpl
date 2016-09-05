@@ -32,7 +32,7 @@
 						{else}
 							<li class="main-menu" id="main-menu-{{ $menu->id }}">
 								<div class="main-menu-title" type="button" id="main-menu-title-{{ $menu->id }}">
-									<a href="{{ htmlentities($menu->url, ENT_QUOTES) }}" {if(!empty($menu->target))} target="{{ $menu->target }}" {/if}>
+									<a href="{{{ $menu->url }}}" {if(!empty($menu->target))} target="{{ $menu->target }}" {/if}>
 										{{ $menu->label }}
 									</a>
 								</div>

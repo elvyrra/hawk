@@ -135,8 +135,8 @@ class Route{
     public function match($path){
         if(preg_match('~^' . $this->pattern . '/?$~i', $path, $m)) {
             // The URL match, let's test the filters to access this URL are OK
-            foreach(array_slice($m, 1) as $i => $var){
-                $this->setData($this->args[$i], $var);
+            foreach(array_slice($m, 1) as $i => $var) {
+                $this->setData($this->args[$i], is_numeric($var) ? (int) $var : $var);
             }
             return true;
 
@@ -153,7 +153,7 @@ class Route{
      *
      * @return mixed If $prop is set, the data value for this property, else the whole route data
      */
-    public function getData($prop = null){
+    public function getData($prop = null) {
         if(!$prop) {
             return $this->data;
         }

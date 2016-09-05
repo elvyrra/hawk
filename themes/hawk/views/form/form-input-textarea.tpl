@@ -1,16 +1,16 @@
 <textarea 	{foreach($input::$attr as $attr => $type)}
 				{if($attr != 'value' && !empty($input->$attr))}
 					{if($type == "bool")}
-						{{ $attr }} 
+						{{ $attr }}
 					{elseif($type == "html")}
-						{{ $attr }}="{{ htmlentities($input->$attr, ENT_COMPAT) }}" 
+						{{ $attr }}="{{{ $input->$attr }}}"
 					{else}
-						{{ $attr }}="{{ $input->$attr }}" 
+						{{ $attr }}="{{ $input->$attr }}"
 					{/if}
 				{/if}
 			{/foreach}
 
 			{foreach($input->attributes as $key => $value)}
-				{if($value !== null)} {{ $key }}="{{ htmlentities($value, ENT_COMPAT) }}" {/if}
+				{if($value !== null)} {{ $key }}="{{{ $value }}}" {/if}
 			{/foreach}
 			>{{$input->value}}</textarea>

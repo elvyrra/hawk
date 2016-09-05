@@ -42,6 +42,11 @@ class FormFieldset{
     $legendId = '',
 
     /**
+     * Defines if the fieldset must not be displayed
+     */
+    $notDisplayed = false,
+
+    /**
      * HTML attibutes to set on the fieldset tag
      * @var array
      */
@@ -87,7 +92,11 @@ class FormFieldset{
      *
      * @return string The HTML result to display
      */
-    public function __toString(){
+    public function __toString() {
+        if($this->notDisplayed) {
+            return '';
+        }
+
         return View::make(Theme::getSelected()->getView(Form::VIEWS_DIR . 'form-fieldset.tpl'), array(
             'fieldset' => $this,
         ));

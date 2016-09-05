@@ -76,11 +76,11 @@ class Model{
     public function __construct($data = array()){
         $this->map($data);
 
-        foreach(get_object_vars($this) as $key => $value) {
-            if(!empty(self::$fields[$key]['json'])) {
-                $this->$key = json_decode($this->key);
-            }
-        }
+        // foreach(get_object_vars($this) as $key => $value) {
+        //     if(!empty(self::$fields[$key]['json'])) {
+        //         $this->$key = json_decode($this->key);
+        //     }
+        // }
     }
 
 

@@ -3,7 +3,7 @@
 				{if($type == "bool")}
 					{{ $attr }}
 				{elseif($type == "html")}
-					{{ $attr }}="{{ htmlentities($input->$attr, ENT_COMPAT) }}"
+					{{ $attr }}="{{{ $input->$attr }}}"
 				{else}
 					{{ $attr }}="{{ $input->$attr }}"
 				{/if}
@@ -11,7 +11,7 @@
 		{/foreach}
 
 		{foreach($input->attributes as $key => $value)}
-			{if($value !== null)} {{ $key }}="{{ htmlentities($value, ENT_COMPAT) }}" {/if}
+			{if($value !== null)} {{ $key }}="{{{ $value }}}" {/if}
 		{/foreach} />
 {if($input->mask)}
 	<script type="text/javascript">

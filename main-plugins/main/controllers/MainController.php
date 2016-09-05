@@ -198,7 +198,8 @@ class MainController extends Controller{
                     'url' => $route->url,
                     'where' => $route->where,
                     'default' => $route->default,
-                    'pattern' => $route->pattern
+                    'pattern' => $route->pattern,
+                    'duplicable' => !empty($route->duplicable)
                 );
             }
         }

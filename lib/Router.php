@@ -342,12 +342,9 @@ final class Router extends Singleton{
 
                 if($route->isAccessible()) {
                     // The route authentications are validated
-
-
                     list($classname, $method) = explode(".", $route->action);
 
                     // call a controller method
-                    // $this->currentController = new $classname($route->getData());
                     $this->currentController = $classname::getInstance($route->getData());
                     App::logger()->debug(sprintf(
                         'URI %s has been routed => %s::%s',

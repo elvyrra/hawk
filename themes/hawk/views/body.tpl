@@ -31,7 +31,7 @@
 
 				<li class="add-tab-button corner-top-left corner-bottom-right" data-href="{uri action='new-tab'}" data-target="newtab">
 					<span class="" id="main-tab-add">
-						{icon icon="plus" class="open-new-tab" title="{text key='main.open-new-tab'}"}
+						{icon icon="plus" class="open-new-tab" title="{text key='main.open-new-tab' encoded='true'}"}
 					</span>
 				</li>
 			</ul>
@@ -56,7 +56,7 @@
 <!-- /ko -->
 
 <div id="footer">
-	{text key='main.hawk-powered'}
+	{text key="main.hawk-powered"}
 	{if(DEV_MODE)}
 		<a href="{uri action='clear-cache'}" class="real-link pull-right" title="{text key="main.clear-cache"}">
 			{icon icon="calendat-times-o" size="lg" class="clear-cache-btn"}

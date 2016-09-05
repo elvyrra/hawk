@@ -6,7 +6,7 @@
 		novalidate
 		autocomplete="{{ $form->autocomplete ? "on" : "off" }}"
 		{foreach($form->attributes as $key => $value)}
-			{if($value !== null)} {{ $key }}="{{ htmlentities($value, ENT_COMPAT) }}" {/if}
+			{if($value !== null)} {{ $key }}="{{{ $value }}}" {/if}
 		{/foreach}
 	>
 	<input type='hidden' name='_submittedForm' value='submitted'/>

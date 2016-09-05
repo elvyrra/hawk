@@ -1,7 +1,7 @@
 {if($fieldset->legend)}
 	<fieldset id="{{ $fieldset->id }}"
                 {foreach($fieldset->attributes as $key => $value)}
-                    {if($value !== null)} {{ $key }}="{{ htmlentities($value, ENT_COMPAT) }}" {/if}
+                    {if($value !== null)} {{ $key }}="{{{ $value }}}" {/if}
                 {/foreach}>
 		<legend id="{{ $fieldset->legendId }}">{{ $fieldset->legend }}</legend>
 {else}

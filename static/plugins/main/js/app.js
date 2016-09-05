@@ -395,10 +395,10 @@ define(
                 headers : {}
             };
 
-            for (var i in data) {
-                if (data.hasOwnProperty(i)) {
-                    options[i] = data[i];
-                }
+            if(data) {
+                Object.keys(data).forEach(function(key) {
+                    options[key] = data[key];
+                });
             }
 
             if (url) {
@@ -414,7 +414,7 @@ define(
                 for (var j = 0; j < this.tabset.tabs().length; j++) {
                     var tab = this.tabset.tabs()[j];
 
-                    if (tab.uri() === url || tab.route() === route) {
+                    if (tab.uri() === url || tab.route() === route && !this.routes[route].duplicable) {
                         if (tab !== this.tabset.activeTab()) {
                             this.tabset.activeTab(tab);
                             return;

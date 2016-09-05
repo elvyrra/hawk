@@ -31,8 +31,17 @@ class Text extends \Hawk\ViewPlugin{
      */
     public function display(){
         $data = $this->params;
-        unset($data['key']);
+        $encoded = isset($data['encoded']);
 
-        return \Hawk\Lang::get($this->key, $data, empty($this->number) ? 0 : $this->number);
+        unset($data['key']);
+        unset($data['encoded']);
+
+        $text = \Hawk\Lang::get($this->key, $data, empty($this->number) ? 0 : $this->number);
+
+        if($encoded) {
+            return htmlentities($text, ENT_QUOTES);
+        }
+
+        return $text;
     }
 }

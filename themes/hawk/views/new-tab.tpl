@@ -1,5 +1,5 @@
 <div>
-    <input type="hidden" class="page-name" value="{{ htmlentities(Lang::get('main.new-tab-page-name'), ENT_QUOTES) }}" />
+    <input type="hidden" class="page-name" value="{text key='main.new-tab-page-name' encoded="true"}" />
 
     {if($custom)}
         {{ $custom }}

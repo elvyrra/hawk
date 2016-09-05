@@ -1,7 +1,7 @@
 {if(! $field->hidden)}
     <th class="list-column-title" data-field="{{ $field->name }}" ko-with="fields['{{ $field->name }}']">
         <div class="list-label-sorts">
-            <span class='list-title-label list-title-label-{{ $field->list->id }}-{{ $field->name }} pull-left' title="{{ htmlentities($field->label, ENT_QUOTES) }}">{{ $field->label }}</span>
+            <span class='list-title-label list-title-label-{{ $field->list->id }}-{{ $field->name }} pull-left' title="{{{ $field->label }}}">{{ $field->label }}</span>
             {if($field->sort)}
                 <div class='list-sort-block pull-left'>
                     <!-- Sort ascending -->

@@ -1,6 +1,6 @@
 <?php
 /**
- * Installer.class.php
+ * Installer.php
  */
 
 namespace {{ $namespace }};
