@@ -133,16 +133,14 @@ class MenuItem extends Model{
 
         // Get all items
         $items = self::getListByExample(
-            new DBExample(
-                array(
+            new DBExample(array(
                 'active' => 1
-                )
-            ),
+            )),
             self::$primaryColumn,
             array(),
             array(
-            'parentId' => 'ASC',
-            'order' => 'ASC'
+                'parentId' => 'ASC',
+                'order' => 'ASC'
             )
         );
 
@@ -150,6 +148,13 @@ class MenuItem extends Model{
         $items = array_filter(
             $items, function ($item) use ($user) {
                 $route = App::router()->getRouteByName($item->action);
+                if($item->actionParameters) {
+                    $data = json_decode($item->actionParameters, true);
+                    foreach($data as $key => $value) {
+                        $route->setData($key, $value);
+                    }
+                }
+
                 if($route) {
                     return $route->isAccessible();
                 } else {
@@ -189,6 +194,10 @@ class MenuItem extends Model{
             'one' => true,
             'return' => DB::RETURN_OBJECT
         ))->newOrder;
+
+        if(!empty($data['actionParameters']) && is_array($data['actionParameters'])) {
+            $data['actionParameters'] = json_encode($data['actionParameters']);
+        }
 
         // Insert the menu item
         $item = parent::add($data);

@@ -13,5 +13,6 @@ namespace Hawk;
  *
  * @package Exceptions
  */
-class InternalErrorException extends \Exception {
+class InternalErrorException extends HTTPException {
+    const STATUS_CODE = 500;
 }

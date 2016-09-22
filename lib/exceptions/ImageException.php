@@ -13,6 +13,6 @@ namespace Hawk;
  *
  * @package Exceptions
  */
-class ImageException extends \Exception{
+class ImageException extends InternalErrorException{
 
 }

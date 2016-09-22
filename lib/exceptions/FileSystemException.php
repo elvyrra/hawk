@@ -14,5 +14,5 @@ namespace Hawk;
  *
  * @package Exceptions
  */
-class FileSystemException extends \Exception{
+class FileSystemException extends InternalErrorException{
 }

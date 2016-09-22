@@ -19,7 +19,9 @@
 
 		{if(empty($input->optgroups))}
 			{foreach($input->options as $v => $l)}
-				<option id="{{$input->id}}-option-{{$v}}" value="{{{ $v }}}" {{$v == $input->value || is_array($input->value) && in_array($v, $input->value) ? "selected" : ""}}>
+				<option id="{{$input->id}}-option-{{$v}}" value="{{{ $v }}}"
+					{{$v == $input->value || is_array($input->value) && in_array($v, $input->value) ? "selected" : ""}}
+					{if(!empty($l['class']))} class="{{{ $l['class'] }}}"{/if}>
 					{{ is_array($l) ? $l['label'] : $l }}
 				</option>
 			{/foreach}

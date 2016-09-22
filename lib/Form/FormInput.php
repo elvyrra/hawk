@@ -38,7 +38,7 @@ class FormInput{
         'title' => 'html',
         'type' => 'text',
         'value' => 'html',
-        'autocomplete' => 'text',
+        'autocomplete' => 'text'
     );
 
     /**

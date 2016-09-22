@@ -28,8 +28,8 @@ class Form{
 
     // Submission return codes
     const HTTP_CODE_SUCCESS = 200; // OK
-    const HTTP_CODE_CHECK_ERROR = 412; // Data format error
-    const HTTP_CODE_ERROR = 424; // Treatment error
+    const HTTP_CODE_CHECK_ERROR = 400; // Data format error
+    const HTTP_CODE_ERROR = 500; // Treatment error
 
     // Actions
     const ACTION_REGISTER = 'register';
@@ -223,7 +223,7 @@ class Form{
             $this->name = $this->id;
         }
 
-        if(!in_array($this->columns, array(1,2,3,4,6,12))) {
+        if(!in_array($this->columns, array(1, 2, 3, 4, 6, 12))) {
             $this->columns = 1;
         }
 
@@ -349,6 +349,7 @@ class Form{
             if(isset($field->default)) {
                 $data[$name] = $field->default;
             }
+
 
             if(isset($field->value)) {
                 $data[$name] = $field->value;
@@ -571,7 +572,7 @@ class Form{
      *
      * @return bool true if the data is valid, false else.
      */
-    public function check($exit = self::EXIT_JSON){
+    public function check() {
         if(empty($this->errors)) {
             $this->errors = array();
         }
@@ -583,15 +584,8 @@ class Form{
         if(!empty($this->errors)) {
             $this->status = self::STATUS_ERROR;
             App::logger()->warning(App::session()->getUser()->username . ' has badly completed the form ' . $this->id);
-            if($exit) {
-                /*** The form check failed ***/
-                App::response()->setBody($this->response(self::STATUS_CHECK_ERROR, Lang::get('form.error-fill')));
-                throw new AppStopException();
-            }
-            else{
-                $this->addReturn('message', Lang::get('form.error-fill'));
-                return false;
-            }
+
+            throw new BadRequestException(Lang::get('form.error-fill'), $this->errors);
         }
 
         /*** The form check return OK status ***/
@@ -623,7 +617,7 @@ class Form{
             }
 
 
-            foreach($this->inputs as $name => $field){
+            foreach($this->inputs as $name => $field) {
                 /* Determine if we have to insert this field in the set of inserted values
                 * A field can't be inserted if :
                 *   it type is in the independant types
@@ -766,7 +760,7 @@ class Form{
      *
      * @return array The response result, that will be displayed as json when the script ends
      */
-    public function response($status, $message = ''){
+    public function response($status, $message = '') {
         $response = array();
         switch($status){
             case self::STATUS_SUCCESS :

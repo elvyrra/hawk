@@ -13,7 +13,7 @@ namespace Hawk;
  *
  * @package Exceptions
  */
-class ViewException extends \Exception{
+class ViewException extends InternalErrorException {
     /**
      * Error type : source file not found
      */
@@ -32,10 +32,13 @@ class ViewException extends \Exception{
      * @param Exception $previous The previous exception that caused that one
      */
     public function __construct($type, $file, $previous = null){
-        $code = $type;
         switch($type){
             case self::TYPE_FILE_NOT_FOUND:
                 $message = "Error creating a view from template file $file : No such file or directory";
+                $details = array(
+                    'type' => $type,
+                    'file' => $file
+                );
                 break;
 
             case self::TYPE_EVAL:
@@ -46,9 +49,14 @@ class ViewException extends \Exception{
                 );
 
                 $message = "An error occured while building the view from file $file : " . $previous->getMessage() . PHP_EOL . implode(PHP_EOL, $trace);
+                $details = array(
+                    'type' => $type,
+                    'file' => $file,
+                    'error' => $preivous->getMessage()
+                )
                 break;
         }
 
-        parent::__construct($message, $code, $previous);
+        parent::__construct($message, $details);
     }
 }

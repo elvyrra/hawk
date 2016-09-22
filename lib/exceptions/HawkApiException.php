@@ -13,5 +13,5 @@ namespace Hawk;
  *
  * @package Exceptions
  */
-class HawkApiException extends \Exception{
+class HawkApiException extends InternalErrorException{
 }

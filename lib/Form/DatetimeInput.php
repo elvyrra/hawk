@@ -34,13 +34,17 @@ class DatetimeInput extends TextInput{
      */
     $dbformat = 'Y-m-d';
 
+    const TYPE = 'date';
+
     /**
      * Constructor
      *
      * @param array $param The parameters of the input
      */
-    public function __construct($param){
+    public function __construct($param) {
         parent::__construct($param);
+
+        $this->type = 'text';
 
         if(empty($this->format)) {
             $this->format = Lang::get('main.date-format');
@@ -53,16 +57,22 @@ class DatetimeInput extends TextInput{
      *
      * @return string The HTML result of displaying
      */
-    public function display(){
-
+    public function display() {
         if(is_numeric($this->value)) {
-            $this->timestamp = $this->value;
+            $this->value = $this->value ? date($this->format, $this->value) : '';
         }
-        else{
-            $this->timestamp = strtotime($this->value);
+        else {
+            if($this->value === '0000-00-00' || $this->value === '0000-00-00 00:00:00') {
+                $this->value = '';
+            }
+            else {
+                $this->value = date($this->format, strtotime($this->value));
+
+            }
         }
 
-        $this->value = $this->timestamp ? date($this->format, $this->timestamp) : '';
+        $this->pattern = Lang::get('main.date-moment-pattern');
+
         $this->class .= ' datetime';
 
         /*** Format the value ***/
@@ -78,7 +88,9 @@ class DatetimeInput extends TextInput{
             $picker['startDate'] = $this->min;
         }
 
-        return parent::display() . '<script>require(["app"], function(){ $("#' . $this->id . '").datepicker(' . json_encode($picker) . '); });</script>';
+        $this->picker = json_encode($picker);
+
+        return parent::display();
     }
 
 

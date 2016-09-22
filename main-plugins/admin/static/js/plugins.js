@@ -18,11 +18,9 @@ require(['app'], function() {
         $.getJSON(url)
 
         .done(function(response) {
-            $.getJSON(app.getUri('all-routes'))
+            app.reloadRoutes()
 
-            .done(function(routes) {
-                app.setRoutes(routes);
-
+            .done(function() {
                 if (response.menuUpdated) {
                     app.refreshMenu();
                 }

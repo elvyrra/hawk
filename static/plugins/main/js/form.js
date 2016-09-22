@@ -2,7 +2,7 @@
 
 'use strict';
 
-define('form', ['jquery'], function($) {
+define('form', ['jquery', 'moment'], function($, moment) {
     /**
      * Class FormInput, represents any input in a form
      *
@@ -104,38 +104,57 @@ define('form', ['jquery'], function($) {
      * @returns {bool} True if the field is valid, false else
      */
     FormInput.prototype.isValid = function() {
+        var value = this.val();
+
         // If the field is required, the field can't be empty
         if (this.required) {
             var emptyValue = this.emptyValue || '';
 
-            if (this.val() === emptyValue) {
+            if (value === emptyValue) {
                 this.addError(Lang.get('form.required-field'));
                 return false;
             }
         }
 
         // If the field has a specific pattern, test the value with this pattern
-        if (this.pattern) {
-            var regex = new RegExp(this.pattern.substr(1, -1));
+        var patternError = false;
 
-            if (this.val() && !regex.test(this.val())) {
-                this.addError(Lang.exists('form.' + this.type + '-format') ?
-                    Lang.get('form.' + this.type + '-format') :
-                    Lang.get('form.field-format')
-                );
-                return false;
+        if(value) {
+            if(this.node.hasClass('datetime')) {
+                let pattern = this.pattern;
+
+                value = moment(value, pattern).format('YYYY-MM-DD');
+
+                if(value === 'Invalid date') {
+                    patternError = true;
+                }
+            }
+            else if (this.pattern) {
+                var regex = new RegExp(this.pattern.substr(1, -1));
+
+                if (!regex.test(value)) {
+                    patternError = true;
+                }
             }
         }
 
+        if(patternError) {
+            this.addError(Lang.exists('form.' + this.type + '-format') ?
+                Lang.get('form.' + this.type + '-format') :
+                Lang.get('form.field-format')
+            );
+            return false;
+        }
+
         if (this.minimum) {
-            if (this.val() && this.val() < this.minimum) {
+            if (value && value < this.minimum) {
                 this.addError(Lang.get('form.number-minimum', {value: this.minimum}));
                 return false;
             }
         }
 
         if (this.maximum) {
-            if (this.val() && this.val() > this.maximum) {
+            if (value && value > this.maximum) {
                 this.addError(Lang.get('form.number-maximum', {value: this.maximum}));
                 return false;
             }
@@ -143,7 +162,7 @@ define('form', ['jquery'], function($) {
 
         // If the field has to be compared with another one, compare the two values
         if (this.compare) {
-            if (this.val() !== this.form.inputs[this.compare].val()) {
+            if (value !== this.form.inputs[this.compare].val()) {
                 this.addError(Lang.get('form.' + this.type + '-comparison'));
                 return false;
             }
@@ -176,7 +195,6 @@ define('form', ['jquery'], function($) {
     FormInput.prototype.removeError = function() {
         this.node.removeClass('error').next('.input-error-message').remove();
     };
-
 
 
     /**
@@ -356,13 +374,13 @@ define('form', ['jquery'], function($) {
                     var response = xhr.responseJSON;
 
                     switch (xhr.status) {
-                        case 412 :
+                        case 400 :
                             // The form has not been checked correctly
                             this.displayErrorMessage(response.message);
-                            this.displayErrors(response.errors);
+                            this.displayErrors(response.details);
                             break;
 
-                        case 424 :
+                        case 500 :
                             // An error occured in the form treatment
                             this.displayErrorMessage(response.message);
                             break;
@@ -462,6 +480,20 @@ define('form', ['jquery'], function($) {
      */
     Form.prototype.toString = function() {
         return JSON.stringify(this.valueOf());
+    };
+
+
+    /**
+     * Static method to test if a type is supported for in put by the browser
+     * @param   {string} type The type to test
+     * @returns {boolean}     True if the type is supported, else False
+     */
+    Form.checkInputTypeSupport = function(type) {
+        var input = document.createElement('input');
+
+        input.setAttribute('type', type);
+
+        return input.type === type;
     };
 
     return Form;

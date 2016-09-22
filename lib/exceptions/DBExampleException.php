@@ -13,5 +13,5 @@ namespace Hawk;
  *
  * @package Exceptions
  */
-class DBExampleException extends \Exception{
+class DBExampleException extends InternalErrorException{
 }

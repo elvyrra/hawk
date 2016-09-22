@@ -21,7 +21,7 @@ App::router()->auth(App::session()->isLogged(), function () {
         ),
         'action' => 'UserProfileController.edit',
         'auth' => function ($route) {
-            return !$route->getData('userId') || $route->getData('userId') === App::session()->getUser()->id;
+            return !$route->getData('userId') || $route->getData('userId') == App::session()->getUser()->id;
         }
     ));
 

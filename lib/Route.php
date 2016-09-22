@@ -81,8 +81,22 @@ class Route{
      *
      * @param string
      */
-    $pattern = '';
+    $pattern = '',
 
+
+    /**
+     * The method this route can be accessed by
+     */
+    $methods = [];
+
+
+    private static $SUPPORTED_METHODS = array(
+        'get',
+        'post',
+        'patch',
+        'put',
+        'delete'
+    );
 
 
     /**
@@ -93,10 +107,22 @@ class Route{
      * @param array  $param The route parameters, containing the pattern rules,
      *                      the default values, the action associated with this route
      */
-    public function __construct($name, $url, $param){
-        $this->name = $name;
-
+    public function __construct($name, $url, $methods, $param){
         $this->map($param);
+
+        if(empty($methods)) {
+            $methods = self::$SUPPORTED_METHODS;
+        }
+
+        foreach($methods as $method) {
+            if(!in_array($method, self::$SUPPORTED_METHODS)) {
+                throw new InternalErrorException('The route method ' . $method . ' is not supported');
+            }
+        }
+
+        $this->methods = $methods;
+
+        $this->name = $name;
 
         $this->args = array();
         $this->url = $this->prefix . $url;
@@ -202,12 +228,20 @@ class Route{
         return $method;
     }
 
+    public function isCallableBy($method) {
+        if(in_array($method, $this->methods)) {
+            return true;
+        }
+
+        return false;
+    }
+
     /**
      * Check of the route is accessible by the web client
      *
      * @return bool True if the route is accessible, False in other case
      */
-    public function isAccessible(){
+    public function isAccessible() {
         foreach($this->auth as $auth) {
             if(is_callable($auth) && !$auth($this) || !$auth) {
                 return false;

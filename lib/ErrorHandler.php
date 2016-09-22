@@ -113,14 +113,13 @@ final class ErrorHandler extends Singleton{
         );
 
         App::logger()->error($e->getMessage());
-        if(App::response()->getContentType() === "json") {
-            App::response()->setBody($param);
+        if(App::request()->getWantedType() === "json") {
+            throw new InternalErrorException($e->getMessage());
         }
         else{
-            App::response()->setBody(View::make(Theme::getSelected()->getView('error.tpl'), $param));
+            throw new InternalErrorException(View::make(Theme::getSelected()->getView('error.tpl'), $param));
         }
 
-        throw new InternalErrorException($e->getMessage(), $e->getCode());
     }
 
     /**

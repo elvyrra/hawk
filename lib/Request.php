@@ -77,6 +77,21 @@ final class Request extends Singleton{
      */
     protected static $instance;
 
+    /**
+     * Predefined content types
+     *
+     * @var array
+     */
+    private static $contentTypes = array(
+        'html' => 'text/html',
+        'json' => 'application/json',
+        'javascript' => 'application/javascript',
+        'css' => 'text/css',
+        'text' => 'text/plain',
+        'xml' => 'application/xml',
+        'stream' => 'application/octet-stream'
+    );
+
 
     /**
      * Constrcutor, initialize the instance with the HTTP request data
@@ -266,5 +281,20 @@ final class Request extends Singleton{
         else{
             return $this->cookies;
         }
+    }
+
+
+    /**
+     * This function returns the content-type expected for the response, and sent by Accept request header
+     * @return string The wanted type
+     */
+    public function getWantedType() {
+        $accepts = $this->getHeaders('Accept');
+
+        $accept = trim(explode(',', $accepts)[0]);
+
+        $key = array_search($accept, self::$contentTypes);
+
+        return $key ? $key : $accept;
     }
 }

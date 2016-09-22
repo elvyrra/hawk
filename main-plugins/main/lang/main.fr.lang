@@ -1,27 +1,55 @@
-back-button = "Retour"
+; Generic error messages
+http-error-400-message = "Le format de la requête est incorrect."
+http-error-401-message = "Vous devez être authentifié pour accéder à cette fonctionnalité"
+http-error-403-message = "Vous n'avez pas les droits nécessaires pour accéder à cette fonctionnalité"
+http-error-404-message = "La page que vous demandez : {url} n'existe pas"
+http-error-405-message = "La page {path} n'est pas accessible la méthode {method}"
+http-error-500-message = "Une erreur interne est survenue."
+
 403-message = "Vous n'avez pas les droits nécessaires pour accéder à cette fonctionnalité"
 404-message = "La page que vous demandez : {uri} n'existe pas"
+db-connection-error = "Une erreur s'est produit durant la connexion à la base de données"
+error-permissions = "Vous n'avez pas les droits nécessaires pour accéder à cette fonctionnalité. Veuillez contacter votre administrateur"
+
+; Main buttons labels
+back-button = "Retour"
 cancel-button = "Annuler"
 close-button = "Fermer"
 connect-button = "Se connecter"
+delete-button = "Supprimer"
+import-button = "Importer"
+input-file-invitation = "Choisissez un fichier"
+save-button = "Sauvegarder"
+valid-button = "Enregistrer"
+
+; Date formats
 date-format = "d/m/Y"
 date-mask = "dd/mm/yyyy"
 mysql-date-format = "%d/%m/%Y"
-db-connection-error = "Une erreur s'est produit durant la connexion à la base de données"
-delete-button = "Supprimer"
-error-permissions = "Vous n'avez pas les droits nécessaires pour accéder à cette fonctionnalité. Veuillez contacter votre administrateur"
+date-moment-pattern = "DD/MM/YYYY"
+time-format = "d/m/Y H:i:s"
+time-mask = "dd/mm/yyyy H:i:s"
+mysql-time-format = "%d/%m/%Y %H:%i"
+time-pattern = "^\\d{2}\\/\\d{2}\\/\\d{2} \\d{2}\\:\\d{2}\\:\\d{2}$"
+
+; Guest username
 guest-username = "Invité"
-import-button = "Importer"
-input-file-invitation = "Choisissez un fichier"
+
+; Lists
 list-error = "Une erreur est survenue pendant l'affichage de la liste"
 list-line-per-page = "/ page"
 list-max-pages = "/ {max}"
 list-next-page = "Page suivante"
-list-no-result = "Aucun résultat pour cette liste"
 list-page-label = "Page"
 list-pervious-page = "Page précédente"
+list-no-result = "Aucun résultat pour cette liste"
 list-sort-asc = "A > Z"
 list-sort-desc = "Z > A"
+list-results-number[0] = "Aucun résultat"
+list-results-number[1] = "1 résultat"
+list-results-number[p] = "{number} résultats"
+
+; Login form
 login-menu-title = "<i class=\"icon icon-sign-in\"></i> Connexion"
 login-error-authentication = "The login ou le mot de passe est incorrect"
 login-error-inactive-user = "Ce compte n'est pas actif sur cette application"
@@ -30,6 +58,8 @@ login-label = "Email"
 login-password-label = "Mot de passe"
 login-forgotten-password-label = "J'ai oublié mon mot de passe"
 login-success = "Connexion réussie"
+
+; Admin menu
 menu-admin-display-title = "Gestion de l'affichage"
 menu-admin-language-title = "Gestion des traductions"
 menu-admin-plugins-title = "Gestion des plugins"
@@ -37,22 +67,32 @@ menu-admin-roles-title = "Gestion des permissions"
 menu-admin-settings-title = "Paramètres de l'application"
 menu-admin-title = "Administration"
 menu-admin-users-title = "Gestion des utilisateurs"
+
+; User's menu
 menu-change-password = "Modifier mon mot de passe"
 menu-edit-profile = "Editer mon profil"
 menu-logout = "Me déconnecter"
 menu-my-profile = "Mon profil"
+
+; Footer
 hawk-powered = "Développé par Hawk ©"
+clear-cache = "Vider le cache"
+
+; New tab
 new-tab-page-name = "Nouvel onglet ..."
+open-new-tab = "Ouvrir un nouvel onglet"
+
+; Generi texts
 no-txt = "Non "
 ok-button = "OK"
-open-new-tab = "Ouvrir un nouvel onglet"
 plugin-name = "Application"
+yes-txt = "Oui"
+
+; Register form
 register-button = "S'inscrire"
 register-connection-legend = "Données de connexion"
 register-username-label = "Pseudo"
-register-email-content = "<p>Vous venez de vous inscire sur {sitename}, et nous vous en remercions. </p><p>Pour valider votre inscription, cliquez sur le lien ci-dessous ou copiez-collez le dans la barre URL de votre navigateur :</p><a href=\"{url}\">{url}</a><p> Nous espérons vous voir rapidement sur {sitename} </p><p> L'équipe {sitename}. </p>"
 register-email-label = "Adresse email"
-register-email-title = "Validez votre inscription sur {sitename}"
 register-password-label = "Mot de passe"
 register-passagain-label = "Confirmez le mot de passe"
 register-profile-legend = "Profil"
@@ -62,12 +102,10 @@ register-error = "Une erreur est survenue pendant votre inscription. Veuillez re
 validate-registration-unknown-error = "Les informations fournies ne nous permettent pas de trouver votre compte pour l'activer."
 validate-registration-error = "Une erreur est survenue pendant l'activation de votre compte"
 register-terms-label = "J'ai lu et j'accepte <a href=\"{uri}\"  target="_blank">les conditions générales d'utilisation</a> de l'application"
-save-button = "Sauvegarder"
-time-format = "d/m/Y H:i:s"
-time-mask = "99/99/9999 99:99:99"
-mysql-time-format = "%d/%m/%Y %H:%i"
-valid-button = "Enregistrer"
-yes-txt = "Oui"
+register-email-title = "Validez votre inscription sur {sitename}"
+register-email-content = "<p>Vous venez de vous inscire sur {sitename}, et nous vous en remercions. </p><p>Pour valider votre inscription, cliquez sur le lien ci-dessous ou copiez-collez le dans la barre URL de votre navigateur :</p><a href=\"{url}\">{url}</a><p> Nous espérons vous voir rapidement sur {sitename} </p><p> L'équipe {sitename}. </p>"
+
+; Update password form
 update-password-title = "Modifier mon mot de passe"
 update-password-current-password-label = "Mot de passe actuel"
 update-password-new-password-label = "Nouveau mot de passe"
@@ -75,13 +113,22 @@ update-password-new-password-confirm-label = "Confirmez votre nouveau mot de pas
 update-password-bad-current-password = "The mot de passe actuel n'est pas correct"
 update-password-error = "Une erreur est survenue pendant la mise à jour de votre mot de passe"
 update-password-success = "Votre mot de passe a été mis à jour avec succès"
+
+; User profile form
 user-profile-update-success = "Votre profil a été mis à jour"
+user-profile-update-success-with-email = "Votre profil a été mis à jour. Un email vous a été envoyé pour valider votre nouvelle adresse email."
 user-profile-update-error = "Une erreur est survenue pendant la mise à jour de votre profil"
-list-results-number[0] = "Aucun résultat"
-list-results-number[1] = "1 résultat"
-list-results-number[p] = "{number} résultats"
+
+; Change email address email
+reset-email-already-used = "Cette adresse email est déjà utilisée par un autre utilisateur sur l'application."
+reset-email-title = "Réintialisez votre mot de passe - {sitename}"
+reset-email-content = "Vous avez fait une demande de modification de votre adresse email sur l'application {sitename}. Pour confirmer votre nouvelle adresse, veuillez cliquer sur le lien suivant :"
+reset-email-ending = "Cordialement, <br /> {sitename}"
+reset-email-invalid-token = "Les informations de cette page ne nous permettent pas de mettre à jour votre adresse email."
+reset-email-success = "Votre adresse a été mise à jour avec succès. Vous pouvez dès à présent vous connecter avec votre nouvelle adresse email."
+
+; Permissions
 permission-name-user-actions = "Action sur son compte"
-clear-cache = "Vider le cache"
 
 ; Forgotten password
 forgotten-pwd-form-email-label = "Votre adresse email"

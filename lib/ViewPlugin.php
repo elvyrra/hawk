@@ -71,6 +71,11 @@ abstract class ViewPlugin{
      * @return string The HTML result to display
      */
     public function __toString(){
-        return $this->display();
+        try {
+            return $this->display();
+        }
+        catch(\Exception $e) {
+            return nl2br($e->getTraceAsString());
+        }
     }
 }

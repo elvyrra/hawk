@@ -25,6 +25,7 @@ require.config(
             ckeditor    : 'ext/ckeditor/ckeditor',
             ace         : 'ext/ace/ace',
             less        : 'ext/less',
+            moment      : 'ext/moment.min'
         },
         shim : {
             jquery : {
@@ -59,6 +60,9 @@ require.config(
             },
             ckeditor : {
                 exports : 'CKEDITOR'
+            },
+            moment : {
+                exports : 'moment'
             }
         }
     }
@@ -381,6 +385,8 @@ define(
          *    - onload (default null) : A callback function to execute when the page is loaded
          *    - post (default null) : an object of POST data to send in the URL
          *
+         * @returns {Promise} A promise resolved if the page is succesfully loaded
+         *
          * @memberOf App
          */
         App.prototype.load = function(url, data) {
@@ -401,7 +407,7 @@ define(
                 });
             }
 
-            if (url) {
+            if(url) {
                 /**
                  * We first check that page does not already exist in a tab
                  */
@@ -417,7 +423,7 @@ define(
                     if (tab.uri() === url || tab.route() === route && !this.routes[route].duplicable) {
                         if (tab !== this.tabset.activeTab()) {
                             this.tabset.activeTab(tab);
-                            return;
+                            return new $.Deferred();
                         }
 
                         options.newtab = false;
@@ -444,7 +450,7 @@ define(
                     this.loading.stop();
                     this.notify('danger', Lang.get('main.loading-page-selector-not-exists'));
 
-                    return;
+                    return new $.Deferred();
                 }
 
                 // Load the page
@@ -462,7 +468,7 @@ define(
                     url = url + query;
                 }
 
-                $.ajax({
+                return $.ajax({
                     xhr : this.xhr,
                     url : url,
                     type : options.post ? 'post' : 'get',
@@ -517,7 +523,7 @@ define(
                         };
                     }
 
-                    if (code === 403 && response.reason === 'login') {
+                    if (code === 401) {
                         // The user is not connected, display the login form
                         this.dialog(this.getUri('login') + '?redirect=' + url + '&code=' + code);
 
@@ -529,6 +535,8 @@ define(
                     this.loading.stop();
                 }.bind(this));
             }
+
+            return new $.Deferred();
         };
 
         /**
@@ -621,7 +629,7 @@ define(
          *                           else it will load the action in the dialog box and open it
          * @param {Object} options The options object :
          *                             - onload : A callback function, executed after the dialogbox has been displayed
-         * @memberOf App
+         * @returns {Object} The jquery Ajax 'promise'
          */
         App.prototype.dialog = function(action, options) {
             options = options || {};
@@ -631,12 +639,13 @@ define(
             container.modal('hide');
 
             if (action === 'close') {
-                return;
+                return null;
             }
 
             // Load the content from an url
             this.loading.start();
-            $.ajax({
+
+            return $.ajax({
                 url : action,
                 type : 'get',
                 data : {
@@ -655,9 +664,18 @@ define(
 
             .fail(function(xhr) {
                 // Page load failed
-                var message = xhr.responseText;
+                var response;
 
-                this.notify('danger', message);
+                try {
+                    response = JSON.parse(xhr.responseText);
+                }
+                catch(err) {
+                    response = {
+                        message : xhr.responseText
+                    };
+                }
+
+                this.notify('danger', response.message);
             }.bind(this))
 
             .always(function() {
@@ -806,6 +824,14 @@ define(
                 };
                 frame.contentDocument.head.appendChild(style);
             }
+        };
+
+        App.prototype.reloadRoutes = function() {
+            return $.getJSON(this.getUri('all-routes'))
+
+            .done(function(routes) {
+                this.setRoutes(routes);
+            }.bind(this));
         };
 
         // Instanciate the application

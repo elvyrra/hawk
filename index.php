@@ -46,38 +46,21 @@ try{
     /*** Compute the routage ***/
     App::router()->route();
 }
-catch(PageNotFoundException $e) {
-    App::response()->setStatus(404);
+catch(HTTPException $err) {
+    App::response()->setStatus($err->getStatusCode());
 
     $response = array(
-        'message' => $e->getMessage()
+        'message' => $err->getMessage(),
+        'details' => $err->getDetails()
     );
 
-    if(App::request()->isAjax()) {
+    if(App::request()->getWantedType() === 'json') {
         App::response()->setContentType('json');
         App::response()->setBody($response);
     }
-    else{
+    else {
         App::response()->setBody($response['message']);
     }
-}
-catch(ForbiddenException $e) {
-    App::response()->setStatus(403);
-    $response = array(
-        'message' => $e->getMessage(),
-        'reason' => $e->getReason()
-    );
-
-    if(App::request()->isAjax()) {
-        App::response()->setContentType('json');
-        App::response()->setBody($response);
-    }
-    else{
-        App::response()->setBody($response['message']);
-    }
-}
-catch(InternalErrorException $e) {
-    App::response()->setStatus(500);
 }
 catch(AppStopException $e){
 }

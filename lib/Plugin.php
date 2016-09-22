@@ -725,16 +725,25 @@ class Plugin{
 
 
     /**
+     * Get a plugin short namespace (without \Hawk\Plugins) by it name
+     *
+     * @param string $name The plugin name
+     */
+    public static function getShortNamespaceByName($name){
+        return preg_replace_callback(
+            '/(^|\W|_)(\w?)/', function ($m) {
+                return strtoupper($m[2]);
+            }, $name
+        );
+    }
+
+    /**
      * Get a plugin namespace by it name
      *
      * @param string $name The plugin name
      */
     public static function getNamespaceByName($name){
-        $namespace = preg_replace_callback(
-            '/(^|\W|_)(\w?)/', function ($m) {
-                return strtoupper($m[2]);
-            }, $name
-        );
+        $namespace = self::getShortNamespaceByName($name);
 
         return 'Hawk\\Plugins\\' . $namespace;
     }
@@ -747,6 +756,16 @@ class Plugin{
      */
     public function getNamespace(){
         return self::getNamespaceByName($this->name);
+    }
+
+
+    /**
+     * Get the short namespace (without \Hawk\Plugins) used for all files in the plugin. The namespace is generated from the plugin name
+     *
+     * @return string The plugin namespace
+     */
+    public function getShortNamespace(){
+        return self::getShortNamespaceByName($this->name);
     }
 
     /**

@@ -1,4 +1,11 @@
 ; Generic error messages
+http-error-400-message = "Bad request format"
+http-error-401-message = "You must be authenticated to access this feature"
+http-error-403-message = "You don't have necessary privileges to access this feature"
+http-error-404-message = "The page you're expected : {url} does not exists"
+http-error-405-message = "The page {path} is not accessible with the method {method}"
+http-error-500-message = "Internal server error"
+
 403-message = "You don't have necessary privileges to access this feature"
 404-message = "The page you're expected : {uri} does not exists"
 db-connection-error = "An error occured while connecting to the database"
@@ -19,9 +26,11 @@ valid-button = "Save"
 date-format = "m/d/Y"
 date-mask = "mm/dd/yyyy"
 mysql-date-format = "%m/%d/%Y"
+date-moment-pattern = "MM/DD/YYYY"
 time-format = "m/d/Y H:i:s"
-time-mask = "99/99/9999 99:99:99"
+time-mask = "99/99/9999 99:99:99
 mysql-time-format = "%m/%d/%Y %H:%i:%s"
+time-pattern = "^\\d{2}\\/\\d{2}\\/\\d{2} \\d{2}\\:\\d{2}\\:\\d{2}$"
 
 ; Guest username
 guest-username = "Quest"
@@ -139,5 +148,3 @@ reset-pwd-form-confirmation-label = "Type it again"
 reset-pwd-form-success = "Your password was successfully reset. You can now connect with this new password"
 reset-pwd-form-error = "An error occured while reseting your password. Please try again later."
 reset-pwd-form-bad-verification-code = "This code is incorrect"
-
-

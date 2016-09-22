@@ -186,7 +186,6 @@ class ItemListField {
      */
     public function getSearchCondition(&$binds){
         if($this->searchValue !== null) {
-            Utils::debug($this->searchValue);
             return DBExample::make(
                 array(
                     $this->field => array(
@@ -323,7 +322,7 @@ class ItemListField {
         }
 
         // Compute the cell content
-        if($cell->display) {
+        if(isset($cell->display)) {
             $cell->content = $cell->display;
         }
         else{

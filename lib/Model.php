@@ -75,12 +75,6 @@ class Model{
      */
     public function __construct($data = array()){
         $this->map($data);
-
-        // foreach(get_object_vars($this) as $key => $value) {
-        //     if(!empty(self::$fields[$key]['json'])) {
-        //         $this->$key = json_decode($this->key);
-        //     }
-        // }
     }
 
 
@@ -285,13 +279,7 @@ class Model{
         $insert = array();
         foreach(get_object_vars($this) as $key => $value){
             if(isset($fields[$key])) {
-                if(!empty($fields[$key]['json'])) {
-                    // Format JSON objects
-                    $insert[$key] = json_encode($value);
-                }
-                else {
-                    $insert[$key] = $value;
-                }
+                $insert[$key] = $value;
             }
         }
 
@@ -548,127 +536,199 @@ class Model{
     /**
      * Update the model table structure
      */
-    // public static function updateTable() {
-    //     // Get the fields currently in the database
-    //     $dbFields = static::getDbInstance()->query(
-    //         'SHOW COLUMNS FROM ' . static::getTable(),
-    //         array(),
-    //         array(
-    //             'index' => 'Field',
-    //             'return' => DB::RETURN_ARRAY
-    //         )
-    //     );
+    public static function updateTable() {
+        $instance = self::getDbInstance();
 
-    //     $dbFields = array_map(function($field) {
-    //         return array(
-    //             'type' => $field['Type'],
-    //             'null' => $field['Null'] == 'YES',
-    //             'default' => $field['Default'],
-    //             'auto_increment' => $field['Extra'] === 'auto_increment'
-    //         );
-    //     });
+        // Get the fields currently in the database
+        $dbFields = $instance->query(
+            'SHOW COLUMNS FROM ' . static::getTable(),
+            array(),
+            array(
+                'index' => 'Field',
+                'return' => DB::RETURN_ARRAY
+            )
+        );
 
-    //     $modelFields = static::$fields;
+        $dbFields = array_map(function($field) {
+            return array(
+                'type' => $field['Type'],
+                'null' => $field['Null'] == 'YES',
+                'default' => $field['Default'],
+                'auto_increment' => $field['Extra'] === 'auto_increment'
+            );
+        }, $dbFields);
 
-    //     // Build the instructions to execute to update the table
-    //     $instructions = array();
+        $modelFields = static::$fields;
 
-    //     // Build the instructions about fields structures
-    //     foreach($dbFields as $fieldname => $dbField) {
-    //         if(!isset($modelFields[$fieldname])) {
-    //             // The field does not exists anymore
+        // Build the instructions to execute to update the table
+        $instructions = array();
 
-    //             // Try to find if it has been renamed
-    //             $renamed = array_filter($modelFields, function($field) use($fieldname) {
-    //                 return !empty($field['oldName']) && $field['oldName'] === $fieldname;
-    //             });
+        // Build the instructions about fields structures
+        foreach($dbFields as $fieldname => $dbField) {
+            if(!isset($modelFields[$fieldname])) {
+                // The field does not exists anymore
 
-    //             if (!empty($renamed)) {
-    //                 // The field has been renamed
-    //                 $newName = reset(array_keys($renamed));
-    //                 $renamed = $renamed[$newName];
+                // Try to find if it has been renamed
+                $renamed = array_filter($modelFields, function($field) use($fieldname) {
+                    return !empty($field['oldName']) && $field['oldName'] === $fieldname;
+                });
 
-    //                 $instruction = 'ALTER TABLE ' . DB::formatField(self::getTable()) . ' CHANGE ' .
-    //                                 DB::formatField($fieldname) . ' ' . self::getFieldDefinition($newName, $renamed);
+                if (!empty($renamed)) {
+                    // The field has been renamed
+                    $newName = reset(array_keys($renamed));
+                    $renamed = $renamed[$newName];
 
-    //                 $instructions[] = $instruction;
+                    $instruction = 'ALTER TABLE ' . DB::formatField(self::getTable()) . ' CHANGE ' .
+                                    DB::formatField($fieldname) . ' ' . self::getFieldDefinition($newName, $renamed);
 
-    //                 // Remove the field from the model fields, because it has been treated
-    //                 unset($modelFields[$newName]);
-    //             }
-    //             else {
-    //                 // The field has been removed
-    //                 $instructions[] = 'ALTER TABLE ' . DB::formatField(self::getTable()) . ' DROP COLUMN ' . DB::formatField($fieldname);
+                    $instructions[] = $instruction;
 
-    //                 // Remove the field from the model fields, because it has been treated
-    //                 unset($modelFields[$fieldname]);
-    //             }
+                    // Remove the field from the model fields, because it has been treated
+                    unset($modelFields[$newName]);
+                }
+                else {
+                    // The field has been removed
+                    $instructions[] = 'ALTER TABLE ' . DB::formatField(self::getTable()) . ' DROP COLUMN ' . DB::formatField($fieldname);
 
-    //         }
-    //         else {
-    //             // The field exists, check if it has been modified
-    //             $modelField = $modelFields[$fieldname];
+                    // Remove the field from the model fields, because it has been treated
+                    unset($modelFields[$fieldname]);
+                }
 
-    //             if(!isset($modelField['null'])) {
-    //                 $modelField['null'] = false;
-    //             }
+            }
+            else {
+                // The field exists, check if it has been modified
+                $modelField = $modelFields[$fieldname];
 
-    //             if(!isset($modelField['default'])) {
-    //                 $modelField['default'] = null;
-    //             }
+                if(!isset($modelField['null'])) {
+                    $modelField['null'] = false;
+                }
 
-    //             if($modelField != $dbField) {
-    //                 // The field has been modified
-    //                 $instructions[] = 'ALTER TABLE ' . DB::formatField(self::getTable()) . ' MODIFY ' .
-    //                                     self::getFieldDefinition($fieldname, $modelFields[$fieldname]);
+                if(!isset($modelField['default'])) {
+                    $modelField['default'] = null;
+                }
 
-    //                 // Remove the field from the model fields, because it has been treated
-    //                 unset($modelFields[$fieldname]);
-    //             }
-    //         }
-    //     }
-
-    //     // Now check if new fields have to be created
-    //     foreach($modeFields as $fieldname => $properties) {
-    //         $instructions[] = 'ALTER TABLE ' . DB::formatField(self::getTable()) . ' ADD COLUMN ' .
-    //                             self::getFieldDefinition($fieldname, $modelFields[$fieldname]);
-    //     }
+                if(!isset($modelField['auto_increment'])) {
+                    $modelField['auto_increment'] = false;
+                }
 
 
-    //     // Build instructions about constraints
-    //     // Get constaints currently saved in th database
-    //     $indexes = App::db()->query(
-    //         'SHOW INDEXES FROM ' . self::getTable() . 'WHERE Key_name <> "PRIMARY"',
-    //         array(),
-    //         array(
-    //             'return' => DB::RETURN_ARRAY
-    //         )
-    //     );
+                if($modelField != $dbField) {
+                    // The field has been modified
+                    $instructions[] = 'ALTER TABLE ' . DB::formatField(self::getTable()) . ' MODIFY ' .
+                                        self::getFieldDefinition($fieldname, $modelFields[$fieldname]);
 
-    //     $dbKeys = array();
-    //     foreach($indexes as $index) {
-    //         if(!isset($dbKeys[$index['Key_name']])) {
-    //             $dbKeys[$index['Key_name']] = array (
-    //                 'fields' => array(
-    //                     $index['Column_name']
-    //                 )
-    //             );
-    //             if ($index['Index_type'] === 'FULLTEXT') {
-    //                 $dbKeys[$index['Key_name']]['type'] = 'fulltext';
-    //             }
-    //         }
-    //         else {
-    //             $dbKeys[$index['Key_name']]['fields'][] = $index['Column_name'];
-    //         }
-    //     }
+                }
+
+                // Remove the field from the model fields, because it has been treated
+                unset($modelFields[$fieldname]);
+            }
+        }
+
+        // Now check if new fields have to be created
+        foreach($modelFields as $fieldname => $properties) {
+            $instructions[] = 'ALTER TABLE ' . DB::formatField(self::getTable()) . ' ADD COLUMN ' .
+                                self::getFieldDefinition($fieldname, $modelFields[$fieldname]);
+        }
 
 
+        // Build instructions about constraints
+        // Get constaints currently saved in th database
 
-    //     // Execute the SQL insctructions
-    //     $sql = implode(';', $insctructions);
+        // First get indexes
+        $dbIndexes = $instance->query('SHOW INDEX FROM ' . self::getTable(), array(), array(
+            'return' => DB::RETURN_ARRAY
+        ));
 
-    //     self::getDbInstance()->query($sql);
-    // }
+        $dbConstraints = array();
+
+        foreach($dbIndexes as $index) {
+            $name = $index['Key_name'];
+            if($name === 'PRIMARY') {
+                // No treat primary keys
+                continue;
+            }
+
+            if(empty($dbConstraints[$name])) {
+                $dbConstraints[$name] = array(
+                    'fields' => array()
+                );
+            }
+
+            $dbConstraints[$name]['type'] = $index['Non_unique'] ? 'index' : 'unique';
+            $dbConstraints[$name]['fields'][] = $index['Column_name'];
+        }
+
+        // Get foreign keys
+        $dbFKeys = $instance->query (
+            'SELECT K.COLUMN_NAME, K.CONSTRAINT_NAME, K.REFERENCED_TABLE_NAME, K.REFERENCED_COLUMN_NAME, R.UPDATE_RULE, R.DELETE_RULE
+            FROM information_schema.KEY_COLUMN_USAGE K INNER JOIN information_schema.REFERENTIAL_CONSTRAINTS R
+                ON K.TABLE_SCHEMA = R.CONSTRAINT_SCHEMA AND K.CONSTRAINT_NAME = R.CONSTRAINT_NAME
+            WHERE K.TABLE_SCHEMA = :dbname AND K.TABLE_NAME = :tablename AND K.REFERENCED_TABLE_NAME IS NOT NULL',
+            array(
+                'dbname' => $instance->dbname,
+                'tablename' => self::getTable()
+            ),
+            array(
+                'return' => DB::RETURN_ARRAY
+            )
+        );
+
+        foreach($dbFKeys as $fkey) {
+            $name = $fkey['CONSTRAINT_NAME'];
+            if(empty($dbConstraints[$name])) {
+                $dbConstraints[$name] = array(
+                    'fields' => array()
+                );
+            }
+
+            $dbConstraints[$name]['type'] = 'foreign';
+            $dbConstraints[$name]['fields'][] = $fkey['COLUMN_NAME'];
+
+            if(empty($dbConstraints[$name]['references'])) {
+                $dbConstraints[$name]['references'] = array(
+                    'table' => $fkey['REFERENCED_TABLE_NAME'],
+                    'fields' => array()
+                );
+            }
+            $dbConstraints[$name]['references']['fields'][] = $fkey['REFERENCED_COLUMN_NAME'];
+
+            $dbConstraints[$name]['on_update'] = $fkey['UPDATE_RULE'];
+            $dbConstraints[$name]['on_delete'] = $fkey['DELETE_RULE'];
+        }
+
+        $constraints = static::$constraints;
+
+        foreach($dbConstraints as $name => $constraint) {
+            $deleteType = $constraint['type'] === 'foreign' ? 'FOREIGN KEY' : 'INDEX';
+
+            if(!isset($constraints[$name])) {
+                // The constraint has been removed
+                $instructions[] = 'ALTER TABLE ' . DB::formatField(self::getTable()) .
+                                    ' DROP ' . $deleteType . ' ' . DB::formatField($name);
+            }
+            elseif($constraint != $constraints[$name]) {
+                // The constraint properties changed
+                $instructions[] = 'ALTER TABLE ' . DB::formatField(self::getTable()) .
+                                    ' DROP ' . $deleteType . ' ' . ApDB::formatField($name);
+
+                $instructions[] = 'ALTER TABLE ' . DB::formatField(self::getTable()) . ' ADD ' .
+                                    self::getConstraintDefinition($name, $constraint);
+            }
+
+            unset($constraints[$name]);
+        }
+
+        foreach($constraints as $name => $constraint) {
+            // The constaint has been created
+            $instructions[] = 'ALTER TABLE ' . DB::formatField(self::getTable()) . ' ADD ' .
+                                    self::getConstraintDefinition($name, $constraint);
+        }
+
+        // Execute the SQL insctructions
+        foreach($instructions as $instruction) {
+            $instance->query($instruction);
+        }
+    }
 
 
     /**
@@ -753,7 +813,7 @@ class Model{
 
             $onDelete = isset($properties['on_delete']) ? $properties['on_delete'] : 'RESTRICT';
 
-            return 'CONSTRAINT ' . $constraintName . ' ' .
+            return 'CONSTRAINT ' . DB::formatField($constraintName) . ' ' .
                     'FOREIGN KEY (' . $onFields . ') '.
                     'REFERENCES ' . $referenceTable . ' (' . $referenceFields . ') ' .
                     'ON UPDATE ' . $onUpdate . ' ' .
@@ -762,15 +822,15 @@ class Model{
         else {
             switch($properties['type']) {
                 case 'unique' :
-                    $keyword =  'UNIQUE KEY';
+                    $keyword =  'UNIQUE KEY ';
                     break;
 
                 case 'fulltext' :
-                    $keyword = 'FULLTEXT';
+                    $keyword = 'FULLTEXT ';
                     break;
 
                 default :
-                    $keyword = 'KEY';
+                    $keyword = 'KEY ';
                     break;
             }
 

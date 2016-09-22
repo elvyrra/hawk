@@ -56,6 +56,9 @@ class Button extends \Hawk\ViewPlugin{
             $this->params['data-target'] = $this->params['target'];
             unset($this->params['target']);
         }
+        if(empty($this->params['type'])) {
+            $this->params['type'] = 'button';
+        }
 
         return \Hawk\View::make(\Hawk\Theme::getSelected()->getView('button.tpl'), array(
             'class' => $this->class,

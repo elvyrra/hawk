@@ -13,25 +13,26 @@ namespace Hawk;
  *
  * @package Exceptions
  */
-class PageNotFoundException extends \Exception {
-    /**
-     * The called URL
-     */
-    private $url;
+class PageNotFoundException extends HTTPException {
+    const STATUS_CODE = 404;
 
     /**
      * Constructor
      *
      * @param string $message The exception message
      */
-    public function __construct($message = '') {
-        $this->url = App::request()->getFullUrl();
-
-        if(!$message) {
-            $message = Lang::get('main.404-message', array('uri' => $this->url));
+    public function __construct($url = '') {
+        if(!$url) {
+            $url = App::request()->getFullUrl();
         }
 
-        parent::__construct($message);
+        $details = array(
+            'url' => $url
+        );
+
+        $message = Lang::get('main.http-error-404-message', $details);
+
+        parent::__construct($message, $details);
     }
 
     /**
@@ -40,6 +41,6 @@ class PageNotFoundException extends \Exception {
      * @return string
      */
     public function getUrl() {
-        return $this->url;
+        return $this->details['url'];
     }
 }

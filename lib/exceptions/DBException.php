@@ -13,7 +13,7 @@ namespace Hawk;
  *
  * @package Exceptions
  */
-class DBException extends \Exception{
+class DBException extends InternalErrorException{
     const CONNECTION_ERROR = 1;
     const QUERY_ERROR = 2;
 
@@ -29,15 +29,21 @@ class DBException extends \Exception{
         switch($code){
             case self::CONNECTION_ERROR :
                 $message = "Impossible to connect to Database Server : $value, $message";
+                $details = array(
+                    'server' => $value
+                );
                 break;
 
             case self::QUERY_ERROR:
                 $message = "An error was detected : $message in the Database Query : $value";
+                $details = array(
+                    'query' => $value
+                )
                 App::logger()->error($message);
                 break;
 
         }
 
-        parent::__construct($message, $code, $previous);
+        parent::__construct($message, $details);
     }
 }

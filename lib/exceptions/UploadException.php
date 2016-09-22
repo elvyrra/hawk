@@ -14,5 +14,5 @@ namespace Hawk;
  *
  * @package Exceptions
  */
-class UploadException extends \Exception{
+class UploadException extends InternalErrorException {
 }

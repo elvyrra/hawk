@@ -13,6 +13,6 @@ namespace Hawk;
  *
  * @package Exceptions
  */
-class MailException extends \Exception{
+class MailException extends InternalErrorException{
 
 }
