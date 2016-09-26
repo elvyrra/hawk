@@ -309,16 +309,24 @@ class AdminController extends Controller{
                 ),
 
                 '_submits' => array(
-                    empty($updates) ? null : new ButtonInput(array(
-                        'name' => 'update-hawk',
-                        'value' => Lang::get('admin.update-page-update-hawk-btn', array('version' => end($updates)['version'])),
-                        'icon' => 'refresh',
-                        'id' => 'update-hawk-btn',
-                        'attributes' => array(
-                            'ko-click' => 'function(){ updateHawk("' . end($updates)['version'] . '"); }'
-                        ),
-                        'class' => 'btn-warning'
-                    )),
+                    empty($updates) ?
+                        new HtmlInput(array(
+                            'value' => Lang::get('admin.hawk-version-up-to-date', array(
+                                'version' => HAWK_VERSION
+                            )),
+                            'class' => 'btn-success'
+                        ))
+
+                        : new ButtonInput(array(
+                            'name' => 'update-hawk',
+                            'value' => Lang::get('admin.update-page-update-hawk-btn', array('version' => end($updates)['version'])),
+                            'icon' => 'refresh',
+                            'id' => 'update-hawk-btn',
+                            'attributes' => array(
+                                'ko-click' => 'function(){ updateHawk("' . end($updates)['version'] . '"); }'
+                            ),
+                            'class' => 'btn-warning'
+                        )),
 
                     new SubmitInput(array(
                         'name' => 'save',

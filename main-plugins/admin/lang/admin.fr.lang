@@ -245,6 +245,7 @@ available-updates-title-plugins[p] = "{number} mises à jour de plugins"
 available-updates-title-themes[s] = "1 themes mise à jour de thème"
 available-updates-title-themes[p] = "{number} mises à jour de thèmes"
 
+hawk-version-up-to-date = "Hawk à jour : v{version}"
 update-page-update-hawk-btn = "Installer Hawk v{version}"
 update-page-confirm-update-hawk = "Voulez-vous réellement mettre Hawk à jour ?"
 update-hawk-error = "Une erreur est survenue pendant la mise à jour de Hawk"
