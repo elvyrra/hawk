@@ -221,6 +221,7 @@ available-updates-title-plugins[p] = "{number} plugins updates"
 available-updates-title-themes[s] = "1 themes updates"
 available-updates-title-themes[p] = "{number} themes updates"
 
+hawk-version-up-to-date = "Hawk up to date : v{version}"
 update-page-update-hawk-btn = "Update Hawk to v{version}"
 update-page-confirm-update-hawk = "Do you really want to update Hawk ?"
 update-hawk-error = "An error occured while updating Hawk."
