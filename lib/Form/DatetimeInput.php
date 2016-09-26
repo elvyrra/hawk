@@ -65,9 +65,11 @@ class DatetimeInput extends TextInput{
             if($this->value === '0000-00-00' || $this->value === '0000-00-00 00:00:00') {
                 $this->value = '';
             }
+            else if($this->value == ''){
+                $this->value = date($this->format, time());
+            }
             else {
                 $this->value = date($this->format, strtotime($this->value));
-
             }
         }
 

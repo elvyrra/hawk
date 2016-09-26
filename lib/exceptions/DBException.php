@@ -38,7 +38,7 @@ class DBException extends InternalErrorException{
                 $message = "An error was detected : $message in the Database Query : $value";
                 $details = array(
                     'query' => $value
-                )
+                );
                 App::logger()->error($message);
                 break;
 

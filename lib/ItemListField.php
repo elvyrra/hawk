@@ -243,7 +243,7 @@ class ItemListField {
                     'attributes' => array(
                         'ko-value' => 'search',
                         'ko-class' => "search() ? 'alert-info not-empty' : 'empty'"
-                    )
+                    ),
                 ));
                 break;
 

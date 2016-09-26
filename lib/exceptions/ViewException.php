@@ -53,8 +53,8 @@ class ViewException extends InternalErrorException {
                     'type' => $type,
                     'file' => $file,
                     'error' => $preivous->getMessage()
-                )
-                break;
+                );
+                break;  
         }
 
         parent::__construct($message, $details);
