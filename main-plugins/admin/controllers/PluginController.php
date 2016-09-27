@@ -624,7 +624,9 @@ class PluginController extends Controller{
     /**
      * Update a plugin from the API
      */
-    public function update(){
+    public function update() {
+        App::response()->setContentType('json');
+
         try{
             $plugin = Plugin::get($this->plugin);
             if(!$plugin) {
@@ -637,7 +639,7 @@ class PluginController extends Controller{
                 $plugin->getName() => $plugin->getDefinition('version')
             ));
 
-            if(count($updates[$plugin->getName()])) {
+            if(!empty($updates[$plugin->getName()])) {
                 $file = $api->downloadPlugin($this->plugin);
 
                 $zip = new \ZipArchive;
@@ -676,12 +678,11 @@ class PluginController extends Controller{
 
                 App::fs()->remove($file);
             }
+
+            return array();
         }
-        catch(\Exception $e){
-            App::response()->setStatus(500);
-            App::response()->setBody(array(
-                'message' => $e->getMessage()
-            ));
+        catch(\Exception $e) {
+            throw new InternalErrorException($e->getMessage());
         }
     }
 
