@@ -983,4 +983,26 @@ class Plugin{
     public function getMenuItems() {
         return MenuItem::getPluginMenuItems($this->getName());
     }
+
+
+    /**
+     * Check if plugin exist and if it is active
+     */
+    public static function existAndIsActive($name){
+        $class = self::getNamespaceByName($name) . "\Installer"; 
+
+        if(class_exists($class)){
+            $plugin = Plugin::get($name);
+
+            if(($plugin != null) && ($plugin->isActive())){
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+        else{
+            return false;
+        }
+    }
 }
