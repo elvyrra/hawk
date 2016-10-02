@@ -987,17 +987,21 @@ class Plugin{
 
     /**
      * Check if plugin exist and if it is active
+     *
+     * @param string $name The plugin name to test
+     *
+     * @return bool True if the plugin exists and is active, else False
      */
     public static function existAndIsActive($name){
-        $class = self::getNamespaceByName($name) . "\Installer"; 
+        $class = self::getNamespaceByName($name) . "\Installer";
 
-        if(class_exists($class)){
+        if(class_exists($class)) {
             $plugin = Plugin::get($name);
 
-            if(($plugin != null) && ($plugin->isActive())){
+            if(($plugin != null) && ($plugin->isActive())) {
                 return true;
             }
-            else{
+            else {
                 return false;
             }
         }
