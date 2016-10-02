@@ -64,7 +64,22 @@ class MenuItem extends Model{
         'order' => array(
             'type' => 'INT(2)'
         ),
-        'active' => 'TINYINT(1)'
+        'active' => array(
+            'type' => 'TINYINT(1)'
+        ),
+        'icon' => array(
+            'type' => 'varchar(64)'
+        )
+    );
+
+    protected static $constraints = array(
+        'index2' => array(
+            'type' => 'unique',
+            'fields' => array(
+                'plugin',
+                'name'
+            )
+        )
     );
 
     /**

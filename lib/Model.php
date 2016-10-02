@@ -709,7 +709,7 @@ class Model{
             elseif($constraint != $constraints[$name]) {
                 // The constraint properties changed
                 $instructions[] = 'ALTER TABLE ' . DB::formatField(self::getTable()) .
-                                    ' DROP ' . $deleteType . ' ' . ApDB::formatField($name);
+                                    ' DROP ' . $deleteType . ' ' . DB::formatField($name);
 
                 $instructions[] = 'ALTER TABLE ' . DB::formatField(self::getTable()) . ' ADD ' .
                                     self::getConstraintDefinition($name, $constraint);

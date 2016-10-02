@@ -16,11 +16,15 @@ namespace Hawk;
 class Permission extends Model{
     /**
      * The associated table
+     *
+     * @var string
      */
     protected static $tablename = "Permission";
 
     /**
      * The model fields
+     *
+     * @var array
      */
     protected static $fields = array(
         'id' => array(
@@ -36,6 +40,21 @@ class Permission extends Model{
         'availableForGuests' => array(
             'type' => 'TINYINT(1)',
             'default' => '0'
+        )
+    );
+
+    /**
+     * The model constraints
+     *
+     * @var array
+     */
+    protected static $constraints = array(
+        'plugin' => array(
+            'type' => 'unique',
+            'fields' => array(
+                'plugin',
+                'key'
+            )
         )
     );
 

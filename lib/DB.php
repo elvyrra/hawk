@@ -580,12 +580,18 @@ class DB{
      *
      * @return string The formatted string
      */
-    public static function formatField($str){
-        return preg_replace_callback(
-            '/^(\w+)(\.(\w+))?$/', function ($m) {
-                return '`' . $m[1] . '`' . (isset($m[2]) && isset($m[3]) ? '.`' . $m[3] . '`' : '');
-            }, $str
-        );
+    public static function formatField($str) {
+        $regex = '/^(\w+)(\.(\w+))?$/';
+
+        if(preg_match($regex, $str)) {
+            return preg_replace_callback(
+                '/^(\w+)(\.(\w+))?$/', function ($m) {
+                    return '`' . $m[1] . '`' . (isset($m[2]) && isset($m[3]) ? '.`' . $m[3] . '`' : '');
+                }, $str
+            );
+        }
+
+        return '`' . $str . '`';
     }
 
 

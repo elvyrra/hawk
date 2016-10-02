@@ -16,6 +16,7 @@
 						{if($menu->visibleItems)}
 							<li class="dropdown main-menu" id="main-menu-{{ $menu->id }}">
 								<div class="dropdown-toggle main-menu-title" type="button" id="main-menu-title-{{ $menu->id }}" data-toggle="dropdown">
+									{icon icon="{$menu->icon}" size="fw"}
 									{{ $menu->label }}
 									{icon icon="caret-down"}
 								</div>
@@ -23,6 +24,7 @@
 									{foreach($menu->visibleItems as $item)}
 										<li role="presentation" class="main-menu-item" id="main-menu-item-{{ $item->id }}" data-item="{{ $item->name }}">
 											<a role="menuitem" href="{{{ $item->url }}}" {if(!empty($item->target))} target="{{ $item->target }}" {/if}>
+												{icon icon="{$item->icon}" size="fw"}
 												{{ $item->label }}
 											</a>
 										</li>
