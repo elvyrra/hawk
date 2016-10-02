@@ -18,36 +18,49 @@ class FormFieldset{
 
     /**
      * The fieldset name
+     *
+     * @var string
      */
     public $name,
 
     /**
      * The legend of the fieldset
+     *
+     * @var string
      */
     $legend,
 
     /**
      * The inputs in this fieldset
+     *
+     * @var array
      */
     $inputs = array(),
 
     /**
      * The form this fieldset is associated to
+     *
+     * @var Form
      */
     $form,
 
     /**
      * The id of the legend tag
+     *
+     * @var string
      */
     $legendId = '',
 
     /**
      * Defines if the fieldset must not be displayed
+     *
+     * @var bool
      */
     $notDisplayed = false,
 
     /**
      * HTML attibutes to set on the fieldset tag
+     *
      * @var array
      */
     $attributes = array();

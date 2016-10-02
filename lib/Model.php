@@ -549,7 +549,7 @@ class Model{
             )
         );
 
-        $dbFields = array_map(function($field) {
+        $dbFields = array_map(function ($field) {
             return array(
                 'type' => $field['Type'],
                 'null' => $field['Null'] == 'YES',
@@ -569,7 +569,7 @@ class Model{
                 // The field does not exists anymore
 
                 // Try to find if it has been renamed
-                $renamed = array_filter($modelFields, function($field) use($fieldname) {
+                $renamed = array_filter($modelFields, function ($field) use ($fieldname) {
                     return !empty($field['oldName']) && $field['oldName'] === $fieldname;
                 });
 
@@ -659,7 +659,7 @@ class Model{
         }
 
         // Get foreign keys
-        $dbFKeys = $instance->query (
+        $dbFKeys = $instance->query(
             'SELECT K.COLUMN_NAME, K.CONSTRAINT_NAME, K.REFERENCED_TABLE_NAME, K.REFERENCED_COLUMN_NAME, R.UPDATE_RULE, R.DELETE_RULE
             FROM information_schema.KEY_COLUMN_USAGE K INNER JOIN information_schema.REFERENTIAL_CONSTRAINTS R
                 ON K.TABLE_SCHEMA = R.CONSTRAINT_SCHEMA AND K.CONSTRAINT_NAME = R.CONSTRAINT_NAME

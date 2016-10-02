@@ -13,7 +13,7 @@ namespace Hawk;
  *
  * @package Form\Input
  */
-class DatetimeInput extends TextInput{
+class DatetimeInput extends TextInput {
     /**
      * The maximal date the user can fill
      */
@@ -65,7 +65,7 @@ class DatetimeInput extends TextInput{
             if($this->value === '0000-00-00' || $this->value === '0000-00-00 00:00:00') {
                 $this->value = '';
             }
-            else if($this->value == ''){
+            elseif($this->value == '') {
                 $this->value = date($this->format, time());
             }
             else {
@@ -139,10 +139,10 @@ class DatetimeInput extends TextInput{
         if($this->dataType == 'int') {
             return $date->getTimestamp();
         }
-        else if($this->value == ""){
+        elseif($this->value == "") {
             return '';
         }
-        else{
+        else {
             return $date->format($this->dbformat);
         }
     }

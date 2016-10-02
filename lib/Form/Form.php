@@ -567,9 +567,6 @@ class Form{
     /**
      * Check if the submitted values are correct
      *
-     * @param bool $exit If set to true and if the data is not valid,
-     *                    this function will output the validation result on HTTP response
-     *
      * @return bool true if the data is valid, false else.
      */
     public function check() {

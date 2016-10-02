@@ -19,7 +19,7 @@ class PageNotFoundException extends HTTPException {
     /**
      * Constructor
      *
-     * @param string $message The exception message
+     * @param string $url The not found URL
      */
     public function __construct($url = '') {
         if(!$url) {
@@ -38,7 +38,7 @@ class PageNotFoundException extends HTTPException {
     /**
      * Get the not found URL
      *
-     * @return string
+     * @return string The exception URL
      */
     public function getUrl() {
         return $this->details['url'];

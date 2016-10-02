@@ -102,10 +102,11 @@ class Route{
     /**
      * Constructor
      *
-     * @param string $name  The route name
-     * @param string $url   The route URI pattern
-     * @param array  $param The route parameters, containing the pattern rules,
-     *                      the default values, the action associated with this route
+     * @param string $name    The route name
+     * @param string $url     The route URI pattern
+     * @param array  $methods The methods the route is accessible
+     * @param array  $param   The route parameters, containing the pattern rules,
+     *                        the default values, the action associated with this route
      */
     public function __construct($name, $url, $methods, $param){
         $this->map($param);
@@ -212,6 +213,8 @@ class Route{
 
     /**
      * Get the route action controller class
+     *
+     * @return string The route action cotnroller class
      */
     public function getActionClassname(){
         list($controller, $method) = explode('.', $this->action);
@@ -221,6 +224,8 @@ class Route{
 
     /**
      * Get the route action method name
+     *
+     * @return string The route action method name
      */
     public function getActionMethodName(){
         list($controller, $method) = explode('.', $this->action);
@@ -228,6 +233,13 @@ class Route{
         return $method;
     }
 
+    /**
+     * Check is the route is callable by a method
+     *
+     * @param string $method The method to check (POST, GET, DELETE, ...)
+     *
+     * @return boolean True if the route is callable on the geivn method, else False
+     */
     public function isCallableBy($method) {
         if(in_array($method, $this->methods)) {
             return true;

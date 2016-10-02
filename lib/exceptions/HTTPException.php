@@ -17,23 +17,28 @@ namespace Hawk;
 abstract class HTTPException extends \Exception {
     /**
      * The Exception status code
+     *
+     * @var int
      */
     protected $status;
 
     /**
      * The exception message
+     *
+     * @var string
      */
     protected $message;
 
     /**
      * The exception details
+     *
+     * @var array
      */
     protected $details = array();
 
     /**
      * Constructor
      *
-     * @param string $status  The status code
      * @param string $message The exception message
      * @param Array  $details The exception details
      */
@@ -52,7 +57,8 @@ abstract class HTTPException extends \Exception {
 
     /**
      * Get the error status code
-     * @returns int The status code of the exception
+     *
+     * @return int The status code of the exception
      */
     public function getStatusCode() {
         return $this->status;
@@ -60,7 +66,8 @@ abstract class HTTPException extends \Exception {
 
     /**
      * Get the exception details
-     * @returns Array The exception details
+     *
+     * @return Array The exception details
      */
     public function getDetails() {
         return $this->details;

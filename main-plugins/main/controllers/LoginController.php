@@ -215,7 +215,7 @@ class LoginController extends Controller{
             $field = json_decode($question->parameters, true);
 
             //if(!empty($field->roles) && in_array(Option::get('roles.default-role'), $field->roles)) {
-            if($question->isAllowedForRole(Option::get('roles.default-role') ) ){
+            if($question->isAllowedForRole(Option::get('roles.default-role'))) {
                 $classname = 'Hawk\\' . ucwords($question->type) . 'Input';
                 $field['name'] = $question->name;
                 $field['independant'] = true;

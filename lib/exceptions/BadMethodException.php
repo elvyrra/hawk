@@ -18,6 +18,7 @@ class BadMethodException extends HTTPException {
 
     /**
      * Constructor
+     *
      * @param string $path   The called path
      * @param string $method The bad method
      */

@@ -1,7 +1,7 @@
 <?php
 namespace Hawk;
 
-try{
+try {
     /*** Initialize the application ***/
     define('SCRIPT_START_TIME', microtime(true));
 
@@ -16,7 +16,7 @@ try{
 
     /*** Initialize the plugins ***/
     $plugins = App::conf()->has('db') ? Plugin::getActivePlugins() : array(Plugin::get('main'), Plugin::get('install'));
-    foreach($plugins as $plugin){
+    foreach($plugins as $plugin) {
         if(is_file($plugin->getStartFile())) {
             include $plugin->getStartFile();
         }

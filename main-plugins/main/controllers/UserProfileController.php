@@ -74,7 +74,7 @@ class UserProfileController extends Controller{
                 $field['independant'] = true;
                 $field['label'] = Lang::get('admin.profile-question-' . $question->name . '-label');
 
-                if(isset($field['readonly'])){
+                if(isset($field['readonly'])) {
                     if($field['readonly'])
                         $field['required'] = false;
                 }

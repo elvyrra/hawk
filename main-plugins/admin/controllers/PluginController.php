@@ -216,7 +216,7 @@ class PluginController extends Controller{
             $md = file_get_contents($plugin->getReadmeFile());
 
             // Replace img sources
-            $md = preg_replace_callback("#\!\[(.*?)\]\((.+?)( .+)?\)#", function($matches) use($plugin) {
+            $md = preg_replace_callback("#\!\[(.*?)\]\((.+?)( .+)?\)#", function ($matches) use ($plugin) {
                 $alt = $matches[1];
                 $src = $matches[2];
                 $attributes = empty($matches[3]) ? '' : $matches[3];
@@ -688,7 +688,8 @@ class PluginController extends Controller{
 
     /**
      * Reload all routes
-     * @returns Array The application routes
+     *
+     * @return array The application routes
      */
     public function getRoutes() {
         $routes = array();

@@ -15,7 +15,7 @@
     <exclude-pattern>*.js</exclude-pattern>
 
     <arg name="report" value="full"/>
-    <arg name="report-file" value="cs.txt" />
+    <!-- <arg name="report-file" value="cs.txt" /> -->
     <arg value="np"/>
 
     <rule ref="PEAR">

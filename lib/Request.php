@@ -262,7 +262,7 @@ final class Request extends Singleton{
         if($name) {
             return isset($this->headers[$name]) ? $this->headers[$name] : null;
         }
-        else{
+        else {
             return $this->headers;
         }
     }
@@ -274,11 +274,11 @@ final class Request extends Singleton{
      *
      * @return string|array The cookie value or all the cookies
      */
-    public function getCookies($name = ""){
+    public function getCookies($name = "") {
         if($name) {
             return isset($this->cookies[$name]) ? $this->cookies[$name] : null;
         }
-        else{
+        else {
             return $this->cookies;
         }
     }
@@ -286,6 +286,7 @@ final class Request extends Singleton{
 
     /**
      * This function returns the content-type expected for the response, and sent by Accept request header
+     *
      * @return string The wanted type
      */
     public function getWantedType() {

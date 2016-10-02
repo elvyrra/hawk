@@ -98,8 +98,7 @@ class QuestionController extends Controller{
                 'actions' => array(
                     'independant' => true,
                     'display' => function ($value, $field, $line) {
-
-                        if($line->editable){
+                        if($line->editable) {
                             return
                                 Icon::make(array(
                                     'icon' => 'pencil',
@@ -265,7 +264,7 @@ class QuestionController extends Controller{
                                     Lang::get($this->_plugin . '.profile-question-form-name-description'),
                         'required' => true,
                     )),
-                    
+
                     new SelectInput(array(
                         'name' => 'type',
                         'required' => true,
