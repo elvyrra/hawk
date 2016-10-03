@@ -355,7 +355,7 @@ class AdminController extends Controller{
                 'languages' => $languages
             ));
 
-            Lang::addKeysToJavascript('admin.update-page-confirm-update-hawk');
+            $this->addKeysToJavaScript('admin.update-page-confirm-update-hawk');
             $this->addJavaScript(Plugin::current()->getJsUrl('settings.js'));
 
             return NoSidebarTab::make(array(
