@@ -37,7 +37,7 @@ class AdminController extends Controller{
         foreach($items as $item){
             if($item->action && !preg_match('/^(javascript\:|#)/', $item->action) && (!$item->target || $item->target == 'newtab')) {
                 if($item->label === 'user.username') {
-                    $item->label = "jthaon";
+                    $item->label = App::session()->getUser()->username;
                 }
 
                 $menuItems[$item->action] = $item->label;
@@ -45,7 +45,7 @@ class AdminController extends Controller{
             else{
                 foreach($item->visibleItems as $subitem){
                     if($item->label === 'user.username') {
-                        $item->label = "jthaon";
+                        $item->label = App::session()->getUser()->username;
                     }
 
                     if(!preg_match('/^(javascript\:|#)/', $subitem->action) && (!$subitem->target || $subitem->target == 'newtab')) {
@@ -368,6 +368,8 @@ class AdminController extends Controller{
         else{
             // treat the form
             try{
+                App::logger()->error("form  = ");
+                App::logger()->notice("form  = ");
                 if($form->check()) {
                     // register scalar values
                     foreach($form->inputs as $name => $field){
@@ -377,6 +379,10 @@ class AdminController extends Controller{
                                 $value = '0';
                             }
                             $optionName = str_replace('_', '.', $name);
+
+                            App::logger()->error("Option name = " . $optionName);
+                            App::logger()->error("basename=" . $value);
+
                             Option::set($optionName, $value);
                         }
                         elseif($field instanceof \Hawk\FileInput) {
@@ -409,6 +415,10 @@ class AdminController extends Controller{
 
                                     // remove the old image
                                     @unlink($dir . Option::get("main.$name"));
+
+                                    App::logger()->error("Option name = " . $name);
+                                    App::logger()->error("main.$name");
+                                    App::logger()->error("basename=" . $basename);
 
                                     Option::set("main.$name", $basename);
                                 }

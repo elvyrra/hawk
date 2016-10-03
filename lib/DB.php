@@ -581,6 +581,7 @@ class DB{
      * @return string The formatted string
      */
     public static function formatField($str) {
+        
         $regex = '/^(\w+)(\.(\w+))?$/';
 
         if(preg_match($regex, $str)) {
@@ -591,7 +592,7 @@ class DB{
             );
         }
 
-        return '`' . $str . '`';
+        return $str;  //return '`' . $str . '`';
     }
 
 
