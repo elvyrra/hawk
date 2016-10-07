@@ -19,7 +19,7 @@ final class Conf extends Singleton{
      *
      * @var array
      */
-    private $conf;
+    private $conf = array();
 
 
     /**
@@ -68,8 +68,8 @@ final class Conf extends Singleton{
      * @param mixed  $value  The value to set
      */
     public function set($option, $value = null){
-        if($value == null) {
-            $this->conf = $option;
+        if($value === null) {
+            $this->conf = array_merge($this->conf, $option);
         }
         else{
             $fields = explode('.', $option);

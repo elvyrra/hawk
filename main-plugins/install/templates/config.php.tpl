@@ -4,7 +4,7 @@ namespace Hawk;
 /** DEFINED BY THE INSTALL PROCESS **/
 define('CRYPTO_SALT', '{{ $salt }}');
 define('CRYPTO_KEY','{{ $key }}');
-define('CRYPTO_IV','{{ $iv }}'); 
+define('CRYPTO_IV','{{ $iv }}');
 
 /** TO BE OVERRIDEN **/
 define('CONFIG_MODE', '{{ $configMode }}');

@@ -44,7 +44,8 @@ final class Logger extends Singleton{
      */
     private function open($level){
         $basename = $level . '.log';
-        $filename = LOG_DIR . $basename;
+        $dirname = App::conf()->get('log.dir') ? App::conf()->get('log.dir') : LOG_DIR;
+        $filename = $dirname . $basename;
 
         if(is_file($filename) && filesize($filename) >= self::MAX_FILE_SIZE) {
             // Archive the last file and create a new one
@@ -78,12 +79,7 @@ final class Logger extends Singleton{
      * @param string $level   The log level : 'debug', 'info', 'notice', 'warning', 'error'
      * @param string $message The message to write
      */
-    private function write($level, $message){
-
-        if(defined('ENABLE_LOG') && !ENABLE_LOG) {
-            return;
-        }
-
+    private function write($level, $message) {
         if(empty($this->resources[$level])) {
             $this->open($level);
         }
@@ -91,15 +87,21 @@ final class Logger extends Singleton{
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
         $trace = (object) $trace[1];
 
+        $request = App::request();
+
         $data = array(
             'date' => date_create()->format('Y-m-d H:i:s'),
-            'uri' => App::request()->getUri(),
-            'trace' => $trace->file . ':' . $trace->line,
+            'requestId' => $request->uid,
+            'method' => $request->getMethod(),
+            'clientIp' => $request->clientIp(),
+            'uri' => $request->getUri(),
+            'file' => $trace->file,
+            'line' => $trace->line,
             'message' => $message,
         );
 
-        $input =  implode(' - ', $data) . PHP_EOL;
-        fwrite($this->resources[$level], $input);
+        $input =  json_encode($data, JSON_UNESCAPED_SLASHES);
+        fwrite($this->resources[$level], $input . PHP_EOL);
     }
 
     /**

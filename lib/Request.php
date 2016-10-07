@@ -29,6 +29,20 @@ final class Request extends Singleton{
     $uri,
 
     /**
+     * The full request URL
+     *
+     * @var string
+     */
+    $url,
+
+    /**
+     * The request unique id
+     *
+     * @var string
+     */
+    $uid,
+
+    /**
      * The request method (GET, POST, PATCH, DELETE, PUT)
      *
      * @var string
@@ -105,6 +119,9 @@ final class Request extends Singleton{
 
         // Get the full request URL
         $this->url = getenv('REQUEST_SCHEME') . '://' . getenv('HTTP_HOST') . getenv('REQUEST_URI');
+
+        // Generate a uniq id for the request
+        $this->uid = uniqid();
 
         // Get the request headers
         $this->headers = getallheaders();
