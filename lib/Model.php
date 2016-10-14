@@ -103,14 +103,14 @@ class Model{
      * @return Model The found Model instance
      */
     public static function getById($id, $fields = array()) {
-        if(!isset(static::$instancesById[get_called_class()][$id])) {
+        if(!isset(self::$instancesById[get_called_class()][$id])) {
             $example = new DBExample(array(
                 static::$primaryColumn => $id
             ));
-            static::$instancesById[get_called_class()][$id] = self::getByExample($example, $fields);
+            self::$instancesById[get_called_class()][$id] = self::getByExample($example, $fields);
         }
 
-        return static::$instancesById[get_called_class()][$id];
+        return self::$instancesById[get_called_class()][$id];
     }
 
 
@@ -704,12 +704,12 @@ class Model{
             if(!isset($constraints[$name])) {
                 // The constraint has been removed
                 $instructions[] = 'ALTER TABLE ' . DB::formatField(self::getTable()) .
-                                    ' DROP ' . $deleteType . ' ' . DB::formatField($name);
+                                    ' DROP ' . $deleteType . ' `' . $name . '`';
             }
             elseif($constraint != $constraints[$name]) {
                 // The constraint properties changed
                 $instructions[] = 'ALTER TABLE ' . DB::formatField(self::getTable()) .
-                                    ' DROP ' . $deleteType . ' ' . DB::formatField($name);
+                                    ' DROP ' . $deleteType . ' `' . $name . '`';
 
                 $instructions[] = 'ALTER TABLE ' . DB::formatField(self::getTable()) . ' ADD ' .
                                     self::getConstraintDefinition($name, $constraint);

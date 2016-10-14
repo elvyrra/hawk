@@ -307,6 +307,12 @@ define('ko-extends', ['jquery', 'ko'], function($, ko) {
                 editor.setShowPrintMargin(true);
                 editor.setReadOnly(ko.unwrap(parameters.readonly) || false);
 
+                if (ko.unwrap(parameters.maxLines)) {
+                    editor.setOptions({
+                        maxLines: ko.unwrap(parameters.maxLines)
+                    });
+                }
+
                 if(parameters.value) {
                     editor.setValue(ko.unwrap(parameters.value));
                 }

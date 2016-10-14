@@ -25,7 +25,8 @@ require.config(
             ckeditor    : 'ext/ckeditor/ckeditor',
             ace         : 'ext/ace/ace',
             less        : 'ext/less',
-            moment      : 'ext/moment.min'
+            moment      : 'ext/moment.min',
+            emv         : 'ext/emv.min'
         },
         shim : {
             jquery : {
@@ -55,6 +56,9 @@ require.config(
             'ko-extends' : {
                 deps : ['ko']
             },
+            'emv-directives' : {
+                deps : ['emv']
+            },
             ace : {
                 exports : 'ace'
             },
@@ -63,6 +67,11 @@ require.config(
             },
             moment : {
                 exports : 'moment'
+            },
+            shim : {
+                emv : {
+                    exports : 'EMV'
+                }
             }
         }
     }
@@ -85,6 +94,8 @@ define(
         'colorpicker',
         'datepicker',
         'ko-extends',
+        'emv',
+        'emv-directives'
     ],
     function($, ko, Tabset, Form, List, Lang) {
         // export libraries to global context

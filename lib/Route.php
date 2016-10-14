@@ -127,13 +127,11 @@ class Route{
 
         $this->args = array();
         $this->url = $this->prefix . $url;
-        $this->pattern = preg_replace_callback(
-            "/\{(\w+)\}/", function ($match) {
-                $this->args[] = $match[1];
-                $where = $this->where[$match[1]] ? $this->where[$match[1]] : '.*?';
-                return "(" . $where . ")";
-            }, $this->url
-        );
+        $this->pattern = preg_replace_callback('/\{(\w+)\}/', function ($match) {
+            $this->args[] = $match[1];
+            $where = !empty($this->where[$match[1]]) ? $this->where[$match[1]] : '.*?';
+            return "(" . $where . ")";
+        }, $this->url);
 
 
         if($this->namespace) {

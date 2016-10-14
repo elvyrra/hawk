@@ -42,7 +42,7 @@ class Input extends \Hawk\ViewPlugin{
         $param = array();
 
         foreach($this->params as $key => $value) {
-            if(isset($classVars[$key])) {
+            if(array_key_exists($key, $classVars)) {
                 $param[$key] = $value;
             }
             else {
@@ -57,7 +57,6 @@ class Input extends \Hawk\ViewPlugin{
         if(!isset($param['id'])) {
             $param['id'] = uniqid();
         }
-
 
         $input = new $inputClass($param);
 

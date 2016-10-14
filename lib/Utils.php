@@ -70,6 +70,7 @@ trait Utils{
         if($object === null) {
             $object = $this;
         }
+
         foreach($array as $key => $value){
             $object->$key = $value;
         }
