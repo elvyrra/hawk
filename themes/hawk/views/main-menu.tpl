@@ -16,7 +16,9 @@
 						{if($menu->visibleItems)}
 							<li class="dropdown main-menu" id="main-menu-{{ $menu->id }}">
 								<div class="dropdown-toggle main-menu-title" type="button" id="main-menu-title-{{ $menu->id }}" data-toggle="dropdown">
-									{icon icon="{$menu->icon}" size="fw"}
+									{if($menu->icon)}
+										{icon icon="{$menu->icon}" size="fw"}
+									{/if}
 									{{ $menu->label }}
 									{icon icon="caret-down"}
 								</div>
@@ -35,6 +37,9 @@
 							<li class="main-menu" id="main-menu-{{ $menu->id }}">
 								<div class="main-menu-title" type="button" id="main-menu-title-{{ $menu->id }}">
 									<a href="{{{ $menu->url }}}" {if(!empty($menu->target))} target="{{ $menu->target }}" {/if}>
+										{if($menu->icon)}
+											{icon icon="{$menu->icon}" size="fw"}
+										{/if}
 										{{ $menu->label }}
 									</a>
 								</div>

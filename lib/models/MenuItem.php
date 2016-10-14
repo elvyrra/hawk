@@ -214,6 +214,10 @@ class MenuItem extends Model{
             $data['actionParameters'] = json_encode($data['actionParameters']);
         }
 
+        if(!isset($data['active'])) {
+            $data['active'] = 1;
+        }
+
         // Insert the menu item
         $item = parent::add($data);
 

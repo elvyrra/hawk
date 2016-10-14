@@ -50,7 +50,7 @@ list-results-number[1] = "1 résultat"
 list-results-number[p] = "{number} résultats"
 
 ; Login form
-login-menu-title = "<i class=\"icon icon-sign-in\"></i> Connexion"
+login-menu-title = "Connexion"
 login-error-authentication = "The login ou le mot de passe est incorrect"
 login-error-inactive-user = "Ce compte n'est pas actif sur cette application"
 login-form-title = "Connexion"

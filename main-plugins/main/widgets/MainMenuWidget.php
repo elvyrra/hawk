@@ -59,6 +59,7 @@ class MainMenuWidget extends Widget{
                 'name' => 'login',
                 'id' => uniqid(),
                 'labelKey' => 'main.login-menu-title',
+                'icon' => 'sign-in',
                 'action' => 'login',
                 'target' => 'dialog',
             ));
