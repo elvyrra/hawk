@@ -697,12 +697,13 @@ define(
         /**
          * Get uri for a given route name or the controller of the route
          *
-         * @param {string} method - The route name or the controller method executed by this route
-         * @param {Object} args - The route parameters
-         * @returns {string} - the computed URI
-         * @memberOf App
+         * @param {string} method      The route name or the controller method executed by this route
+         * @param {Object} args        The route parameters
+         * @param {Object} queryString Query string parameters to add
+         *
+         * @returns {string}           The computed URI
          */
-        App.prototype.getUri = function(method, args) {
+        App.prototype.getUri = function(method, args, queryString) {
             var route = null;
 
             if (method in this.routes) {
@@ -729,6 +730,10 @@ define(
                         url = url.replace('{' + j + '}', args[j]);
                     }
                 }
+            }
+
+            if(queryString) {
+                url += '?' + $.param(queryString);
             }
 
             return this.conf.basePath + url;
@@ -846,11 +851,15 @@ define(
         };
 
         // Instanciate the application
+        const app = new App();
+
         if (!window.app) {
-            window.app = new App();
+            window.app = app;
         }
 
-        window.app.start();
+        app.start();
+
+        return app;
     }
 );
 

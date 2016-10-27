@@ -423,4 +423,29 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
             };
         }
     });
+
+    EMV.directive('href', {
+        update : function(element, parameters, model) {
+            const options = model.$getDirectiveValue(parameters, element);
+            // get pathname
+            const pathname = options.$path;
+            const queryString = options.$qs;
+            const param = {};
+
+            Object.keys(options).forEach((key) => {
+                if(key !== '$path' && key !== '$qs') {
+                    param[key] = options[key];
+                }
+            });
+
+            const url = app.getUri(pathname, param, queryString);
+
+            if(element.nodeName.toLowerCase() === 'a') {
+                element.href = url;
+            }
+            else {
+                element.dataset.href = url;
+            }
+        }
+    });
 });

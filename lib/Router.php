@@ -419,12 +419,13 @@ final class Router extends Singleton{
     /**
      * Generate an URI from a given controller method (or route name) and its arguments.
      *
-     * @param string $name The route name of the controller method, formatted like this : 'ControllerClass.method'
-     * @param array  $args The route arguments, where keys define the parameters names and values, the values to affect.
+     * @param string $name        The route name of the controller method, formatted like this : 'ControllerClass.method'
+     * @param array  $args        The route arguments, where keys define the parameters names and values, the values to affect.
+     * @param array  $queryString Query string parameters
      *
      * @return string The generated URI, or the current URI (if $method is not set)
      */
-    public function getUri($name, $args= array()){
+    public function getUri($name, $args= array(), $queryString = array()){
 
         $route = $this->getRouteByAction($name);
 
@@ -444,6 +445,10 @@ final class Router extends Singleton{
                 throw new \Exception("The URI built from '$name' needs the argument : $arg");
             }
             $url = str_replace("{{$arg}}", $replace, $url);
+        }
+
+        if(!empty($queryString)) {
+            $url .= '?' . http_build_query($queryString);
         }
 
         return BASE_PATH . $url;

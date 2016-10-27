@@ -682,7 +682,10 @@ class Model{
             }
 
             $dbConstraints[$name]['type'] = 'foreign';
-            $dbConstraints[$name]['fields'][] = $fkey['COLUMN_NAME'];
+
+            if(!in_array($fkey['COLUMN_NAME'], $dbConstraints[$name]['fields'])) {
+                $dbConstraints[$name]['fields'][] = $fkey['COLUMN_NAME'];
+            }
 
             if(empty($dbConstraints[$name]['references'])) {
                 $dbConstraints[$name]['references'] = array(
@@ -690,23 +693,41 @@ class Model{
                     'fields' => array()
                 );
             }
-            $dbConstraints[$name]['references']['fields'][] = $fkey['REFERENCED_COLUMN_NAME'];
+            if(!in_array($fkey['REFERENCED_COLUMN_NAME'], $dbConstraints[$name]['references']['fields'])) {
+                $dbConstraints[$name]['references']['fields'][] = $fkey['REFERENCED_COLUMN_NAME'];
+            }
 
             $dbConstraints[$name]['on_update'] = $fkey['UPDATE_RULE'];
             $dbConstraints[$name]['on_delete'] = $fkey['DELETE_RULE'];
         }
 
-        $constraints = static::$constraints;
+        $modelConstraints = array();
+        foreach(static::$constraints as $name => $constraint) {
+            $name = self::getTable() . $name;
+            $modelConstraints[$name] = $constraint;
+
+            if(!empty($constraint['references']['model'])) {
+                $class = $constraint['references']['model'];
+
+                if(!class_exists($class)) {
+                    $reflection  = new \ReflectionClass(get_called_class());
+                    $class = $reflection->getNamespaceName() . '\\'. $class;
+                }
+
+                $modelConstraints[$name]['references']['table'] = $class::getTable();
+                unset($modelConstraints[$name]['references']['model']);
+            }
+        }
 
         foreach($dbConstraints as $name => $constraint) {
             $deleteType = $constraint['type'] === 'foreign' ? 'FOREIGN KEY' : 'INDEX';
 
-            if(!isset($constraints[$name])) {
+            if(!isset($modelConstraints[$name])) {
                 // The constraint has been removed
                 $instructions[] = 'ALTER TABLE ' . DB::formatField(self::getTable()) .
                                     ' DROP ' . $deleteType . ' `' . $name . '`';
             }
-            elseif($constraint != $constraints[$name]) {
+            elseif($constraint != $modelConstraints[$name]) {
                 // The constraint properties changed
                 $instructions[] = 'ALTER TABLE ' . DB::formatField(self::getTable()) .
                                     ' DROP ' . $deleteType . ' `' . $name . '`';
@@ -715,10 +736,10 @@ class Model{
                                     self::getConstraintDefinition($name, $constraint);
             }
 
-            unset($constraints[$name]);
+            unset($modelConstraints[$name]);
         }
 
-        foreach($constraints as $name => $constraint) {
+        foreach($modelConstraints as $name => $constraint) {
             // The constaint has been created
             $instructions[] = 'ALTER TABLE ' . DB::formatField(self::getTable()) . ' ADD ' .
                                     self::getConstraintDefinition($name, $constraint);
