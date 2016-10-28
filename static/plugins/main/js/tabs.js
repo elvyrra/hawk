@@ -1,60 +1,59 @@
 'use strict';
 
-define('tabs', ['jquery', 'ko'], function($, ko) {
+define('tabs', ['jquery', 'emv'], function($, EMV) {
     /**
      * This class describes the behavior of a tab.
-     *
-     * @class Tab
-     * @param {int} id The unique tab id
-     * @param {Object} data The initial data to put in the tab
      */
-    function Tab(id, data) {
-        data = data || {};
+    class Tab extends EMV {
+        /**
+         * Constructor
+         *
+         * @param {int} id The unique tab id
+         * @param {Object} data The initial data to put in the tab
+         */
+        constructor(id, data) {
+            const options = data || {};
 
-        this.id = ko.observable(id);
-        this.uri = ko.observable(data.uri || '');
-        this.content = ko.observable(data.content || '');
-        this.route = ko.observable(data.route || '');
+            super({
+                data : {
+                    id : id,
+                    uri : options.uri || '',
+                    content : options.content || '',
+                    route : options.route || '',
+                    history : [],
+                    onclose : null
+                },
+                computed : {
+                    title : function() {
+                        return $('.page-name', this.content).first().val() || '';
+                    },
+                    icon : function() {
+                        const value = $('.page-icon', this.content).first().val() || null;
 
-        this.title = ko.computed({
-            read : function() {
-                return $('.page-name', this.content()).first().val() || '';
-            }.bind(this)
-        });
+                        try {
+                            const url = new URL(value);
 
-        this.icon = ko.computed({
-            read : function() {
-                var value = $('.page-icon', this.content()).first().val() || null;
+                            return url && null;
+                        }
+                        catch(err) {
+                            return value;
+                        }
+                    },
+                    favicon : function() {
+                        const value = $('.page-icon', this.content).first().val() || null;
 
-                try {
-                    var url = new URL(value);
+                        try {
+                            const url = new URL(value);
 
-                    return null;
+                            return url ? value : null;
+                        }
+                        catch(err) {
+                            return null;
+                        }
+                    }
                 }
-                catch(e) {
-                    return value;
-                }
-            }.bind(this)
-        });
-
-        this.favicon = ko.computed({
-            read : function() {
-                var value = $('.page-icon', this.content()).first().val() || null;
-
-                try {
-                    var url = new URL(value);
-
-                    return url;
-                }
-                catch(e) {
-                    return null;
-                }
-            }.bind(this)
-        });
-
-        this.history = [];
-
-        this.onclose = null;
+            });
+        }
     }
 
     // export Tab to window
@@ -63,127 +62,116 @@ define('tabs', ['jquery', 'ko'], function($, ko) {
 
     /**
      * This class is the tabs manager of the application. It is accessible by `app.tabset`
-     *
-     * @class  Tabset
      */
-    function Tabset() {
-        this.tabs = ko.observableArray([]);
+    class Tabset extends EMV {
+        /**
+         * Constructor
+         */
+        constructor() {
+            super({
+                data : {
+                    tabs : [],
+                    activeId : undefined
+                },
+                computed : {
+                    activeTab : {
+                        read : function() {
+                            const tab = this.tabs.find((tab) => {
+                                return tab.id === this.activeId;
+                            });
 
-        this.activeId = ko.observable();
-
-        this.activeTab = ko.computed({
-            read : function() {
-                var i;
-
-                for (i = 0; i < this.tabs().length; i++) {
-                    if (this.tabs()[i].id() === this.activeId()) {
-                        return this.tabs()[i];
+                            return tab || this.tabs[0];
+                        },
+                        write : function(tab) {
+                            this.activeId = tab.id;
+                        }
                     }
                 }
-                return this.tabs()[0];
-            }.bind(this),
+            });
 
-            write : function(tab) {
-                this.activeId(tab.id());
-            }.bind(this)
-        });
+            this.$watch('activeTab', (tab) => {
+                if(tab.history) {
+                    window.history.replaceState({}, '', '#!' + tab.history[tab.history.length - 1]);
+                }
+            });
+        }
 
-        this.activeTab.subscribe(function(tab) {
-            if (tab.history.length) {
-                history.replaceState({}, '', '#!' + tab.history[tab.history.length - 1]);
+        /**
+         * Add a new tab to the tabset
+         * @param  {Pbject} data The tab init values
+         */
+        push(data) {
+            const tab = new Tab(this.constructor.index++, data);
+
+            this.tabs.push(tab);
+
+            this.activeTab = tab;
+        }
+
+        /**
+         * Remove a tab by it index in the tabset
+         *
+         * @param {Tab} Tab The tab to remove
+         */
+        remove(tab) {
+            const index = this.tabs.indexOf(tab);
+
+            if (this.tabs.length > 1) {
+                if (this.activeTab === tab) {
+                    var next = index === this.tabs.length - 1 ? this.tabs[index - 1] : this.tabs[index + 1];
+
+                    if (next) {
+                        // Activate the next tab
+                        this.activeTab = next;
+                    }
+                }
+
+                if (tab.onclose) {
+                    tab.onclose.call(tab);
+                }
+
+                // Delete the tab nodes
+                this.tabs.splice(index, 1);
+
+                // Register the new list of tabs
+                this.registerTabs();
             }
-        });
+        }
+
+
+        /**
+         * Save the tabs last urls in a cookie
+         */
+        registerTabs() {
+            const uris = this.tabs.map((tab) => tab.uri);
+
+            $.cookie('open-tabs', JSON.stringify(uris), {expires : 365, path : '/'});
+        }
+
+
+        /**
+         * Perform click action on tab title
+         *
+         * @param   {int}   index The tab index in the tabset
+         * @param   {Event} event The triggered event
+         * @returns {boolean}     False
+         */
+        clickTab(tab, event) {
+            if (event.which === 2) {
+                this.remove(tab);
+            }
+            else {
+                this.activeTab = tab;
+            }
+            return false;
+        }
     }
 
     /**
      * This index is incremented each time a tab is created, to generate a unique id for each tab
-     *
-     * @static
-     * @private
      */
     Tabset.index = 0;
 
-
-    /**
-     * Push a new tab in the tabset
-     *
-     * @memberOf Tabset
-     */
-    Tabset.prototype.push = function(data) {
-        // Create the tab
-        var tab = new Tab(Tabset.index ++, data);
-
-        this.tabs.push(tab);
-
-        // Activate the newly created tab
-        this.activeId(tab.id());
-    };
-
-
-    /**
-     * Remove a tab by it index in the tabset
-     *
-     * @param {int} index The tab index in the tabset
-     * @memberOf Tabset
-     */
-    Tabset.prototype.remove = function(index) {
-        if (this.tabs().length > 1) {
-            if (this.activeTab() === this.tabs()[index]) {
-                var next = index === this.tabs().length - 1 ? this.tabs()[index - 1] : this.tabs()[index + 1];
-
-                if (next) {
-                    // Activate the next tab
-                    this.activeId(next.id());
-                }
-            }
-
-            if (this.tabs()[index].onclose) {
-                this.tabs()[index].onclose.call(this.tabs()[index]);
-            }
-
-            // Delete the tab nodes
-            this.tabs.splice(index, 1);
-
-            // Register the new list of tabs
-            this.registerTabs();
-        }
-    };
-
-
-    /**
-     * Save the tabs last urls in a cookie
-     *
-     * @memberOf Tabset
-     */
-    Tabset.prototype.registerTabs = function() {
-        var data = [],
-            i;
-
-        for (i = 0; i < this.tabs().length; i++) {
-            data.push(this.tabs()[i].uri());
-        }
-
-        $.cookie('open-tabs', JSON.stringify(data), {expires : 365, path : '/'});
-    };
-
-
-    /**
-     * Perform click action on tab title
-     *
-     * @param {int} $index The tab index in the tabset
-     * @param {Event} event The triggered event
-     * @returns {boolean} False
-     * @memberOf Tabset
-     */
-    Tabset.prototype.clickTab = function($index, event) {
-        if (event.which === 2) {
-            this.remove($index);
-        }
-        else {
-            this.activeId(this.tabs()[$index].id());
-        }
-        return false;
-    };
 
     return Tabset;
 });

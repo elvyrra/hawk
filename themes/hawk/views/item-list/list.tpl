@@ -5,7 +5,7 @@
             <tr class="list-title-line" >
                 {if($list->selectableLines)}
                     <td>
-                        <input type="checkbox" class="list-select-all-lines" ko-checked="selection.all" id="{{ $list->id }}-list-select-all-lines"/>
+                        <input type="checkbox" class="list-select-all-lines" e-value="selection.$all" id="{{ $list->id }}-list-select-all-lines"/>
                         <label for="{{ $list->id }}-list-select-all-lines" class="checkbox-icon"></label>
                     </td>
                 {/if}
@@ -17,7 +17,7 @@
     {/if}
 
     <!-- THE CONTENT OF THE LIST RESULTS -->
-    <tbody>
+    <tbody e-html="htmlResult">
         {import file="{$list->resultTpl}"}
     </tbody>
 </table>

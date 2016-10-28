@@ -129,7 +129,7 @@ class ThemeController extends Controller{
                         'value' => Lang::get($this->_plugin . '.theme-custom-reset'),
                         'class' => 'btn-default',
                         'attributes' => array(
-                            'ko-click' => 'reset',
+                            'e-click' => 'reset',
                         )
                     ))
                 )
@@ -163,7 +163,7 @@ class ThemeController extends Controller{
                     break;
             }
             $input->attributes = array(
-                'ko-value' => 'vars["' . $input->name . '"]',
+                'e-value' => 'vars["' . $input->name . '"]',
             );
             $input->labelWidth = '25em';
             $param['fieldsets']['form'][] = $input;
@@ -243,14 +243,14 @@ class ThemeController extends Controller{
                         'hidden' => true,
                         'value' => $css,
                         'attributes' => array(
-                            'ko-value' => 'css'
+                            'e-value' => 'css'
                         )
                     )),
 
                     new HtmlInput(array(
                         'name' => 'ace',
-                        'value' => '<style id="editing-css-computed" ko-text="css">' . $css . '</style>
-									<div id="theme-css-edit" contenteditable ko-ace="{language : \'css\', change : function(value){ css(value); }}">' . $css . '</div>'
+                        'value' => '<style id="editing-css-computed" e-text="css">' . $css . '</style>
+									<div id="theme-css-edit" contenteditable e-ace="{language : \'css\', change : function(value){ css(value); }}">' . $css . '</div>'
                     )),
                 )
             )

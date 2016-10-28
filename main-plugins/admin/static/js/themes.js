@@ -1,20 +1,18 @@
-/* global $, app, ko, Lang */
-
 'use strict';
 
-require(['app'], function() {
-    $("#manage-themes-page")
+require(['app', 'jquery', 'emv', 'lang'], function(app, $, EMV, Lang) {
+    $('#manage-themes-page')
 
-    .on("click", ".select-theme", function(){
-        if(confirm(Lang.get("admin.theme-update-reload-page-confirm"))){
-        	$.get(app.getUri("select-theme", {name : $(this).data("theme")}), function(){
+    .on('click', '.select-theme', function() {
+        if(confirm(Lang.get('admin.theme-update-reload-page-confirm'))) {
+            $.get(app.getUri('select-theme', {name : $(this).data('theme')}), function() {
                 location.reload();
-        	});
+            });
         }
     })
 
-    .on("click", ".delete-theme", function(){
-    	if(confirm(Lang.get("admin.theme-delete-confirm"))){
+    .on('click', '.delete-theme', function() {
+        if(confirm(Lang.get('admin.theme-delete-confirm'))) {
     		$.get(app.getUri("delete-theme", {name : $(this).data("theme")}), function(){
     			app.load(app.getUri("available-themes"), {selector: "#admin-themes-select-tab"});
     		})

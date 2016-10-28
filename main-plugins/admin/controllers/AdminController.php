@@ -154,7 +154,7 @@ class AdminController extends Controller{
                         'label' => Lang::get('admin.settings-home-page-type-label'),
                         'layout' => 'vertical',
                         'attributes' => array(
-                            'ko-checked' => 'homePage.type'
+                            'e-value' => 'homePage.type'
                         )
                     )),
 
@@ -202,7 +202,7 @@ class AdminController extends Controller{
                         'label' => Lang::get('admin.settings-open-registers-label'),
                         'default' => Option::get('main.open-register') ?  Option::get('main.open-register') : 0,
                         'attributes' => array(
-                            'ko-checked' => 'register.open'
+                            'e-value' => 'register.open'
                         )
                     )),
 
@@ -212,7 +212,7 @@ class AdminController extends Controller{
                         'default' => Option::get('main.confirm-register-email'),
                         'dataType' => 'int',
                         'attributes' => array(
-                            'ko-checked' => 'register.checkEmail'
+                            'e-value' => 'register.checkEmail'
                         )
                     )),
 
@@ -231,7 +231,7 @@ class AdminController extends Controller{
                         'dataType' => 'int',
                         'labelWidth' => 'auto',
                         'attributes' => array(
-                            'ko-checked' => 'register.checkTerms'
+                            'e-value' => 'register.checkTerms'
                         )
                     )),
 
@@ -274,7 +274,7 @@ class AdminController extends Controller{
                         ),
                         'label' => Lang::get('admin.settings-mailer-type-label'),
                         'attributes' => array(
-                            'ko-value' => 'mail.type'
+                            'e-value' => 'mail.type'
                         )
                     )),
 
@@ -331,7 +331,7 @@ class AdminController extends Controller{
                             'icon' => 'refresh',
                             'id' => 'update-hawk-btn',
                             'attributes' => array(
-                                'ko-click' => 'function(){ updateHawk("' . end($updates)['version'] . '"); }'
+                                'e-click' => 'function(){ updateHawk("' . end($updates)['version'] . '"); }'
                             ),
                             'class' => 'btn-warning'
                         )),
