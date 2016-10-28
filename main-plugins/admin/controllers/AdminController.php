@@ -368,20 +368,18 @@ class AdminController extends Controller{
         else{
             // treat the form
             try{
-                App::logger()->error("form  = ");
-                App::logger()->notice("form  = ");
                 if($form->check()) {
                     // register scalar values
                     foreach($form->inputs as $name => $field){
-                        if(!$field instanceof \Hawk\FileInput && !$field instanceof \Hawk\ButtonInput) {
+                        if(!$field instanceof \Hawk\FileInput && !$field instanceof \Hawk\ButtonInput && !$field instanceof \Hawk\HtmlInput) {
                             $value = $field->dbvalue();
                             if($value === null) {
                                 $value = '0';
                             }
                             $optionName = str_replace('_', '.', $name);
 
-                            App::logger()->error("Option name = " . $optionName);
-                            App::logger()->error("basename=" . $value);
+                            App::logger()->error("Option name =" . $optionName . 'X');
+                            App::logger()->error("basename=" . $value . 'X');
 
                             Option::set($optionName, $value);
                         }
