@@ -1,9 +1,9 @@
 ﻿<!-- Inactive items content -->
 {assign name="backlogContent"}
     <ol class="inactive">
-        <li e-each="inactiveItems" data-id="${id}">
+        <li e-each="{$data : items, $filter : inactiveFilter}" data-id="${id}">
             <span>${label}</span>
-            {icon icon="plus" class="pull-right text-success pointer" size="lg" e-click=" $root.activateItem.bind($root)"}
+            {icon icon="plus" class="pull-right text-success pointer" size="lg" e-click="$root.activateItem.bind($root)"}
             {icon icon="pencil" class="pull-right text-primary pointer" size="lg" e-show="plugin === 'custom'" e-click="$root.editItem.bind($root)"}
             {icon icon="times" class="pull-right text-danger pointer" size="lg" e-show="plugin === 'custom'" e-click="$root.removeItem.bind($root)"}
         </li>
@@ -22,18 +22,18 @@
         {{ $form->inputs['data'] }}
         <div id="sort-menu-wrapper">
             <ol class="sortable active" data-parent="0">
-                <li e-each="sortedItems" data-id="${id}" data-order="${$index}" e-class="{'no-action-item' : !action}">
-                    <div class="sortable-item" title="${url}">
+                <li e-each="{$data : items, $filter : function(item) { return item.active && item.parentId == 0; }, $sort : 'order'}" data-id="${id}" data-order="${$index}" e-class="{'no-action-item' : !action}">
+                    <div class="sortable-item">
                         {icon icon="arrows" class="drag-handle"}
-                        <span>${label}</span>
-                        {icon icon="ban" size="lg" class="pull-right text-danger deactivate-item pointer" e-show="!(children && children.length)" e-click="$root.deactivateItem.bind($root)"}
+                        <span><i class="icon icon-${ icon }"></i> ${label}</span>
+                        {icon icon="ban" size="lg" class="pull-right text-danger deactivate-item pointer" e-show="!getChildren($root).length" e-click="$root.deactivateItem.bind($root)"}
                         {icon icon="pencil" size="lg" class="pull-right text-primary edit-item pointer" e-show="plugin === 'custom'" e-click="$root.editItem.bind($root)"}
                     </div>
                     <ol data-parent="${id}">
-                        <li e-each="children" data-id="${id}" data-order="${$index}">
-                            <div class="sortable-item" title="${url}">
+                        <li e-each="{$data : $root.items, $filter : function(item) { return item.active && item.parentId === $this.id; }, $sort : 'order'}" data-id="${id}" data-order="${$index}">
+                            <div class="sortable-item">
                                 {icon icon="arrows" class="drag-handle"}
-                                <span>${ label }</span>
+                                <span><i class="icon icon-${ icon }"></i> ${ label }</span>
                                 {icon icon="ban" size="lg" class="pull-right text-danger deactivate-item pointer" e-click="$root.deactivateItem.bind($root)"}
                                 {icon icon="pencil" size="lg" class="pull-right text-primary edit-item pointer" e-show="plugin === 'custom'" e-click="$root.editItem.bind($root)"}
                             </div>

@@ -211,6 +211,7 @@ define('form', ['jquery', 'moment'], function($, moment) {
         this.upload = this.node.hasClass('upload-form');
         this.action = this.node.attr('action');
         this.method = this.node.attr('method').toLowerCase();
+        this.fields = fields;
         this.inputs = {};
 
         for (var name in fields) {
@@ -220,11 +221,11 @@ define('form', ['jquery', 'moment'], function($, moment) {
         }
 
         // Listen for form submission
-        this.node.submit(function() {
+        this.node.get(0).onsubmit = () => {
             this.submit();
 
             return false;
-        }.bind(this));
+        };
 
         // Listen for form change
         this.onchange = null;

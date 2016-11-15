@@ -1,3 +1,5 @@
+/* global app */
+
 'use strict';
 
 define('tabs', ['jquery', 'emv'], function($, EMV) {
@@ -53,6 +55,14 @@ define('tabs', ['jquery', 'emv'], function($, EMV) {
                     }
                 }
             });
+        }
+
+        /**
+         * Reload the tab
+         * @returns {Promise} Resolved with the content of the tab
+         */
+        reload() {
+            return app.load(this.uri);
         }
     }
 

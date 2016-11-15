@@ -2,6 +2,31 @@
 
 require(['app', 'emv', 'jquery'], (app, EMV, $) => {
     const menuManagerNode = document.getElementById('menu-manager');
+    const allItems = JSON.parse(app.forms['set-menus-form'].inputs.data.val());
+
+    /**
+     * This class manages the menu items
+     */
+    class MenuItem extends EMV {
+        /**
+         * Constructor
+         * @param   {Object} data The initial data
+         */
+        constructor(data) {
+            super(data);
+        }
+
+        /**
+         * get the item children
+         * @param   {MenuModel} manager The menu manager
+         * @returns {Array}         An array containing the item children
+         */
+        getChildren(manager) {
+            return manager.items.filter((item) => {
+                return item.active && item.parentId === this.id;
+            });
+        }
+    }
 
     /**
      * This class manages the UI to manage the main menu
@@ -12,29 +37,17 @@ require(['app', 'emv', 'jquery'], (app, EMV, $) => {
          */
         constructor() {
             super({
-                data : {
-                    items : JSON.parse(app.forms['set-menus-form'].inputs.data.val())
+                items : allItems.map((item) => new MenuItem(item)),
+                activeFilter : function(item) {
+                    return item.active;
                 },
-                computed : {
-                    inactiveItems : function() {
-                        return this.items.filter((item) => {
-                            return !item.active;
-                        });
-                    },
-                    activeItems : function() {
-                        return this.items.filter((item) => {
-                            return item.active;
-                        });
-                    },
-                    sortedItems : function() {
-                        var result = this.getItemsByParent(0);
-
-                        result.forEach((item) => {
-                            item.children = this.getItemsByParent(item.id);
-                        });
-
-                        return result;
-                    }
+                inactiveFilter : function(item) {
+                    return !item.active;
+                },
+                parentFilter : function(parentId) {
+                    return function(item) {
+                        return item.active && item.parenId === parentId;
+                    };
                 }
             });
         }
@@ -56,12 +69,8 @@ require(['app', 'emv', 'jquery'], (app, EMV, $) => {
          * @returns {Array}        The list of the parent children items
          */
         getItemsByParent(parentId) {
-            const children = this.activeItems.filter((item) => {
-                return item.parentId === parentId;
-            });
-
-            return children.sort(function(item1, item2) {
-                return item1.order - item2.order;
+            return this.items.filter((item) => {
+                return item.active && item.parentId === parentId;
             });
         }
 
@@ -70,9 +79,9 @@ require(['app', 'emv', 'jquery'], (app, EMV, $) => {
          * @param  {Objcet} item The item to activate
          */
         activateItem(item) {
-            item.active = 1;
             item.parentId = 0;
-            item.order = this.getItemsByParent(0).length;
+            item.order = Math.max.apply(this, this.getItemsByParent(0).map((item) => item.order)) + 1;
+            item.active = 1;
 
             this.refresh();
         }
@@ -130,8 +139,6 @@ require(['app', 'emv', 'jquery'], (app, EMV, $) => {
                 },
 
                 onDrop: ($item, container, _super) => {
-                    this.$clean(menuManagerNode);
-
                     _super($item, container);
 
                     // Get the moved item
@@ -147,16 +154,14 @@ require(['app', 'emv', 'jquery'], (app, EMV, $) => {
                     moved.order = index;
 
                     // Increment items that are ordered after this one
-                    $item.parent().children().each((index) => {
-                        const item = this.getItemById($(this).attr('data-id'));
+                    $item.parent().children().each((index, elem) => {
+                        const item = elem.$context;
 
                         item.order = index;
                     });
 
                     // Set the parent id to the item
                     moved.parentId = parentId;
-
-                    this.$apply(menuManagerNode);
                 }
             });
         }
@@ -177,16 +182,18 @@ require(['app', 'emv', 'jquery'], (app, EMV, $) => {
         const item = menuManager.getItemById(data.id);
 
         if(!item) {
-            menuManager.items.push(data);
-            this.reset();
+            data.order = 0;
+
+            menuManager.items.push(new MenuItem(data));
+            $(this).reset();
         }
         else {
-            for(var prop in data) {
-                if(data.hasOwnProperty(prop)) {
-                    item[prop] = data[prop];
+            app.dialog('close');
+            for(let i in data) {
+                if(item.hasOwnProperty(i)) {
+                    item[i] = data[i];
                 }
             }
-            app.dialog('close');
         }
 
         menuManager.refresh();

@@ -72,7 +72,8 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
                         <ul e-show="result.length">
                             <li e-each="result" e-attr="{value: value}"
                                 e-on="{mousedown : $root.select.bind($root)}"
-                                e-class="{hover : $root.overItem === $this}">!{label}
+                                e-class="{hover : $root.overItem === $this}"
+                                e-html="label">
                             </li>
                         </ul>
                     </div>`
@@ -336,6 +337,10 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
         init : function(element, parameters, model) {
             var options = model.$getDirectiveValue(parameters, element);
 
+            if(typeof options !== 'object') {
+                options = {};
+            }
+
             ace.config.set('modePath', app.baseUrl + 'ext/ace/');
             ace.config.set('workerPath', app.baseUrl + 'ext/ace/');
             ace.config.set('themePath', app.baseUrl + 'ext/ace/');
@@ -351,6 +356,13 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
                     maxLines: options.maxLines
                 });
             }
+            if(options.noLineNumber) {
+                editor.renderer.setShowGutter(false);
+            }
+
+            if(options.highlightActiveLine === false) {
+                editor.setHighlightActiveLine(false);
+            }
 
             element.$aceEditor = editor;
         },
@@ -358,22 +370,25 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
             var editor = element.$aceEditor;
             var options = model.$getDirectiveValue(parameters, element);
 
-            if(options.value) {
-                editor.getSession().on('change', function() {
-                    var value = editor.getValue();
+            if(typeof options !== 'object') {
+                options = {};
+            }
 
+            editor.getSession().on('change', function() {
+                var value = editor.getValue();
 
+                if(options.value) {
                     let setter = function(context, value) {
                         context[options.value] = value;
                     };
 
                     setter(model.$getContext(element), value);
+                }
 
-                    if (options.change) {
-                        options.change(value);
-                    }
-                });
-            }
+                if (options.change) {
+                    options.change(value);
+                }
+            });
         },
         update : function(element, parameters, model) {
             var options = model.$getDirectiveValue(parameters, element);

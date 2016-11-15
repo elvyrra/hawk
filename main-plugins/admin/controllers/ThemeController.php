@@ -251,7 +251,7 @@ class ThemeController extends Controller{
                     new HtmlInput(array(
                         'name' => 'ace',
                         'value' => '<style id="editing-css-computed" e-text="css">' . $css . '</style>
-									<div id="theme-css-edit" contenteditable e-ace="{language : \'css\', change : function(value){ css(value); }}">' . $css . '</div>'
+									<div id="theme-css-edit" contenteditable e-ace="{language : \'css\', change : function(value){ css = value; }}">' . $css . '</div>'
                     )),
                 )
             )

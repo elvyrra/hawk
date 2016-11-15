@@ -27,7 +27,7 @@ class MenuController extends Controller{
                     'name' => 'data',
                     'default' => json_encode($items, JSON_NUMERIC_CHECK),
                     'attributes' => array(
-                        'ko-value' => 'ko.toJSON(items)'
+                        'e-value' => 'JSON.stringify(items.valueOf())'
                     ),
                 )),
                 new SubmitInput(array(

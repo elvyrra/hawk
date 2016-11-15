@@ -742,6 +742,36 @@ define(
             };
 
             /**
+             * Get the route corresponding to an URI. This method turns the route name and the path parameters
+             * @param   {string} uri The uri to look the corresponding route for
+             * @returns {Object}     The found route parameters, or null
+             */
+            getRouteInformationFromUri(uri) {
+                var path = uri.replace(/\/?\?.*$/, '');
+
+                for (var i in this.routes) {
+                    if (this.routes.hasOwnProperty(i)) {
+                        const regex = new RegExp('^' + this.routes[i].pattern + '$');
+                        const match = path.match(regex);
+
+                        if (path.match(regex)) {
+                            const result = {
+                                name : i,
+                                data : {}
+                            };
+                            Object.keys(this.routes[i].where).forEach((key, index) => {
+                                result.data[key] = match[index + 1];
+                            });
+
+                            return result;
+                        }
+                    }
+                }
+
+                return null;
+            }
+
+            /**
              * Set the existing routes of the application
              *
              * @param {Object} routes The routes to set
