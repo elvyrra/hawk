@@ -75,4 +75,39 @@ trait Utils{
             $object->$key = $value;
         }
     }
+
+
+    public static function timeAgo($time) {
+        $periods = array(
+            'seconds',
+            'minutes',
+            'hours',
+            'days',
+            'weeks',
+            'months',
+            'years',
+            'decades'
+        );
+        $lengths = array(
+            60,
+            60,
+            24,
+            7,
+            4.35,
+            12,
+            10
+        );
+
+        $now = time();
+        $difference = $now - $time;
+        $tense = "ago";
+
+        for($j = 0; $difference >= $lengths[$j] && $j < count($lengths) - 1; $j++) {
+            $difference /= $lengths[$j];
+        }
+
+        $difference = round($difference);
+
+        return Lang::get('main.time-ago-' . $periods[$j], array('diff' => $difference), $difference);
+    }
 }
