@@ -85,7 +85,12 @@ final class Router extends Singleton{
         }
 
         foreach($this->predefinedData as $key => $value){
-            $param[$key] = $value;
+            if(!isset($param[$key])) {
+                $param[$key] = $value;
+            }
+            elseif(is_array($value) && is_array($param[$key])) {
+                $param[$key] = array_merge($value, $param[$key]);
+            }
         }
 
         if(!isset($param['namespace'])) {
@@ -159,10 +164,21 @@ final class Router extends Singleton{
      * @param string   $prefix The prefix to set to the URIs
      * @param callable $action The function that defined the routes with this prefix
      */
-    public function prefix($prefix, $action) {
+    public function prefix($prefix, $where, $action = null) {
+        if(!$action) {
+            $action = $where;
+            $where = array();
+        }
+
         $currentPrefix = empty($this->predefinedData['prefix']) ? '' : $this->predefinedData['prefix'];
 
-        $this->setProperties(array('prefix' => $currentPrefix . $prefix), $action);
+        $this->setProperties(array(
+            'prefix' => $currentPrefix . $prefix,
+            'where' => array_merge(
+                empty($this->predefinedData['where']) ? array() : $this->predefinedData['where'],
+                $where
+            )
+        ), $action);
     }
 
 
