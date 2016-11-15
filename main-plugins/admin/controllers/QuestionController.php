@@ -273,7 +273,7 @@ class QuestionController extends Controller{
                         }, $allowedTypes)),
                         'label' => Lang::get($this->_plugin . '.profile-question-form-type-label'),
                         'attributes' => array(
-                            'ko-value' => 'type',
+                            'e-value' => 'type',
                         )
                     )),
 
@@ -301,7 +301,7 @@ class QuestionController extends Controller{
                         'id' => 'question-form-parameters',
                         'hidden' => true,
                         'attributes' => array(
-                            'ko-value' => 'parameters'
+                            'e-value' => 'parameters'
                         )
                     )),
 
@@ -310,7 +310,7 @@ class QuestionController extends Controller{
                         'independant' => true,
                         'label' => Lang::get($this->_plugin . '.profile-question-form-required-label'),
                         'attributes' => array(
-                            'ko-checked' => "required",
+                            'e-value' => "required",
                         )
                     )),
 
@@ -319,7 +319,7 @@ class QuestionController extends Controller{
                         'independant' => true,
                         'label' => Lang::get($this->_plugin . '.profile-question-form-readonly-label'),
                         'attributes' => array(
-                            'ko-checked' => "readonly",
+                            'e-value' => "readonly",
                         )
                     )),
 
@@ -328,7 +328,7 @@ class QuestionController extends Controller{
                         'independant' => true,
                         'label' => Lang::get($this->_plugin . '.profile-question-form-minDate-label'),
                         'attributes' => array(
-                            'ko-value' => "minDate"
+                            'e-value' => "minDate"
                         ),
                     )),
 
@@ -337,7 +337,7 @@ class QuestionController extends Controller{
                         'independant' => true,
                         'label' => Lang::get($this->_plugin . '.profile-question-form-maxDate-label'),
                         'attributes' => array(
-                            'ko-value' => "maxDate"
+                            'e-value' => "maxDate"
                         ),
                     )),
 
@@ -367,19 +367,12 @@ class QuestionController extends Controller{
                                     Lang::get($this->_plugin . '.profile-question-form-options-description'),
                         'labelClass' => 'required',
                         'attributes' => array(
-                            'ko-value' => "options",
+                            'e-value' => "options",
                         ),
                         'cols' => 20,
                         'rows' => 10
                     ))
                 ),
-
-                /*
-                // Not use for now
-                'roles' => array(
-                    'legend' => Lang::get($this->_plugin . '.profile-question-form-roles-legend'),
-                ),
-                */
 
                 '_submits' => array(
                     new SubmitInput(array(
@@ -404,23 +397,11 @@ class QuestionController extends Controller{
             'onsuccess' => 'app.dialog("close"); app.load(app.getUri("profile-questions"), {selector : "#admin-questions-tab"})',
         );
 
-        /*
-        // For each roles create a Checkbox
-        foreach($roles as $role){
-            // Add the input to display in the user profile
-            $param['fieldsets']['roles'][] = new CheckboxInput(array(
-                'name' => "role-$role->name-question-$this->name",
-                'label' => $role->name,
-                'default' => in_array($role->id, $attributesRoles) ? 1 : 0,
-                'attributes' => array(
-                    'ko-value' => 'roles'
-                )
-            ));
-        }*/
-
         $form = new Form($param);
 
         if(!$form->submitted()) {
+            $this->addJavaScript($this->getPlugin()->getJsUrl('question-form.js'));
+
             $content = View::make(Plugin::current()->getView("question-form.tpl"), array(
                 'form' => $form
             ));
