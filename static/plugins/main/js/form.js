@@ -18,10 +18,10 @@ define('form', ['jquery', 'moment'], function($, moment) {
             }
         }
 
-        this.node = $('[id=\'' + this.id + '\']');
+        // this.node = $('[id=\'' + this.id + '\']');
 
         if (this.type === 'submit') {
-            this.node.click(function() {
+            this.node().click(function() {
                 // Ask for confirmation
                 if (this.name === 'delete' && !confirm(Lang.get('form.confirm-delete'))) {
                     // The user finally doesn't want to delete the record
@@ -36,6 +36,10 @@ define('form', ['jquery', 'moment'], function($, moment) {
         }
     };
 
+    FormInput.prototype.node = function() {
+        return $('[id=\'' + this.id + '\']');
+    };
+
 
     /**
      * Get or set the value of the field
@@ -45,38 +49,40 @@ define('form', ['jquery', 'moment'], function($, moment) {
      * @returns {string} The input value or the value that has been set
      */
     FormInput.prototype.val = function(value) {
+        const node = this.node();
+
         if (value === undefined) {
             // Get the input value
             switch (this.type) {
                 case 'checkbox' :
-                    return this.node.prop('checked');
+                    return node.prop('checked');
 
                 case 'radio' :
-                    return this.node.find(':checked').val();
+                    return node.find(':checked').val();
 
                 case 'html' :
-                    return this.node.html();
+                    return node.html();
 
                 default :
-                    return this.node.val();
+                    return node.val();
             }
         }
         else {
             switch (this.type) {
                 case 'checkbox' :
-                    this.node.prop('checked', value);
+                    node.prop('checked', value);
                     break;
 
                 case 'radio' :
-                    this.node.find('[value="' + value + '"]').prop('checked', true);
+                    node.find('[value="' + value + '"]').prop('checked', true);
                     break;
 
                 case 'html' :
-                    this.node.html(value);
+                    node.html(value);
                     break;
 
                 default :
-                    this.node.val(value);
+                    node.val(value);
                     break;
             }
         }
@@ -93,7 +99,7 @@ define('form', ['jquery', 'moment'], function($, moment) {
      * @returns {styring} The value of the property
      */
     FormInput.prototype.data = function(prop) {
-        return this.node.data(prop);
+        return this.node().data(prop);
     };
 
 
@@ -120,7 +126,7 @@ define('form', ['jquery', 'moment'], function($, moment) {
         var patternError = false;
 
         if(value) {
-            if(this.node.hasClass('datetime')) {
+            if(this.node().hasClass('datetime')) {
                 let pattern = this.pattern;
 
                 value = moment(value, pattern).format('YYYY-MM-DD');
@@ -183,7 +189,7 @@ define('form', ['jquery', 'moment'], function($, moment) {
             this.form.inputs[this.errorAt].addError(text);
         }
         else {
-            this.node.addClass('error').after('<span class="input-error-message">' + text + '</span>');
+            this.node().addClass('error').after('<span class="input-error-message">' + text + '</span>');
         }
     };
 
@@ -193,7 +199,7 @@ define('form', ['jquery', 'moment'], function($, moment) {
      * @memberOf FormInput
      */
     FormInput.prototype.removeError = function() {
-        this.node.removeClass('error').next('.input-error-message').remove();
+        this.node().removeClass('error').next('.input-error-message').remove();
     };
 
 

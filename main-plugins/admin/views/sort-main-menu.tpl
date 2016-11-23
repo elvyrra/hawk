@@ -10,11 +10,6 @@
     </ol>
 {/assign}
 
-<!-- New MenuItem widget -->
-{assign name="newMenuItem"}
-    {widget class="\Hawk\Plugins\Admin\NewMenuWidget"}
-{/assign}
-
 <!-- The structure to sort the menu -->
 {assign name="sortingContent"}
     {{ $form->inputs['valid'] }}
@@ -22,7 +17,7 @@
         {{ $form->inputs['data'] }}
         <div id="sort-menu-wrapper">
             <ol class="sortable active" data-parent="0">
-                <li e-each="{$data : items, $filter : function(item) { return item.active && item.parentId == 0; }, $sort : 'order'}" data-id="${id}" data-order="${$index}" e-class="{'no-action-item' : !action}">
+                <li e-each="{$data : items, $filter : function(item) { return item.active && item.parentId == 0; }, $sort : 'order'}" data-id="${id}" e-attr="{'data-order' : $index}" e-class="{'no-action-item' : !action}">
                     <div class="sortable-item">
                         {icon icon="arrows" class="drag-handle"}
                         <span><i class="icon icon-${ icon }"></i> ${label}</span>
@@ -30,7 +25,7 @@
                         {icon icon="pencil" size="lg" class="pull-right text-primary edit-item pointer" e-show="plugin === 'custom'" e-click="$root.editItem.bind($root)"}
                     </div>
                     <ol data-parent="${id}">
-                        <li e-each="{$data : $root.items, $filter : function(item) { return item.active && item.parentId === $this.id; }, $sort : 'order'}" data-id="${id}" data-order="${$index}">
+                        <li e-each="{$data : $root.items, $filter : function(item) { return item.active && item.parentId === $this.id; }, $sort : 'order'}" e-attr="{'data-id' : id, 'data-order' : $index}">
                             <div class="sortable-item">
                                 {icon icon="arrows" class="drag-handle"}
                                 <span><i class="icon icon-${ icon }"></i> ${ label }</span>
@@ -52,7 +47,6 @@
 <div class="row" id="menu-manager">
     <div class="col-sm-4">
         {panel type="info" id="sort-menu-inactive" title="{text key='admin.sort-menu-inactive-items-title'}" content="{$backlogContent}"}
-        {panel type="success" title="{text key='admin.new-menu-form-title'}" content="{$newMenuItem}"}
     </div>
 
     <div class="col-sm-8" id="">

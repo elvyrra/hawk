@@ -322,7 +322,7 @@ class AdminController extends Controller{
                             'value' => Lang::get('admin.hawk-version-up-to-date', array(
                                 'version' => HAWK_VERSION
                             )),
-                            'class' => 'btn-success'
+                            'blockClass' => 'btn-success'
                         ))
 
                         : new ButtonInput(array(

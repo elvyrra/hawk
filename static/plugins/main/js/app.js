@@ -611,7 +611,7 @@ define(
                 clearTimeout(this.notification.timeout);
 
                 this.notification.display = false;
-            };
+            }
 
             /**
              * Load a URL in a dialog box
@@ -651,6 +651,8 @@ define(
                     if (options.onload) {
                         options.onload();
                     }
+
+                    return content;
                 })
 
                 .fail(function(xhr) {

@@ -83,7 +83,7 @@ require(['app', 'emv', 'jquery'], (app, EMV, $) => {
             item.order = Math.max.apply(this, this.getItemsByParent(0).map((item) => item.order)) + 1;
             item.active = 1;
 
-            this.refresh();
+            // this.refresh();
         }
 
         /**
@@ -92,7 +92,7 @@ require(['app', 'emv', 'jquery'], (app, EMV, $) => {
          */
         deactivateItem(item) {
             item.active = 0;
-            this.refresh();
+            // this.refresh();
         }
 
         /**
@@ -162,6 +162,8 @@ require(['app', 'emv', 'jquery'], (app, EMV, $) => {
 
                     // Set the parent id to the item
                     moved.parentId = parentId;
+
+                    this.refresh();
                 }
             });
         }
@@ -175,27 +177,4 @@ require(['app', 'emv', 'jquery'], (app, EMV, $) => {
     menuManager.$apply(menuManagerNode);
 
     menuManager.refresh();
-
-
-    // Manage when a new menu item is created
-    app.forms['set-menus-form'].node.on('register-custom-item', function(event, data) {
-        const item = menuManager.getItemById(data.id);
-
-        if(!item) {
-            data.order = 0;
-
-            menuManager.items.push(new MenuItem(data));
-            $(this).reset();
-        }
-        else {
-            app.dialog('close');
-            for(let i in data) {
-                if(item.hasOwnProperty(i)) {
-                    item[i] = data[i];
-                }
-            }
-        }
-
-        menuManager.refresh();
-    });
 });

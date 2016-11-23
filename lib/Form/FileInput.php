@@ -24,7 +24,7 @@ class FileInput extends FormInput{
      *
      * @var boolean
      */
-    public     $multiple = false;
+    public $multiple = false;
 
     /**
      * Defines which extensions are allowed to be uploaded with this input

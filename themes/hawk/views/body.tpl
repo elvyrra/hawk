@@ -9,14 +9,15 @@
 				<li role="presentation" class="main-tab-title corner-top"
 					e-each="tabs"
 					e-on="{mousedown : $root.clickTab.bind($root)}"
-					id="maint-tab-title-${id}" data-tab="${$index}"
+					id="main-tab-title-${id}"
+					data-tab="${$index}"
 					e-class="{active : $root.activeTab == $this }"
 					e-style="{ width: 'calc((100% - 25px )/ ' + $root.tabs.length + ' - 2px )' }"
 					data-toggle="tooltip" data-placement="bottom" >
-					<a role="tab" data-toggle="tab" href="#main-tab-${id}">
+					<a role="tab" data-toggle="tab" e-attr="{ href : '#main-tab-' + id}">
 						<i class="icon icon-${ icon }" e-if="icon"></i>
 						<img e-attr="{src : favicon}" alt="tab-favicon" class="main-tab-favicon" e-if="favicon"/>
-						<span e-text="title">${title}</span>
+						<span e-text="title"></span>
 					</a>
 
 					<span class="main-tab-close pull-right" e-attr="{ 'data-tab' : $index }" e-show="$root.tabs.length > 1" e-click="$root.remove.bind($root)">

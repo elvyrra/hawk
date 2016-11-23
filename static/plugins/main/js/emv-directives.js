@@ -42,13 +42,7 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
          * Autocomplete manager
          */
         class Autocomplete {
-            /**
-             * Init the directive
-             * @param  {DOMNode} element  The element the directive is applied on
-             * @param  {string}  param    The directive parameters
-             * @param  {EMV}     instance The EMV instance
-             */
-            init(element, param, instance) {
+            getOptions(element, param, instance) {
                 const parameters = instance.$getDirectiveValue(param, element);
                 const options = {
                     search : parameters.search || 'label',
@@ -60,11 +54,23 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
                     minLength : 'minLength' in parameters ? parameters.minLength : 2
                 };
 
+                return options;
+            }
+
+            /**
+             * Init the directive
+             * @param  {DOMNode} element  The element the directive is applied on
+             * @param  {string}  param    The directive parameters
+             * @param  {EMV}     instance The EMV instance
+             */
+            init(element, param, instance) {
+                const options = this.getOptions(element, param, instance);
+
                 /**
                  * Initialize element
                  * @type {String}
                  */
-                element.autocomplete = 'false';
+                element.autocomplete = 'off';
                 $(element)
                 .wrap('<div class="emv-autocomplete"></div')
                 .after(
@@ -95,6 +101,16 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
                                 searchTimeout : null
                             }
                         });
+
+                        this.setOptions(options);
+                    }
+
+                    /**
+                     * Set the autocomplete model options
+                     * @param {Object} options The options to set to the model
+                     */
+                    setOptions(options) {
+                        this.options = options;
                     }
 
                     /**
@@ -131,7 +147,7 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
 
                         // Affect element data
                         element.$autocompleteData = data;
-                        element.value = data[options.value];
+                        element.value = data[this.options.value];
                         element.blur();
                     }
 
@@ -142,26 +158,26 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
                     search(value) {
                         element.$autocompleteData = null;
 
-                        if (value.length < options.minLength) {
+                        if (value.length < this.options.minLength) {
                             this.result = [];
                             this.selectedItem = null;
 
                             return;
                         }
 
-                        var source = options.source;
+                        var source = this.options.source;
 
                         // Search on an array
                         if (Array.isArray(source)) {
                             // Filter the source by the
                             let filtered = !value ? source : source.filter((item) => {
-                                return item[options.search].match(value);
+                                return item[this.options.search].match(value);
                             });
 
                             // Change the output items to match to the autocomplete parameters
                             let displayed = filtered.map((item) => {
-                                item.label = item[options.label];
-                                item.value = item[options.value];
+                                item.label = item[this.options.label];
+                                item.value = item[this.options.value];
 
                                 return item;
                             });
@@ -180,7 +196,7 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
                                     type : 'get',
                                     dataType : 'json',
                                     data : {
-                                        q : this.value
+                                        q : value
                                     }
                                 })
                                 .then((data) => {
@@ -190,7 +206,7 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
                                         this.selectedItem = null;
                                     }
                                 });
-                            }, options.delay);
+                            }, this.options.delay);
                         }
                     }
                 }
@@ -202,7 +218,6 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
                 }
 
                 element.$autocompleteModel = model;
-                element.$autocompleteOptions = options;
                 element.$autocompleteData = null;
 
 
@@ -218,8 +233,8 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
              * @param  {string}  param    The directive parameters
              * @param  {EMV}     instance The EMV instance
              */
-            bind(element, param, instance) {
-                const options = element.$autocompleteOptions;
+            update(element, param, instance) {
+                const options = this.getOptions(element, param, instance);
                 const model = element.$autocompleteModel;
 
                 options.value = options.value || options.label;
@@ -228,91 +243,90 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
                     return;
                 }
 
-                /**
-                 * Listen on the element events
+                model.setOptions(options);
+
+                /*
+                 * Search and display the result when the data changes
                  */
-                $(element).on({
-                    /*
-                     * Display the result when the data changes
-                     */
-                    input : function() {
-                        const value = this.value;
+                element.oninput = function() {
+                    model.search(this.value);
+                };
 
-                        model.search(value);
-                    },
+                /**
+                 * Compute research when entering in the input
+                 */
+                element.onfocus = function() {
+                    model.search(this.value);
+                };
 
-                    focus : function() {
-                        model.search(this.value);
-                    },
 
                     /*
                      * Blur the input
                      */
-                    blur : function() {
-                        if (!this.$autocompleteData || this.$autocompleteData !== model.selectedItem) {
-                            model.selectedItem = null;
-                            this.$autocompleteData = null;
-                        }
-
-                        model.result = [];
-
-                        if (options.change) {
-                            options.change.apply(instance, [this.$autocompleteData]);
-                        }
-                    },
-
-                    /*
-                     * Navigate in the result list
-                     * @param  {Event} event The keydown event
-                     */
-                    keydown : function(event) {
-                        if (model.result.length) {
-                            switch (event.keyCode) {
-                                // Move up
-                                case keyCode.UP :
-                                    model.previous();
-                                    break;
-
-                                // Move down
-                                case keyCode.DOWN :
-                                    model.next();
-                                    break;
-
-                                // Tab key
-                                case keyCode.TAB :
-                                    if (event.shiftKey) {
-                                        // Go preivous element
-                                        model.previous();
-                                    }
-                                    else {
-                                        model.next();
-                                    }
-                                    break;
-
-                                // Select item
-                                case keyCode.ENTER :
-                                    if (!model.overItem) {
-                                        return true;
-                                    }
-
-                                    model.select(model.overItem);
-                                    break;
-
-                                // Hide the result list
-                                case keyCode.ESCAPE :
-                                    model.result = [];
-                                    break;
-
-                                default :
-                                    return true;
-                            }
-
-                            return false;
-                        }
-
-                        return true;
+                element.onblur = function() {
+                    if (!this.$autocompleteData || this.$autocompleteData !== model.selectedItem) {
+                        model.selectedItem = null;
+                        this.$autocompleteData = null;
                     }
-                });
+
+                    model.result = [];
+
+                    if (options.change) {
+                        options.change.apply(instance, [this.$autocompleteData]);
+                    }
+                };
+
+                /*
+                 * Navigate in the result list
+                 * @param  {Event} event The keydown event
+                 */
+                element.onkeydown = function(event) {
+                    if (model.result.length) {
+                        switch (event.keyCode) {
+                            // Move up
+                            case keyCode.UP :
+                                model.previous();
+                                break;
+
+                            // Move down
+                            case keyCode.DOWN :
+                                model.next();
+                                break;
+
+                            // Tab key
+                            case keyCode.TAB :
+                                if (event.shiftKey) {
+                                    // Go preivous element
+                                    model.previous();
+                                }
+                                else {
+                                    model.next();
+                                }
+                                break;
+
+                            // Select item
+                            case keyCode.ENTER :
+                                if (!model.overItem) {
+                                    return true;
+                                }
+
+                                model.select(model.overItem);
+                                break;
+
+                            // Hide the result list
+                            case keyCode.ESCAPE :
+                                model.result = [];
+                                break;
+
+                            default :
+                                return true;
+                        }
+
+                        return false;
+                    }
+
+                    return true;
+                };
             }
         }
 
@@ -351,6 +365,21 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
             editor.getSession().setMode('ace/mode/' + options.language);
             editor.setShowPrintMargin(false);
             editor.setReadOnly(options.readonly || false);
+
+            if(options.save) {
+                editor.commands.addCommand({
+                    name: 'saveFile',
+                    bindKey: {
+                        win : 'Ctrl-S',
+                        mac : 'Command-S',
+                        sender : 'editor|cli'
+                    },
+                    exec: function() {
+                        options.save(model.$getContext(element), editor.getValue());
+                    }
+                });
+            }
+
             if (options.maxLines) {
                 editor.setOptions({
                     maxLines: options.maxLines
@@ -375,18 +404,22 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
             }
 
             editor.getSession().on('change', function() {
-                var value = editor.getValue();
+                if(!editor.$fromSetValue) {
+                    var value = editor.getValue();
 
-                if(options.value) {
-                    let setter = function(context, value) {
-                        context[options.value] = value;
-                    };
+                    const match = parameters.match(/(['"])?value\1\s*\:\s*([^,}]+)/);
 
-                    setter(model.$getContext(element), value);
-                }
+                    if(match) {
+                        let setter = model.$parseDirectiveSetterParameters(match[2]);
 
-                if (options.change) {
-                    options.change(value);
+                        editor.$fromChangeEvent = true;
+                        setter(model.$getContext(element), value);
+                        delete editor.$fromChangeEvent;
+                    }
+
+                    if (options.change) {
+                        options.change(value);
+                    }
                 }
             });
         },
@@ -394,8 +427,10 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
             var options = model.$getDirectiveValue(parameters, element);
             var editor = element.$aceEditor;
 
-            if(options.value) {
+            if(!editor.$fromChangeEvent && options.value) {
+                editor.$fromSetValue = true;
                 editor.setValue(options.value);
+                delete editor.$fromSetValue;
             }
         }
     });
