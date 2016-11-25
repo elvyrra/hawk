@@ -110,4 +110,21 @@ trait Utils{
 
         return Lang::get('main.time-ago-' . $periods[$j], array('diff' => $difference), $difference);
     }
+
+
+    /**
+     * This method transform a string into a corresponding color
+     * @param   string $str The input string
+     * @returns string      The output color, hexadecimal notation
+     */
+    public static function strToColor($str) {
+        $hash = 0;
+        for($i = 0; $i < strlen($str); $i++) {
+            $hash = ord($str{$i}) + (($hash << 5) - $hash);
+        }
+
+        $color = strtoupper(dechex($hash & 0x00FFFFFF));
+
+        return substr('00000', 0, 6 - strlen($color)) . $color;
+    }
 }

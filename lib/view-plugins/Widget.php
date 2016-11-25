@@ -28,7 +28,14 @@ class Widget extends \Hawk\ViewPlugin{
      * @return string The displayed HTML
      */
     public function display(){
-        $classname = $this->class;
+        if(isset($this->plugin)) {
+            $namespace = '\\' . \Hawk\Plugin::getNamespaceByName($this->plugin) . '\\';
+        }
+        else {
+            $namespace = '';
+        }
+
+        $classname = $namespace . $this->class;
         $component = $classname::getInstance($this->params);
 
         return $component->display();
