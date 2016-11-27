@@ -3,7 +3,7 @@
         <tr class="list-line list-line-{{ $list->id }} {{ $linesParameters[$id]['class'] }}" value="{{ $id }}" >
             {if($list->selectableLines)}
                 <td>
-                    <input type="checkbox" class="list-select-line" value="{{ $id }}" id="{{ $list->id }}-list-select-line-{{ $id}}" />
+                    <input type="checkbox" class="list-select-line" value="{{ $id }}" id="{{ $list->id }}-list-select-line-{{ $id}}" e-value="selection[{{$id}}] || selection.$all"/>
                     <label for="{{ $list->id }}-list-select-line-{{ $id}}" class="checkbox-icon"></label>
                 </td>
             {/if}

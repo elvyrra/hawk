@@ -25,7 +25,7 @@ class WysiwygInput extends TextareaInput{
     public function __construct($param){
         parent::__construct($param);
 
-        $this->attributes['ko-wysiwyg'] = '1';
+        $this->attributes['e-wysiwyg'] = '1';
     }
 
 
@@ -37,8 +37,10 @@ class WysiwygInput extends TextareaInput{
     public function display(){
         return parent::display() .
         '<script>
-            require(["app"], function(){
-                ko.applyBindingsToNode(document.getElementById("' . $this->id . '"), { wysiwyg : 1});
+            require(["app", "emv"], function(app, EMV) {
+                const model = new EMV();
+
+                model.$apply(document.getElementById("' . $this->id . '"));
             });
         </script>';
     }

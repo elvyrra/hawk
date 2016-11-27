@@ -425,10 +425,15 @@ class FormInput{
 
         // If the value of this field must be unique in the database, check this unicity is not compromised
         if(!empty($this->value) && $this->unique && $form) {
-            $example = new DBExample(array(
-                '$not' => $form->reference,
+            $example = array(
                 array($this->name => $this->dbvalue())
-            ));
+            );
+
+            if($form->object) {
+                $example['$not'] = $form->reference;
+            }
+
+            $example = new DBExample($example);
 
             $model = $form->model;
             if($model::getByExample($example)) {

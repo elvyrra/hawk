@@ -20,15 +20,14 @@ class PageNotFoundException extends HTTPException {
      * Constructor
      *
      * @param string $url The not found URL
+     * @param array $details The exception details
      */
-    public function __construct($url = '') {
+    public function __construct($url = '', $details = array()) {
         if(!$url) {
             $url = App::request()->getFullUrl();
         }
 
-        $details = array(
-            'url' => $url
-        );
+        $details['url'] = $url;
 
         $message = Lang::get('main.http-error-404-message', $details);
 

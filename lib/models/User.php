@@ -193,7 +193,7 @@ class User extends Model{
      *
      * @return mixed
      */
-    public function getProfileData($prop = ""){
+    public function getProfileData($prop = ''){
         if(!isset($this->profile)) {
             $sql = 'SELECT Q.name, V.value
     				FROM ' . ProfileQuestionValue::getTable()  . ' V

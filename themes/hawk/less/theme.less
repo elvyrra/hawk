@@ -434,8 +434,8 @@ input[type="checkbox"]{
 }
 
 form{
-    .form-input-wrap{
-        margin: .5rem;
+    .form-input-wrap {
+        margin: .5rem 0;
 
         > :not(textarea, .cke) {
             float: left;
@@ -1209,7 +1209,7 @@ p .icon{
 }
 
 /*------------------------------ Autocomplete ------------------------------*/
-.ko-autocomplete{
+.ko-autocomplete, .emv-autocomplete{
     display: inline-block;
     position: relative;
 
@@ -1223,6 +1223,8 @@ p .icon{
         list-style-type: none;
         min-width: 16rem;
         left: 0;
+        max-height: 30rem;
+        overflow-y: auto;
 
         &:empty{
             display: none;

@@ -1,18 +1,13 @@
 ﻿<!-- Inactive items content -->
 {assign name="backlogContent"}
-    <ol class="inactive" ko-foreach="{data : inactiveItems, as : 'item'}">
-        <li ko-attr="{'data-id' : item.id}">
-            <span ko-text="item.label"></span>
-            {icon icon="plus" class="pull-right text-success pointer" size="lg" ko-click=" $root.activateItem.bind($root)"}
-            {icon icon="pencil" class="pull-right text-primary pointer" size="lg" ko-visible="item.plugin === 'custom'" ko-click="$root.editItem.bind($root)"}
-            {icon icon="times" class="pull-right text-danger pointer" size="lg" ko-visible="item.plugin === 'custom'" ko-click="$root.removeItem.bind($root)"}
+    <ol class="inactive">
+        <li e-each="{$data : items, $filter : inactiveFilter}" data-id="${id}">
+            <span>${label}</span>
+            {icon icon="plus" class="pull-right text-success pointer" size="lg" e-click="$root.activateItem.bind($root)"}
+            {icon icon="pencil" class="pull-right text-primary pointer" size="lg" e-show="plugin === 'custom'" e-click="$root.editItem.bind($root)"}
+            {icon icon="times" class="pull-right text-danger pointer" size="lg" e-show="plugin === 'custom'" e-click="$root.removeItem.bind($root)"}
         </li>
     </ol>
-{/assign}
-
-<!-- New MenuItem widget -->
-{assign name="newMenuItem"}
-    {widget class="\Hawk\Plugins\Admin\NewMenuWidget"}
 {/assign}
 
 <!-- The structure to sort the menu -->
@@ -20,24 +15,22 @@
     {{ $form->inputs['valid'] }}
     <div id="sort-menu-active">
         {{ $form->inputs['data'] }}
-        <div id="sort-menu-wrapper" ko-template="{ nodes : [template] }"></div>
-
-        <div id="sort-menu-template">
-            <ol class="sortable active" ko-foreach="{data : sortedItems, as : 'item' }" data-parent="0">
-                <li ko-attr="{ 'data-id': item.id, 'data-order': $index}" ko-class="{'no-action-item' : !item.action}">
-                    <div class="sortable-item" ko-attr="{title : item.url}">
+        <div id="sort-menu-wrapper">
+            <ol class="sortable active" data-parent="0">
+                <li e-each="{$data : items, $filter : function(item) { return item.active && item.parentId == 0; }, $sort : 'order'}" data-id="${id}" e-attr="{'data-order' : $index}" e-class="{'no-action-item' : !action}">
+                    <div class="sortable-item">
                         {icon icon="arrows" class="drag-handle"}
-                        <span ko-text="item.label"></span>
-                        {icon icon="ban" size="lg" class="pull-right text-danger deactivate-item pointer" ko-visible="!(item.children && item.children.length)" ko-click="$root.deactivateItem.bind($root)"}
-                        {icon icon="pencil" size="lg" class="pull-right text-primary edit-item pointer" ko-visible="item.plugin === 'custom'" ko-click="$root.editItem.bind($root)"}
+                        <span><i class="icon icon-${ icon }"></i> ${label}</span>
+                        {icon icon="ban" size="lg" class="pull-right text-danger deactivate-item pointer" e-show="!getChildren($root).length" e-click="$root.deactivateItem.bind($root)"}
+                        {icon icon="pencil" size="lg" class="pull-right text-primary edit-item pointer" e-show="plugin === 'custom'" e-click="$root.editItem.bind($root)"}
                     </div>
-                    <ol ko-foreach="{data: children, as : 'subitem'}" ko-attr="{'data-parent': item.id}">
-                        <li ko-attr="{ 'data-id': subitem.id, 'data-order': $index}">
-                            <div class="sortable-item" ko-attr="{title : item.url}">
+                    <ol data-parent="${id}">
+                        <li e-each="{$data : $root.items, $filter : function(item) { return item.active && item.parentId === $this.id; }, $sort : 'order'}" e-attr="{'data-id' : id, 'data-order' : $index}">
+                            <div class="sortable-item">
                                 {icon icon="arrows" class="drag-handle"}
-                                <span ko-text="subitem.label"></span>
-                                {icon icon="ban" size="lg" class="pull-right text-danger deactivate-item pointer" ko-click="$root.deactivateItem.bind($root)"}
-                                {icon icon="pencil" size="lg" class="pull-right text-primary edit-item pointer" ko-visible="subitem.plugin === 'custom'" ko-click="$root.editItem.bind($root)"}
+                                <span><i class="icon icon-${ icon }"></i> ${ label }</span>
+                                {icon icon="ban" size="lg" class="pull-right text-danger deactivate-item pointer" e-click="$root.deactivateItem.bind($root)"}
+                                {icon icon="pencil" size="lg" class="pull-right text-primary edit-item pointer" e-show="plugin === 'custom'" e-click="$root.editItem.bind($root)"}
                             </div>
                         </li>
                     </ol>
@@ -51,10 +44,9 @@
     {form id="set-menus-form" content="{$sortingContent}"}
 {/assign}
 
-<div class="row">
+<div class="row" id="menu-manager">
     <div class="col-sm-4">
         {panel type="info" id="sort-menu-inactive" title="{text key='admin.sort-menu-inactive-items-title'}" content="{$backlogContent}"}
-        {panel type="success" title="{text key='admin.new-menu-form-title'}" content="{$newMenuItem}"}
     </div>
 
     <div class="col-sm-8" id="">

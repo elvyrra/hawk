@@ -217,8 +217,8 @@ class ItemListField {
                     'invitation' => isset($this->search['invitation']) ? $this->search['invitation'] : null,
                     'emptyValue' => isset($this->search['emptyValue']) ? $this->search['emptyValue'] : null,
                     'attributes' => array(
-                        'ko-value' => 'search',
-                        'ko-class' => "search() ? 'alert-info not-empty' : 'empty'"
+                        'e-value' => 'search',
+                        'e-class' => "search ? 'alert-info not-empty' : 'empty'"
                     )
                 ));
                 break;
@@ -226,7 +226,7 @@ class ItemListField {
             case 'checkbox' :
                 $input = new CheckboxInput(array(
                     'attributes' => array(
-                        'ko-checked' => 'search'
+                        'e-value' => 'search'
                     )
                 ));
                 break;
@@ -237,12 +237,12 @@ class ItemListField {
                     'after' => Icon::make(array(
                         'icon' => 'times-circle',
                         'class' => 'clean-search',
-                        'ko-click' => 'function(data){ data.search(null); }',
-                        'ko-visible' => 'search()'
+                        'e-click' => 'function(){ search = null; }',
+                        'e-show' => 'search'
                     )),
                     'attributes' => array(
-                        'ko-value' => 'search',
-                        'ko-class' => "search() ? 'alert-info not-empty' : 'empty'"
+                        'e-value' => 'search',
+                        'e-class' => "search ? 'alert-info not-empty' : 'empty'"
                     ),
                 ));
                 break;
@@ -254,12 +254,12 @@ class ItemListField {
                     'after' => Icon::make(array(
                         'icon' => 'times-circle',
                         'class' => 'clean-search',
-                        'ko-click' => 'function(data){ data.search(null); }',
-                        'ko-visible' => 'search()'
+                        'e-click' => 'function(){ search = null; }',
+                        'e-show' => 'search'
                     )),
                     'attributes' => array(
-                        'ko-textInput' => 'search',
-                        'ko-class' => "search() ? 'alert-info not-empty' : 'empty'"
+                        'e-input' => 'search',
+                        'e-class' => "search ? 'alert-info not-empty' : 'empty'"
                     )
                 ));
                 break;

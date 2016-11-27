@@ -234,6 +234,7 @@ class Form{
         }
 
         if(!isset($data['object'])) {
+            // Get the object from the model and the reference
             if(isset($this->model) && !empty($this->reference)) {
                 $model = $this->model;
                 $this->example = new DBExample($this->reference);
@@ -243,7 +244,8 @@ class Form{
                 $this->object = null;
             }
         }
-        else{
+        else {
+            // An object (model) has been injected in the form
             $this->model = get_class($this->object);
             $model = $this->model;
             $id = $model::getPrimaryColumn();
@@ -771,17 +773,13 @@ class Form{
 
             case self::STATUS_CHECK_ERROR :
                 // An error occured while checking field syntaxes
-                App::response()->setStatus(self::HTTP_CODE_CHECK_ERROR);
-                $response['message'] = $message ? $message : Lang::get('form.error-fill');
-                $response['errors'] = $this->errors;
-                break;
+                throw new BadRequestException($message ? $message : Lang::get('form.error-fill'), $this->errors);
+
 
             case self::STATUS_ERROR :
             default :
                 App::response()->setStatus(self::HTTP_CODE_ERROR);
-                $response['message'] = $message ? $message : Lang::get('form.'.$status.'-'.$this->dbaction);
-                $response['errors'] = $this->errors;
-                break;
+                throw new InternalErrorException($message ? $message : Lang::get('form.'.$status.'-'.$this->dbaction), $this->errors);
         }
 
         App::response()->setContentType('json');

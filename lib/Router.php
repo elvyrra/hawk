@@ -85,7 +85,12 @@ final class Router extends Singleton{
         }
 
         foreach($this->predefinedData as $key => $value){
-            $param[$key] = $value;
+            if(!isset($param[$key])) {
+                $param[$key] = $value;
+            }
+            elseif(is_array($value) && is_array($param[$key])) {
+                $param[$key] = array_merge($value, $param[$key]);
+            }
         }
 
         if(!isset($param['namespace'])) {
@@ -159,10 +164,21 @@ final class Router extends Singleton{
      * @param string   $prefix The prefix to set to the URIs
      * @param callable $action The function that defined the routes with this prefix
      */
-    public function prefix($prefix, $action) {
+    public function prefix($prefix, $where, $action = null) {
+        if(!$action) {
+            $action = $where;
+            $where = array();
+        }
+
         $currentPrefix = empty($this->predefinedData['prefix']) ? '' : $this->predefinedData['prefix'];
 
-        $this->setProperties(array('prefix' => $currentPrefix . $prefix), $action);
+        $this->setProperties(array(
+            'prefix' => $currentPrefix . $prefix,
+            'where' => array_merge(
+                empty($this->predefinedData['where']) ? array() : $this->predefinedData['where'],
+                $where
+            )
+        ), $action);
     }
 
 
@@ -419,12 +435,13 @@ final class Router extends Singleton{
     /**
      * Generate an URI from a given controller method (or route name) and its arguments.
      *
-     * @param string $name The route name of the controller method, formatted like this : 'ControllerClass.method'
-     * @param array  $args The route arguments, where keys define the parameters names and values, the values to affect.
+     * @param string $name        The route name of the controller method, formatted like this : 'ControllerClass.method'
+     * @param array  $args        The route arguments, where keys define the parameters names and values, the values to affect.
+     * @param array  $queryString Query string parameters
      *
      * @return string The generated URI, or the current URI (if $method is not set)
      */
-    public function getUri($name, $args= array()){
+    public function getUri($name, $args= array(), $queryString = array()){
 
         $route = $this->getRouteByAction($name);
 
@@ -444,6 +461,10 @@ final class Router extends Singleton{
                 throw new \Exception("The URI built from '$name' needs the argument : $arg");
             }
             $url = str_replace("{{$arg}}", $replace, $url);
+        }
+
+        if(!empty($queryString)) {
+            $url .= '?' . http_build_query($queryString);
         }
 
         return BASE_PATH . $url;

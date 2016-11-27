@@ -38,6 +38,14 @@ class Import extends \Hawk\ViewPlugin{
             $basedir = dirname(realpath($this->viewFile));
         }
 
-        return \Hawk\View::make($basedir . '/' . $this->file, $this->viewData);
+        $data = $this->viewData;
+
+        foreach(get_object_vars($this) as $key => $value) {
+            if($key !== 'file') {
+                $data[$key] = $value;
+            }
+        }
+
+        return \Hawk\View::make($basedir . '/' . $this->file, $data);
     }
 }

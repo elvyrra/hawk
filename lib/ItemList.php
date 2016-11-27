@@ -308,6 +308,10 @@ class ItemList {
             'page',
         );
 
+        if(!$this->navigation) {
+            $this->lines = self::ALL_LINES;
+        }
+
         if(App::request()->getHeaders('X-List-Filter-'.$this->id)) {
             App::session()->getUser()->setOption('main.list-'.$this->id, App::request()->getHeaders('X-List-Filter-'.$this->id));
         }

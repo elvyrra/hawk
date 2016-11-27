@@ -1,7 +1,7 @@
  <script type="text/javascript">
-     (function(){
-        function init(){
-            var form = new Form('{{ $form->id }}', {{$inputs}});
+    (function() {
+        function initForm(app, Form) {
+            var form = new Form('{{ $form->id }}', {{ $inputs }});
 
             {if(!empty($form->onsuccess))}
             form.onsuccess = function(data){
@@ -16,11 +16,17 @@
             app.forms['{{ $form->id }}'] = form;
         }
 
-        if(window.app){
-            init();
+        if(require.defined('app') && require.defined('form')) {
+            app = require('app');
+            Form = require('form');
+
+            initForm(app, Form);
         }
-        else{
-            require(["app"], init);
+        else {
+            require(['app', 'form'], (app, Form) => {
+                initForm(app, Form);
+            });
         }
+
     })();
 </script>

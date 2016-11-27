@@ -26,7 +26,7 @@ require(['app'], function() {
                 }
             });
 
-            app.load(app.tabset.activeTab().uri());
+            app.tabset.activeTab.reload();
         })
 
         .fail(function(xhr) {
