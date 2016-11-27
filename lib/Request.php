@@ -259,9 +259,9 @@ final class Request extends Singleton{
      *
      * @return string|array The parameter value or all the parameters
      */
-    public function getParams($name = ""){
+    public function getParams($name = '') {
         if($name) {
-            return isset($this->params[$name]) ? $this->params[$name] : null;
+            return isset($this->params[$name]) ? $this->params[$name] : '';
         }
         else{
             return $this->params;
@@ -275,9 +275,9 @@ final class Request extends Singleton{
      *
      * @return string|array The header value or all the headers
      */
-    public function getHeaders($name = ""){
+    public function getHeaders($name = ''){
         if($name) {
-            return isset($this->headers[$name]) ? $this->headers[$name] : null;
+            return isset($this->headers[$name]) ? $this->headers[$name] : '';
         }
         else {
             return $this->headers;
@@ -291,9 +291,9 @@ final class Request extends Singleton{
      *
      * @return string|array The cookie value or all the cookies
      */
-    public function getCookies($name = "") {
+    public function getCookies($name = '') {
         if($name) {
-            return isset($this->cookies[$name]) ? $this->cookies[$name] : null;
+            return isset($this->cookies[$name]) ? $this->cookies[$name] : '';
         }
         else {
             return $this->cookies;
