@@ -1,4 +1,4 @@
-{widget class="Hawk\Plugins\Main\MainMenuWidget"}
+{widget plugin="main" class="MainMenuWidget"}
 <script type="text/javascript" src="{{ Theme::getSelected()->getFileUrl('js/theme-hawk.js') }}"></script>
 
 {if(empty($content))}

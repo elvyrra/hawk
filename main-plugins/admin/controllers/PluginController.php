@@ -102,12 +102,12 @@ class PluginController extends Controller{
                                 )),
 
                                 // Delete button
-                                ButtonInput::create(array(
+                                ! $plugin->isMandatoryDependency() ? ButtonInput::create(array(
                                     'title' => Lang::get($this->_plugin . '.delete-plugin-button'),
                                     'icon' => 'trash',
                                     'class' => 'btn-danger delete-plugin',
                                     'href' => App::router()->getUri('delete-plugin', array('plugin' => $plugin->getName())),
-                                ))
+                                )) : ''
                             );
 
                             $status = Lang::get($this->_plugin . '.plugin-uninstalled-status');
@@ -135,12 +135,12 @@ class PluginController extends Controller{
                                         )) : '',
 
                                     // Uninstall button
-                                    ButtonInput::create(array(
+                                    ! $plugin->isMandatoryDependency() ? ButtonInput::create(array(
                                         'title' => Lang::get($this->_plugin . '.uninstall-plugin-button'),
                                         'class' => 'btn-danger uninstall-plugin',
                                         'icon' => 'chain-broken',
                                         'href' => App::router()->getUri('uninstall-plugin', array('plugin' => $plugin->getName())),
-                                    ))
+                                    )) : ''
                                 );
 
                                 $status = Lang::get($this->_plugin . '.plugin-inactive-status');
@@ -158,6 +158,7 @@ class PluginController extends Controller{
                                             'class' => 'btn-info',
                                         )) : '',
 
+                                    // Deactivate button
                                     ButtonInput::create(array(
                                         'title' => Lang::get($this->_plugin . '.deactivate-plugin-button'),
                                         'class' => 'btn-warning deactivate-plugin',
@@ -213,7 +214,7 @@ class PluginController extends Controller{
         if(is_file($plugin->getReadmeFile())) {
             $mdParser = new Parsedown();
 
-            $md = file_get_contents($plugin->getReadmeFile());
+            $md = View::make($plugin->getReadmeFile());
 
             // Replace img sources
             $md = preg_replace_callback("#\!\[(.*?)\]\((.+?)( .+)?\)#", function ($matches) use ($plugin) {
@@ -229,6 +230,8 @@ class PluginController extends Controller{
             }, $md);
 
             $plugin->readme = $mdParser->text($md);
+
+            // $plugin->readme = View::makeFromString($plugin->readme);
         }
         else {
             $plugin->readme = '';
@@ -277,14 +280,15 @@ class PluginController extends Controller{
             Plugin::get($this->plugin)->$action();
         }
         catch(\Exception $e){
-            $response['message'] = Lang::get($this->_plugin . '.plugin-' . $action . '-error', array(
+            $errorMessage = Lang::get($this->_plugin . '.plugin-' . $action . '-error', array(
                 'plugin' => $this->plugin
             ));
 
             if(DEBUG_MODE) {
-                $response['message'] .= preg_replace('/\s/', ' ', $e->getMessage());
+                $errorMessage .= preg_replace('/\s/', ' ', $e->getMessage());
             }
-            App::response()->setStatus(500);
+
+            throw new InternalErrorException($errorMessage);
         }
 
         return $response;
@@ -375,25 +379,19 @@ class PluginController extends Controller{
             }
         }
 
-        $list = new ItemList(array(
-            'id' => 'search-plugins-list',
-            'data' => $plugins,
-            'resultTpl' => Plugin::current()->getView('plugin-search-list.tpl'),
-            'fields' => array()
-        ));
+        $this->addKeysToJavaScript(
+            $this->_plugin . '.search-plugin-downloads',
+            $this->_plugin . '.download-plugin-dependencies'
+        );
 
-        if($list->isRefreshing()) {
-            return $list->display();
-        }
-        else{
-            return $this->index(
-                $list->display(),
-                Lang::get($this->_plugin . '.search-plugins-result-title', array(
-                    'search' => htmlentities($search)
-                ))
-            );
-        }
-
+        return $this->index(
+            View::make($this->getPlugin()->getView('plugin-search-list.tpl'), array(
+                'searchResult' => json_encode(array_values($plugins))
+            )),
+            Lang::get($this->_plugin . '.search-plugins-result-title', array(
+                'search' => htmlentities($search)
+            ))
+        );
     }
 
 
@@ -401,7 +399,7 @@ class PluginController extends Controller{
     /**
      * Download and install a plugin from Mint
      */
-    public function download(){
+    public function download($install = true){
         App::response()->setContentType('json');
         try{
             $api = new HawkApi;
@@ -418,17 +416,22 @@ class PluginController extends Controller{
             if(!$plugin) {
                 throw new \Exception('An error occured while downloading the plugin');
             }
-            $plugin->install();
 
-            App::response()->setBody($plugin);
+            // Check if the plugin has dependencies
+            $dependencies = $plugin->getDefinition('dependencies');
+
+            $this->installOrupdateDependencies($plugin);
+
+            if($install) {
+                $plugin->install();
+            }
 
             unlink($file);
+
+            return $plugin;
         }
         catch(\Exception $e){
-            App::response()->setStatus(500);
-            App::response()->setBody(array(
-                'message' => $e->getMessage()
-            ));
+            throw new InternalErrorException($e->getMessag());
         }
     }
 
@@ -654,10 +657,13 @@ class PluginController extends Controller{
                 try{
                     $zip->extractTo(PLUGINS_DIR);
 
+                    unset(Plugin::$instances[$this->plugin]);
                     $plugin = Plugin::get($this->plugin);
                     if(!$plugin) {
                         throw new \Exception('An error occured while downloading the plugin');
                     }
+
+                    $this->installOrupdateDependencies($plugin);
 
                     $installer = $plugin->getInstallerInstance();
                     foreach($updates[$plugin->getName()] as $version){
@@ -674,6 +680,9 @@ class PluginController extends Controller{
                     // An error occured while installing the new version, rollback to the previous version
                     App::fs()->remove($plugin->getRootDir());
                     rename($backup, $plugin->getRootDir());
+                    App::fs()->remove($file);
+
+                    throw $e;
                 }
 
                 App::fs()->remove($file);
@@ -683,6 +692,44 @@ class PluginController extends Controller{
         }
         catch(\Exception $e) {
             throw new InternalErrorException($e->getMessage());
+        }
+    }
+
+
+
+    private function installOrupdateDependencies(Plugin $plugin) {
+        // Check if the plugin has dependencies
+        $dependencies = $plugin->getDefinition('dependencies');
+
+        if(!empty($dependencies)) {
+            foreach($dependencies as $name => $param) {
+                $dependentPlugin = Plugin::get($name);
+
+                if(!$dependentPlugin) {
+                    // The plugin does not exist yet, download it
+                    $controller = self::getInstance(array(
+                        'plugin' => $name
+                    ));
+
+                    $controller->download(false);
+                }
+                else {
+                    // The plugin already exists. Check if it needs to be updated
+                    if(!empty($param['version'])) {
+                        $installedVersion = Utils::getSerializedVersion($dependentPlugin->getDefinition('version'));
+                        $expectedVersion = Utils::getSerializedVersion($param['version']);
+
+                        if($installedVersion < $expectedVersion) {
+                            // The dependency needs to be updated
+                            $controller = $controller = self::getInstance(array(
+                                'plugin' => $name
+                            ));
+
+                            $controller->update();
+                        }
+                    }
+                }
+            }
         }
     }
 

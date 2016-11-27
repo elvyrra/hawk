@@ -249,4 +249,5 @@ update-theme-button = "Update"
 search-theme-result-list-installed = "Insatlled"
 
 download-plugin-button =  "Install"
+download-plugin-dependencies = "The following plugins needs to be installed to make '{plugin}' work : \n\n{list} \n\nDo you want to continue ?"
 buy-plugin-button = "Buy"

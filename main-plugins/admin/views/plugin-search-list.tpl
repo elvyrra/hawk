@@ -1,47 +1,50 @@
 {button href="{uri action='manage-plugins'}" label="{text key='admin.search-plugin-back'}" icon="reply"}
 <div class="clearfix"></div>
-<div class="row container-fluid">
-    {if(count($list->results))}
-        {foreach($list->results as $id => $plugin)}
-            <div class="col-md-6 col-lg-4 plugin-item-wrapper">
-                <div class="plugin-item">
-                    <div class="plugin-item-header">
-                        <div class="plugin-logo-container pull-left">
-                            <a href="{{ $plugin->detailsUrl }}" target="_blank">
-                                {if($plugin->logo)}
-                                    <img src="{{ $plugin->logo }}" alt="{{ $plugin->title }}" class="pull-left plugin-logo" />
-                                {else}
-                                    {icon icon="plug" size="fw" class="pull-left plugin-logo"}
-                                {/if}
-                            </a>
-                        </div>
+<div class="row container-fluid" id="search-plugins-list">
+    <div class="col-md-6 col-lg-4 plugin-item-wrapper" e-each="{$data : plugins, $item : 'plugin'}">
+        <div class="plugin-item">
+            <div class="plugin-item-header">
+                <div class="plugin-logo-container pull-left">
+                    <a target="_blank" e-attr="{href : detailsUrl}">
+                        <img class="pull-left plugin-logo" e-attr="{src : logo, alt : title}" e-if="logo"/>
+                        {icon icon="plug" size="fw" class="pull-left plugin-logo" e-unless="logo"}
+                    </a>
+                </div>
 
-                        <div class="plugin-description-container pull-left">
-                            <span class="plugin-title">{{ $plugin->title }}</span>
-                            <p class="plugin-description">{{ $plugin->description }}</p>
-                        </div>
-                    </div>
-
-                    <div class="clearfix"></div>
-                    <div class="plugin-item-footer">
-                        <span class="plugin-rate" title="{{ $plugin->rate }}">
-                            {foreach(range(1, 5) as $i)}
-                                {icon icon="{$plugin->rate < $i - 1 + 0.25 ? 'star-o' : ($plugin->rate < $i - 1 + 0.75 ? 'star-half-o' : 'star')}" class="text-success" size="lg"}
-                            {/foreach}
-                        </span>
-
-                        {if($plugin->installed)}
-                            <span class="btn btn-success pull-right">{text key="admin.search-plugin-result-list-installed"}</span>
-                        {else}
-                            {button label="{text key='admin.download-plugin-button'}" icon="download" href="{uri action='download-plugin' plugin='{$plugin->name}'}" class="pull-right download-plugin"}
-                        {/if}
-                        <div class="clearfix"></div>
-                        {text key="admin.search-plugin-downloads" downloads="{$plugin->downloads}"}
-                    </div>
+                <div class="plugin-description-container pull-left">
+                    <span class="plugin-title">${title}</span>
+                    <p class="plugin-description" e-html="description"></p>
                 </div>
             </div>
-        {/foreach}
-    {else}
-        <h3 class="text-danger text-center">{text key="admin.search-plugin-no-result"}</h3>
-    {/if}
+
+            <div class="clearfix"></div>
+            <div class="plugin-item-footer">
+                <span class="plugin-rate" title="${rate}">
+                    <i class="icon text-success icon-lg"
+                        e-each="{$data : [1,2,3,4,5], $item : 'i'}"
+                        e-class="{
+                            'icon-star-o' : $plugin.rate < $i - 0.75,
+                            'icon-star-half-o' : $plugin.rate >= $i - 0.75 && $plugin.rate < $i - 0.25,
+                            'icon-star' : $plugin.rate >= $i - 0.25
+                        }"></i>
+                </span>
+
+
+                <span class="btn btn-success pull-right" e-if="installed">{text key="admin.search-plugin-result-list-installed"}</span>
+                {button e-unless="installed"
+                        e-click="$root.downloadPlugin($plugin)"
+                        label="{text key='admin.download-plugin-button'}"
+                        icon="download"
+                        class="pull-right download-plugin"
+                }
+
+                <div class="clearfix"></div>
+                ${Lang.get('admin.search-plugin-downloads', {downloads : downloads})}
+            </div>
+        </div>
+    </div>
+
+    <h3 class="text-danger text-center" e-unless="plugins.length">{text key="admin.search-plugin-no-result"}</h3>
+
+    <input type="hidden" name="search-result" value="{{{ $searchResult }}}" />
 </div>

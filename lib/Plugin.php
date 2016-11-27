@@ -1009,4 +1009,24 @@ class Plugin{
             return false;
         }
     }
+
+    /**
+     * Check if a plugin requires that plugin to be present
+     *
+     * @return boolean
+     */
+    public function isMandatoryDependency() {
+        $allPlugins = self::getAll(false, false);
+
+        foreach($allPlugins as $plugin) {
+            if($plugin->getName() !== $this->getName()) {
+                $dependencies = $plugin->getDefinition('dependencies');
+                if(!empty($dependencies[$this->getName()]['mandatory'])) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 }

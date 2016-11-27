@@ -185,19 +185,17 @@ class HawkApi{
             $uri .= '?' . http_build_query($data['params']);
         }
 
-        $request = new HTTPRequest(
-            array(
+        $request = new HTTPRequest(array(
             'url' => HAWK_SITE_URL . '/api' . $uri,
             'headers' => array(
-            'X-Requested-With' => 'XMLHttpRequest'
+                'X-Requested-With' => 'XMLHttpRequest'
             ),
             'method' => $route['method'],
             'contentType' => 'json',
             'dataType' => isset($route['dataType']) ? $route['dataType'] : 'json',
             'body' => $data['body'],
             'files' => $data['files']
-            )
-        );
+        ));
 
         $request->send();
 
