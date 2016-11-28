@@ -464,7 +464,7 @@ class ItemList {
                 $data = array_filter(
                     $data,
                     function ($line) use ($pattern, $name) {
-                        return stripos($line[$name], $pattern) !== false;
+                        return stripos($line->$name, $pattern) !== false;
                     }
                 );
             }

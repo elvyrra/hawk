@@ -216,6 +216,8 @@ class MainController extends Controller{
         if(App::session()->isLogged() && Option::get($this->_plugin . '.open-last-tabs') && App::request()->getCookies('open-tabs')) {
             // Open the last tabs the users opened before logout
             $pages = json_decode(App::request()->getCookies('open-tabs'), true);
+
+            $pages = array_filter($pages);
         }
 
         if(empty($pages)) {
