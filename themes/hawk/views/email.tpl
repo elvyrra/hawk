@@ -7,7 +7,7 @@
         <div style="width:100%; border: none; height: 6rem;margin-bottom: .5rem; background: {{ $css['header-bg'] }}; color: {{ $css['header-color'] }};position:relative">
             <a href="{{ App::router()->getUrl('index') }}" style="float: left">
                 <img style="height:4rem;width:auto;position:absolute;top:50%; transform: translateY(-50%);"
-                    src="{{ Option::get('main.logo') ? Plugin::current()->getUserfilesUrl(Option::get('main.logo')) : Plugin::get('main')->getStaticUrl('img/hawk-logo.png') }} " alt="Application logo"/>
+                    src="{{ Option::get('main.logo') ? Plugin::get('main')->getUserfilesUrl(Option::get('main.logo')) : Plugin::get('main')->getStaticUrl('img/hawk-logo.png') }} " alt="Application logo"/>
             </a>
         </div>
 
