@@ -274,7 +274,7 @@ class LanguageController extends Controller{
         $data = array();
         foreach($keys as $langKey => $values){
             if($filters['keys'] != 'missing' ||  empty($values[$filters['tag']])) {
-                $data[] = array(
+                $data[] = (object) array(
                     'langKey' => $langKey,
                     'origin' => isset($values[Lang::DEFAULT_LANGUAGE]) ? $values[Lang::DEFAULT_LANGUAGE] : '',
                     'translation' => isset($values[$filters['tag']]) ? $values[$filters['tag']] : ''

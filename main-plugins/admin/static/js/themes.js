@@ -165,7 +165,7 @@ require(['app', 'jquery', 'emv', 'lang'], function(app, $, EMV, Lang) {
                         }, 50);
 
                         if(this.type === 'color') {
-                            this.node.parent().colorpicker('setValue', value);
+                            this.node().parent().colorpicker('setValue', value);
                         }
                     }.bind(input));
                 }

@@ -36,7 +36,7 @@ define('list', ['jquery', 'emv'], function($, EMV) {
                         $all : false,
                         $none : true
                     },
-                    htmlResult : $(`#${data.id} .list > tbody`).html()
+                    htmlResult : ''
                 },
                 computed : {
                     // The label displaying the number of the list results
@@ -55,8 +55,6 @@ define('list', ['jquery', 'emv'], function($, EMV) {
                     sort : this.sorts[field]
                 };
             });
-
-            this.$apply(this.node());
 
             /**
              * Change the number of lines per page
@@ -143,6 +141,12 @@ define('list', ['jquery', 'emv'], function($, EMV) {
                     }, List.DEFAULT_SEARCH_DELAY);
                 });
             });
+
+            this.refresh()
+
+            .done(() => {
+                this.$apply(this.node());
+            });
         }
 
         /**
@@ -170,7 +174,7 @@ define('list', ['jquery', 'emv'], function($, EMV) {
             };
 
             // Load the new data from the server
-            $.ajax({
+            return $.ajax({
                 url: this.action,
                 method : 'GET',
                 headers : headers,
@@ -184,8 +188,6 @@ define('list', ['jquery', 'emv'], function($, EMV) {
             .fail(function() {
                 app.notify('error', Lang.get('main.refresh-list-error'));
             });
-
-            return false;
         }
 
         /**
@@ -193,7 +195,7 @@ define('list', ['jquery', 'emv'], function($, EMV) {
          * @returns {n.init} The node containing the list
          */
         node() {
-            return $('#' + this.id).get(0);
+            return document.getElementById(this.id);
         }
 
 
@@ -202,6 +204,24 @@ define('list', ['jquery', 'emv'], function($, EMV) {
          */
         print() {
             app.print(this.node());
+        }
+
+        /**
+         * Display the previous page
+         */
+        prev() {
+            if(this.page > 1) {
+                this.page --;
+            }
+        }
+
+        /**
+         * Display the next page
+         */
+        next() {
+            if(this.page < this.maxPages) {
+                this.page ++;
+            }
         }
     }
 

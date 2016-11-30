@@ -18,6 +18,8 @@
 
     <!-- THE CONTENT OF THE LIST RESULTS -->
     <tbody e-html="htmlResult">
-        {import file="{$list->resultTpl}"}
+        <tr>
+            <td colspan="500">{icon icon="spin" class="icon-spinner center" size="2x"}</td>
+        </tr>
     </tbody>
 </table>

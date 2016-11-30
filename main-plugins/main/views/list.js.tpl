@@ -15,9 +15,6 @@
             userParam       : {{ json_encode($list->userParam, JSON_FORCE_OBJECT) }}
         });
 
-        list.maxPages = {{ $pages }};
-        list.recordNumber = {{ $list->recordNumber }};
-
         app.lists['{{ $list->id }}'] = list;
     {/if}
     });

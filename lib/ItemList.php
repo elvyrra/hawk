@@ -578,28 +578,35 @@ class ItemList {
      * @return string The HTML result of displaying
      */
     public function display() {
-        try{
-            // Get the data to display
-            $this->get();
-
-            // Get the total number of pages
-            $pages = (ceil($this->recordNumber / $this->lines) > 0) ? ceil($this->recordNumber / $this->lines) : 1;
-
-            // At least one result to display
-            $data  = array();
+        try {
+            $pages = 1;
+            $data = array();
             $param = array();
-            if(is_array($this->results)) {
-                foreach($this->results as $id => $line){
-                    $data[$id]  = array();
-                    $param[$id] = array('class' => '');
+            $this->recordNumber = 0;
 
-                    if($this->lineClass) {
-                        $function = $this->lineClass;
-                        $param[$id]['class'] .= $function($line);
-                    }
+            if($this->refresh) {
+                // Get the data to display
+                $this->get();
 
-                    foreach($this->fields as $name => $field){
-                        $data[$id][$name] = $field->displayCell($id);
+                // Get the total number of pages
+                $pages = (ceil($this->recordNumber / $this->lines) > 0) ? ceil($this->recordNumber / $this->lines) : 1;
+
+                // At least one result to display
+                $data  = array();
+                $param = array();
+                if(is_array($this->results)) {
+                    foreach($this->results as $id => $line){
+                        $data[$id]  = array();
+                        $param[$id] = array('class' => '');
+
+                        if($this->lineClass) {
+                            $function = $this->lineClass;
+                            $param[$id]['class'] .= $function($line);
+                        }
+
+                        foreach($this->fields as $name => $field){
+                            $data[$id][$name] = $field->displayCell($id);
+                        }
                     }
                 }
             }
