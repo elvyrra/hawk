@@ -250,8 +250,10 @@ class Theme{
      *
      * @return string
      */
-    public function getRootUrl(){
-        return THEMES_ROOT_URL . $this->name . '/';
+    public function getRootUrl() {
+        $version = $this->getName() === self::DEFAULT_THEME ? HAWK_VERSION : $this->getDefinition('version');
+
+        return THEMES_ROOT_URL . $this->name . '/' . $version . '/';
     }
 
 
@@ -277,7 +279,7 @@ class Theme{
             App::fs()->copy($privateFile, $publicFile);
         }
 
-        return $this->getRootUrl() . $file . '?' . filemtime($publicFile);
+        return $this->getRootUrl() . $file;
     }
 
 
@@ -347,7 +349,7 @@ class Theme{
     public function getBaseLessUrl(){
         $this->build();
 
-        return $this->getRootUrl() . 'less/' . self::LESS_BASENAME . '?' . filemtime($this->getStaticLessFile());
+        return $this->getRootUrl() . 'less/' . self::LESS_BASENAME;
     }
 
 
@@ -359,7 +361,7 @@ class Theme{
     public function getBaseCssUrl(){
         $this->build();
 
-        return $this->getRootUrl() . 'less/' . self::COMPILED_CSS_BASENAME . '?' . filemtime($this->getStaticCssFile());
+        return $this->getRootUrl() . 'less/' . self::COMPILED_CSS_BASENAME;
     }
 
 

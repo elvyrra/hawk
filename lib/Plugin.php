@@ -445,8 +445,9 @@ class Plugin{
      *
      * @return string The URL
      */
-    public function getStaticUrl($basename = ''){
-        $baseUrl = PLUGINS_ROOT_URL . $this->name . '/';
+    public function getStaticUrl($basename = '') {
+        $version = $this->isMainPlugin() ? HAWK_VERSION : $this->getDefinition('version');
+        $baseUrl = PLUGINS_ROOT_URL . $this->name . '/' . $version . '/';
         if(empty($basename)) {
             return $baseUrl;
         }
@@ -462,7 +463,7 @@ class Plugin{
                 copy($privateFilename, $publicFilename);
             }
 
-            return $baseUrl . $basename . '?' . filemtime($publicFilename);
+            return $baseUrl . $basename;
         }
     }
 
