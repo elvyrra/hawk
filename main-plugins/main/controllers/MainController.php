@@ -217,7 +217,7 @@ class MainController extends Controller{
             // Open the last tabs the users opened before logout
             $pages = json_decode(App::request()->getCookies('open-tabs'), true);
 
-            $pages = array_filter($pages);
+            $pages = array_values(array_filter($pages));
         }
 
         if(empty($pages)) {
