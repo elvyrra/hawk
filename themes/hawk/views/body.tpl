@@ -68,8 +68,10 @@
 
 
 <div id='loading' e-show="display">
-	{icon icon="spinner" size="5x" class="center icon-spin"}
-	<div id="loading-bar" e-class="{processing: processing}">
-		<span id='loading-purcentage' e-style="{ width: purcentage + '%'}"></span>
+	<div class="center text-center">
+		{icon icon="spinner" size="5x" class="icon-spin"}
+		<div id="loading-bar" e-class="{progressing: progressing}">
+			<span id='loading-purcentage' e-style="{ width: purcentage + '%'}"></span>
+		</div>
 	</div>
 </div>
