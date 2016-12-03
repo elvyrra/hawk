@@ -61,7 +61,7 @@
 	{text key="main.hawk-powered"}
 	{if(DEV_MODE)}
 		<a href="{uri action='clear-cache'}" class="real-link pull-right" title="{text key="main.clear-cache"}">
-			{icon icon="calendat-times-o" size="lg" class="clear-cache-btn"}
+			{icon icon="calendar-times-o" size="lg" class="clear-cache-btn"}
 		</a>
 	{/if}
 </div>
