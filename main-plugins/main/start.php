@@ -64,7 +64,7 @@ App::router()->auth(!App::session()->isLogged(), function () {
 
 App::router()->get('terms', '/terms-of-application', array('action' => 'MainController.terms'));
 
-App::router()->get('refresh-menu', '/main-menu', array('action' => 'MainController.refreshMenu'));
+App::router()->get('refresh-menu', '/main-menu', array('action' => 'MainController.getMainMenu'));
 
 App::router()->get('js-conf', '/conf.js', array('action' => 'MainController.jsConf'));
 

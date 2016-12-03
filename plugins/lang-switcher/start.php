@@ -2,7 +2,7 @@
 
 namespace Hawk\Plugins\LangSwitcher;
 
-Event::on(\Hawk\Plugins\Main\MainMenuWidget::EVENT_AFTER_GET_MENUS, function(Event $event){
+Event::on(\Hawk\Plugins\Main\MainController::EVENT_AFTER_GET_MENUS, function(Event $event){
     $languages = Language::getAllActive();
 
     if(count($languages) > 0){
@@ -30,7 +30,7 @@ Event::on(\Hawk\Plugins\Main\MainMenuWidget::EVENT_AFTER_GET_MENUS, function(Eve
             ));
         }
 
-        $menus['user'][] = $menu;
+        $menus['settings'][] = $menu;
 
         $event->setData('menus', $menus);
     }

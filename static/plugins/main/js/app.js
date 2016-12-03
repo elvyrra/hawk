@@ -163,6 +163,11 @@ define(
                         }
                     }
                 });
+                this.menu = new EMV({
+                    data : {
+                        items : window.appConf.menu
+                    }
+                });
             }
 
             /**
@@ -799,7 +804,7 @@ define(
              */
             refreshMenu() {
                 $.get(this.getUri('refresh-menu'), (response) => {
-                    $('#main-menu').replaceWith(response);
+                    this.menu.items = response;
 
                     this.notify('warning', Lang.get('main.main-menu-changed'));
                 });

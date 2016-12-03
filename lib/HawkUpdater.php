@@ -85,4 +85,18 @@ class HawkUpdater{
         $logoutItem->icon = 'sign-out';
         $logoutItem->save();
     }
+
+    /**
+     * v1.6.0 : Add the menu item 'user.login'
+     */
+    public function v1_6_0() {
+        MenuItem::add(array(
+            'plugin' => 'main',
+            'name' => 'login',
+            'labelKey' => 'main.login-menu-title',
+            'icon' => 'sign-in',
+            'action' => 'login',
+            'target' => 'dialog'
+        ));
+    }
 }

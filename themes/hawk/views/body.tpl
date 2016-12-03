@@ -1,4 +1,4 @@
-{widget plugin="main" class="MainMenuWidget"}
+{import file="main-menu.tpl"}
 <script type="text/javascript" src="{{ Theme::getSelected()->getFileUrl('js/theme-hawk.js') }}"></script>
 
 {if(empty($content))}

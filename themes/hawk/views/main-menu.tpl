@@ -1,7 +1,7 @@
 <nav id="main-menu" class="navbar navbar-inverse">
 	<div class="container-fluid">
 		<div class="navbar-header">
-			<img class="application-logo" src="{{ $logo ? $logo : Plugin::get('main')->getStaticUrl('img/hawk-logo.png') }}" alt="Application logo"/>
+			<img class="application-logo" src="{{ $appLogo }}" alt="Application logo"/>
 			<h1 class="visible-xs app-title vertical-center text-center">{{ App::conf()->has('db') ? Option::get('main.page-title-' . LANGUAGE) : DEFAULT_HTML_TITLE }}</h1>
 			<div class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-menu-collapse" >
 		        <span class="sr-only">Toggle navigation</span>
@@ -10,44 +10,31 @@
 		</div>
 
 		<div class="collapse navbar-collapse" id="main-menu-collapse">
-			{foreach($menus as $name => $groups)}
-				<ul class="nav navbar-nav {if($name=='user')} navbar-right {/if}">
-					{foreach($groups as $menu)}
-						{if($menu->visibleItems)}
-							<li class="dropdown main-menu" id="main-menu-{{ $menu->id }}">
-								<div class="dropdown-toggle main-menu-title" type="button" id="main-menu-title-{{ $menu->id }}" data-toggle="dropdown">
-									{if($menu->icon)}
-										{icon icon="{$menu->icon}" size="fw"}
-									{/if}
-									{{ $menu->label }}
-									{icon icon="caret-down"}
-								</div>
-								<ul class="dropdown-menu" role="menu" aria-labelledby="main-menu-title-{{ $menu->id }}" id="main-menu-items-{{ $menu->id }}">
-									{foreach($menu->visibleItems as $item)}
-										<li role="presentation" class="main-menu-item" id="main-menu-item-{{ $item->id }}" data-item="{{ $item->name }}">
-											<a role="menuitem" href="{{{ $item->url }}}" {if(!empty($item->target))} target="{{ $item->target }}" {/if}>
-												{icon icon="{$item->icon}" size="fw"}
-												{{ $item->label }}
-											</a>
-										</li>
-									{/foreach}
-								</ul>
-							</li>
-						{else}
-							<li class="main-menu" id="main-menu-{{ $menu->id }}">
-								<div class="main-menu-title" type="button" id="main-menu-title-{{ $menu->id }}">
-									<a href="{{{ $menu->url }}}" {if(!empty($menu->target))} target="{{ $menu->target }}" {/if}>
-										{if($menu->icon)}
-											{icon icon="{$menu->icon}" size="fw"}
-										{/if}
-										{{ $menu->label }}
-									</a>
-								</div>
-							</li>
-						{/if}
-					{/foreach}
-				</ul>
-			{/foreach}
+			<ul e-each="{$data : Object.keys(items), $item : 'section'}"
+				class="nav navbar-nav"
+				e-class="{'navbar-right' : $section === 'settings'}">
+
+				<li e-each="$root.items[$section]" id="main-menu-${id}" class="main-menu" e-class="{dropdown : visibleItems.length}">
+					<!-- Main menu with sub items -->
+					<div class="dropdown-toggle main-menu-title" type="button" id="main-menu-title-${id}" data-toggle="dropdown" e-if="visibleItems.length">
+						<i class="icon icon-${ icon } icon-fw" e-if="icon"></i> ${label} {icon icon="caret-down"}
+					</div>
+					<ul class="dropdown-menu" role="menu" id="main-menu-items-${id}" e-if="visibleItems.length">
+						<li e-each="visibleItems" role="presentation" class="main-menu-item" id="main-menu-item-${id}" data-item="${name}">
+							<a role="menuitem" e-attr="{href : url, target : target}">
+								<i class="icon icon-${ icon } icon-fw"></i> ${label}
+							</a>
+						</li>
+					</ul>
+
+					<!-- Main menus without sub items -->
+					<div class="main-menu-title" type="button" id="main-menu-title-${$menu.id}" e-unless="visibleItems.length">
+						<a e-attr="{href : url, target : target}">
+							<i class="icon icon-${ icon } icon-fw" e-if="icon"></i> ${label}
+						</a>
+					</div>
+				</li>
+			</ul>
 		</div>
 	</div>
 </nav>

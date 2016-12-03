@@ -18,7 +18,9 @@ window.appConf = {
 	user : {
 		logged : {{ App::session()->isLogged() ? 'true' : 'false' }},
 		canAccessApplication : {{ $accessible ? 'true' : 'false' }}
-	}
+	},
+
+	menu : {{ $mainMenu }}
 };
 
 (function(){
