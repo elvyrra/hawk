@@ -288,7 +288,7 @@ App::router()->prefix('/admin/', function () {
 
             // Display number of updates in menu
             if(App::session()->isAllowed('admin.all')) {
-                Event::on(\Hawk\Plugins\Main\MainMenuWidget::EVENT_AFTER_GET_MENUS, function (Event $event) {
+                Event::on(\Hawk\Plugins\Main\MainController::EVENT_AFTER_GET_MENUS, function (Event $event) {
                     SearchUpdatesWidget::getInstance()->display();
                 });
             }

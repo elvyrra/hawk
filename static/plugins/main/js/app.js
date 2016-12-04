@@ -163,6 +163,11 @@ define(
                         }
                     }
                 });
+                this.menu = new EMV({
+                    data : {
+                        items : window.appConf.menu
+                    }
+                });
             }
 
             /**
@@ -327,29 +332,28 @@ define(
                 /**
                  * Open the last tabs
                  */
-                let onload = null;
                 const hash = location.hash.replace(/^#\!/, '');
 
-                if (hash) {
-                    var index = this.conf.tabs.open.indexOf(hash);
+                this.openLastTabs(this.conf.tabs.open)
 
-                    if (index === -1) {
-                        if (this.conf.tabs.open.length === 1) {
-                            this.conf.tabs.open = [hash];
+                .done(() => {
+                    if (hash) {
+                        var index = this.conf.tabs.open.indexOf(hash);
+
+                        if (index === -1) {
+                            if (this.conf.tabs.open.length === 1) {
+                                this.conf.tabs.open = [hash];
+                            }
+                            else {
+                                this.conf.tabs.open.push(hash);
+                            }
                         }
-                        else {
-                            this.conf.tabs.open.push(hash);
-                        }
-                    }
 
-                    index = this.conf.tabs.open.indexOf(hash);
+                        index = this.conf.tabs.open.indexOf(hash);
 
-                    onload = function() {
                         this.tabset.activeTab = this.tabset.tabs[index];
-                    }.bind(this);
-                }
-
-                this.openLastTabs(this.conf.tabs.open, onload);
+                    }
+                });
             }
 
             /**
@@ -539,26 +543,21 @@ define(
              *
              * @param {Array} uris The uris to open, each one in a tab
              * @param {Function} onload The callback to execute when all the tabs are loaded
+             * @returns {Promise} A promise reslved when all te tabs are open
              */
-            openLastTabs(uris, onload) {
-                var loaded = 0;
+            openLastTabs(uris) {
+                // var loaded = 0;
 
-                uris.forEach((uri) => {
-                    this.load(uri, {
+                return $.when.apply(this, uris.map((uri) => {
+                    return this.load(uri, {
                         newtab : true
-                    })
-
-                    .then(() => {
-                        this.loading.start();
-                        loaded++;
-                        if (loaded === uris.length) {
-                            this.loading.stop();
-
-                            if (onload) {
-                                onload(uris);
-                            }
-                        }
                     });
+                }))
+
+                .done(() => {
+                    this.loading.stop();
+
+                    return uris;
                 });
             }
 
@@ -805,7 +804,7 @@ define(
              */
             refreshMenu() {
                 $.get(this.getUri('refresh-menu'), (response) => {
-                    $('#main-menu').replaceWith(response);
+                    this.menu.items = response;
 
                     this.notify('warning', Lang.get('main.main-menu-changed'));
                 });

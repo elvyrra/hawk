@@ -160,23 +160,9 @@ class MenuItem extends Model{
         );
 
         // Filter unavailable items (that are not active or not accessible)
-        $items = array_filter(
-            $items, function ($item) use ($user) {
-                $route = App::router()->getRouteByName($item->action);
-                if($item->actionParameters) {
-                    $data = json_decode($item->actionParameters, true);
-                    foreach($data as $key => $value) {
-                        $route->setData($key, $value);
-                    }
-                }
-
-                if($route) {
-                    return $route->isAccessible();
-                } else {
-                    return true;
-                }
-            }
-        );
+        $items = array_filter($items, function ($item) use ($user) {
+            return $item->isVisible($user);
+        });
 
         // Put the sub items under their parent item
         foreach($items as $item){
@@ -184,6 +170,11 @@ class MenuItem extends Model{
                 $items[$item->parentId]->visibleItems[$item->order] = $item;
                 unset($items[$item->id]);
             }
+        }
+
+        $items = array_values($items);
+        foreach($items as $item) {
+            $item->visibleItems = array_values($item->visibleItems);
         }
 
         return $items;
@@ -284,5 +275,29 @@ class MenuItem extends Model{
         // Send an event to compute actions on menu item deletion
         $event = new Event('menuitem.deleted', array('item' => $this));
         $event->trigger();
+    }
+
+    /**
+     * Check if a menu is accessible for a given user
+     * @param  User $user The user to check the menu is visible for
+     *
+     * @return boolean     True if the user can access the route defined by this menu, else False
+     */
+    public function isVisible($user) {
+        $route = App::router()->getRouteByName($this->action);
+
+        if($this->actionParameters) {
+            $data = json_decode($this->actionParameters, true);
+
+            foreach($data as $key => $value) {
+                $route->setData($key, $value);
+            }
+        }
+
+        if($route) {
+            return $route->isAccessible();
+        }
+
+        return true;
     }
 }

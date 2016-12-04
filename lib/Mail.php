@@ -69,6 +69,8 @@ class Mail{
 
         $this->map($param, $this->mailer);
 
+        $this->from(Option::get('main.mailer-from'), Option::get('main.mailer-from-name'));
+
         $this->mailer->CharSet = 'utf-8';
     }
 
@@ -120,7 +122,19 @@ class Mail{
      * @return Mail The instance itself, to permit chained actions
      */
     public function to($email, $name = '') {
-        $this->mailer->addAddress($email, $name);
+        if(is_array($email)) {
+            foreach($email as $key => $value) {
+                if(is_numeric($key)) {
+                    $this->to($value);
+                }
+                else {
+                    $this->to($key, $value);
+                }
+            }
+        }
+        else {
+            $this->mailer->addAddress($email, $name);
+        }
 
         return $this;
     }
@@ -134,7 +148,19 @@ class Mail{
      * @return Mail The instance itself, to permit chained actions
      */
     public function replyTo($email, $name = '') {
-        $this->mailer->addReplyTo($email, $name);
+        if(is_array($email)) {
+            foreach($email as $key => $value) {
+                if(is_numeric($key)) {
+                    $this->replyTo($value);
+                }
+                else {
+                    $this->replyTo($key, $value);
+                }
+            }
+        }
+        else {
+            $this->mailer->addReplyTo($email, $name);
+        }
 
         return $this;
     }
@@ -148,7 +174,19 @@ class Mail{
      * @return Mail The instance itself, to permit chained actions
      */
     public function cc($email, $name = '') {
-        $this->mailer->addCC($email, $name);
+        if(is_array($email)) {
+            foreach($email as $key => $value) {
+                if(is_numeric($key)) {
+                    $this->cc($value);
+                }
+                else {
+                    $this->cc($key, $value);
+                }
+            }
+        }
+        else {
+            $this->mailer->addCC($email, $name);
+        }
 
         return $this;
     }
@@ -162,7 +200,19 @@ class Mail{
      * @return Mail The instance itself, to permit chained actions
      */
     public function bcc($email, $name){
-        $this->mailer->addBCC($email, $name);
+        if(is_array($email)) {
+            foreach($email as $key => $value) {
+                if(is_numeric($key)) {
+                    $this->bcc($value);
+                }
+                else {
+                    $this->bcc($key, $value);
+                }
+            }
+        }
+        else {
+            $this->mailer->addBCC($email, $name);
+        }
 
         return $this;
     }

@@ -12,7 +12,8 @@ namespace Hawk\Plugins\Main;
  *
  * @package Plugins\Main
  */
-class MainController extends Controller{
+class MainController extends Controller {
+    const EVENT_AFTER_GET_MENUS = 'menu.after-get-items';
 
     /**
      * Display a while HTML page
@@ -44,7 +45,7 @@ class MainController extends Controller{
             'description' => $description,
             'keywords' => $keywords,
             'body' => $body,
-            'favicon' => $this->getFaviconUrl(),
+            'favicon' => $this->getFaviconUrl()
         ));
     }
 
@@ -62,7 +63,10 @@ class MainController extends Controller{
 
         $body = View::make(Theme::getSelected()->getView('body.tpl'), array(
             'canAccessApplication' => $canAccessApplication,
-            'content' => $content
+            'content' => $content,
+            'appLogo' => Option::get('main.logo') ?
+                $this->getPlugin()->getUserfilesUrl(Option::get('main.logo')) :
+                $this->getPlugin()->getStaticUrl('img/hawk-logo.png')
         ));
 
         if(!$title) {
@@ -177,10 +181,53 @@ class MainController extends Controller{
 
 
     /**
-     * Refresh The main menu
+     * Get the main menu items
+     * @return array The main menu items
      */
-    public function refreshMenu(){
-        return MainMenuWidget::getInstance()->display();
+    public function getMainMenu() {
+        $user = App::session()->getUser();
+
+        $menus = array(
+            'applications' => array(),
+            'settings' => array()
+        );
+
+        // Get the menus
+        $items = MenuItem::getAvailableItems($user);
+
+        // Filter the menus that have no action and no item
+        $items = array_filter($items, function ($item) {
+            return $item->action || count($item->visibleItems) > 0;
+        });
+
+        foreach($items as $id => $item) {
+            if($item->labelKey === 'user.username') {
+                $item->label = $user->getUsername();
+            }
+
+            if(in_array($item->plugin, PLugin::$mainPlugins)) {
+                $menus['settings'][] = $item;
+            }
+            else{
+                $menus['applications'][] = $item;
+            }
+        }
+
+        // Trigger an event to add or remove menus from plugins
+        $event = new Event(self::EVENT_AFTER_GET_MENUS, array(
+            'menus' => $menus
+        ));
+
+        $event->trigger();
+        $menus = $event->getData('menus');
+
+        App::response()->setContentType('json');
+
+        return $menus;
+        return View::make(Theme::getSelected()->getView('main-menu.tpl'), array(
+            'menus' => $menus,
+            'logo' => Option::get('main.logo') ? Plugin::current()->getUserfilesUrl(Option::get('main.logo')) : ''
+        ));
     }
 
 
@@ -216,6 +263,8 @@ class MainController extends Controller{
         if(App::session()->isLogged() && Option::get($this->_plugin . '.open-last-tabs') && App::request()->getCookies('open-tabs')) {
             // Open the last tabs the users opened before logout
             $pages = json_decode(App::request()->getCookies('open-tabs'), true);
+
+            $pages = array_values(array_filter($pages));
         }
 
         if(empty($pages)) {
@@ -237,6 +286,8 @@ class MainController extends Controller{
             $newTabUrl = App::router()->getUri(Option::get('main.home-page-item'));
         }
 
+        $mainMenu = $this->getMainMenu();
+
         App::response()->setContentType('javascript');
 
         return View::make(Plugin::current()->getView('conf.js.tpl'), array(
@@ -247,7 +298,8 @@ class MainController extends Controller{
             'less' => array(
                 'initVars' => json_encode($initVariables, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRETTY_PRINT),
             ),
-            'newTabUrl' => $newTabUrl
+            'newTabUrl' => $newTabUrl,
+            'mainMenu' => json_encode($mainMenu, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRETTY_PRINT)
         ));
     }
 

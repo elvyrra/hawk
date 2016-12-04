@@ -1,5 +1,7 @@
 RewriteEngine on
 
+RewriteRule "^/?static/(themes|plugins)/([^/]+)/([0-9\.]+)/(.*)$" "/static/$1/$2/$4" [PT]
+
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.*)$ index.php [L]
 

@@ -319,10 +319,11 @@ class AdminController extends Controller{
                 '_submits' => array(
                     empty($updates) ?
                         new HtmlInput(array(
-                            'value' => Lang::get('admin.hawk-version-up-to-date', array(
-                                'version' => HAWK_VERSION
-                            )),
-                            'blockClass' => 'btn-success'
+                            'value' => '<span class="btn btn-success">' .
+                                Lang::get('admin.hawk-version-up-to-date', array(
+                                    'version' => HAWK_VERSION
+                                )) .
+                                '</span>'
                         ))
 
                         : new ButtonInput(array(

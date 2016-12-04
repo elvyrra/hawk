@@ -319,6 +319,10 @@ class User extends Model{
      * @return boolean TRUE if the user is allowed to perform the action, else FALSE
      */
     public function isAllowed($action){
+        if(!$this->active) {
+            return false;
+        }
+
         if($this->roleId == Role::ADMIN_ROLE_ID) {
             // The admins can perform any action
             return true;

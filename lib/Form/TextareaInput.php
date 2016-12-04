@@ -21,7 +21,7 @@ class TextareaInput extends FormInput{
      *
      * @var int
      */
-    public     $rows = 15, 
+    public $rows = 5,
 
     /**
      * The attribute 'cols'

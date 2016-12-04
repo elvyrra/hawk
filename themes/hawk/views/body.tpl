@@ -1,4 +1,4 @@
-{widget plugin="main" class="MainMenuWidget"}
+{import file="main-menu.tpl"}
 <script type="text/javascript" src="{{ Theme::getSelected()->getFileUrl('js/theme-hawk.js') }}"></script>
 
 {if(empty($content))}
@@ -61,15 +61,17 @@
 	{text key="main.hawk-powered"}
 	{if(DEV_MODE)}
 		<a href="{uri action='clear-cache'}" class="real-link pull-right" title="{text key="main.clear-cache"}">
-			{icon icon="calendat-times-o" size="lg" class="clear-cache-btn"}
+			{icon icon="calendar-times-o" size="lg" class="clear-cache-btn"}
 		</a>
 	{/if}
 </div>
 
 
 <div id='loading' e-show="display">
-	{icon icon="spinner" size="5x" class="center icon-spin"}
-	<div id="loading-bar" e-class="{processing: processing}">
-		<span id='loading-purcentage' e-style="{ width: purcentage + '%'}"></span>
+	<div class="center text-center">
+		{icon icon="spinner" size="5x" class="icon-spin"}
+		<div id="loading-bar" e-class="{progressing: progressing}">
+			<span id='loading-purcentage' e-style="{ width: purcentage + '%'}"></span>
+		</div>
 	</div>
 </div>

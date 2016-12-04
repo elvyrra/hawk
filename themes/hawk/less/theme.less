@@ -1142,29 +1142,32 @@ a, a:active, a:hover, a:visited, a:focus{
     padding: 25% 50%;
     background: rgba(128,128,128,0.5);
     color: white;
-}
 
-#loading-bar{
-    width: 20rem;
-    margin-left: -10rem;
-    height: .5rem;
-    display: block;
-    background: darken(@body-bg, 6.5%);
-    border-radius: .5rem;
-
-    &:not(.progressing){
+    #loading-bar{
+        width: 20rem;
+        height: .5rem;
+        display: block;
+        background: darken(@body-bg, 6.5%);
+        border-radius: .5rem;
         display:none;
+        margin-top: 1rem;
+
+        &.progressing {
+            display: block;
+        }
+
+        #loading-purcentage{
+            width: 0%;
+            background: @brand-success;
+            height: 100%;
+            display: block;
+            border-radius: 5px;
+            transition: width .2s;
+        }
     }
+
 }
 
-#loading-purcentage{
-    width: 0%;
-    background: @brand-success;
-    height: 100%;
-    display: block;
-    border-radius: 5px;
-    transition: width .2s;
-}
 
 
 /*----------------------- Icons -----------------------------*/

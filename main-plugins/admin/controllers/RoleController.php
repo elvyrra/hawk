@@ -29,6 +29,7 @@ class RoleController extends Controller{
             'id' => 'roles-list',
             'action' => App::router()->getUri('list-roles'),
             'model' => 'Role',
+            'navigation' => false,
             'controls' => array(
                 array(
                     'icon' => 'plus',
@@ -99,11 +100,15 @@ class RoleController extends Controller{
                     'label' => Lang::get('roles.list-default-label'),
                     'display' => function ($value,$field, $line) use ($defaultRole) {
                         if($line->id != 0) {
-                            return "<input type='checkbox'
-                                            class='set-default-role'
-                                            value='{$line->id}' " .
-                                            ($defaultRole == $line->id ? "checked disabled" : "") .
-                                    " />";
+                            $checkbox = new CheckboxInput(array(
+                                'class' => 'set-default-role',
+                                'value' => $defaultRole == $line->id,
+                                'disabled' => $defaultRole == $line->id,
+                                'attributes' => array(
+                                    'value' => $line->id
+                                )
+                            ));
+                            return $checkbox->display();
                         }
                     },
                     'search' => false,
