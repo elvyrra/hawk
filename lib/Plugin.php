@@ -502,8 +502,9 @@ class Plugin{
         if(empty($basename)) {
             return $this->getStaticUrl() . 'js/';
         }
-        else{
-            return $this->getStaticUrl('js/' . $basename);
+        else {
+            // The characater '?' at the end is added as a work around for require
+            return $this->getStaticUrl('js/' . $basename) . '?';
         }
     }
 
