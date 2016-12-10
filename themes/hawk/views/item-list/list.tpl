@@ -19,7 +19,7 @@
     <!-- THE CONTENT OF THE LIST RESULTS -->
     <tbody e-html="htmlResult">
         <tr>
-            <td colspan="500">{icon icon="spin" class="icon-spinner center" size="2x"}</td>
+            <td colspan="500" class="loading">{icon icon="spin" class="icon-spinner center" size="2x"}</td>
         </tr>
     </tbody>
 </table>

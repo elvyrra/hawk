@@ -48,7 +48,7 @@ class Option{
      * @return array All the options of the plugin with their values
      */
     public static function getPluginOptions($plugin){
-        if(!App::conf()->has('db')) {
+        if(!App::isInstalled()) {
             return array();
         }
 

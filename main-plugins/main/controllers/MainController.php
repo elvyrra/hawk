@@ -185,6 +185,10 @@ class MainController extends Controller {
      * @return array The main menu items
      */
     public function getMainMenu() {
+        if(!App::isInstalled()) {
+            return array();
+        }
+
         $user = App::session()->getUser();
 
         $menus = array(
@@ -285,6 +289,7 @@ class MainController extends Controller {
         if(Option::get('main.home-page-type') == 'page') {
             $newTabUrl = App::router()->getUri(Option::get('main.home-page-item'));
         }
+
 
         $mainMenu = $this->getMainMenu();
 

@@ -54,6 +54,13 @@ final class App extends Singleton{
         $this->singleton('cache', Cache::getInstance());
     }
 
+    /**
+     * Check id the application is installed
+     */
+    public static function isInstalled() {
+        return self::conf()->has('db');
+    }
+
 
     /**
      * Create an application singleton

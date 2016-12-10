@@ -30,13 +30,13 @@ class InstallController extends Controller{
                             'fr' => 'Français'
                         ),
                         'default' => LANGUAGE,
-                        'label' => Lang::get('install.set-language-label')
+                        'label' => Lang::get($this->_plugin . '.set-language-label')
                     )),
                 ),
                 '_submits' => array(
                     new SubmitInput(array(
                         'name' => 'valid',
-                        'value' => Lang::get('install.continue-button'),
+                        'value' => Lang::get($this->_plugin . '.continue-button'),
                         'icon' => 'chevron-circle-right',
                         'nl' => true
                     ))

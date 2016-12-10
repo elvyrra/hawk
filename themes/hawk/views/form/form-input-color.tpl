@@ -3,11 +3,11 @@
 	<span class="input-group-addon"><i></i></span>
 </div>
 <script type="text/javascript">
-    require(['app'], function(){
-        $(".{{$input->id}}").colorpicker()
+    require(['jquery'], function($) {
+        $('.{{$input->id}}').colorpicker()
 
-        .on('hidePicker.colorpicker', function(event){
-            $("#{{ $input->id }}").trigger('change');
+        .on('hidePicker.colorpicker', function() {
+            $('#{{ $input->id }}').trigger('change');
         });
     });
 </script>

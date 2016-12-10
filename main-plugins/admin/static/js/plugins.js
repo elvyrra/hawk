@@ -24,7 +24,7 @@ require(['app', 'jquery', 'lang', 'emv'], function(app, $, Lang, EMV) {
                 }
             });
 
-            app.tabset.activeTab.reload();
+            app.lists['available-plugins-list'].refresh();
         })
 
         .fail(function(xhr) {

@@ -191,7 +191,7 @@ define(
                 $('body').on(
                     'click',
                     linkSelector,
-                    function(event) {
+                    (event) => {
                         var node = $(event.currentTarget);
                         var url  = $(node).attr('href') || $(node).data('href');
 
@@ -235,7 +235,7 @@ define(
                                 this.load(url, {selector : target});
                                 break;
                         }
-                    }.bind(this)
+                    }
                 )
 
                 // Open a link in a new tab of the application
@@ -244,7 +244,7 @@ define(
                         if (!$(this).attr('target')) {
                             event.type = 'click';
 
-                            var clickEvent   = new Event('click', event);
+                            var clickEvent = new Event('click', event);
 
                             clickEvent.which = 2;
                             $(this).get(0).dispatchEvent(clickEvent);
@@ -265,7 +265,7 @@ define(
                  *
                  * @param {Event} event The popstate event
                  */
-                window.onpopstate = function(event) {
+                window.onpopstate = (event) => {
                     event.preventDefault();
                     if (this.tabset.activeTab) {
                         var history = this.tabset.activeTab.history;
@@ -291,7 +291,7 @@ define(
                             window.history.replaceState({}, '', '#!' + history[history.length - 1]);
                         }
                     }
-                }.bind(this);
+                };
 
                 // trigger the application is ready
                 var evt = document.createEvent('Event');
