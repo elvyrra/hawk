@@ -33,14 +33,16 @@ class FileInput extends FormInput{
      */
     public $extensions = array();
 
-
     /**
      * Display the file input
      *
      * @return string The displayed HTML
      */
-    public function display(){
+    public function display() {
         $this->value = '';
+
+        $this->attributes['e-value'] = 'value';
+
 
         return parent::display();
     }

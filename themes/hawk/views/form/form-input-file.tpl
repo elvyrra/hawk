@@ -9,6 +9,6 @@
             value : ''
         });
 
-        model.$apply($('[id="{{ $input->id }}"]').get(0));
+        model.$apply($('[id="{{ $input->id }}"]').parent().get(0));
     });
 </script>
