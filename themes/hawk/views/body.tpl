@@ -46,7 +46,7 @@
 	{{ $content }}
 {/if}
 
-<div class="modal fade" id="dialogbox" e-with="dialogbox" e-class="{in : display}">
+<div class="modal fade" id="dialogbox" e-with="dialogbox" e-class="{in : display}" e-style="{display : display ? 'block' : undefined}">
 	<div class="modal-backdrop fade" e-class="{in : display}" e-click="display = false"></div>
 	<div class="modal-dialog center" e-style="{width : width, height : height}">
 		<div class="modal-content">
