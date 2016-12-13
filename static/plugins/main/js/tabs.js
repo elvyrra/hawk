@@ -108,10 +108,10 @@ define('tabs', ['jquery', 'emv'], function($, EMV) {
 
         /**
          * Add a new tab to the tabset
-         * @param  {Pbject} data The tab init values
+         * @param  {Object} data The tab init values
          */
         push(data) {
-            const tab = new Tab(this.constructor.index++, data);
+            const tab = new Tab(this.constructor.index++, data || {});
 
             this.tabs.push(tab);
 

@@ -85,6 +85,7 @@ class QuestionController extends Controller{
         $paramList = array(
             'id' => 'profile-questions-list',
             'model' => 'ProfileQuestion',
+            'action' => App::router()->getUri('profile-questions'),
             'lines' => 'all',
             'navigation' => false,
             'sort' => array('order' => DB::SORT_ASC),
@@ -167,6 +168,10 @@ class QuestionController extends Controller{
         $list = new ItemList($paramList);
 
         if(!$form->submitted()) {
+            if($list->isRefreshing()) {
+                return $list->display();
+            }
+
             $this->addKeysToJavaScript($this->_plugin . ".confirm-delete-question");
             $content = View::make(Plugin::current()->getView("questions-list.tpl"), array(
                 'list' => $list,
@@ -175,62 +180,55 @@ class QuestionController extends Controller{
 
             return $form->wrap($content);
         }
-        else{
-            try{
 
-                // Extract from form, all infos abour roles associate to ProfileQuestion
-                $listRoles = array();
-                $roles = Role::getAll('name');
-                $save = array();
+        // Extract from form, all infos abour roles associate to ProfileQuestion
+        $listRoles = array();
+        $roles = Role::getAll('name');
+        $save = array();
 
-                foreach($form->inputs as $name => $field){
-                    // Manage displayInRegister and displayInProfile
-                    if(preg_match("/^(register|profile)\-display\-(\w+)$/", $name, $match)) {
-                        $qname = $match[2];
-                        $func = $match[1] == "register" ? 'displayInRegister' : 'displayInProfile';
-                        if(!isset($save[$qname])) {
-                            $save[$qname] = new ProfileQuestion();
-                            $save[$qname]->set('name', $qname);
-                        }
-                        $save[$qname]->set($func, (int) App::request()->getBody($name));
-                    }
-                    // Manage roles
-                    else if(preg_match("/^role\-(\w+)\-question\-(\w+)$/", $name, $match)) {
-                        $qname = $match[2];
-                        $roleName = $match[1];
-
-                        // If tab doesn't exit create it to avoid exception
-                        if(!isset($listRoles[$qname]))
-                            $listRoles[$qname] = array();
-
-                        $role = $roles[$roleName];
-
-                        // If checkbox is tag, add roleId
-                        if($field->dbvalue())
-                            array_push($listRoles[$qname], intval($role->id));
-                    }
+        foreach($form->inputs as $name => $field){
+            // Manage displayInRegister and displayInProfile
+            if(preg_match("/^(register|profile)\-display\-(\w+)$/", $name, $match)) {
+                $qname = $match[2];
+                $func = $match[1] == "register" ? 'displayInRegister' : 'displayInProfile';
+                if(!isset($save[$qname])) {
+                    $save[$qname] = new ProfileQuestion();
+                    $save[$qname]->set('name', $qname);
                 }
-
-                foreach($save as $question){
-                    $question->update();
-                }
-
-                // Save each ProfileQuestions
-                foreach($questions as $question){
-                    $params = json_decode($question->parameters, true);
-
-                    $params['roles'] = $listRoles[$question->name];
-
-                    $question->set('parameters', json_encode($params));
-                    $question->update();
-                }
-
-                return $form->response(Form::STATUS_SUCCESS);
+                $save[$qname]->set($func, (int) App::request()->getBody($name));
             }
-            catch(Exception $e){
-                return $form->response(Form::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : '');
+            // Manage roles
+            else if(preg_match("/^role\-(\w+)\-question\-(\w+)$/", $name, $match)) {
+                $qname = $match[2];
+                $roleName = $match[1];
+
+                // If tab doesn't exit create it to avoid exception
+                if(!isset($listRoles[$qname]))
+                    $listRoles[$qname] = array();
+
+                $role = $roles[$roleName];
+
+                // If checkbox is tag, add roleId
+                if($field->dbvalue())
+                    array_push($listRoles[$qname], intval($role->id));
             }
         }
+
+        foreach($save as $question){
+            $question->update();
+        }
+
+        // Save each ProfileQuestions
+        foreach($questions as $question){
+            $params = json_decode($question->parameters, true);
+
+            $params['roles'] = $listRoles[$question->name];
+
+            $question->set('parameters', json_encode($params));
+            $question->update();
+        }
+
+        return $form->response(Form::STATUS_SUCCESS);
     }
 
     /**

@@ -92,87 +92,94 @@ require(['app', 'jquery', 'emv', 'lang'], function(app, $, EMV, Lang) {
     /**
      * Customize the theme variables
      */
-    setTimeout(function() {
-        require(['less'], function() {
-            var form = app.forms['custom-theme-form'];
+    require(['less'], function() {
+        var form = app.forms['custom-theme-form'];
 
-            // The id of the style tag containing the compiled CSS
-            var cssId = 'less:custom-base-theme';
+        // The id of the style tag containing the compiled CSS
+        var cssId = 'less:custom-base-theme';
 
+        /**
+         * When the form has been successfully submitted, reload the page CSS
+         *
+         * @param {Object} data The data responded by the server
+         */
+        form.onsuccess = function(data) {
+            $('#theme-base-stylesheet').attr('href', data.href);
+        };
+
+        /**
+         * Manager class for theme basic customization
+         */
+        class CustomizationManager extends EMV {
             /**
-             * When the form has been successfully submitted, reload the page CSS
-             *
-             * @param {Object} data The data responded by the server
+             * Constructor
              */
-            form.onsuccess = function(data) {
-                $('#theme-base-stylesheet').attr('href', data.href);
-            };
+            constructor() {
+                const vars = {};
 
-            var model = new EMV({
-                data : {
-                    vars : {},
-                    /**
-                     * Reset the custom form
-                     */
-                    reset : function() {
-                        Object.keys(this.vars).forEach((key) => {
-                            this.vars[key] = window.less.options.initVars[key];
-                        });
-                    },
+                Object.keys(form.inputs).forEach((key) => {
+                    if(key !== 'compiled') {
+                        const input = form.inputs[key];
 
-                    /**
-                     * Refresh the CSS when a form value changes
-                     * @returns {Promise} Resolved if the action is succeed
-                     */
-                    refresh : function() {
-                        const values = form.valueOf();
+                        vars[key] = input.val();
+                    }
+                });
 
-                        delete values.compiled;
-                        delete values.reset;
-                        delete values.valid;
-
-                        return window.less.modifyVars(values);
-                    },
-
+                super({
+                    vars : vars,
                     updateTimeout : 0
-                }
-            });
+                });
 
-            // Add the theme less file to lessjs
-            setTimeout(function() {
-                window.less.registerStylesheets();
-
-                model.refresh();
-            });
-
-
-            for(var i in form.inputs) {
-                if(i !== 'compiled') {
-                    var input = form.inputs[i];
-
-                    model.vars[input.name] = input.val();
-
-                    // Update a theme variable
-                    model.vars.$watch(input.name, function(value) {
-                        clearTimeout(model.updateTimeout);
+                Object.keys(this.vars).forEach((key) => {
+                    this.vars.$watch(key, (value) => {
+                        clearTimeout(this.updateTimeout);
 
                         // Real time compilation of the theme
-                        model.updateTimeout = setTimeout(function() {
-                            model.refresh()
-                            .then(function() {
+                        this.updateTimeout = setTimeout(() => {
+                            this.refresh()
+
+                            .then(() => {
                                 form.inputs.compiled.val(document.getElementById(cssId).innerText);
                             });
                         }, 50);
 
-                        if(this.type === 'color') {
-                            this.node().parent().colorpicker('setValue', value);
+                        const input = form.inputs[key];
+
+                        if(input.type === 'color') {
+                            input.node().parent().colorpicker('setValue', value);
                         }
-                    }.bind(input));
-                }
+                    });
+                });
             }
 
-            model.$apply(form.node.get(0));
+            /**
+             * Reset the custom form
+             */
+            reset() {
+                Object.keys(this.vars).forEach((key) => {
+                    this.vars[key] = window.less.options.initVars[key];
+                });
+            }
+
+            /**
+             * Refresh the CSS when a form value changes
+             * @returns {Promise} Resolved if the action is succeed
+             */
+            refresh() {
+                return window.less.modifyVars(this.vars.valueOf());
+            }
+        }
+
+        var model = new CustomizationManager();
+
+        // Add the theme less file to lessjs
+        setTimeout(function() {
+            window.less.registerStylesheets();
+
+            model.refresh();
         });
+
+        model.$apply(form.node.get(0));
     });
 
     /***

@@ -20,6 +20,17 @@ define('list', ['jquery', 'emv'], function($, EMV) {
             // Get the list display parameters (number of lines, page number, searches and sorts)
             var param = data.userParam || {};
 
+            const fields = {};
+
+            data.fields.forEach((field) => {
+                fields[field] = {
+                    name : field,
+                    search : (param.searches || {})[field],
+                    sort : (param.sorts || {})[field]
+                };
+            });
+
+
             super({
                 data : {
                     id  : data.id,
@@ -31,7 +42,7 @@ define('list', ['jquery', 'emv'], function($, EMV) {
                     sorts : param.sorts || {},
                     page : param.page || List.DEFAULT_PAGE_NUMBER,
                     lines : param.lines || List.DEFAULT_LINES_NUMBER,
-                    fields : {},
+                    fields : fields,
                     selection : {
                         $all : false,
                         $none : true
@@ -46,15 +57,6 @@ define('list', ['jquery', 'emv'], function($, EMV) {
                 }
             });
 
-
-
-            data.fields.forEach((field) => {
-                this.fields[field] = {
-                    name : field,
-                    search : this.searches[field],
-                    sort : this.sorts[field]
-                };
-            });
 
             /**
              * Change the number of lines per page

@@ -1,0 +1,198 @@
+#main-menu, #footer{
+    width: 100%;
+    border: none;
+    background: @header-bg;
+    color: @header-color;
+}
+
+@main-menu-height: 3rem;
+#main-menu{
+    min-height: @main-menu-height;
+    margin-bottom: .5rem;
+    border-radius: 0;
+
+    .navbar-header{
+        color: white;
+        position: relative;
+        min-height: @main-menu-height;
+
+        .app-title{
+            font-size: 1.5rem;
+            width: 100%;
+            margin: 0;
+        }
+    }
+
+    .application-logo{
+        max-width: @main-menu-height;
+        max-height:@main-menu-height;
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+    }
+
+    .main-menu{
+        background: none;
+        height: @main-menu-height;
+        line-height: @main-menu-height;
+        padding: 0 .5rem;
+        vertical-align: middle;
+        cursor: pointer;
+
+        &:hover{
+            background-color: darken(@header-bg, 10%);
+            color: lighten(@header-color, 10%);
+        }
+
+        a {
+            display: block;
+        }
+    }
+
+    @media (max-width: @screen-xs-max) {
+        .main-menu{
+            height: auto;
+        }
+
+        #main-menu-collapse{
+            position: absolute;
+            background: @header-bg;
+            color: #d6d6d6;
+            z-index: 1000;
+            min-width: 50%;
+        }
+
+        .application-logo{
+            float: left;
+
+            .vertical-center();
+        }
+    }
+
+    @media(min-width: @screen-sm-min){
+        #main-menu-collapse{
+            padding-left: 3.5rem;
+        }
+    }
+
+    .dropdown-menu li i.icon{
+        width: 2rem;
+    }
+
+    .dropdown-menu{
+        background: @sub-header-bg;
+    }
+}
+
+
+
+
+#footer{
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    height: 2rem;
+    text-align: center;
+
+    .clear-cache-btn{
+        cursor: pointer;
+        margin-right: 1rem;
+    }
+}
+
+/*-------------------- Main Tab System ---------------------*/
+#main-content{
+    position: relative;
+    width: 100%;
+    height: calc(~"100% - " 2 * @main-menu-height);
+}
+
+#main-nav-tabs{
+    height: 2rem;
+    width: 100%;
+
+    .main-tab-title{
+        border: 1px solid darken(@body-bg, 13.5%);
+        border-bottom: none;
+        background: darken(@body-bg, 6.5%);
+        height: 2rem;
+        margin-right: .2rem;
+        max-width: 20rem;
+
+        &.active{
+            background: @body-bg;
+            color: black;
+        }
+
+        & > a{
+            padding: 0 1rem;
+            display: inline-block;
+            border: none;
+            background: none;
+            width: calc(~"100% - 2.5rem");
+            .text-overflow();
+            height: 100%;
+
+            & > .icon {
+                margin-right: .5rem;
+            }
+
+            & > .main-tab-favicon {
+                height: 1.6rem;
+                width: 1.6rem;
+                margin-right: .5rem;
+                vertical-align: top;
+                margin-top: .1rem;
+            }
+        }
+
+        .main-tab-close{
+            padding: 0;
+            padding-left: .8rem;
+            height: 100%;
+            width: 2rem;
+        }
+    }
+
+    .add-tab-button{
+        padding: .1rem .5rem 0 .5rem;
+        border: 1px solid darken(@body-bg, 13.5%);
+        margin-left: .3rem;
+        width: 2.2rem;
+    }
+}
+
+
+#main-tab-content{
+    height: calc(~"100% - 2rem");
+    width: 100%;
+
+    .main-tab-pane{
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+    }
+}
+
+.tab-pane{
+    padding: 1rem;
+}
+
+
+
+/*--------------------- Tabs content --------------------*/
+.main-tab-pane {
+    .page-title{
+        color: @brand-primary;
+        text-align: center;
+        margin: .5rem 0;
+    }
+
+    .left-sidebar-tab, .right-sidebar-tab, .no-sidebar-tab{
+        height: 100%;
+
+        .tab-body {
+            height: calc(~"100% - 3rem");
+        }
+    }
+}

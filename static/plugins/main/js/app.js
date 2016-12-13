@@ -14,7 +14,7 @@ require.config(
         baseUrl :  typeof baseUrl === 'undefined' ? './' : baseUrl,
 
         paths : {
-            jquery      : 'ext/jquery-2.1.3.min',
+            jquery      : 'ext/jquery-last.min',
             cookie      : 'ext/jquery.cookie',
             mask        : 'ext/jquery.mask.min',
             sortable    : 'ext/jquery-sortable',
@@ -110,11 +110,99 @@ define(
         /**
          * This class describes the behavior of the application
          */
-        class App {
+        class App extends EMV {
             /**
              * Constructor
              */
             constructor() {
+                super({
+                    data : {
+                        notification : {
+                            display : false,
+                            level : undefined,
+                            message : ''
+                        },
+
+                        menu : {
+                            items : window.appConf.menu
+                        },
+                        tabset : new Tabset(),
+                        loading : {
+                            display : false,
+                            progressing : false,
+                            purcentage : 0,
+
+
+                            /**
+                             * Display loading
+                             */
+                            start : function() {
+                                this.display = true;
+                            },
+
+                            /**
+                             * Show loading progression
+                             *
+                             * @param {Float} purcentage The advancement purcentage on the progress bar
+                             */
+                            progress : function(purcentage) {
+                                this.purcentage = purcentage;
+                                this.progressing = Boolean(purcentage);
+                            },
+
+                            /**
+                             * Hide loading
+                             */
+                            stop : function() {
+                                this.display = false;
+                                this.progress(0);
+                            }
+                        },
+                        dialogbox : new EMV({
+                            data : {
+                                display : false,
+                                content : '',
+                                width : '',
+                                height : ''
+                            },
+                            computed : {
+                                title : function() {
+                                    return $('.page-name', this.content).first().val() || '';
+                                },
+                                width : function() {
+                                    return $('.page-width', this.content).first().val() || '';
+                                },
+                                height : function() {
+                                    return $('.page-height', this.content).first().val() || '';
+                                },
+                                icon : function() {
+                                    const value = $('.page-icon', this.content).first().val() || null;
+
+                                    try {
+                                        const url = new URL(value);
+
+                                        return url && null;
+                                    }
+                                    catch(err) {
+                                        return value;
+                                    }
+                                },
+                                favicon : function() {
+                                    const value = $('.page-icon', this.content).first().val() || null;
+
+                                    try {
+                                        const url = new URL(value);
+
+                                        return url ? value : null;
+                                    }
+                                    catch(err) {
+                                        return null;
+                                    }
+                                }
+                            }
+                        })
+                    }
+                });
                 this.conf = window.appConf;
                 this.language = '';
                 this.rootUrl = '';
@@ -122,52 +210,6 @@ define(
                 this.routes = [];
                 this.forms = {};
                 this.lists = {};
-                this.notification = new EMV({
-                    data : {
-                        display : false,
-                        level : undefined,
-                        message : ''
-                    }
-                });
-                this.tabset = new Tabset();
-                this.loading = new EMV({
-                    data : {
-                        display : false,
-                        progressing : false,
-                        purcentage : 0,
-
-
-                        /**
-                         * Display loading
-                         */
-                        start : function() {
-                            this.display = true;
-                        },
-
-                        /**
-                         * Show loading progression
-                         *
-                         * @param {Float} purcentage The advancement purcentage on the progress bar
-                         */
-                        progress : function(purcentage) {
-                            this.purcentage = purcentage;
-                            this.progressing = Boolean(purcentage);
-                        },
-
-                        /**
-                         * Hide loading
-                         */
-                        stop : function() {
-                            this.display = false;
-                            this.progress(0);
-                        }
-                    }
-                });
-                this.menu = new EMV({
-                    data : {
-                        items : window.appConf.menu
-                    }
-                });
             }
 
             /**
@@ -188,55 +230,51 @@ define(
                 var linkSelector =  '[href]:not([href^="#"]):not([href^="javascript:"]),' +
                                     '[data-href]:not([data-href^="#"]):not([data-href^="javascript:"])';
 
-                $('body').on(
-                    'click',
-                    linkSelector,
-                    function(event) {
-                        var node = $(event.currentTarget);
-                        var url  = $(node).attr('href') || $(node).data('href');
+                $('body').on('click', linkSelector, (event) => {
+                    var node = $(event.currentTarget);
+                    var url  = $(node).attr('href') || $(node).data('href');
 
-                        event.preventDefault();
-                        var data = {},
-                            target = $(node).attr('target') || $(node).data('target');
+                    event.preventDefault();
+                    var data = {},
+                        target = $(node).attr('target') || $(node).data('target');
 
-                        if ((event.which === 2 || !this.tabset.tabs.length) && !target) {
-                            target = 'newtab';
-                        }
+                    if ((event.which === 2 || !this.tabset.tabs.length) && !target) {
+                        target = 'newtab';
+                    }
 
-                        switch (target) {
-                            case 'newtab' :
-                                // Load the page in a new tab of the application
-                                data = {newtab : true};
-                                this.load(url, data);
-                                break;
+                    switch (target) {
+                        case 'newtab' :
+                            // Load the page in a new tab of the application
+                            data = {newtab : true};
+                            this.load(url, data);
+                            break;
 
-                            case 'dialog' :
-                                this.dialog(url);
-                                break;
+                        case 'dialog' :
+                            this.dialog(url);
+                            break;
 
-                            case '_blank' :
-                                // Load the whole page in a new browser tab
-                                window.open(url);
-                                break;
+                        case '_blank' :
+                            // Load the whole page in a new browser tab
+                            window.open(url);
+                            break;
 
-                            case undefined :
-                            case '' :
-                                // Open the url in the current application tab
-                                this.load(url);
-                                break;
+                        case undefined :
+                        case '' :
+                            // Open the url in the current application tab
+                            this.load(url);
+                            break;
 
-                            case 'window' :
-                                // Open the URL in the current web page
-                                location.href = url;
-                                break;
+                        case 'window' :
+                            // Open the URL in the current web page
+                            location.href = url;
+                            break;
 
-                            default :
-                                // Open the url in a given DOM node, represented by it CSS selector
-                                this.load(url, {selector : target});
-                                break;
-                        }
-                    }.bind(this)
-                )
+                        default :
+                            // Open the url in a given DOM node, represented by it CSS selector
+                            this.load(url, {selector : target});
+                            break;
+                    }
+                })
 
                 // Open a link in a new tab of the application
                 .on('mousedown', linkSelector, function(event) {
@@ -244,7 +282,7 @@ define(
                         if (!$(this).attr('target')) {
                             event.type = 'click';
 
-                            var clickEvent   = new Event('click', event);
+                            var clickEvent = new Event('click', event);
 
                             clickEvent.which = 2;
                             $(this).get(0).dispatchEvent(clickEvent);
@@ -265,7 +303,7 @@ define(
                  *
                  * @param {Event} event The popstate event
                  */
-                window.onpopstate = function(event) {
+                window.onpopstate = (event) => {
                     event.preventDefault();
                     if (this.tabset.activeTab) {
                         var history = this.tabset.activeTab.history;
@@ -291,13 +329,7 @@ define(
                             window.history.replaceState({}, '', '#!' + history[history.length - 1]);
                         }
                     }
-                }.bind(this);
-
-                // trigger the application is ready
-                var evt = document.createEvent('Event');
-
-                evt.initEvent('app-ready', true, false);
-                dispatchEvent(evt);
+                };
 
                 /**
                  * Customize app HttpRequestObject
@@ -354,23 +386,6 @@ define(
                         this.tabset.activeTab = this.tabset.tabs[index];
                     }
                 });
-            }
-
-            /**
-             * Add a callback when the application is ready to run
-             *
-             * @param {Function} callback The action to perform when the application is ready to run
-             */
-            ready(callback) {
-                if (this.isReady) {
-                    callback();
-                }
-                else {
-                    addEventListener('app-ready', () => {
-                        this.isReady = true;
-                        callback();
-                    });
-                }
             }
 
             /**
@@ -615,18 +630,17 @@ define(
             /**
              * Load a URL in a dialog box
              *
-             * @param {string} action The action to perform. If "close", it will wlose the current dialog box,
+             * @param {string} action  The action to perform. If "close", it will wlose the current dialog box,
              *                           else it will load the action in the dialog box and open it
              * @param {Object} options The options object :
-             *                             - onload : A callback function, executed after the dialogbox has been displayed
+             *                         - onload : A callback function, executed after the dialogbox has been displayed
              * @returns {Object} The jquery Ajax 'promise'
              */
             dialog(action, options) {
                 options = options || {};
 
-                var container = $('#dialogbox');
-
-                container.modal('hide');
+                this.dialogbox.display = false;
+                this.dialogbox.content = '';
 
                 if (action === 'close') {
                     return null;
@@ -643,9 +657,10 @@ define(
                     }
                 })
 
-                .done(function(content) {
+                .done((content) => {
                     // Page successfully loaded
-                    container.html(content).modal('show');
+                    this.dialogbox.display = true;
+                    this.dialogbox.content = content;
 
                     if (options.onload) {
                         options.onload();
@@ -654,7 +669,7 @@ define(
                     return content;
                 })
 
-                .fail(function(xhr) {
+                .fail((xhr) => {
                     // Page load failed
                     var response;
 
@@ -668,11 +683,11 @@ define(
                     }
 
                     this.notify('danger', response.message);
-                }.bind(this))
+                })
 
-                .always(function() {
+                .always(() => {
                     this.loading.stop();
-                }.bind(this));
+                });
             }
 
             /**

@@ -1,14 +1,17 @@
-<div class="modal-backdrop fade in"></div>
-<div class="modal-dialog center" style="{{ !empty($width) ? "width:$width;" : ""}}{{!empty($height) ? "height:$height;" : ""}}">
-	<div class="modal-content">
-		<div class="modal-header">
-			<button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
-			<h4 class="modal-title">
-                {if(!empty($icon))}{icon icon="{$icon}"}{/if} {{$title}}
-            </h4>
-		</div>
-		<div class="modal-body">
-			{{$page}}
-		</div>
-	</div>
+<div>
+	{if(!empty($width))}
+		<input type="hidden" class="page-width" value="{{{$width}}}" />
+	{/if}
+
+	{if(!empty($height))}
+		<input type="hidden" class="page-height" value="{{{$height}}}" />
+	{/if}
+
+	<input type="hidden" class="page-name" value="{{{ $title }}}" />
+
+	{if(!empty($icon))}
+		<input type="hidden" class="page-icon" value="{{{ $icon }}}" />
+	{/if}
+
+	{{ $page }}
 </div>

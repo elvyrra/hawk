@@ -9,7 +9,7 @@
 namespace Hawk\Plugins\Install;
 
 
-if(!App::conf()->has('db')) {
+if(!App::isInstalled()) {
 
     // First install page : Choose the language
     App::router()->get('install', '/install', array('action' => 'InstallController.setLanguage'));
