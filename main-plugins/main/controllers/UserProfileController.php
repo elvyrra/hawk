@@ -308,7 +308,7 @@ class UserProfileController extends Controller{
         }
         else{
             if($form->check()) {
-                $me = Session::getUser();
+                $me = App::session()->getUser();
                 if($me->password != Crypto::saltHash($form->getData('current-password'))) {
                     return $form->response(Form::STATUS_ERROR, Lang::get($this->_plugin . '.update-password-bad-current-password'));
                 }
