@@ -244,7 +244,7 @@ final class Response extends Singleton{
 
         switch($this->contentType){
             case 'json' :
-                echo json_encode($this->body, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_NUMERIC_CHECK);
+                echo json_encode($this->body);
                 break;
             default :
                 echo $this->body;
