@@ -378,10 +378,6 @@ class AdminController extends Controller{
                                 $value = '0';
                             }
                             $optionName = str_replace('_', '.', $name);
-
-                            App::logger()->error("Option name =" . $optionName . 'X');
-                            App::logger()->error("basename=" . $value . 'X');
-
                             Option::set($optionName, $value);
                         }
                         elseif($field instanceof \Hawk\FileInput) {
