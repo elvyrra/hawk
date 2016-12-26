@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `{{ $prefix }}MenuItem` (
   `actionParameters` VARCHAR(1024) NOT NULL,
   `target` VARCHAR(64) NOT NULL,
   `order` int(2) NOT NULL DEFAULT 0,
-  `permissionId` INT(11) NOT NULL DEFAULT 0,
+  `icon` varchar(32) NOT NULL DEFAULT 0,
   `active` TINYINT(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   UNIQUE INDEX `Index 2` (`plugin`, `name`)
@@ -40,17 +40,18 @@ CREATE TABLE IF NOT EXISTS `{{ $prefix }}MenuItem` (
 
 /*!40000 ALTER TABLE `{{ $prefix }}MenuItem` DISABLE KEYS */;
 INSERT IGNORE INTO `{{ $prefix }}MenuItem` (`id`, `plugin`, `name`, `parentId`, `labelKey`, `action`, `actionParameters`, `target`, `order`, `permissionId`, `active`) VALUES
-(1, 'main', 'user', 0, 'user.username', '', '', '', 0, 0, 1),
-(2, 'admin', 'admin', 0, 'main.menu-admin-title', '', '', '', 1, 0, 1),
-(3, 'admin', 'settings', 2, 'main.menu-admin-settings-title', 'main-settings', '', '', 0, 1, 1),
-(4, 'admin', 'users', 2, 'main.menu-admin-users-title', 'manage-users', '', '', 1, 2, 1),
-(5, 'admin', 'permissions', 2, 'main.menu-admin-roles-title', 'permissions', '', '', 2, 2, 1),
-(6, 'admin', 'themes', 2, 'main.menu-admin-display-title', 'manage-themes', '', '', 3, 3, 1),
-(7, 'admin', 'plugins', 2, 'main.menu-admin-plugins-title', 'manage-plugins', '', '', 4, 1, 1),
-(8, 'admin', 'translations', 2, 'main.menu-admin-language-title', 'manage-languages', '', '', 5, 5, 1),
-(9, 'user', 'profile', 1, 'main.menu-my-profile', 'edit-profile', '', '', 0, 6, 1),
-(10, 'user', 'change-password', 1, 'main.menu-change-password', 'change-password', '', 'dialog', 1, 6, 1),
-(11, 'user', 'logout', 1, 'main.menu-logout', 'javascript: location = app.getUri(''logout'');', '', '', 2, 6, 1);
+(1, 'main', 'user', 0, 'user.username', '', '', '', 0, 'user', 1),
+(2, 'admin', 'admin', 0, 'main.menu-admin-title', '', '', '', 1, 'cogs', 1),
+(3, 'admin', 'settings', 2, 'main.menu-admin-settings-title', 'main-settings', '', '', 0, 'wrench', 1),
+(4, 'admin', 'users', 2, 'main.menu-admin-users-title', 'manage-users', '', '', 1, 'users', 1),
+(5, 'admin', 'permissions', 2, 'main.menu-admin-roles-title', 'permissions', '', '', 2, 'lock', 1),
+(6, 'admin', 'themes', 2, 'main.menu-admin-display-title', 'manage-themes', '', '', 3, 'picture-o', 1),
+(7, 'admin', 'plugins', 2, 'main.menu-admin-plugins-title', 'manage-plugins', '', '', 4, 'plug', 1),
+(8, 'admin', 'translations', 2, 'main.menu-admin-language-title', 'manage-languages', '', '', 5, 'language', 1),
+(9, 'user', 'profile', 1, 'main.menu-my-profile', 'edit-profile', '', '', 0, 'cog', 1),
+(10, 'user', 'change-password', 1, 'main.menu-change-password', 'change-password', '', 'dialog', 1, 'key', 1),
+(11, 'user', 'logout', 1, 'main.menu-logout', logout, '', 'window', 2, 'sign-out', 1),
+(12, 'main', 'login', 1, 'main.menu-login', login, '', 'dialog', 15, 'sign-in', 1);
 /*!40000 ALTER TABLE `{{ $prefix }}MenuItem` ENABLE KEYS */;
 
 
