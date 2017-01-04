@@ -186,6 +186,15 @@ class ItemListField {
      */
     public function getSearchCondition(&$binds){
         if($this->searchValue !== null) {
+            if($this->search['type'] === 'select') {
+                return DBExample::make(
+                    array(
+                        $this->field => $this->getInput()->dbvalue()
+                    ),
+                    $binds
+                );
+            }
+
             return DBExample::make(
                 array(
                     $this->field => array(
@@ -195,6 +204,8 @@ class ItemListField {
                 $binds
             );
         }
+
+        return '';
     }
 
 
