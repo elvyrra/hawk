@@ -366,26 +366,24 @@ define(
                  */
                 const hash = location.hash.replace(/^#\!/, '');
 
-                this.openLastTabs(this.conf.tabs.open)
+                if (hash) {
+                    var index = this.conf.tabs.open.indexOf(hash);
 
-                .done(() => {
-                    if (hash) {
-                        var index = this.conf.tabs.open.indexOf(hash);
-
-                        if (index === -1) {
-                            if (this.conf.tabs.open.length === 1) {
-                                this.conf.tabs.open = [hash];
-                            }
-                            else {
-                                this.conf.tabs.open.push(hash);
-                            }
+                    if (index === -1) {
+                        if (this.conf.tabs.open.length === 1) {
+                            this.conf.tabs.open = [hash];
                         }
-
-                        index = this.conf.tabs.open.indexOf(hash);
-
-                        this.tabset.activeTab = this.tabset.tabs[index];
+                        else {
+                            this.conf.tabs.open.push(hash);
+                        }
                     }
-                });
+
+                    index = this.conf.tabs.open.indexOf(hash);
+
+                    this.tabset.activeTab = this.tabset.tabs[index];
+                }
+
+                this.openLastTabs(this.conf.tabs.open);
             }
 
             /**
