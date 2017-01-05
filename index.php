@@ -1,7 +1,7 @@
 <?php
 
 namespace Hawk;
-exit('coucou');
+
 try {
     /*** Initialize the application ***/
     define('SCRIPT_START_TIME', microtime(true));
@@ -11,7 +11,7 @@ try {
 
     include ROOT_DIR . 'start.php';
 
-    App::logger()->debug('script has been Initialized');
+    App::logger()->debug('Script has been initialized');
 
     (new Event('process-start'))->trigger();
 
