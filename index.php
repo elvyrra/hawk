@@ -1,7 +1,7 @@
 <?php
 
 namespace Hawk;
-
+exit('coucou');
 try {
     /*** Initialize the application ***/
     define('SCRIPT_START_TIME', microtime(true));
