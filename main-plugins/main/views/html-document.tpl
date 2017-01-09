@@ -22,7 +22,7 @@
 		<link rel="stylesheet" href="{{ Theme::getSelected()->getCustomCssUrl() }}" id="theme-custom-stylesheet"/>
 
 		<script type="text/javascript" src="{{ Plugin::get('main')->getJsUrl('ext/require.js') }}" ></script>
-		<script type="text/javascript" src="{{ Plugin::get('main')->getJsUrl(DEV_MODE ? 'app.js' : 'app.min.js') }}" id="app-main-script"></script>
+		<script type="text/javascript" src="{{ Plugin::get('main')->getJsUrl('app.js') }}" id="app-main-script"></script>
 	</head>
 
 	<body>
