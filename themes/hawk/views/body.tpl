@@ -51,7 +51,7 @@
 	<div class="modal-dialog center" e-style="{width : width, height : height}">
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close" e-click="display = false">&times;</button>
 				<h4 class="modal-title">
 	                {icon icon="${ icon }"} ${title}
 	            </h4>

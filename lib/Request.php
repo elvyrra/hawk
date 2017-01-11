@@ -129,12 +129,23 @@ final class Request extends Singleton{
         // Get the request parameters
         $this->params = $_GET;
 
-        // Retrive the body
+        // Retrieve the body
         if($this->getHeaders('Content-Type') === 'application/json') {
             $this->body = json_decode(file_get_contents('php://input'), true);
         }
-        else{
-            $this->body = $_POST;
+        else {
+            switch($this->getMethod()) {
+                case 'get' :
+                    $this->body = array();
+                    break;
+
+                case 'post' :
+                    $this->body = $_POST;
+                    break;
+                default :
+                    parse_str(file_get_contents('php://input'), $this->body);
+                    break;
+            }
         }
 
         // Retreive the client IP
