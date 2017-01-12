@@ -110,8 +110,11 @@ class PluginActionsWidget extends Widget{
             ));
         }
 
+        $this->addCss(Plugin::current()->getCssUrl('plugins-details.less'));
+
         return View::make($this->getPlugin()->getView('plugin-details-actions.tpl'), array(
-            'buttons' => $buttons
+            'buttons' => $buttons,
+            'plugin' => $plugin
         ));
     }
 }
