@@ -358,7 +358,7 @@ class LoginController extends Controller{
             'message' => Lang::get($messageKey)
         ));
 
-        App::response()->redirectToAction('index');
+        App::response()->redirectToRoute('index');
     }
 
     /**
@@ -367,7 +367,7 @@ class LoginController extends Controller{
     public function logout(){
         session_destroy();
 
-        App::response()->redirectToAction('index');
+        App::response()->redirectToRoute('index');
     }
 
 

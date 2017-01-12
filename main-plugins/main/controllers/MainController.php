@@ -115,7 +115,7 @@ class MainController extends Controller {
             $route = App::router()->getRouteByAction($page);
 
             if($route && $route->isAccessible()) {
-                App::response()->redirectToAction($page);
+                App::response()->redirectToRoute($page);
                 return;
             }
             else{
@@ -326,6 +326,6 @@ class MainController extends Controller {
             }
         }
 
-        App::response()->redirectToAction('index');
+        App::response()->redirectToRoute('index');
     }
 }

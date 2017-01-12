@@ -97,13 +97,24 @@ class ButtonInput extends FormInput{
         $param = array_merge($param, $this->attributes);
 
         /*** Set the attribute and text to the span inside the button ***/
-        return View::make(Theme::getSelected()->getView('button.tpl'), array(
+        $button = View::make(Theme::getSelected()->getView('button.tpl'), array(
             'class' => isset($param['class']) ? $param['class'] : '',
             'param' => $param,
             'icon' => isset($param['icon']) ? $param['icon'] : '',
             'label' => isset($param['label']) ? $param['label'] : '',
             'textStyle' => isset($param['textStyle']) ? $param['textStyle'] : '',
         ));
+
+        if($this->nl) {
+            return View::make(Theme::getSelected()->getView(Form::VIEWS_DIR . 'form-input-block.tpl'), array(
+                'input' => $this,                
+                'inputLabel' => '',
+                'inputDisplay' => $button
+            ));    
+        }
+
+        return $button;
+
     }
 
 

@@ -24,3 +24,5 @@ The full developer guide is available on : [Wiki](https://github.com/elvyrra/haw
 ## v1.6.2.7
 * Fix bug in the theme 'Hawk' to close dialog boxes
 * Compute body in PATCH / PUT / DELETE methods
+* Change method Response::redirectToAction for Response::redirectToRoute
+* Add support of categories in autocomplete

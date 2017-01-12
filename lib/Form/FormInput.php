@@ -503,16 +503,19 @@ class FormInput{
      *
      * @return FormInput The input instance
      */
-    public static function getInstance($parameters){
-        // Detect the class name to instance
-        if(!isset($parameters['type'])) {
-            $parameters['type'] = 'text';
+    public static function getInstance($parameters) {
+        $classname = get_called_class();
+
+        if($classname === __CLASS__) {
+            // Detect the class name to instance
+            if(!isset($parameters['type'])) {
+                $parameters['type'] = 'text';
+            }
+            $classname = ucwords($parameters['type']).'Input';
+
+            // Remove the 'type' data, only used to find out the classname
+            unset($parameters['type']);
         }
-
-        $classname = ucwords($parameters['type']).'Input';
-
-        // Remove the 'type' data, only used to find out the classname
-        unset($parameters['type']);
 
         // Create the instance
         return new $classname($parameters);

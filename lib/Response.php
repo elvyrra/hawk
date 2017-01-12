@@ -273,7 +273,7 @@ final class Response extends Singleton{
      * @param string $route The route name to redirect to
      * @param array  $vars  The route parameters value to set
      */
-    public function redirectToAction($route, $vars = array()){
+    public function redirectToRoute($route, $vars = array()){
         $url = App::router()->getUri($route, $vars = array());
         $this->redirect($url);
     }

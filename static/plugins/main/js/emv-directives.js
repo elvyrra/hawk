@@ -42,6 +42,13 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
          * Autocomplete manager
          */
         class Autocomplete {
+            /**
+             * Get the directive options
+             * @param   {DOMNode} element  The element the directive is applied on
+             * @param   {Object}  param    The directive parameters
+             * @param   {EMV}     instance The EMV instance
+             * @returns {Object}           The directive options
+             */
             getOptions(element, param, instance) {
                 const parameters = instance.$getDirectiveValue(param, element);
                 const options = {
@@ -51,7 +58,8 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
                     source : parameters.source,
                     change : parameters.change,
                     delay : parameters.delay || this.constructor.DEFAULT_DELAY,
-                    minLength : 'minLength' in parameters ? parameters.minLength : 2
+                    minLength : 'minLength' in parameters ? parameters.minLength : 2,
+                    categorized : parameters.categorized
                 };
 
                 return options;
@@ -71,19 +79,39 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
                  * @type {String}
                  */
                 element.autocomplete = 'off';
-                $(element)
-                .wrap('<div class="emv-autocomplete"></div')
-                .after(
-                    `<div class="emv-autocomplete-result">
-                        <ul e-show="result.length">
+
+                // Initialize the template
+                let resultTemplate = '';
+
+                if(options.categorized) {
+                    resultTemplate =
+                        `<div class="emv-autocomplete-result"><div e-if="result.length">
+                            <div e-each="result">
+                                <div class="emv-autocomplete-cat-name" e-html="label"></div>
+                                <ul>
+                                    <li e-each="items" e-attr="{value: value}"
+                                        e-on="{mousedown : $root.select.bind($root)}"
+                                        e-class="{hover : $root.overItem === $this}"
+                                        e-html="label">
+                                    </li>
+                                </ul>
+                            </div>
+                        </div></div>`;
+                }
+                else {
+                    resultTemplate =
+                        `<div class="emv-autocomplete-result"><ul e-if="result.length">
                             <li e-each="result" e-attr="{value: value}"
                                 e-on="{mousedown : $root.select.bind($root)}"
                                 e-class="{hover : $root.overItem === $this}"
                                 e-html="label">
                             </li>
-                        </ul>
-                    </div>`
-                );
+                        </ul></div>`;
+                }
+
+                $(element)
+                .wrap('<div class="emv-autocomplete"></div')
+                .after(resultTemplate);
 
                 /**
                  * Initiate the model that will manage the autocomplete results
@@ -98,6 +126,7 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
                                 result : [],
                                 selectedItem : null,
                                 overItem : null,
+                                overCategory : null,
                                 searchTimeout : null
                             }
                         });
@@ -117,21 +146,57 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
                      * Go to the previous element in the result list
                      */
                     previous() {
-                        var index = (this.overItem ? this.result.indexOf(this.overItem) : 0) - 1;
+                        if(!this.options.categorized) {
+                            let index = (this.overItem ? this.result.indexOf(this.overItem) : 0) - 1;
 
-                        if (index < 0) {
-                            index = this.result.length - 1;
+                            if (index < 0) {
+                                index = this.result.length - 1;
+                            }
+                            this.overItem = this.result[index];
                         }
-                        this.overItem = this.result[index];
+                        else {
+                            let index = this.overCategory ? this.overCategory.items.indexOf(this.overItem) : -1;
+
+                            if(index <= 0) {
+                                let catIndex = this.result.indexOf(this.overCategory) - 1;
+
+                                if(catIndex < 0) {
+                                    catIndex = this.result.length - 1;
+                                }
+
+                                this.overCategory = this.result[catIndex];
+                                this.overItem = this.overCategory.items[this.overCategory.items.length - 1];
+                            }
+                            else {
+                                this.overItem = this.overCategory.items[index - 1];
+                            }
+                        }
                     }
 
                     /**
                      * Got to the next element in the result list
                      */
                     next() {
-                        var index = ((this.overItem ? this.result.indexOf(this.overItem) : 0) + 1) % this.result.length;
+                        if(!this.options.categorized) {
+                            let index = ((this.overItem ? this.result.indexOf(this.overItem) : 0) + 1) % this.result.length;
 
-                        this.overItem = this.result[index];
+                            this.overItem = this.result[index];
+                        }
+                        else if(!this.overCategory) {
+                            this.overCategory = this.result[0];
+                            this.overItem = this.overCategory.items[0];
+                        }
+                        else {
+                            let index = (this.overCategory.items.indexOf(this.overItem) + 1) % this.overCategory.items.length;
+
+                            if(!index) {
+                                let catIndex = (this.result.indexOf(this.overCategory) + 1) % this.result.length;
+
+                                this.overCategory = this.result[catIndex];
+                            }
+
+                            this.overItem = this.overCategory.items[index];
+                        }
                     }
 
 
@@ -143,7 +208,7 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
                         this.selectedItem = data;
 
                         // Reset the results list
-                        this.result = [];
+                        this.buildResult([]);
 
                         // Affect element data
                         element.$autocompleteData = data;
@@ -152,14 +217,50 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
                     }
 
                     /**
-                     * Cpmpute the research
+                     * Build the result and categories
+                     * @param  {Arrray} data The input data to build
+                     */
+                    buildResult(data) {
+                        if(!this.options.categorized) {
+                            this.result = data;
+                        }
+                        else {
+                            const categories = [];
+
+                            data.forEach((item) => {
+                                if(!item.category) {
+                                    item.category = '';
+                                }
+
+                                let category = categories.find((cat) => {
+                                    return cat.label === item.category;
+                                });
+
+                                if(!category) {
+                                    category = {
+                                        label : item.category,
+                                        items : []
+                                    };
+
+                                    categories.push(category);
+                                }
+
+                                category.items.push(item);
+                            });
+
+                            this.result = categories;
+                        }
+                    }
+
+                    /**
+                     * Compute the research
                      * @param  {string} value The search term
                      */
                     search(value) {
                         element.$autocompleteData = null;
 
                         if (value.length < this.options.minLength) {
-                            this.result = [];
+                            this.buildResult([]);
                             this.selectedItem = null;
 
                             return;
@@ -183,7 +284,7 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
                             });
 
                             // Display the result to the user
-                            this.result = displayed;
+                            this.buildResult(displayed);
                         }
                         else if (typeof source === 'string') {
                             clearTimeout(this.searchTimeout);
@@ -200,7 +301,7 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
                                     }
                                 })
                                 .then((data) => {
-                                    this.result = data;
+                                    this.buildResult(data);
 
                                     if (!data.length) {
                                         this.selectedItem = null;
@@ -269,7 +370,7 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
                         this.$autocompleteData = null;
                     }
 
-                    model.result = [];
+                    model.buildResult([]);
 
                     if (options.change) {
                         options.change.apply(instance, [this.$autocompleteData]);

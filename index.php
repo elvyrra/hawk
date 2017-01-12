@@ -38,7 +38,7 @@ try {
             if(!App::conf()->has('db') && App::request()->getUri() == App::router()->getUri('index')) {
                 // The application is not installed yet
                 App::logger()->notice('Hawk is not installed yet, redirect to install process page');
-                App::response()->redirectToAction('install');
+                App::response()->redirectToRoute('install');
                 return;
             }
         }
