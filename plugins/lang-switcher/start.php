@@ -20,12 +20,8 @@ Event::on(\Hawk\Plugins\Main\MainController::EVENT_AFTER_GET_MENUS, function(Eve
                 'id' => uniqid(),
                 'plugin' => 'lang-switcher',
                 'name' => $language->tag,
-                'label' =>
-                    Icon::make(array(
-                        'size' => 'fw',
-                        'icon' => $language->tag == LANGUAGE ? 'check' : ''
-                    )) .
-                    strtoupper($language->tag),
+                'icon' => $language->tag == LANGUAGE ? 'check' : '',
+                'label' => strtoupper($language->tag),
                 'action' => 'javascript: $.cookie("language", "' . $language->tag . '", {path : "/"}); location = app.getUri("index");'
             ));
         }

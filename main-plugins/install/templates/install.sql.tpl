@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS `{{ $prefix }}MenuItem` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*!40000 ALTER TABLE `{{ $prefix }}MenuItem` DISABLE KEYS */;
-INSERT IGNORE INTO `{{ $prefix }}MenuItem` (`id`, `plugin`, `name`, `parentId`, `labelKey`, `action`, `actionParameters`, `target`, `order`, `permissionId`, `active`) VALUES
+INSERT IGNORE INTO `{{ $prefix }}MenuItem` (`id`, `plugin`, `name`, `parentId`, `labelKey`, `action`, `actionParameters`, `target`, `order`, `icon`, `active`) VALUES
 (1, 'main', 'user', 0, 'user.username', '', '', '', 0, 'user', 1),
 (2, 'admin', 'admin', 0, 'main.menu-admin-title', '', '', '', 1, 'cogs', 1),
 (3, 'admin', 'settings', 2, 'main.menu-admin-settings-title', 'main-settings', '', '', 0, 'wrench', 1),
@@ -50,8 +50,8 @@ INSERT IGNORE INTO `{{ $prefix }}MenuItem` (`id`, `plugin`, `name`, `parentId`, 
 (8, 'admin', 'translations', 2, 'main.menu-admin-language-title', 'manage-languages', '', '', 5, 'language', 1),
 (9, 'user', 'profile', 1, 'main.menu-my-profile', 'edit-profile', '', '', 0, 'cog', 1),
 (10, 'user', 'change-password', 1, 'main.menu-change-password', 'change-password', '', 'dialog', 1, 'key', 1),
-(11, 'user', 'logout', 1, 'main.menu-logout', logout, '', 'window', 2, 'sign-out', 1),
-(12, 'main', 'login', 1, 'main.menu-login', login, '', 'dialog', 15, 'sign-in', 1);
+(11, 'user', 'logout', 1, 'main.menu-logout', 'logout', '', 'window', 2, 'sign-out', 1),
+(12, 'main', 'login', 1, 'main.menu-login', 'login', '', 'dialog', 15, 'sign-in', 1);
 /*!40000 ALTER TABLE `{{ $prefix }}MenuItem` ENABLE KEYS */;
 
 

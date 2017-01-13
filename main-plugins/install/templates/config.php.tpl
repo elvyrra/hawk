@@ -24,7 +24,6 @@ App::conf()->set(array(
         'prefix' => '{{ $prefix }}',
     ),
     'session' => array(
-        'engine' => '{{ $sessionEngine }}',
         'lifetime' => 0
     ),
 ));

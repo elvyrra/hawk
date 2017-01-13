@@ -222,8 +222,6 @@ class InstallController extends Controller{
                         '{{ $password }}' => $form->getData('db[password]'),
                         '{{ $dbname }}' => $form->getData('db[dbname]'),
                         '{{ $prefix }}' => $form->getData('db[prefix]'),
-                        '{{ $sessionEngine }}' => $form->getData('session'),
-                        '{{ $version }}' => $form->getData('version')
                     );
                     $config = strtr(file_get_contents(Plugin::current()->getRootDir() . 'templates/config.php.tpl'), $param);
                     file_put_contents(INCLUDES_DIR . 'config.php', $config);
@@ -244,6 +242,7 @@ class InstallController extends Controller{
                     return $form->response(Form::STATUS_SUCCESS, Lang::get('install.install-success'));
                 }
                 catch(\Exception $e){
+                    return $form->response(Form::STATUS_ERROR, $e->getMessage());
                     return $form->response(Form::STATUS_ERROR, Lang::get('install.install-error'));
                 }
             }
