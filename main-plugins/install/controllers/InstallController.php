@@ -242,7 +242,6 @@ class InstallController extends Controller{
                     return $form->response(Form::STATUS_SUCCESS, Lang::get('install.install-success'));
                 }
                 catch(\Exception $e){
-                    return $form->response(Form::STATUS_ERROR, $e->getMessage());
                     return $form->response(Form::STATUS_ERROR, Lang::get('install.install-error'));
                 }
             }
