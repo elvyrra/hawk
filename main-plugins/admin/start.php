@@ -209,7 +209,7 @@ App::router()->prefix('/admin/', function () {
             App::router()->get('plugins-list', 'plugins/list', array('action' => 'PluginController.availablePlugins'));
 
             // The details page of a plugin
-            App::router()->get('plugin-details', '/plugins/{plugin}/details', array(
+            App::router()->get('plugin-details', 'plugins/{plugin}/details', array(
                 'where' => array(
                     'plugin' => Plugin::NAME_PATTERN
                 ),
