@@ -20,9 +20,7 @@
   "scripts": {
     "clean" : "rm -r ./static/plugins/main/js/es5",
     "babel": "cd ./static/plugins/main/js && babel *.js -d es5 --presets=latest",
-    "copy-ext" : "cd ./static/plugins/main/js && cp -r ext ./es5",
-    "babel-emv" : "cd ./static/plugins/main/js && babel ext/emv.min.js -d es5 --presets=latest",
     "clean-main" : "rm ./static/plugins/main/js/es5/main.js",
-    "build-es5": "npm run clean && npm run babel && npm run copy-ext && npm run babel-emv && npm run clean-main"
+    "build-es5": "npm run clean && npm run babel && npm run clean-main"
   }
 }

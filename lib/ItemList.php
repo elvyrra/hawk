@@ -308,9 +308,6 @@ class ItemList {
             'page',
         );
 
-        if(!$this->navigation) {
-            $this->lines = self::ALL_LINES;
-        }
 
         if(App::request()->getHeaders('X-List-Filter-'.$this->id)) {
             App::session()->getUser()->setOption('main.list-'.$this->id, App::request()->getHeaders('X-List-Filter-'.$this->id));
@@ -322,6 +319,10 @@ class ItemList {
             if(!empty($this->userParam[$name])) {
                 $this->$name = $this->userParam[$name];
             }
+        }
+
+        if(!$this->navigation) {
+            $this->lines = self::ALL_LINES;
         }
 
         // initialize fields default values

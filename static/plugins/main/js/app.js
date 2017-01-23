@@ -3,31 +3,27 @@
 /**
  * Start by configure requirejs paths and shim
  */
-// var baseUrl = './';
+let extPrefix = 'ext/';
 
-// if(typeof document !== 'undefined') {
-//     baseUrl = document.getElementById('app-main-script').src.replace(/^(.+\/).+$/, '$1');
-// }
+if(!window.Proxy) {
+    extPrefix = '../ext/';
+}
 
 require.config(
     {
-        // Workaround to be optimized by r.js
-        // baseUrl :  typeof baseUrl === 'undefined' ? './' : baseUrl,
-
         paths : {
-            jquery      : 'ext/jquery-last.min',
-            cookie      : 'ext/jquery.cookie',
-            mask        : 'ext/jquery.mask.min',
-            sortable    : 'ext/jquery-sortable',
-            bootstrap   : 'ext/bootstrap.min',
-            colorpicker : 'ext/bootstrap-colorpicker.min',
-            datepicker  : 'ext/bootstrap-datepicker.min',
-            ckeditor    : 'ext/ckeditor/ckeditor',
-            ace         : 'ext/ace/ace',
-            less        : 'ext/less',
-            moment      : 'ext/moment.min',
-            // Workaround to build app-es5 with npm
-            emv         : 'ext/emv.min'
+            jquery      : `${extPrefix}jquery-last.min`,
+            cookie      : `${extPrefix}jquery.cookie`,
+            mask        : `${extPrefix}jquery.mask.min`,
+            sortable    : `${extPrefix}jquery-sortable`,
+            bootstrap   : `${extPrefix}bootstrap.min`,
+            colorpicker : `${extPrefix}bootstrap-colorpicker.min`,
+            datepicker  : `${extPrefix}bootstrap-datepicker.min`,
+            ckeditor    : `${extPrefix}ckeditor/ckeditor`,
+            ace         : `${extPrefix}ace/ace`,
+            less        : `${extPrefix}less`,
+            moment      : `${extPrefix}moment.min`,
+            emv         : 'emv.min'
         },
         shim : {
             jquery : {
@@ -767,6 +763,7 @@ define(
                                 name : i,
                                 data : {}
                             };
+
                             Object.keys(this.routes[i].where).forEach((key, index) => {
                                 result.data[key] = match[index + 1];
                             });
@@ -889,5 +886,3 @@ define(
         return app;
     }
 );
-
-require(['app']);

@@ -3,11 +3,6 @@
 /**
  * Start by configure requirejs paths and shim
  */
-// var baseUrl = './';
-
-// if(typeof document !== 'undefined') {
-//     baseUrl = document.getElementById('app-main-script').src.replace(/^(.+\/).+$/, '$1');
-// }
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -19,24 +14,26 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-require.config({
-    // Workaround to be optimized by r.js
-    // baseUrl :  typeof baseUrl === 'undefined' ? './' : baseUrl,
+var extPrefix = 'ext/';
 
+if (!window.Proxy) {
+    extPrefix = '../ext/';
+}
+
+require.config({
     paths: {
-        jquery: 'ext/jquery-last.min',
-        cookie: 'ext/jquery.cookie',
-        mask: 'ext/jquery.mask.min',
-        sortable: 'ext/jquery-sortable',
-        bootstrap: 'ext/bootstrap.min',
-        colorpicker: 'ext/bootstrap-colorpicker.min',
-        datepicker: 'ext/bootstrap-datepicker.min',
-        ckeditor: 'ext/ckeditor/ckeditor',
-        ace: 'ext/ace/ace',
-        less: 'ext/less',
-        moment: 'ext/moment.min',
-        // Workaround to build app-es5 with npm
-        emv: 'ext/emv.min'
+        jquery: extPrefix + 'jquery-last.min',
+        cookie: extPrefix + 'jquery.cookie',
+        mask: extPrefix + 'jquery.mask.min',
+        sortable: extPrefix + 'jquery-sortable',
+        bootstrap: extPrefix + 'bootstrap.min',
+        colorpicker: extPrefix + 'bootstrap-colorpicker.min',
+        datepicker: extPrefix + 'bootstrap-datepicker.min',
+        ckeditor: extPrefix + 'ckeditor/ckeditor',
+        ace: extPrefix + 'ace/ace',
+        less: extPrefix + 'less',
+        moment: extPrefix + 'moment.min',
+        emv: 'emv.min'
     },
     shim: {
         jquery: {
@@ -777,6 +774,7 @@ define('app', ['jquery', 'emv', 'tab', 'tabs', 'form', 'list', 'lang', 'cookie',
                                         name: i,
                                         data: {}
                                     };
+
                                     Object.keys(_this5.routes[i].where).forEach(function (key, index) {
                                         result.data[key] = match[index + 1];
                                     });
@@ -930,5 +928,3 @@ define('app', ['jquery', 'emv', 'tab', 'tabs', 'form', 'list', 'lang', 'cookie',
 
     return app;
 });
-
-require(['app']);
