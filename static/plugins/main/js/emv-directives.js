@@ -50,7 +50,7 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
              * @returns {Object}           The directive options
              */
             getOptions(element, param, instance) {
-                const parameters = instance.$getDirectiveValue(param, element);
+                const parameters = instance.$getDirectiveValue(param, element) || {};
                 const options = {
                     search : parameters.search || 'label',
                     label : parameters.label || 'label',

@@ -38,14 +38,14 @@ class MainController extends Controller {
         }
 
 
-        App::fs()->copy(Plugin::current()->getJsDir() . '/*', Plugin::current()->getPublicJsDir());
-
         return View::make(Plugin::current()->getView('html-document.tpl'), array(
             'title' => $title,
             'description' => $description,
             'keywords' => $keywords,
             'body' => $body,
-            'favicon' => $this->getFaviconUrl()
+            'favicon' => $this->getFaviconUrl(),
+            'appUrl' => $this->getPlugin()->getJsUrl('main.js'),
+            'polyfillUrl' => $this->getPlugin()->getjsUrl('ext/ie-polyfills.js')
         ));
     }
 

@@ -1,17 +1,18 @@
-/* global Tab */
-
 'use strict';
 
 /**
  * Start by configure requirejs paths and shim
  */
-var baseUrl = document.getElementById('app-main-script').src;
+// var baseUrl = './';
 
-baseUrl = baseUrl.replace(/^(.+\/).+$/, '$1');
+// if(typeof document !== 'undefined') {
+//     baseUrl = document.getElementById('app-main-script').src.replace(/^(.+\/).+$/, '$1');
+// }
+
 require.config(
     {
         // Workaround to be optimized by r.js
-        baseUrl :  typeof baseUrl === 'undefined' ? './' : baseUrl,
+        // baseUrl :  typeof baseUrl === 'undefined' ? './' : baseUrl,
 
         paths : {
             jquery      : 'ext/jquery-last.min',
@@ -21,11 +22,11 @@ require.config(
             bootstrap   : 'ext/bootstrap.min',
             colorpicker : 'ext/bootstrap-colorpicker.min',
             datepicker  : 'ext/bootstrap-datepicker.min',
-            ko          : 'ext/knockout-3.3.0',
             ckeditor    : 'ext/ckeditor/ckeditor',
             ace         : 'ext/ace/ace',
             less        : 'ext/less',
             moment      : 'ext/moment.min',
+            // Workaround to build app-es5 with npm
             emv         : 'ext/emv.min'
         },
         shim : {
@@ -52,9 +53,6 @@ require.config(
             },
             colorpicker: {
                 deps : ['bootstrap']
-            },
-            'ko-extends' : {
-                deps : ['ko']
             },
             'emv-directives' : {
                 deps : ['emv']
@@ -83,21 +81,20 @@ define(
     [
         'jquery',
         'emv',
+        'tab',
         'tabs',
         'form',
         'list',
         'lang',
-        'ko',
         'cookie',
         'mask',
         'sortable',
         'bootstrap',
         'colorpicker',
         'datepicker',
-        'ko-extends',
         'emv-directives'
     ],
-    function($, EMV, Tabset, Form, List, Lang, ko) {
+    function($, EMV, Tab, Tabset, Form, List, Lang) {
         // export libraries to global context
         window.$ = $;
         window.EMV = EMV;
@@ -105,7 +102,6 @@ define(
         window.Form = Form;
         window.List = List;
         window.Lang = Lang;
-        window.ko = ko;
 
         /**
          * This class describes the behavior of the application
@@ -518,6 +514,7 @@ define(
                     }.bind(this))
 
                     .fail(function(xhr) {
+                        this.loading.stop();
                         var code = xhr.status;
 
                         // The page is not accessible for the user
@@ -543,8 +540,6 @@ define(
                         }
 
                         this.notify('danger', response.message);
-
-                        this.loading.stop();
                     }.bind(this));
                 }
 
@@ -592,7 +587,7 @@ define(
                         this.notify('success', message);
                     }
                     else if (Notification.permission === 'granted') {
-                        var notif = new Notification(message, options);
+                        const notif = new Notification(message, options);
                     }
                     else if (Notification.permission !== 'denied') {
                         // Ask for user permission to display notifications
@@ -656,6 +651,8 @@ define(
                 })
 
                 .done((content) => {
+                    this.loading.stop();
+
                     // Page successfully loaded
                     this.dialogbox.display = true;
                     this.dialogbox.content = content;
@@ -670,6 +667,7 @@ define(
                 .fail((xhr) => {
                     // Page load failed
                     var response;
+                    this.loading.stop();
 
                     try {
                         response = JSON.parse(xhr.responseText);
@@ -681,10 +679,6 @@ define(
                     }
 
                     this.notify('danger', response.message);
-                })
-
-                .always(() => {
-                    this.loading.stop();
                 });
             }
 
@@ -895,6 +889,5 @@ define(
         return app;
     }
 );
-
 
 require(['app']);

@@ -23,23 +23,23 @@
                     <i class="icon text-success icon-lg"
                         e-each="{$data : [1,2,3,4,5], $item : 'i'}"
                         e-class="{
-                            'icon-star-o' : $plugin.rate < $i - 0.75,
-                            'icon-star-half-o' : $plugin.rate >= $i - 0.75 && $plugin.rate < $i - 0.25,
-                            'icon-star' : $plugin.rate >= $i - 0.25
+                            'icon-star-o' : plugin.rate < i - 0.75,
+                            'icon-star-half-o' : plugin.rate >= i - 0.75 && plugin.rate < i - 0.25,
+                            'icon-star' : plugin.rate >= i - 0.25
                         }"></i>
                 </span>
 
 
                 <span class="btn btn-success pull-right" e-if="installed">{text key="admin.search-plugin-result-list-installed"}</span>
                 {button e-unless="installed"
-                        e-click="$root.downloadPlugin($plugin)"
+                        e-click="$root.downloadPlugin(plugin)"
                         label="{text key='admin.download-plugin-button'}"
                         icon="download"
                         class="pull-right download-plugin"
                 }
 
                 <div class="clearfix"></div>
-                ${Lang.get('admin.search-plugin-downloads', {downloads : downloads})}
+                ${$root.downloadsLabel(plugin)}
             </div>
         </div>
     </div>

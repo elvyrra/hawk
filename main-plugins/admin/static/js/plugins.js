@@ -86,57 +86,52 @@ require(['app', 'jquery', 'lang', 'emv'], function(app, $, Lang, EMV) {
         /**
          * This controller manages the page that allows to search and download remote plugins
          */
-        class RemotePluginController extends EMV {
-            /**
-             * Constructor
-             */
-            constructor() {
-                super({
-                    plugins : JSON.parse($(searchNode).find('input[name="search-result"]').val())
+        const remotePluginController = new EMV({
+            plugins : JSON.parse($(searchNode).find('input[name="search-result"]').val())
+        });
+
+        remotePluginController.downloadsLabel = function(plugin) {
+            return Lang.get('admin.search-plugin-downloads', {downloads : plugin.downloads});
+        };
+
+        /**
+         * Download a plugin from the platform
+         *
+         * @param {Object} plugin The remote plugin to download
+         */
+        remotePluginController.downloadPlugin = function(plugin) {
+            let confirmed = true;
+            const dependencies = plugin.dependencies;
+
+            if(dependencies && Object.keys(dependencies).length) {
+                const list = Object.keys(dependencies).map(function(dependency) {
+                    return `- ${dependency}`;
+                }).join('\n');
+
+                confirmed = confirm(Lang.get('admin.download-plugin-dependencies', {
+                    plugin : plugin.name,
+                    list : list
+                }));
+            }
+
+            if(confirmed) {
+                app.loading.start();
+
+                $.get(app.getUri('download-plugin', {
+                    plugin : plugin.name
+                }))
+
+                .done(function() {
+                    app.tabset.activeTab.reload();
+                })
+
+                .fail(function(xhr, status, error) {
+                    app.loading.stop();
+                    app.notify('error', error.message);
                 });
             }
+        };
 
-            /**
-             * Download a plugin from the platform
-             *
-             * @param {Object} plugin The remote plugin to download
-             */
-            downloadPlugin(plugin) {
-                let confirmed = true;
-                const dependencies = plugin.dependencies;
-
-                if(dependencies && Object.keys(dependencies).length) {
-                    const list = Object.keys(dependencies).map((dependency) => {
-                        return `- ${dependency}`;
-                    }).join('\n');
-
-                    confirmed = confirm(Lang.get('admin.download-plugin-dependencies', {
-                        plugin : plugin.name,
-                        list : list
-                    }));
-                }
-
-                if(confirmed) {
-                    app.loading.start();
-
-                    $.get(app.getUri('download-plugin', {
-                        plugin : plugin.name
-                    }))
-
-                    .done(function() {
-                        app.tabset.activeTab.reload();
-                    })
-
-                    .fail(function(xhr, status, error) {
-                        app.loading.stop();
-                        app.notify('error', error.message);
-                    });
-                }
-            }
-        }
-
-        const controller = new RemotePluginController();
-
-        controller.$apply(searchNode);
+        remotePluginController.$apply(searchNode);
     }
 });

@@ -12,9 +12,9 @@
 		<div class="collapse navbar-collapse" id="main-menu-collapse">
 			<ul e-each="{$data : Object.keys(items), $item : 'section'}"
 				class="nav navbar-nav"
-				e-class="{'navbar-right' : $section === 'settings'}">
+				e-class="{'navbar-right' : section === 'settings'}">
 
-				<li e-each="$menu.items[$section]" id="main-menu-${id}" class="main-menu" e-class="{dropdown : visibleItems.length}">
+				<li e-each="menu.items[section]" id="main-menu-${id}" class="main-menu" e-class="{dropdown : visibleItems.length}">
 					<!-- Main menu with sub items -->
 					<div class="dropdown-toggle main-menu-title" type="button" id="main-menu-title-${id}" data-toggle="dropdown" e-if="visibleItems.length">
 						<i class="icon icon-${ icon } icon-fw" e-if="icon"></i> <span e-text="label"></span> {icon icon="caret-down"}
@@ -28,7 +28,7 @@
 					</ul>
 
 					<!-- Main menus without sub items -->
-					<div class="main-menu-title" type="button" id="main-menu-title-${$menu.id}" e-unless="visibleItems.length">
+					<div class="main-menu-title" type="button" id="main-menu-title-${menu.id}" e-unless="visibleItems.length">
 						<a e-attr="{href : url, target : target}">
 							<i class="icon icon-${ icon } icon-fw" e-if="icon"></i> <span e-text="label"></span>
 						</a>

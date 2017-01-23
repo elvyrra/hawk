@@ -2,3 +2,4 @@ includes/config.php
 includes/custom-constants.php
 phpdoc.xml
 cs.txt
+node_modules

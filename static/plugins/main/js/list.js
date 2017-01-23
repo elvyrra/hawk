@@ -162,8 +162,8 @@ define('list', ['jquery', 'emv'], function($, EMV) {
             var data = {
                 lines : this.lines,
                 page : this.page,
-                searches : this.searches,
-                sorts : this.sorts
+                searches : this.searches.valueOf(),
+                sorts : this.sorts.valueOf()
             };
 
             var headers = options && options.headers || {};

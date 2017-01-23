@@ -23,10 +23,9 @@
             initForm(app, Form);
         }
         else {
-            require(['app', 'form'], (app, Form) => {
+            require(['app', 'form'], function(app, Form) {
                 initForm(app, Form);
             });
         }
-
     })();
 </script>

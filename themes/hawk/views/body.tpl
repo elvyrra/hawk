@@ -6,12 +6,12 @@
 		{if($canAccessApplication)}
 			<ul class="nav nav-tabs" role="tablist" id="main-nav-tabs">
 				<li role="presentation" class="main-tab-title corner-top"
-					e-each="$tabset.tabs"
-					e-on="{mousedown : $tabset.clickTab.bind($tabset)}"
+					e-each="tabset.tabs"
+					e-on="{mousedown : tabset.clickTab.bind(tabset)}"
 					id="main-tab-title-${id}"
 					data-tab="${$index}"
-					e-class="{active : $tabset.activeTab == $this }"
-					e-style="{ width: 'calc((100% - 25px )/ ' + $tabset.tabs.length + ' - 2px )' }"
+					e-class="{active : tabset.activeTab == $this }"
+					e-style="{ width: 'calc((100% - 25px )/ ' + tabset.tabs.length + ' - 2px )' }"
 					data-toggle="tooltip" data-placement="bottom" >
 					<a role="tab" data-toggle="tab" e-attr="{ href : '#main-tab-' + id}">
 						<i class="icon icon-${ icon }" e-if="icon"></i>
@@ -19,7 +19,7 @@
 						<span e-text="title"></span>
 					</a>
 
-					<span class="main-tab-close pull-right" e-attr="{ 'data-tab' : $index }" e-show="$tabset.tabs.length > 1" e-click="$tabset.remove.bind($tabset)">
+					<span class="main-tab-close pull-right" e-attr="{ 'data-tab' : $index }" e-show="tabset.tabs.length > 1" e-click="tabset.remove.bind(tabset)">
 						{icon icon="times-circle"}
 					</span>
 				</li>
@@ -35,11 +35,11 @@
 		<!-- Tab panes -->
 		<div class="tab-content" id="main-tab-content">
 			<div role="tabpanel" class="tab-pane main-tab-pane"
-				e-each="$tabset.tabs"
+				e-each="tabset.tabs"
 				id="main-tab-${id}"
 				data-tab="${$index}"
 				e-html="content"
-				e-class="{active : $tabset.activeTab == $this}"></div>
+				e-class="{active : tabset.activeTab == $this}"></div>
 		</div>
 	</div>
 {else}
@@ -87,5 +87,3 @@
 		</div>
 	</div>
 </div>
-
-<script type="text/javascript" src="{{ Theme::getSelected()->getFileUrl('js/theme-hawk.js') }}"></script>

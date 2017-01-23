@@ -21,7 +21,7 @@
                     <div class="sortable-item">
                         {icon icon="arrows" class="drag-handle"}
                         <span><i class="icon icon-${ icon }"></i> ${label}</span>
-                        {icon icon="ban" size="lg" class="pull-right text-danger deactivate-item pointer" e-show="!getChildren($root).length" e-click="$root.deactivateItem.bind($root)"}
+                        {icon icon="ban" size="lg" class="pull-right text-danger deactivate-item pointer" e-show="!$root.getChildren($this).length" e-click="$root.deactivateItem.bind($root)"}
                         {icon icon="pencil" size="lg" class="pull-right text-primary edit-item pointer" e-show="plugin === 'custom'" e-click="$root.editItem.bind($root)"}
                     </div>
                     <ol data-parent="${id}">

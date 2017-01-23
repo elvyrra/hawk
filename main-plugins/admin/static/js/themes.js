@@ -107,79 +107,68 @@ require(['app', 'jquery', 'emv', 'lang'], function(app, $, EMV, Lang) {
             $('#theme-base-stylesheet').attr('href', data.href);
         };
 
-        /**
-         * Manager class for theme basic customization
-         */
-        class CustomizationManager extends EMV {
-            /**
-             * Constructor
-             */
-            constructor() {
-                const vars = {};
+        const vars = {};
 
-                Object.keys(form.inputs).forEach((key) => {
-                    if(key !== 'compiled') {
-                        const input = form.inputs[key];
+        Object.keys(form.inputs).forEach(function(key) {
+            if(key !== 'compiled') {
+                const input = form.inputs[key];
 
-                        vars[key] = input.val();
-                    }
-                });
+                vars[key] = input.val();
+            }
+        });
 
-                super({
-                    vars : vars,
-                    updateTimeout : 0
-                });
+        const customizationManager = new EMV({
+            vars : vars,
+            updateTimeout : 0
+        });
 
-                Object.keys(this.vars).forEach((key) => {
-                    this.vars.$watch(key, (value) => {
-                        clearTimeout(this.updateTimeout);
+        Object.keys(customizationManager.vars).forEach(function(key) {
+            this.vars.$watch(key, function(value) {
+                clearTimeout(this.updateTimeout);
 
-                        // Real time compilation of the theme
-                        this.updateTimeout = setTimeout(() => {
-                            this.refresh()
+                // Real time compilation of the theme
+                customizationManager.updateTimeout = setTimeout(function() {
+                    this.refresh()
 
-                            .then(() => {
-                                form.inputs.compiled.val(document.getElementById(cssId).innerText);
-                            });
-                        }, 50);
-
-                        const input = form.inputs[key];
-
-                        if(input.type === 'color') {
-                            input.node().parent().colorpicker('setValue', value);
-                        }
+                    .then(function() {
+                        form.inputs.compiled.val(document.getElementById(cssId).innerText);
                     });
-                });
-            }
+                }.bind(this), 50);
 
-            /**
-             * Reset the custom form
-             */
-            reset() {
-                Object.keys(this.vars).forEach((key) => {
-                    this.vars[key] = window.less.options.initVars[key];
-                });
-            }
+                const input = form.inputs[key];
 
-            /**
-             * Refresh the CSS when a form value changes
-             * @returns {Promise} Resolved if the action is succeed
-             */
-            refresh() {
-                return window.less.modifyVars(this.vars.valueOf());
-            }
-        }
+                if(input.type === 'color') {
+                    input.node().parent().colorpicker('setValue', value);
+                }
+            }.bind(this));
+        }.bind(customizationManager));
 
-        var model = new CustomizationManager();
+
+        /**
+         * Reset the custom form
+         */
+        customizationManager.reset = function() {
+            Object.keys(this.vars).forEach(function(key) {
+                this.vars[key] = window.less.options.initVars[key];
+            }.bind(this));
+        }.bind(customizationManager);
+
+        /**
+         * Refresh the CSS when a form value changes
+         * @returns {Promise} Resolved if the action is succeed
+         */
+        customizationManager.refresh = function() {
+            return window.less.modifyVars(this.vars.valueOf());
+        }.bind(customizationManager);
 
         // Add the theme less file to lessjs
         setTimeout(function() {
             window.less.registerStylesheets();
 
-            model.refresh();
+            customizationManager.refresh();
         });
 
-        model.$apply(form.node.get(0));
+        customizationManager.$apply(form.node.get(0));
     });
 
     /***
