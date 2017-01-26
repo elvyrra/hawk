@@ -1,0 +1,31 @@
+set-language-title = "Installation de hawk"
+set-language-label = "Choisissez votre langue"
+continue-button = "Continuer" 
+
+settings-global-legend = "Données générales"
+settings-title-label = "Titre de l'application"
+settings-rooturl-label = "URL de l'application"
+settings-timezone-label = "Votre fuseau horaire"
+settings-session-label = "Moteur de session"
+settings-session-file-value = "Fichier"
+settings-session-database-value = "Base de données"
+settings-version-label = "Version"
+
+settings-database-legend = "Connexion à la base de données"
+settings-db-host-label = "Nom de l'hôte"
+settings-db-username-label = "Login de connexion"
+settings-db-password-label = "Mot de passe"
+settings-db-dbname-label = "Le nom de la base (sera créée si elle n'existe pas déjà)"
+settings-db-prefix-label = "Préfixe des tables"
+
+settings-admin-legend = "Administrateur"
+settings-admin-login-label = "Login"
+settings-admin-email-label = "Email"
+settings-admin-password-label = "Mot de passe"
+settings-admin-passagain-label = "Confirmation du mot de passe"
+
+install-button = "Installer Hawk"
+
+install-error = "Une erreur est survenue pendant l'installation de Hawk"
+install-connection-error = "Les données que vous avez renseignées pour la connexion à la base de données sont erronées."
+install-success = "Hawk a été correctement installé"

@@ -29,7 +29,7 @@ final class ErrorHandler extends Singleton{
      * @param int    $line    The line in the file where the error was throwed
      * @param array  $context All the variables in the error context
      */
-    public function error($no, $str, $file, $line, $context){
+    public function error($no, $str, $file, $line, $context) {
         if (!(error_reporting() & $no)) {
             // This error code is not in error_reporting
             return;
@@ -88,7 +88,7 @@ final class ErrorHandler extends Singleton{
             )
         );
 
-        if(!App::response()->getContentType() === "json") {
+        if(App::response()->getContentType() === "json") {
             App::response()->setBody($param);
             throw new AppStopException();
         }
@@ -138,4 +138,39 @@ final class ErrorHandler extends Singleton{
         }
     }
 
+
+    /**
+     * Start error handler
+     */
+    public function start() {
+        if(ini_get('display_errors')) {
+            set_error_handler(array($this, 'error'), error_reporting());
+            register_shutdown_function(array($this, 'fatalError'));
+
+            set_exception_handler(array($this, 'exception'));
+        }
+    }
+
+    /**
+     * Manage Http exceptions
+     * @param  HTTPException $err The thrown exception
+     * @param  Request       $req The HTTP request
+     * @param  response      $res The HTTP response
+     */
+    public function manageHttpError(HTTPException $err, $req, $res) {
+        $res->setStatus($err->getStatusCode());
+
+        $response = array(
+            'message' => $err->getMessage(),
+            'details' => $err->getDetails()
+        );
+
+        if($req->getWantedType() === 'json') {
+            $res->setContentType('json');
+            $res->setBody($response);
+        }
+        else {
+            $res->setBody($response['message']);
+        }
+    }
 }

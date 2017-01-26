@@ -69,6 +69,7 @@ class Autoload{
         $searchDirectories = array(
             'Hawk' => array(LIB_DIR, CUSTOM_LIB_DIR),
             'Hawk\View\Plugins' => array(LIB_DIR . 'view-plugins/'),
+            'Hawk\Middlewares' => array(LIB_DIR . 'middlewares/'),
             '' => array(LIB_DIR . 'ext', CUSTOM_LIB_DIR)
         );
 

@@ -115,7 +115,11 @@ class Theme{
      *
      * @return Theme The selected theme
      */
-    public static function getSelected(){
+    public static function getSelected() {
+        if(App::conf()->get('theme')) {
+            return App::conf()->get('theme');
+        }
+
         return self::get(App::isInstalled() ? Option::get('main.selected-theme') : self::DEFAULT_THEME);
     }
 
@@ -222,6 +226,17 @@ class Theme{
      */
     public function getStartFile(){
         return $this->getRootDir() . 'start.php';
+    }
+
+    /**
+     * Start the theme
+     */
+    public function start() {
+        $startFile = $this->getStartFile();
+
+        if(is_file($startFile)) {
+            include $startFile;
+        }
     }
 
 

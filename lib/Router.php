@@ -334,65 +334,18 @@ final class Router extends Singleton{
     /**
      * Compute the routing, and execute the controller method associated to the URI
      */
-    public function route(){
-        $path = str_replace(BASE_PATH, '', parse_url(App::request()->getUri(), PHP_URL_PATH));
-
+    public function route($path){
         // Scan each row
         foreach($this->routes as $route){
             if($route->match($path)) {
                 // The URI matches with the route
                 $this->currentRoute = &$route;
 
-                // Check if the route is accessible with the current method
-                if(!$route->isCallableBy(App::request()->getMethod())) {
-                    throw new BadMethodException($route->url, App::request()->getMethod());
-                }
-
-                // Emit an event, saying the routing action is finished
-                $event = new Event('after-routing', array(
-                    'route' => $route,
-                ));
-                $event->trigger();
-
-                $route = $event->getData('route');
-
-                if(!$route->isAccessible()) {
-                    // The route is not accessible
-                    App::logger()->warning(sprintf(
-                        'A user with the IP address %s tried to access %s without the necessary privileges',
-                        App::request()->clientIp(),
-                        App::request()->getUri()
-                    ));
-
-                    if(!App::session()->isLogged()) {
-                        throw new UnauthorizedException();
-                    }
-                    else {
-                        throw new ForbiddenException();
-                    }
-                }
-
-                // The route authentications are validated
-                list($classname, $method) = explode(".", $route->action);
-
-                // call a controller method
-                $this->currentController = $classname::getInstance($route->getData());
-                App::logger()->debug(sprintf(
-                    'URI %s has been routed => %s::%s',
-                    App::request()->getUri(),
-                    $classname,
-                    $method
-                ));
-
-                // Set the controller result to the HTTP response
-                App::response()->setBody($this->currentController->$method());
-
-                return;
+                return $route;
             }
         }
 
-        App::logger()->warning('The URI ' . App::request()->getUri() . ' has not been routed');
-        throw new PageNotFoundException();
+        return null;
     }
 
 

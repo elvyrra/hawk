@@ -51,6 +51,9 @@ class Session extends Singleton{
      * Initialize the session user
      */
     public function init() {
+        session_set_cookie_params((int) App::conf()->get('session.lifetime'), '/');
+        session_start();
+
         if (!$this->getData('user.id')) {
             $this->setData('user.id', 0);
         }

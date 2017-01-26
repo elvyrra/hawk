@@ -109,7 +109,7 @@ class Lang{
         }
 
         // The file is not present in the cache, search it. We use the method Autoload::find that already performs this action
-        foreach(array(MAIN_PLUGINS_DIR, PLUGINS_DIR, THEMES_DIR) as $dir){
+        foreach(array(PLUGINS_DIR, THEMES_DIR) as $dir){
             $files = App::fs()->find($dir, $this->plugin . '.' . $this->lang . '.lang', FileSystem::FIND_FILE_ONLY);
             if(!empty($files)) {
                 $file = $files[0];

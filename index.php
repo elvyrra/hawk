@@ -2,81 +2,52 @@
 
 namespace Hawk;
 
-try {
-    /*** Initialize the application ***/
-    define('SCRIPT_START_TIME', microtime(true));
+/*** Initialize the application ***/
+define('SCRIPT_START_TIME', microtime(true));
 
-    define('ROOT_DIR', __DIR__ . '/');
-    define('INCLUDES_DIR', ROOT_DIR . 'includes/');
+define('ROOT_DIR', __DIR__ . '/');
+define('INCLUDES_DIR', ROOT_DIR . 'includes/');
 
-    include ROOT_DIR . 'start.php';
+// Get the core constants
+require INCLUDES_DIR . 'constants.php';
 
-    App::logger()->debug('Script has been initialized');
-
-    (new Event('process-start'))->trigger();
-
-    /*** Initialize the plugins ***/
-    $plugins = App::conf()->has('db') ? Plugin::getActivePlugins() : array(Plugin::get('main'), Plugin::get('install'));
-    foreach($plugins as $plugin) {
-        if(is_file($plugin->getStartFile())) {
-            include $plugin->getStartFile();
-        }
-    }
-
-    /*** Initialize the theme ***/
-    if(is_file(Theme::getSelected()->getStartFile())) {
-        include Theme::getSelected()->getStartFile();
-    }
-
-    (new Event('before-routing'))->trigger();
-
-    /*** Execute action just after routing ***/
-    Event::on(
-        'after-routing', function ($event) {
-            $route = $event->getData('route');
-
-            if(!App::conf()->has('db') && App::request()->getUri() == App::router()->getUri('index')) {
-                // The application is not installed yet
-                App::logger()->notice('Hawk is not installed yet, redirect to install process page');
-                App::response()->redirectToRoute('install');
-                return;
-            }
-        }
-    );
-
-    /*** Compute the routage ***/
-    App::router()->route();
+// Get the constants customized by developer for the application
+if(!is_file(INCLUDES_DIR . 'custom-constants.php')) {
+    touch(INCLUDES_DIR . 'custom-constants.php');
 }
-catch(HTTPException $err) {
-    App::response()->setStatus($err->getStatusCode());
+require INCLUDES_DIR . 'custom-constants.php';
 
-    $response = array(
-        'message' => $err->getMessage(),
-        'details' => $err->getDetails()
-    );
+// Load the autoload system
+require INCLUDES_DIR . 'autoload.php';
 
-    if(App::request()->getWantedType() === 'json') {
-        App::response()->setContentType('json');
-        App::response()->setBody($response);
+$app = App::getInstance();
+
+$app->init();
+
+$app->on('after.route', function ($event) use($app) {
+	$req = $app->request;
+    $route = $req->route;
+
+    if(!$app->conf->has('db') && $route->getName() === 'index') {
+        // The application is not installed yet
+        $app->logger->notice('Hawk is not installed yet, redirect to install process page');
+        $app->response->redirectToRoute('install');
+        return;
     }
-    else {
-        App::response()->setBody($response['message']);
+    elseif($app->conf->has('db') && in_array($route->getName(), array('install', 'install-settings'))) {
+        $app->response->redirectToRoute('index');
+        return;
     }
-}
-catch(AppStopException $e){
-}
+});
 
-// Finish the script
-App::logger()->debug('end of script');
-$event = new Event(
-    'process-end', array(
-    'output' => App::response()->getBody(),
-    'execTime' => microtime(true) - SCRIPT_START_TIME
-    )
-);
-$event->trigger();
+$app->logger->debug('Script has been initialized');
 
-App::response()->setBody($event->getData('output'));
+$app->addMiddleware(new \Hawk\Middlewares\Configuration)
+    ->addMiddleware(new \Hawk\Middlewares\StartPlugins)
+    ->addMiddleware(new \Hawk\Middlewares\StartTheme)
+    ->addMiddleware(new \Hawk\Middlewares\Route)
+    ->addMiddleware(new \Hawk\Middlewares\CheckRequestMethod)
+    ->addMiddleware(new \Hawk\Middlewares\CheckRequestAccess)
+    ->addMiddleware(new \Hawk\Middlewares\ExecuteController);
 
-/*** Return the response to the client ***/
-App::response()->end();
+$app->run();

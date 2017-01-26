@@ -343,9 +343,11 @@ class Mail{
                 'css' => $css,
                 'title' => $this->title,
                 'content' => $this->content,
-                'logo' => Option::get('main.logo') ?
-                    Plugin::get('main')->getUserfilesUrl(Option::get('main.logo')) :
-                    Plugin::get('main')->getStaticUrl('img/hawk-logo.png')
+                'logoUrl' => ROOT_URL .
+                    (Option::get('main.logo') ?
+                        Plugin::get('main')->getUserfilesUrl(Option::get('main.logo')) :
+                        Plugin::get('main')->getStaticUrl('img/hawk-logo.png')
+                    )
             ));
 
             $this->html($emailHtml);

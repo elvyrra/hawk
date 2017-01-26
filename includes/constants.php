@@ -22,11 +22,6 @@ define('LIB_DIR', ROOT_DIR . 'lib/');
 define('CUSTOM_LIB_DIR', ROOT_DIR . 'custom-lib/');
 
 /**
- * The folder containing the core plugins
- */
-define('MAIN_PLUGINS_DIR', ROOT_DIR . 'main-plugins/');
-
-/**
  * The folder containing the installed plugins
  */
 define('PLUGINS_DIR', ROOT_DIR . 'plugins/');

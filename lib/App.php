@@ -21,6 +21,11 @@ final class App extends Singleton{
      */
     protected static $instance;
 
+    /**
+     * The list of the application middlewares
+     * @var array
+     */
+    private $middlewares = array();
 
     /**
      * Initialize the application
@@ -30,7 +35,12 @@ final class App extends Singleton{
         $this->singleton('conf', Conf::getInstance());
 
         // Load the application error Handler
-        $this->singleton('errorHandler', ErrorHandler::getInstance());
+        if($this->conf->get('errorHandler')) {
+            $this->singleton('errorHandler', $this->conf->get('errorHandler'));
+        }
+        else {
+            $this->singleton('errorHandler', ErrorHandler::getInstance());
+        }
 
         // Load the application logger
         $this->singleton('logger', Logger::getInstance());
@@ -52,6 +62,9 @@ final class App extends Singleton{
 
         // Load the application cache
         $this->singleton('cache', Cache::getInstance());
+
+        // Start the error handler
+        $this->errorHandler->start();
     }
 
     /**
@@ -86,5 +99,93 @@ final class App extends Singleton{
         else{
             throw new \Exception('The application singleton "' . $method . '" has not been initiated');
         }
+    }
+
+    /**
+     * Add a middleware to the application
+     * @param  Middleware $middleware The middleware to add
+     * @return App        The application itself, to chain actions
+     */
+    public function addMiddleware($middleware) {
+        $middleware->app = $this;
+
+        $this->middlewares[] = $middleware;
+
+        return $this;
+    }
+
+    /**
+     * Run the application
+     */
+    public function run() {
+        $req = self::request();
+        $res = self::response();
+
+        try {
+            foreach($this->middlewares as $middleware) {
+                // Send an event before the middleware execution
+                $this->trigger('before.' . $middleware::NAME, array(
+                    'req' => $req,
+                    'res' => $res
+                ));
+
+                $middleware->execute($req, $res);
+
+                // Send an event after the middleware execution
+                $this->trigger('after.' . $middleware::NAME, array(
+                    'req' => $req,
+                    'res' => $res
+                ));
+            }
+        }
+        catch(HTTPException $err) {
+            $this->errorHandler->manageHttpError($err, $req, $res);
+        }
+        catch(AppStopException $err) {
+
+        }
+
+        $this->finalize($req, $res);
+    }
+
+    /**
+     * Listen to an event
+     * @param  string $name      The event name
+     * @param  callable $handler The action to execute when the event is triggered. This function gets one parameter,
+     *                           the event itself
+     */
+    public function on($name, $handler) {
+        Event::on($name, $handler);
+    }
+
+    /**
+     * Trigger an event
+     * @param  string $name The event name
+     * @param  array  $data  The event data
+     */
+    public function trigger($name, $data) {
+        $event = new Event($name, $data);
+
+        $event->trigger();
+    }
+
+    /**
+     * Finalize the script
+     */
+    public function finalize($req, $res) {
+        // Finish the script
+        self::logger()->debug('end of script');
+
+        $event = new Event('process-end', array(
+            'output' => $res->getBody(),
+            'execTime' => microtime(true) - SCRIPT_START_TIME
+        ));
+
+        $event->trigger();
+
+        $res->setBody($event->getData('output'));
+
+        /*** Return the response to the client ***/
+        $res->end();
     }
 }

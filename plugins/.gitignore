@@ -1,4 +1,10 @@
 *
 !lang-switcher
 !lang-switcher/**
+!main
+!main/**
+!admin
+!admin/**
+!install
+!install/**
 !.gitignore

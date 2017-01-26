@@ -3,75 +3,6 @@
 /**
  * Start by configure requirejs paths and shim
  */
-let extPrefix = 'ext/';
-
-if(!window.Proxy) {
-    extPrefix = '../ext/';
-}
-
-require.config(
-    {
-        paths : {
-            jquery      : `${extPrefix}jquery-last.min`,
-            cookie      : `${extPrefix}jquery.cookie`,
-            mask        : `${extPrefix}jquery.mask.min`,
-            sortable    : `${extPrefix}jquery-sortable`,
-            bootstrap   : `${extPrefix}bootstrap.min`,
-            colorpicker : `${extPrefix}bootstrap-colorpicker.min`,
-            datepicker  : `${extPrefix}bootstrap-datepicker.min`,
-            ckeditor    : `${extPrefix}ckeditor/ckeditor`,
-            ace         : `${extPrefix}ace/ace`,
-            less        : `${extPrefix}less`,
-            moment      : `${extPrefix}moment.min`,
-            emv         : 'emv.min'
-        },
-        shim : {
-            jquery : {
-                exports : '$'
-            },
-            ko : {
-                exports : 'ko'
-            },
-            cookie : {
-                deps : ['jquery']
-            },
-            mask : {
-                deps : ['jquery']
-            },
-            sortable : {
-                deps : ['jquery']
-            },
-            bootstrap : {
-                deps : ['jquery']
-            },
-            datepicker : {
-                deps : ['bootstrap']
-            },
-            colorpicker: {
-                deps : ['bootstrap']
-            },
-            'emv-directives' : {
-                deps : ['emv']
-            },
-            ace : {
-                exports : 'ace'
-            },
-            ckeditor : {
-                exports : 'CKEDITOR'
-            },
-            moment : {
-                exports : 'moment'
-            },
-            shim : {
-                emv : {
-                    exports : 'EMV'
-                }
-            }
-        }
-    }
-);
-
-
 define(
     'app',
     [
@@ -356,6 +287,13 @@ define(
                 /**
                  * Open the last tabs
                  */
+                const route = this.getRouteFromUri(location.pathname);
+
+                if(route === 'install' || route === 'install-settings') {
+                    // Do not load any new page in installation pages
+                    return;
+                }
+
                 const hash = location.hash.replace(/^#\!/, '');
 
                 if (hash) {

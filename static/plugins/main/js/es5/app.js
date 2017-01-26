@@ -14,72 +14,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var extPrefix = 'ext/';
-
-if (!window.Proxy) {
-    extPrefix = '../ext/';
-}
-
-require.config({
-    paths: {
-        jquery: extPrefix + 'jquery-last.min',
-        cookie: extPrefix + 'jquery.cookie',
-        mask: extPrefix + 'jquery.mask.min',
-        sortable: extPrefix + 'jquery-sortable',
-        bootstrap: extPrefix + 'bootstrap.min',
-        colorpicker: extPrefix + 'bootstrap-colorpicker.min',
-        datepicker: extPrefix + 'bootstrap-datepicker.min',
-        ckeditor: extPrefix + 'ckeditor/ckeditor',
-        ace: extPrefix + 'ace/ace',
-        less: extPrefix + 'less',
-        moment: extPrefix + 'moment.min',
-        emv: 'emv.min'
-    },
-    shim: {
-        jquery: {
-            exports: '$'
-        },
-        ko: {
-            exports: 'ko'
-        },
-        cookie: {
-            deps: ['jquery']
-        },
-        mask: {
-            deps: ['jquery']
-        },
-        sortable: {
-            deps: ['jquery']
-        },
-        bootstrap: {
-            deps: ['jquery']
-        },
-        datepicker: {
-            deps: ['bootstrap']
-        },
-        colorpicker: {
-            deps: ['bootstrap']
-        },
-        'emv-directives': {
-            deps: ['emv']
-        },
-        ace: {
-            exports: 'ace'
-        },
-        ckeditor: {
-            exports: 'CKEDITOR'
-        },
-        moment: {
-            exports: 'moment'
-        },
-        shim: {
-            emv: {
-                exports: 'EMV'
-            }
-        }
-    }
-});
-
 define('app', ['jquery', 'emv', 'tab', 'tabs', 'form', 'list', 'lang', 'cookie', 'mask', 'sortable', 'bootstrap', 'colorpicker', 'datepicker', 'emv-directives'], function ($, EMV, Tab, Tabset, Form, List, Lang) {
     // export libraries to global context
     window.$ = $;
@@ -352,6 +286,13 @@ define('app', ['jquery', 'emv', 'tab', 'tabs', 'form', 'list', 'lang', 'cookie',
                 /**
                  * Open the last tabs
                  */
+                var route = this.getRouteFromUri(location.pathname);
+
+                if (route === 'install' || route === 'install-settings') {
+                    // Do not load any new page in installation pages
+                    return;
+                }
+
                 var hash = location.hash.replace(/^#\!/, '');
 
                 if (hash) {

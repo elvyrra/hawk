@@ -113,7 +113,7 @@ class Plugin{
      */
     private function __construct($name){
         $this->name = $name;
-        $this->rootDir = ($this->isMainPlugin() ? MAIN_PLUGINS_DIR : PLUGINS_DIR) . $this->name . '/';
+        $this->rootDir = PLUGINS_DIR . $this->name . '/';
 
         if(!is_dir($this->rootDir)) {
             throw new \Exception('The plugin does not exists');
@@ -184,9 +184,6 @@ class Plugin{
         if(strpos($file, PLUGINS_DIR) !== false) {
             $dir = str_replace(PLUGINS_DIR, '', $file);
         }
-        elseif(strpos($file, MAIN_PLUGINS_DIR) !== false) {
-            $dir = str_replace(MAIN_PLUGINS_DIR, '', $file);
-        }
         else{
             return null;
         }
@@ -213,7 +210,6 @@ class Plugin{
       */
     public static function getAll($includeMain = true, $loadConf = false){
         $plugins = array();
-        $dirs = $includeMain ? array(MAIN_PLUGINS_DIR, PLUGINS_DIR) : array(PLUGINS_DIR);
 
         if($loadConf && App::conf()->has('db')) {
             $configs = PluginModel::getAll(PluginModel::getPrimaryColumn());
@@ -222,17 +218,19 @@ class Plugin{
             $configs = array();
         }
 
-        foreach($dirs as $dir){
-            foreach(glob($dir . '*', GLOB_ONLYDIR) as $dir){
-                $name = basename($dir);
-                $config = isset($configs[$name]) ? $configs[$name] : null;
-
-                $plugin = self::get($name);
-                if($loadConf && !$plugin->isMainPlugin()) {
-                    $plugin->active = isset($config->active) ? (bool) $config->active : false;
-                }
-                $plugins[$name] = $plugin;
+        foreach(glob(PLUGINS_DIR . '*', GLOB_ONLYDIR) as $dir) {
+            $name = basename($dir);
+            if(!$includeMain && in_array($name, self::$mainPlugins)) {
+                continue;
             }
+
+            $config = isset($configs[$name]) ? $configs[$name] : null;
+
+            $plugin = self::get($name);
+            if($loadConf && !$plugin->isMainPlugin()) {
+                $plugin->active = isset($config->active) ? (bool) $config->active : false;
+            }
+            $plugins[$name] = $plugin;
         }
 
         return $plugins;
@@ -337,6 +335,16 @@ class Plugin{
      */
     public function getStartFile(){
         return $this->getRootDir() . 'start.php';
+    }
+
+
+    /**
+     * Start the plugin
+     */
+    public function start() {
+        if(is_file($this->getStartFile())) {
+            include $this->getStartFile();
+        }
     }
 
 
