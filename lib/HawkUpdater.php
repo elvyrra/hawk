@@ -99,4 +99,12 @@ class HawkUpdater{
             'target' => 'dialog'
         ));
     }
+
+
+    /**
+     * v2.0.0 : Clear the cache
+     */
+    public function v2_0_0() {
+        unlink(CACHE_DIR . 'autoload-cache.php');
+    }
 }
