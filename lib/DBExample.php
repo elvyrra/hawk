@@ -132,6 +132,7 @@ class DBExample{
 
         $sql = "";
         $elements = array();
+        $sqlExpressions = DB::getSqlExpressions();
 
         foreach($example as $key => $value){
             // Binary operations (= , <, >, LIKE, IN, NOT IN, .. etc)
@@ -143,16 +144,26 @@ class DBExample{
                 if(is_array($value)) {
                     $values = array();
                     foreach($value as $unitValue) {
-                        $bindKey = uniqid();
-                        $binds[$bindKey] = $unitValue;
-                        $values[] = ':'.$bindKey;
+                        if(isset($sqlExpressions[$unitValue])) {
+                            $values[] = $sqlExpressions[$unitValue];
+                        }
+                        else {
+                            $bindKey = uniqid();
+                            $binds[$bindKey] = $unitValue;
+                            $values[] = ':' . $bindKey;
+                        }
                     }
                     $elements[] = DB::formatField($upperKey) . " $op (" . implode(',', $values) . ")";
                 }
                 else{
-                    $bindKey = uniqid();
-                    $binds[$bindKey] = $value;
-                    $val = ':' . $bindKey;
+                    if(isset($sqlExpressions[$value])) {
+                        $val = $sqlExpressions[$value];
+                    }
+                    else {
+                        $bindKey = uniqid();
+                        $binds[$bindKey] = $value;
+                        $val = ':' . $bindKey;
+                    }
                     $elements[] = DB::formatField($upperKey) . " $op $val";
                 }
             }
@@ -187,9 +198,14 @@ class DBExample{
 
                     default :
                         if(is_scalar($value)) {
-                            $bindKey = uniqid();
-                            $binds[$bindKey] = $value;
-                            $val = ':' . $bindKey;
+                            if(isset($sqlExpressions[$value])) {
+                                $val = $sqlExpressions[$value];
+                            }
+                            else {
+                                $bindKey = uniqid();
+                                $binds[$bindKey] = $value;
+                                $val = ':' . $bindKey;
+                            }
 
                             $elements[] = DB::formatField($key) . ' = ' . $val;
                         }

@@ -59,9 +59,8 @@ class DatabaseSessionHandler implements \SessionHandlerInterface{
             $maxlifetime = max(App::conf()->get('session.lifetime'), ini_get('session.gc_maxlifetime'));
         }
 
-        return (bool) SessionModel::deleteBySQL(':lifetime AND mtime + :lifetime < :now', array(
-            'lifetime' => $maxlifetime,
-            'now' => time()
+        return (bool) SessionModel::deleteBySQL(':lifetime AND mtime + :lifetime < UNIX_TIMESTAMP()', array(
+            'lifetime' => $maxlifetime
         ));
     }
 
@@ -84,7 +83,7 @@ class DatabaseSessionHandler implements \SessionHandlerInterface{
                     'id' => App::request()->getCookies($name)
                 )),
                 array(
-                    'mtime' => time()
+                    'mtime' => DB::sqlExpression('UNIX_TIMESTAMP()')
                 )
             );
         }
@@ -120,7 +119,7 @@ class DatabaseSessionHandler implements \SessionHandlerInterface{
             array(
                 'id' => $sessionId,
                 'data' => $data,
-                'mtime' => time()
+                'mtime' => DB::sqlExpression('UNIX_TIMESTAMP()')
             )
         );
     }

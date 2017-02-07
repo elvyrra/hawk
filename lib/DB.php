@@ -76,7 +76,17 @@ class DB{
     const SORT_ASC = 'ASC'; // Sort ascending
     const SORT_DESC = 'DESC'; // Sort descending
 
+    /**
+     * A salt key, generated for each script instance, to encode raw sql expressions
+     * @var string
+     */
+    private static $sqlExpressionSalt = '';
 
+    /**
+     * The list of declared raw sql expressions
+     * @var array
+     */
+    private static $sqlExpressions = array();
 
     /**
      * Constructor
@@ -439,9 +449,14 @@ class DB{
         foreach($insert as $key => $value) {
             $keys[] = self::formatField($key);
 
-            $uniq = uniqid();
-            $values[] = ':'.$uniq;
-            $binds[$uniq] = $value;
+            if(isset(self::$sqlExpressions[$value])) {
+                $values[] = self::$sqlExpressions[$value];
+            }
+            else {
+                $uniq = uniqid();
+                $values[] = ':' . $uniq;
+                $binds[$uniq] = $value;
+            }
         }
 
         $keys = implode(',', $keys);
@@ -469,12 +484,17 @@ class DB{
         $values = array();
         $binds = array();
 
-        foreach($insert as $key => $value){
+        foreach($insert as $key => $value) {
             $keys[] = self::formatField($key);
 
-            $uniq = uniqid();
-            $values[] = ':'.$uniq;
-            $binds[$uniq] = $value;
+            if(isset(self::$sqlExpressions[$value])) {
+                $values[] = self::$sqlExpressions[$value];
+            }
+            else {
+                $uniq = uniqid();
+                $values[] = ':' . $uniq;
+                $binds[$uniq] = $value;
+            }
         }
 
         $keys = implode(',', $keys);
@@ -505,9 +525,15 @@ class DB{
 
         $updates = array();
         foreach($update as $key => $value) {
-            $bind = uniqid();
-            $updates[] = self::formatField($key) . ' = :' . $bind;
-            $binds[$bind] = $value;
+            if(isset(self::$sqlExpressions[$value])) {
+                $updates[] = self::formatField($key) . ' = ' . self::$sqlExpressions[$value];
+            }
+            else {
+                $bind = uniqid();
+                $updates[] = self::formatField($key) . ' = :' . $bind;
+                $binds[$bind] = $value;
+            }
+
         }
 
         $sql = 'UPDATE ' . $table . ' SET '. implode(',', $updates) . $where;
@@ -581,7 +607,7 @@ class DB{
      * @return string The formatted string
      */
     public static function formatField($str) {
-        
+
         $regex = '/^(\w+)(\.(\w+))?$/';
 
         if(preg_match($regex, $str)) {
@@ -651,5 +677,27 @@ class DB{
         }
 
         return $prefix . $table;
+    }
+
+    /**
+     * This method is used to insert a raw SQL expression in an example or a insertion,
+     * and avoid this value to be binded
+     * @param  string $expression The SQL expression to insert
+     * @return string             The matching expression
+     */
+    public static function sqlExpression($expression) {
+        if(!self::$sqlExpressionSalt) {
+            self::$sqlExpressionSalt = mcrypt_create_iv(8, MCRYPT_RAND);
+        }
+
+        $hash = md5(self::$sqlExpressionSalt . $expression);
+
+        self::$sqlExpressions[$hash] = $expression;
+
+        return $hash;
+    }
+
+    public static function getSqlExpressions() {
+        return self::$sqlExpressions;
     }
 }

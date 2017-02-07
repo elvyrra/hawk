@@ -105,13 +105,17 @@ class Controller{
         Event::on(
             $this->_plugin . '.' . $this->getClassname() . '.' . $method . '.' . self::AFTER_ACTION, function ($event) use ($content) {
                 if(App::response()->getContentType() === 'html') {
-                    $dom = $event->getData('result');
-                    if($dom->find('body')->length) {
-                        $dom->find('body')->prepend($content);
+                    $html = $event->getData('result');
+                    $bodyRegex = '#(<body.*?>)#';
+
+                    if(preg_match($bodyRegex, $html)) {
+                        $html = preg_replace($bodyRegex, "$1$content", $html);
                     }
-                    else{
-                        $dom->find("*:first")->parent()->prepend($content);
+                    else {
+                        $html = $content . $html;
                     }
+
+                    $event->setData('result', $html);
                 }
             }
         );
@@ -128,13 +132,18 @@ class Controller{
         Event::on(
             $this->_plugin . '.' . $this->getClassname() . '.' . $method . '.' . self::AFTER_ACTION, function ($event) use ($content) {
                 if(App::response()->getContentType() === 'html') {
-                    $dom = $event->getData('result');
-                    if($dom->find('body')->length) {
-                        $dom->find('body')->append($content);
+                    $html = $event->getData('result');
+                    $closingBodyTag = '</body>';
+                    $bodyRegex = '#' . preg_quote($closingBodyTag) . '#';
+
+                    if(preg_match($bodyRegex, $html)) {
+                        $html = preg_replace($bodyRegex, $content . $closingBodyTag, $html);
                     }
-                    else{
-                        $dom->find("*:first")->parent()->children()->slice(-1)->after($content);
+                    else {
+                        $html .= $content;
                     }
+
+                    $event->setData('result', $html);
                 }
             }
         );
@@ -278,10 +287,10 @@ class ControllerProcessor extends Controller{
 
         /*** Call the controller method ***/
         $result = call_user_func_array(array($this->controller, $method), $arguments);
-        if(App::response()->getContentType() == 'html' && is_string($result)) {
-            // Create a phpQuery object to be modified by event listeners (widgets)
-            $result = \phpQuery::newDocument($result);
-        }
+        // if(App::response()->getContentType() == 'html' && is_string($result)) {
+        //     // Create a phpQuery object to be modified by event listeners (widgets)
+        //     $result = \phpQuery::newDocument($result);
+        // }
 
         /*** Load the widgets after calling the controller method ***/
         $event = new Event($eventBasename . Controller::AFTER_ACTION, array('controller' => $this->controller, 'result' => $result));
@@ -289,6 +298,7 @@ class ControllerProcessor extends Controller{
 
         // Return the result of the action
         $result = $event->getData('result');
+        $this->controller->executingMethod = null;
         if($result instanceof \phpQuery || $result instanceof \phpQueryObject) {
             return $result->htmlOuter();
         }
@@ -296,6 +306,5 @@ class ControllerProcessor extends Controller{
             return $result;
         }
 
-        $this->controller->executingMethod = null;
     }
 }
