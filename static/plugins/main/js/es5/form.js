@@ -379,7 +379,7 @@ define('form', ['jquery', 'moment'], function ($, moment) {
                     var data;
 
                     if (this.method === 'get') {
-                        data = $(this.node).serlialize();
+                        data = $(this.node).serialize();
                     } else {
                         data = new FormData(this.node.get(0));
                     }
