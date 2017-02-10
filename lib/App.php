@@ -129,7 +129,7 @@ final class App extends Singleton{
                     'res' => $res
                 ));
 
-                $middleware->execute($req, $res);
+                $middleware->execute($req, $res, $this);
 
                 // Send an event after the middleware execution
                 $this->trigger('after.' . $middleware::NAME, array(

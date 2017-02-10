@@ -2,6 +2,9 @@
 
 namespace Hawk\Middlewares;
 
+use \Hawk\UnauthorizedException as UnauthorizedException;
+use \Hawk\ForbiddenException as ForbiddenException;
+
 /**
  * This middleware initialize and configure the application
  */
@@ -18,13 +21,13 @@ class CheckRequestAccess extends \Hawk\Middleware {
 
         if(!$route->isAccessible()) {
             // The route is not accessible
-            App::logger()->warning(sprintf(
+            $this->app->logger->warning(sprintf(
                 'A user with the IP address %s tried to access %s without the necessary privileges',
                 $req->clientIp(),
                 $req->getUri()
             ));
 
-            if(!App::session()->isLogged()) {
+            if(!$this->app->session->isLogged()) {
                 throw new UnauthorizedException();
             }
             else {

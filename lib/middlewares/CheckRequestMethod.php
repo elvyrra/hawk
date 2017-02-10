@@ -2,6 +2,8 @@
 
 namespace Hawk\Middlewares;
 
+use \Hawk\BadMethodException as BadMethodException;
+
 /**
  * This middleware initialize and configure the application
  */

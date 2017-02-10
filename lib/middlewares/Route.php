@@ -2,6 +2,8 @@
 
 namespace Hawk\Middlewares;
 
+use \Hawk\PageNotFoundException as PageNotFoundException;
+
 /**
  * This middleware initialize and configure the application
  */
@@ -25,6 +27,7 @@ class Route extends \Hawk\Middleware {
 
         // No matching route
         $this->app->logger->warning('The URI ' . $req->getUri() . ' has not been routed');
-        throw new \Hawk\PageNotFoundException();
+
+        throw new PageNotFoundException();
 	}
 }
