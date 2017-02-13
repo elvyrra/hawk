@@ -117,7 +117,7 @@ final class Response extends Singleton{
      *                     'value', 'expires', 'path', 'domain', 'secure' or 'httponly'
      */
     public function setCookie($name, $data){
-        if(is_string($data)) {
+        if(is_scalar($data)) {
             $data = array(
                 'value' => $data,
             );
@@ -232,7 +232,14 @@ final class Response extends Singleton{
 
         // Set the response headers
         foreach($this->headers as $name => $value){
-            header($name .': ' . $value);
+            if(strpos($value, PHP_EOL) !== false) {
+                foreach(explode(PHP_EOL, $value) as $valueLine) {
+                    header($name . ':' . $valueLine);
+                }
+            }
+            else {
+                header($name .': ' . $value);
+            }
         }
 
 
