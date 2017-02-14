@@ -88,13 +88,8 @@ final class ErrorHandler extends Singleton{
             )
         );
 
-        if(App::response()->getContentType() === "json") {
-            App::response()->setBody($param);
-            throw new AppStopException();
-        }
-        else{
-            echo View::make(Theme::getSelected()->getView('error.tpl'), $param);
-        }
+
+        echo View::make(Theme::getSelected()->getView('error.tpl'), $param);
     }
 
 

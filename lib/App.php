@@ -139,10 +139,12 @@ final class App extends Singleton{
             }
         }
         catch(HTTPException $err) {
-            $this->errorHandler->manageHttpError($err, $req, $res);
+            try {
+                $this->errorHandler->manageHttpError($err, $req, $res);
+            }
+            catch(AppStopException $err){}
         }
-        catch(AppStopException $err) {
-
+        catch(\Hawk\AppStopException $err) {
         }
 
         $this->finalize($req, $res);
