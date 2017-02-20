@@ -65,6 +65,12 @@ class DBExample{
         '$notnull' => 'IS NOT NULl'
     );
 
+
+    private static $complexOperators = array(
+        '$between' => '{field} BETWEEN %s AND %s',
+        '$match' => 'MATCH ({field}) AGAINST (%s)'
+    );
+
     /**
      * Constructor
      *
@@ -172,6 +178,30 @@ class DBExample{
             elseif(is_scalar($value) && isset(self::$unaryOperators[$value])) {
                 $op = self::$unaryOperators[$value];
                 $elements[] = DB::formatField($key) . " $op";
+            }
+
+            // Complex operators (BETWEEN, ...)
+            elseif(isset(self::$complexOperators[$key])) {
+                $expression = str_replace('{field}', DB::formatField($upperKey), self::$complexOperators[$key]);
+
+                if(is_scalar($value)) {
+                    $bindKey = uniqid();
+                    $binds[$bindKey] = $value;
+                    $val = ':' . $bindKey;
+
+                    $elements[] = sprintf($expression, $val);
+                }
+                else {
+                    $vals = array();
+                    foreach($value as $unitvalue) {
+                        $bindKey = uniqid();
+                        $binds[$bindKey] = $unitvalue;
+                        $val = ':' . $bindKey;
+
+                        $vals[] = $val;
+                    }
+                    $elements[] = vsprintf($expression, $vals);
+                }
             }
 
             // Parse a sub element
