@@ -30,10 +30,8 @@
 					<!-- Main menus without sub items -->
 					<div class="main-menu-title" type="button" id="main-menu-title-${menu.id}" e-unless="visibleItems.length">
 						<a e-attr="{href : url, target : target}">
-							<i class="icon icon-${ icon } icon-fw" e-if="icon"></i> <span e-text="label"></span>
+							<i class="icon icon-${ icon } icon-fw" e-if="icon"></i> <span e-html="label"></span>
 						</a>
-
-						<div e-attr="{href : url, target : target}" e-if="html" e-html="html"/></div>
 					</div>
 				</li>
 			</ul>
