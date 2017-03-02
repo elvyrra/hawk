@@ -585,6 +585,9 @@ class DB{
         if(!empty($group)) {
             $group = 'GROUP BY ' . implode(',', array_map(array(self, 'formatField'), $group));
         }
+        else {
+            $group = '';
+        }
 
         if(empty($field)) {
             $field = '*';
@@ -593,7 +596,7 @@ class DB{
             $field = $field;
         }
 
-        $sql = 'SELECT COUNT(' . $field . ') as counter FROM ' . $table .' ' . $where;
+        $sql = 'SELECT COUNT(' . $field . ') as counter FROM ' . $table .' ' . $where . ' ' . $group;
 
         return $this->query($sql, $binds, array('return' => self::RETURN_OBJECT, 'onerow' => true))->counter;
     }
