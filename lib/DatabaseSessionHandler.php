@@ -74,13 +74,15 @@ class DatabaseSessionHandler implements \SessionHandlerInterface{
     public function open($savePath, $name){
         $this->db = App::db();
         $this->table = DB::getFullTablename('Session');
+        $app = App::getInstance();
+        $req = isset($app->request) ? $app->request : null;
 
         // Update the session mtime
-        if(App::request()->getCookies($name)) {
+        if($req && $req->getCookies($name)) {
             SessionModel::getDbInstance()->update(
                 SessionModel::getTable(),
                 new DBExample(array(
-                    'id' => App::request()->getCookies($name)
+                    'id' => $req->getCookies($name)
                 )),
                 array(
                     'mtime' => DB::sqlExpression('UNIX_TIMESTAMP()')

@@ -59,11 +59,11 @@ class Configuration extends \Hawk\Middleware {
 		$app->session->init();
 
 		// Constants depending to the options
-		if($req->getCookies('language')) {
+		if($req && $req->getCookies('language')) {
 		    define('LANGUAGE', $req->getCookies('language'));
 		}
 		elseif($app->conf->has('db')) {
-		    if($app->session->getUser()->getProfileData('language')) {
+		    if(!$app->isCron && $app->session->getUser()->getProfileData('language')) {
 		        define('LANGUAGE', $app->session->getUser()->getProfileData('language'));
 		    }
 		    elseif(Option::get('main.language')) {

@@ -64,13 +64,11 @@ class Session extends Singleton{
         }
         else {
             // The database does not exists yet. Create a 'fake' guest user
-            $this->user = new User(
-                array(
+            $this->user = new User(array(
                 'id' => User::GUEST_USER_ID,
                 'username' => 'guest',
-                'active' => 0,
-                )
-            );
+                'active' => 0
+            ));
 
             $this->logged = false;
         }
@@ -134,7 +132,7 @@ class Session extends Singleton{
      * @param string $name The variable name to get in session. For a multidimentionnal data, write 'level1.level2'
      */
     public function getData($name = null) {
-        $this->data = $_SESSION;
+        $this->data = isset($_SESSION) ? $_SESSION : array();
 
         if (!isset($this->data)) {
             return null;

@@ -28,6 +28,12 @@ final class App extends Singleton{
     private $middlewares = array();
 
     /**
+     * Defines if the application is run as a script
+     * @var boolean
+     */
+    public $isCron = false;
+
+    /**
      * Initialize the application
      */
     public function init(){
@@ -51,14 +57,18 @@ final class App extends Singleton{
         // Load the application session
         $this->singleton('session', Session::getInstance());
 
+        if(!$this->isCron) {
+            // Load the application HTTP request
+            $this->singleton('request', Request::getInstance());
+
+            // Load the application HTTP response
+            $this->singleton('response', Response::getInstance());
+        } else {
+            $this->uid = uniqid();
+        }
+
         // Load the application router
         $this->singleton('router', Router::getInstance());
-
-        // Load the application HTTP request
-        $this->singleton('request', Request::getInstance());
-
-        // Load the application HTTP response
-        $this->singleton('response', Response::getInstance());
 
         // Load the application cache
         $this->singleton('cache', Cache::getInstance());
@@ -118,8 +128,14 @@ final class App extends Singleton{
      * Run the application
      */
     public function run() {
-        $req = self::request();
-        $res = self::response();
+        if(!$this->isCron) {
+            $req = self::request();
+            $res = self::response();
+        }
+        else {
+            $req = null;
+            $res = null;
+        }
 
         try {
             foreach($this->middlewares as $middleware) {
@@ -147,7 +163,9 @@ final class App extends Singleton{
         catch(\Hawk\AppStopException $err) {
         }
 
-        $this->finalize($req, $res);
+        if(!$this->isCron) {
+            $this->finalize($req, $res);
+        }
     }
 
     /**
