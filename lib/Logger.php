@@ -87,14 +87,30 @@ final class Logger extends Singleton{
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
         $trace = (object) $trace[1];
 
-        $request = App::request();
+        $app = App::getInstance();
+        if(!$app->isCron) {
+            $request = $app->request;
+
+            $method = $request->getMethod();
+            $ip = $request->clientIp();
+            $uri = $request->getUri();
+            $uid = $request->uid;
+        }
+        else {
+            global $argv;
+
+            $method = 'NA';
+            $ip = 'cron';
+            $uri = $argv[2];
+            $uid = $app->uid;
+        }
 
         $data = array(
             'date' => date_create()->format('Y-m-d H:i:s'),
-            'requestId' => $request->uid,
-            'method' => $request->getMethod(),
-            'clientIp' => $request->clientIp(),
-            'uri' => $request->getUri(),
+            'requestId' => $uid,
+            'method' => $method,
+            'clientIp' => $ip,
+            'uri' => $uri,
             'file' => $trace->file,
             'line' => $trace->line,
             'message' => $message,

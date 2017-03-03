@@ -560,7 +560,6 @@ class Plugin{
             $publicFilename = $this->getPublicCssDir() . $cssBasename;
 
             if(is_file($privateFilename)) {
-
                 Event::on('built-less', function (Event $event) use ($privateFilename) {
                     if($event->getData('source') === $privateFilename) {
                         // Copy all static files except less and JS
@@ -571,7 +570,19 @@ class Plugin{
                         }
                     }
                 });
-                Less::compile($privateFilename, $publicFilename);
+
+                if(preg_match('/\.less$/', $privateFilename)) {
+                    // Compile less file
+                    Less::compile($privateFilename, $publicFilename);
+                }
+                else {
+                    // Copy CSS file
+                    copy($privateFilename, $publicFilename);
+
+                    App::getInstance()->trigger('build-less', array(
+                        'source' => $privateFilename
+                    ));
+                }
             }
 
             return $cssUrl . $cssBasename . '?' . filemtime($publicFilename);
