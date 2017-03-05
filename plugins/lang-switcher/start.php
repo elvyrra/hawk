@@ -7,12 +7,12 @@ Event::on(\Hawk\Plugins\Main\MainController::EVENT_AFTER_GET_MENUS, function(Eve
 
     if(count($languages) > 0){
         $menus = $event->getData('menus');
-
         $menu = new MenuItem(array(
             'id' => uniqid(),
             'plugin' => 'lang-switcher',
             'name' => 'selector',
             'label' => strtoupper(LANGUAGE),
+            'icon' => 'flag'
         ));
 
         foreach($languages as $language){
