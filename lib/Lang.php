@@ -320,27 +320,6 @@ class Lang{
     }
 
 
-
-    /**
-     * Add language keys to Javascript. To add several keys, you can call one time this function, each parameters
-     * being a language key that wille be added to JavaScript
-     *
-     * @param string ...$keys The keys to add
-     *
-     * @deprecated since version 0.7.0, use Controller::addKeysToJavascript instead
-     */
-    public static function addKeysToJavascript(...$keys){
-        $script = "";
-        foreach($keys as $key){
-            list($plugin, $langKey) = explode(".", $key);
-            $script .= "Lang.set('$key', '" . addcslashes(self::get($key), "'") . "');";
-        }
-
-        App::router()->getCurrentController()->addJavaScriptInline($script);
-    }
-
-
-
     /**
      * Get the translations data the user customized on the interface
      *

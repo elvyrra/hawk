@@ -405,7 +405,7 @@ class LoginController extends Controller{
         ));
 
         if(!$form->submitted()) {
-            Lang::addKeysToJavascript($this->_plugin . '.forgotten-pwd-sent-email-message');
+            $this->addKeysToJavascript($this->_plugin . '.forgotten-pwd-sent-email-message');
 
             return Dialogbox::make(array(
                 'title' => Lang::get($this->_plugin . '.forgotten-pwd-form-title'),
