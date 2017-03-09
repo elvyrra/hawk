@@ -56,15 +56,16 @@ class Mail{
         $this->mailer = new \PHPMailer;
 
         $param['Mailer'] = Option::get('main.mailer-type') ? Option::get('main.mailer-type') : self::DEFAULT_MAILER;
-        if($param['Mailer'] == 'smtp' || $param['Mailer'] == 'pop3') {
+        if($param['Mailer'] === 'smtp' || $param['Mailer'] === 'pop3') {
             $param['Host'] = Option::get('main.mailer-host');
             $param['Port'] = Option::get('main.mailer-port');
             $param['Username'] = Option::get('main.mailer-username');
-            $param['Password'] = Option::get('main.mailer-password');
+            $param['Password'] = Crypto::aes256Decode(Option::get('main.mailer-password'));
         }
 
-        if($param['Mailer'] == 'smtp') {
+        if($param['Mailer'] === 'smtp') {
             $param['Secure'] = Option::get('main.smtp-secured');
+            $param['SMTPAuth'] = true;
         }
 
         $this->map($param, $this->mailer);

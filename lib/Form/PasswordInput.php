@@ -51,7 +51,8 @@ class PasswordInput extends FormInput{
      */
     public function display(){
         $decrypt = $this->decrypt;
-        $this->value = ($this->get && $decrypt && is_callable($decrypt)) ? $decrypt($this->value) : "";
+        $this->value = ($this->get && $decrypt && is_callable($decrypt)) ? $decrypt($this->value) : '';
+
         return parent::display();
     }
 
@@ -89,7 +90,8 @@ class PasswordInput extends FormInput{
         if($this->encrypt && is_callable($this->encrypt)) {
             return call_user_func($this->encrypt, $this->value);
         }
-        else
+        else {
             return $this->value;
+        }
     }
 }

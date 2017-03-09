@@ -299,8 +299,9 @@ class AdminController extends Controller{
 
                     new PasswordInput(array(
                         'name' => 'main_mailer-password',
-                        'encrypt' => 'Crypto::aes256Encode',
-                        'decrypt' => 'Crypto::aes256Decode',
+                        'encrypt' => array('\Hawk\Crypto', 'aes256Encode'),
+                        'decrypt' => array('\Hawk\Crypto', 'aes256Decode'),
+                        'get' => true,
                         'default' => Option::get('main.mailer-password'),
                         'label' => Lang::get('admin.settings-mailer-password-label'),
                     )),
@@ -312,6 +313,7 @@ class AdminController extends Controller{
                             'ssl' => 'SSL',
                             'tsl' => 'TSL'
                         ),
+                        'default' => Option::get('main.smtp-secured'),
                         'label' => Lang::get('admin.settings-smtp-secured-label')
                     ))
                 ),
@@ -374,6 +376,7 @@ class AdminController extends Controller{
                     foreach($form->inputs as $name => $field){
                         if(!$field instanceof \Hawk\FileInput && !$field instanceof \Hawk\ButtonInput && !$field instanceof \Hawk\HtmlInput) {
                             $value = $field->dbvalue();
+
                             if($value === null) {
                                 $value = '0';
                             }
