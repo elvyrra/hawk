@@ -101,6 +101,11 @@ class Lang{
     private function getOriginFile(){
         if(is_file(App::cache()->getCacheFilePath(self::ORIGIN_CACHE_FILE)) && empty(self::$originCache)) {
             self::$originCache = App::cache()->includeCache(self::ORIGIN_CACHE_FILE);
+
+            if(!is_array(self::$originCache)) {
+                // The format of the cache file is incorrec
+                self::$originCache = array();
+            }
         }
 
         if(isset(self::$originCache["$this->plugin.$this->lang"])) {

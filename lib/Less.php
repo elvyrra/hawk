@@ -40,7 +40,7 @@ class Less{
      * @return The filename path
      */
     private function getLastCompilationInfoFilename(){
-        return 'less/' . str_replace(array(ROOT_DIR, '/'), array('', '-'), realpath($this->source));
+        return 'less/' . str_replace(array(ROOT_DIR, '/'), array('', '-'), realpath($this->source)) . '.php';
     }
 
     /**
@@ -82,8 +82,7 @@ class Less{
         if(!is_array($cache) || $compilation['updated'] > $cache['updated']) {
             file_put_contents($dest, '/*** ' . date('Y-m-d H:i:s') . ' ***/' . PHP_EOL . $compilation['compiled']);
 
-            $event = new Event('built-less', array('source' => $this->source, 'dest' => $dest));
-            $event->trigger();
+            App::getInstance()->trigger('built-less', array('source' => $this->source, 'dest' => $dest));
 
             // Save the compilation information
             unset($compilation['compiled']);

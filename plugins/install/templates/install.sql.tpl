@@ -51,7 +51,7 @@ INSERT IGNORE INTO `{{ $prefix }}MenuItem` (`id`, `plugin`, `name`, `parentId`, 
 (9, 'user', 'profile', 1, 'main.menu-my-profile', 'edit-profile', '', '', 0, 'cog', 1),
 (10, 'user', 'change-password', 1, 'main.menu-change-password', 'change-password', '', 'dialog', 1, 'key', 1),
 (11, 'user', 'logout', 1, 'main.menu-logout', 'logout', '', 'window', 2, 'sign-out', 1),
-(12, 'main', 'login', 1, 'main.menu-login', 'login', '', 'dialog', 15, 'sign-in', 1);
+(12, 'main', 'login', 0, 'main.login-menu-title', 'login', '', 'dialog', 15, 'sign-in', 1);
 /*!40000 ALTER TABLE `{{ $prefix }}MenuItem` ENABLE KEYS */;
 
 

@@ -44,6 +44,11 @@ class Autoload{
         // Load the cache file for the first time the autload is called
         if(empty(self::$cache) && is_file(Cache::getInstance()->getCacheFilePath(self::CACHE_FILE))) {
             self::$cache = Cache::getInstance()->includeCache(self::CACHE_FILE);
+
+            if(!is_array(self::$cache)) {
+                // The format of the cache is incorrect
+                self::$cache = array();
+            }
         }
 
         // Check the class file is registered in cache
