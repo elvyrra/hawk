@@ -65,7 +65,13 @@ class LoginController extends Controller{
                     ))
                 ),
             ),
-            'onsuccess' => 'location = app.getUri("index");',
+            'onsuccess' => '
+                if(data.redirect) {
+                    location.hash = "#!" + data.redirect;
+                }
+
+                location.reload();
+            '
         );
 
         return new Form($param);
@@ -77,7 +83,7 @@ class LoginController extends Controller{
     public function login(){
         $form = $this->form();
         if(!$form->submitted()) {
-            if(App::request()->getParams('code') == 403) {
+            if(App::request()->getParams('code') == 401) {
                 $form->status = Form::STATUS_ERROR;
                 $form->addReturn('message', Lang::get($this->_plugin . '.403-message'));
             }
