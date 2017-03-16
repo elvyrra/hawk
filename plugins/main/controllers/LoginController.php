@@ -85,7 +85,7 @@ class LoginController extends Controller{
         if(!$form->submitted()) {
             if(App::request()->getParams('code') == 401) {
                 $form->status = Form::STATUS_ERROR;
-                $form->addReturn('message', Lang::get($this->_plugin . '.403-message'));
+                $form->addReturn('message', Lang::get($this->_plugin . '.http-error-401-message'));
             }
             // Display the login page in a dialog box
             return Dialogbox::make(array(
