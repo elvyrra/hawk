@@ -13,7 +13,7 @@ namespace Hawk;
  *
  * @package Layout
  */
-class Dialogbox extends View{
+class Dialogbox {
 
     /**
      * Display the dialogbox
@@ -23,6 +23,6 @@ class Dialogbox extends View{
      * @return string The generated HTML
      */
     public static function make($data){
-        return parent::make(Theme::getSelected()->getView('dialogbox.tpl'), $data);
+        return View::make(Theme::getSelected()->getView('dialogbox.tpl'), $data);
     }
 }

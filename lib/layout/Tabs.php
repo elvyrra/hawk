@@ -13,7 +13,7 @@ namespace Hawk;
  *
  * @package Layout
  */
-class Tabs extends View{
+class Tabs {
 
     /**
      * Display the tabset
@@ -34,6 +34,6 @@ class Tabs extends View{
                 $data['selected'] = $i;
             }
         }
-        return parent::make(Theme::getSelected()->getView('tabs.tpl'), $data);
+        return View::make(Theme::getSelected()->getView('tabs.tpl'), $data);
     }
 }

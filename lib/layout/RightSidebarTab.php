@@ -13,7 +13,7 @@ namespace Hawk;
  *
  * @package Layout
  */
-class RightSidebarTab extends View{
+class RightSidebarTab {
     /**
      * Display the tab
      *
@@ -30,6 +30,6 @@ class RightSidebarTab extends View{
             $data['page']['class'] = 'col-md-9 col-lg-10';
         }
 
-        return parent::make(Theme::getSelected()->getView('tabs-layout/tabs-sidebar-right.tpl'), $data);
+        return View::make(Theme::getSelected()->getView('tabs-layout/tabs-sidebar-right.tpl'), $data);
     }
 }

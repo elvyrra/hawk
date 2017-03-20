@@ -13,7 +13,7 @@ namespace Hawk;
  *
  * @package Layout
  */
-class Icon extends View{
+class Icon {
 
     /**
      * Display the icon
@@ -33,6 +33,6 @@ class Icon extends View{
 
         unset($data['param']['size'], $data['param']['class'], $data['param']['icon']);
 
-        return parent::make(Theme::getSelected()->getView('icon.tpl'), $data);
+        return View::make(Theme::getSelected()->getView('icon.tpl'), $data);
     }
 }

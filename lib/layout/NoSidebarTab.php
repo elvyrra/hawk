@@ -13,7 +13,7 @@ namespace Hawk;
  *
  * @package Layout
  */
-class NoSidebarTab extends View{
+class NoSidebarTab {
 
     /**
      * Display the tab
@@ -26,6 +26,6 @@ class NoSidebarTab extends View{
         if(is_array($data['page']) && isset($data['page']['content']))
         $data['page'] = $data['page']['content'];
 
-        return parent::make(Theme::getSelected()->getView('tabs-layout/tabs-no-sidebar.tpl'), $data);
+        return View::make(Theme::getSelected()->getView('tabs-layout/tabs-no-sidebar.tpl'), $data);
     }
 }

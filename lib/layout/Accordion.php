@@ -13,7 +13,7 @@ namespace Hawk;
  *
  * @package Layout
  */
-class Accordion extends View{
+class Accordion {
 
     /**
      * Display the accordion
@@ -34,6 +34,7 @@ class Accordion extends View{
                 $data['selected'] = $i;
             }
         }
-        return parent::make(Theme::getSelected()->getView('accordion.tpl'), $data);
+
+        return View::make(Theme::getSelected()->getView('accordion.tpl'), $data);
     }
 }

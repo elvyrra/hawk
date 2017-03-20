@@ -13,7 +13,7 @@ namespace Hawk;
  *
  * @package Layout
  */
-class Panel extends View{
+class Panel {
 
     /**
      * Display the panem
@@ -29,6 +29,6 @@ class Panel extends View{
         if(empty($data['type'])) {
             $data['type'] = 'info';
         }
-        return parent::make(Theme::getSelected()->getView('panel.tpl'), $data);
+        return View::make(Theme::getSelected()->getView('panel.tpl'), $data);
     }
 }
