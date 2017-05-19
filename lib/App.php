@@ -54,6 +54,9 @@ final class App extends Singleton{
         // Load the filesystem library
         $this->singleton('fs', FileSystem::getInstance());
 
+        // Load the system library
+        $this->singleton('system', System::getInstance());
+
         // Load the application session
         $this->singleton('session', Session::getInstance());
 

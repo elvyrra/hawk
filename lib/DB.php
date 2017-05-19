@@ -388,7 +388,9 @@ class DB{
         }
         $where = !empty($query->where) ? "WHERE $query->where" : '';
 
-        $group = !empty($query->group) ? "GROUP BY ".implode(",", array_map(array($this, 'formatField'), $query->group)) : "";
+        $group = !empty($query->group) ? 'GROUP BY '. implode(',', array_map(function($group) {
+            return self::formatField($group);
+        }, $query->group)) : "";
 
         $having = !empty($query->having) ? "HAVING $query->having" : '';
 
@@ -583,7 +585,9 @@ class DB{
         }
 
         if(!empty($group)) {
-            $group = 'GROUP BY ' . implode(',', array_map(array(self, 'formatField'), $group));
+            $group = 'GROUP BY ' . implode(',', array_map(function($gr) {
+                return self::formatField($gr);
+            }, $group));
         }
         else {
             $group = '';

@@ -468,7 +468,13 @@ class Plugin{
                     mkdir(dirname($publicFilename), 0755, true);
                 }
 
-                copy($privateFilename, $publicFilename);
+                if(preg_match('/\.js$/', $privateFilename) && App::conf()->get('js.mode') === 'es5') {
+                    // transpile the js file into ES5
+                    App::system()->cmd('npm run build-es5-file -- ' . $privateFilename . ' --out-file ' . $publicFilename);
+                }
+                else {
+                    copy($privateFilename, $publicFilename);
+                }
             }
 
             return $baseUrl . $basename;
@@ -515,11 +521,6 @@ class Plugin{
             return $this->getStaticUrl('js/' . $basename) . '?';
         }
     }
-
-
-
-
-
 
     /**
      * Return the directory containing the plugin CSS files

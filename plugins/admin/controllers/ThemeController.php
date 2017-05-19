@@ -590,7 +590,7 @@ class ThemeController extends Controller{
                 ),
                 'sidebar' => array(
                     'widgets' => array(
-                        new SearchThemeWidget()
+                        SearchThemeWidget::getInstance()
                     )
                 ),
                 'icon' => 'picture-o',

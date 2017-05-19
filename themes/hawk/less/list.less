@@ -37,7 +37,7 @@
     white-space: nowrap;
 
     .list-title-label{
-        max-width: 100%;
+        max-width: calc(~"100% - 3rem");
         white-space: nowrap;
         overflow: hidden;
         display: inline-block;
@@ -45,28 +45,19 @@
         margin-right: 1rem;
     }
 
-    .list-sort-block{
-        white-space: nowrap;
-        display: inline-block;
+    .list-sort-column{
+        background: none;
+        border: none;
+        font-size: 1.3rem;
+        opacity: 0.5;
 
-        .list-sort-column{
-            background: transparent;
-            border: none;
-            font-size: 1.3rem;
-            opacity: 0.5;
-
-            &:hover{
-                opacity: 1;
-            }
-
-            &.list-sort-active{
-                color: @brand-primary;
-                opacity: 1;
-            }
+        &:hover{
+            opacity: 1;
         }
 
-        & + .list-title-label{
-            max-width : calc(~"100% - 3rem");
+        &.list-sort-active{
+            color: @brand-primary;
+            opacity: 1;
         }
     }
 }

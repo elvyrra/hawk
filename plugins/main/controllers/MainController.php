@@ -304,7 +304,8 @@ class MainController extends Controller {
                 'initVars' => json_encode($initVariables, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRETTY_PRINT),
             ),
             'newTabUrl' => $newTabUrl,
-            'mainMenu' => json_encode($mainMenu, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRETTY_PRINT)
+            'mainMenu' => json_encode($mainMenu, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRETTY_PRINT),
+            'es5' => (int)(App::conf()->get('js.mode') === 'es5')
         ));
     }
 

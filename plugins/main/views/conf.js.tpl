@@ -20,7 +20,9 @@ window.appConf = {
 		canAccessApplication : {{ $accessible ? 'true' : 'false' }}
 	},
 
-	menu : {{ $mainMenu }}
+	menu : {{ $mainMenu }},
+
+	es5 : {{ $es5 }}
 };
 
 (function(){
