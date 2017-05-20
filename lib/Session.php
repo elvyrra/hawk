@@ -21,7 +21,7 @@ class Session extends Singleton{
      *
      * @var boolean
      */
-    private $logged,
+    protected $logged,
 
     /**
      * Static variable that registers the current user of the session
@@ -51,7 +51,19 @@ class Session extends Singleton{
      * Initialize the session user
      */
     public function init() {
-        session_set_cookie_params((int) App::conf()->get('session.lifetime'), '/');
+        $lifetime = App::conf()->get('session.lifetime');
+        $path =  App::conf()->get('session.path');
+        $domain =  App::conf()->get('session.domain');
+        $secure =  App::conf()->get('session.secure');
+        $httpOnly =  App::conf()->get('session.httponly');
+
+        session_set_cookie_params(
+            $lifetime ? (int) $lifetime : 0,
+            $path ? $path : '/',
+            $domain ? $domain : getenv('http_host'),
+            $secure ? $secure : false,
+            $httpOnly ? $httpOnly : false
+        );
         session_start();
 
         if (!$this->getData('user.id')) {

@@ -95,6 +95,35 @@ class ItemListField {
     $unit = null,
 
     /**
+     * A specified format
+     *
+     * @var string
+     */
+    $format = null,
+
+    /**
+     * The default number of decimals to display in case of format 'number'
+     *
+     * @var integer
+     */
+    $decimals = 2,
+
+    /**
+     * the default decimal separator in case of format 'number'
+     *
+     * @var string
+     */
+    $decimalSep = '.',
+
+
+    /**
+     * The default thousand separator in case of format 'number'
+     *
+     * @var string
+     */
+    $thousandSep = ' ',
+
+    /**
      * Define if you want a specific displaying for this cell
      *
      * @var string|callable
@@ -184,7 +213,7 @@ class ItemListField {
      *
      * @return string The SQL expression for the search on this field
      */
-    public function getSearchCondition(&$binds){
+    public function getSearchCondition(&$binds) {
         if($this->searchValue !== null) {
             if($this->search['type'] === 'select') {
                 return DBExample::make(
@@ -221,7 +250,7 @@ class ItemListField {
             );
         }
 
-        switch($this->search['type']){
+        switch($this->search['type']) {
             case 'select' :
                 $input = new SelectInput(array(
                     'options' => $this->search['options'],
@@ -311,6 +340,53 @@ class ItemListField {
     }
 
     /**
+     * Get the display function for a given 'format'
+     * @return callable The displaying function
+     */
+    private function getFormatDisplayFunction() {
+        switch($this->format) {
+            case 'number' :
+                $this->display = function($value) {
+                    return number_format($value, $this->decimals, $this->decimalSep, $this->thousandSep);
+                };
+                break;
+
+            case 'date' :
+                $this->display = function($value) {
+                    if(!is_numeric($value)) {
+                        $value = strtotime($value);
+                    }
+                    return date(Lang::get('main.date-format'), $value);
+                };
+                break;
+
+            case 'datetime' :
+                $this->display = function($value) {
+                    if(!is_numeric($value)) {
+                        $value = strtotime($value);
+                    }
+                    return date(Lang::get('main.time-format'), $value);
+                };
+                break;
+
+            case 'relative-time' :
+                $this->display = function($value) {
+                    if(!is_numeric($value)) {
+                        $value = strtotime($value);
+                    }
+                    return Utils::timeAgo($value);
+                };
+                break;
+
+            case 'email' :
+                $this->display = function($value) {
+                    return '<a href="mailto:' . $value . '">' . $value . '</a>';
+                };
+                break;
+        }
+    }
+
+    /**
      * Get the displayed value
      *
      * @param array $lineIndex The index of the line in the list results to display
@@ -320,6 +396,8 @@ class ItemListField {
     public function displayCell($lineIndex){
         $line = $this->list->results[$lineIndex];
         $name = $this->name;
+
+        $this->getFormatDisplayFunction();
 
         $cell = new \StdClass;
         foreach(self::$callableProperties as $prop){
@@ -331,6 +409,8 @@ class ItemListField {
                 $cell->$prop = $this->$prop;
             }
         }
+
+
 
         // Compute the cell content
         if(isset($cell->display)) {

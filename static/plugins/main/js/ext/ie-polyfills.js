@@ -130,7 +130,7 @@ if(!window.Set) {
      * @return {boolean}     True if the value has been removed, else false
      */
     Set.prototype.delete = function(value) {
-        let index = this.content.indexOf(value);
+        var index = this.content.indexOf(value);
 
         if(index !== -1) {
             this.content.splice(index, 1);

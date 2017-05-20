@@ -77,6 +77,11 @@ trait Utils{
     }
 
 
+    /**
+     * Get the given date representation, relative to the current tim
+     * @param  int $time The time to format
+     * @return string    The time relative representation
+     */
     public static function timeAgo($time) {
         $periods = array(
             'seconds',
