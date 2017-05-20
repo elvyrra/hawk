@@ -22,6 +22,13 @@ class Permission extends Model{
     protected static $tablename = "Permission";
 
     /**
+     * The DB instance name to get data in database default MAINDB
+     *
+     * @var string
+     */
+    protected static $dbname = MAINDB;
+
+    /**
      * The model fields
      *
      * @var array
