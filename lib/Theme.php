@@ -117,7 +117,7 @@ class Theme{
      */
     public static function getSelected() {
         if(App::conf()->get('theme')) {
-            return App::conf()->get('theme');
+            return self::get(App::conf()->get('theme'));
         }
 
         return self::get(App::isInstalled() ? Option::get('main.selected-theme') : self::DEFAULT_THEME);
