@@ -20,7 +20,7 @@ class User extends Model{
      *
      * @var string
      */
-    protected static $tablename = "User";
+    protected static $tablename = 'User';
 
     /**
      * The DB instance name to get data in database default MAINDB
@@ -173,20 +173,32 @@ class User extends Model{
      */
     private function getPermissions(){
         if(!isset($this->permissions)) {
-            $sql = 'SELECT P.plugin, P.key, P.id
-    				FROM ' . RolePermission::getTable() . ' RP
-    					INNER JOIN ' . Permission::getTable() . ' P ON RP.permissionId = P.id
-    					INNER JOIN ' . self::getTable() . ' U ON U.roleId = RP.roleId
-    				WHERE U.id = :id AND RP.value=1';
-
-            $permissions = App::db()->query($sql, array('id' => $this->id), array('return' => DB::RETURN_OBJECT));
             $this->permissions = array();
-            foreach($permissions as $permission){
-                // Register the permission by it id
-                $this->permissions['byId'][$permission->id] = 1;
+            $authorized = RolePermission::getListByExample(
+                new DBExample(array(
+                    'value' => 1,
+                    'roleId' => $this->roleId
+                )),
+                'permissionId'
+            );
 
-                // Regoster the permission by it name
-                $this->permissions['byName'][$permission->plugin][$permission->key] = 1;
+            if(!empty($authorized)) {
+                $permissions = Permission::getListByExample(
+                    new DBExample(array(
+                        'id' => array(
+                            '$in' => array_keys($authorized)
+                        )
+                    )),
+                    Permission::getPrimaryColumn()
+                );
+
+                foreach($permissions as $id => $permission){
+                    // Register the permission by it id
+                    $this->permissions['byId'][$id] = 1;
+
+                    // Regoster the permission by it name
+                    $this->permissions['byName'][$permission->plugin][$permission->key] = 1;
+                }
             }
         }
     }
@@ -200,27 +212,18 @@ class User extends Model{
      *
      * @return mixed
      */
-    public function getProfileData($prop = ''){
+    public function getProfileData($prop = '') {
         if(!isset($this->profile)) {
-            $sql = 'SELECT Q.name, V.value
-    				FROM ' . ProfileQuestionValue::getTable()  . ' V
-                        INNER JOIN ' . ProfileQuestion::getTable() . ' Q ON V.question = Q.name
-    				WHERE V.userId = :id';
-
-            $data = App::db()->query(
-                $sql,
-                array(
-                    'id' => $this->id
-                ),
-                array(
-                    'return' => DB::RETURN_ARRAY,
-                    'index' => 'name'
-                )
+            $data = ProfileQuestionValue::getListByExample(
+                new DBExample(array(
+                    'userId' => $this->id
+                )),
+                'question'
             );
 
             $this->profile = array_map(
                 function ($v) {
-                    return $v['value'];
+                    return $v->value;
                 },
                 $data
             );

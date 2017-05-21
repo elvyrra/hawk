@@ -483,9 +483,9 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function ($, EMV,
                 options = {};
             }
 
-            ace.config.set('modePath', app.baseUrl + 'ext/ace/');
-            ace.config.set('workerPath', app.baseUrl + 'ext/ace/');
-            ace.config.set('themePath', app.baseUrl + 'ext/ace/');
+            ace.config.set('modePath', app.baseUrl + require.extLibPrefix + 'ace/');
+            ace.config.set('workerPath', app.baseUrl + require.extLibPrefix + 'ace/');
+            ace.config.set('themePath', app.baseUrl + require.extLibPrefix + 'ace/');
 
             var editor = ace.edit(element.id);
 

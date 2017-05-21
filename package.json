@@ -12,7 +12,7 @@
   },
   "author": "Elvyrra S.A.S",
   "license": "MIT",
-  "devDependencies": {
+  "dependencies": {
     "babel-cli": "^6.18.0",
     "babel-preset-env": "^1.1.8",
     "babel-preset-latest": "^6.16.0"
@@ -21,6 +21,7 @@
     "clean" : "rm -r ./static/plugins/main/js/es5",
     "babel": "cd ./static/plugins/main/js && babel *.js -d es5 --presets=latest",
     "clean-main" : "rm ./static/plugins/main/js/es5/main.js",
-    "build-es5": "npm run clean && npm run babel && npm run clean-main"
+    "build-es5": "npm run clean && npm run babel && npm run clean-main",
+    "build-es5-file" : "babel --presets=latest"
   }
 }

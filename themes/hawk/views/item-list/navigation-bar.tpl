@@ -11,7 +11,7 @@
         <div class="pull-right list-pagination">
             <table>
                 <tr>
-                    <td class='list-result-number'>${recordNumberLabel}</td>
+                    <td class='list-result-number' e-text="recordNumberLabel"></td>
                     <td>
                         <select class="list-max-lines" e-value="lines">
                             {foreach(ItemList::$lineChoice as $v)}
@@ -22,7 +22,6 @@
                     </td>
                     <td class='list-page-choice'>
                         {icon icon="chevron-circle-left" class="list-previous-page" e-click="$this.page--" e-show="page > 1" title="{text key='main.list-previous-page'}"}
-
 
                         <input type='text' class='list-page-number' e-value="page" /> / ${maxPages}
 
