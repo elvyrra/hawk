@@ -36,8 +36,8 @@ define('list', ['jquery', 'emv'], function($, EMV) {
                     id  : data.id,
                     action : data.action,
                     target : data.target,
-                    maxPages : undefined,
-                    recordNumber : 0,
+                    maxPages : data.maxPages,
+                    recordNumber : data.recordNumber || 0,
                     searches : param.searches || {},
                     sorts : param.sorts || {},
                     page : param.page || List.DEFAULT_PAGE_NUMBER,
@@ -47,7 +47,7 @@ define('list', ['jquery', 'emv'], function($, EMV) {
                         $all : false,
                         $none : true
                     },
-                    htmlResult : ''
+                    htmlResult : data.htmlResult || ''
                 },
                 computed : {
                     // The label displaying the number of the list results
@@ -144,11 +144,7 @@ define('list', ['jquery', 'emv'], function($, EMV) {
                 });
             });
 
-            this.refresh()
-
-            .done(() => {
-                this.$apply(this.node());
-            });
+            this.$apply(this.node());
         }
 
         /**
@@ -183,9 +179,11 @@ define('list', ['jquery', 'emv'], function($, EMV) {
                 data : get,
                 cache : false
             })
-            .done(function(response) {
-                this.htmlResult = response;
-            }.bind(this))
+            .done((response) => {
+                Object.keys(response).forEach((key) => {
+                    this[key] = response[key];
+                });
+            })
 
             .fail(function() {
                 app.notify('error', Lang.get('main.refresh-list-error'));

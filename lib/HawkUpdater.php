@@ -107,4 +107,12 @@ class HawkUpdater{
     public function v2_0_0() {
         unlink(CACHE_DIR . 'autoload-cache.php');
     }
+
+
+    /**
+     * v2.1.6 : Remove the field userIp in UserOption
+     */
+    public function v2_1_6() {
+        UserOption::updateTable();
+    }
 }
