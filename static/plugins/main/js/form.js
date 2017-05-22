@@ -120,7 +120,7 @@ define('form', ['jquery', 'moment'], function($, moment) {
             if (this.required) {
                 var emptyValue = this.emptyValue || '';
 
-                if (value === emptyValue) {
+                if (value.toString() === emptyValue.toString()) {
                     this.addError(Lang.get('form.required-field'));
                     return false;
                 }

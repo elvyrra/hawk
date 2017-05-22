@@ -159,6 +159,10 @@ define('app', ['jquery', 'emv', 'tab', 'tabs', 'form', 'list', 'lang', 'cookie',
                     var node = $(event.currentTarget);
                     var url = $(node).attr('href') || $(node).data('href');
 
+                    if (url.match(/^(#|javascript\:|mailto\:)/)) {
+                        return true;
+                    }
+
                     event.preventDefault();
                     var data = {},
                         target = $(node).attr('target') || $(node).data('target');
