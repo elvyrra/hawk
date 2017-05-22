@@ -394,8 +394,6 @@ class FormInput{
         }
 
         // Check, if the field is required, that a value was submitted
-        Utils::debug($this->emptyValue);
-        Utils::debug($this->value);
         if(!empty($this->required) && ((string)$this->value === '' || $this->emptyValue && $this->value === $this->emptyValue)) {
             // The field is required but not filled
             $form && $form->error($this->errorAt, Lang::get('form.required-field'));
