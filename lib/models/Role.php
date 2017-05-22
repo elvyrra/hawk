@@ -21,6 +21,13 @@ class Role extends Model{
     protected static $tablename = "Role";
 
     /**
+     * The DB instance name to get data in database default MAINDB
+     *
+     * @var string
+     */
+    protected static $dbname = MAINDB;
+
+    /**
      * The model fields
      */
     protected static $fields = array(

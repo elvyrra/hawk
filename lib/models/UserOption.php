@@ -23,6 +23,13 @@ class UserOption extends Model{
     protected static $tablename = "UserOption";
 
     /**
+     * The DB instance name to get data in database default MAINDB
+     *
+     * @var string
+     */
+    protected static $dbname = MAINDB;
+
+    /**
      * The primary column
      */
     protected static $primaryColumn = null;

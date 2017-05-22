@@ -21,7 +21,7 @@ final class Logger extends Singleton{
     const LEVEL_WARNING = 'warning';
     const LEVEL_ERROR = 'error';
 
-    const MAX_FILE_SIZE = 204800;
+    const MAX_FILE_SIZE = 20480000;
     const MAX_FILES_BY_LEVEL = 9;
 
     /**
