@@ -308,12 +308,17 @@ class ItemList {
             'page',
         );
 
+        $this->userParam = json_decode(App::session()->getUser()->getOptions('main.list-'.$this->id), true);
 
-        if(App::request()->getHeaders('X-List-Filter-'.$this->id)) {
-            App::session()->getUser()->setOption('main.list-'.$this->id, App::request()->getHeaders('X-List-Filter-'.$this->id));
+        $sentParam = json_decode(App::request()->getHeaders('X-List-Filter-'.$this->id), true);
+
+        foreach($parameters as $paramName) {
+            if(isset($sentParam[$paramName])) {
+                $this->userParam[$paramName] = $sentParam[$paramName];
+            }
         }
 
-        $this->userParam = json_decode(App::session()->getUser()->getOptions('main.list-'.$this->id), true);
+        App::session()->getUser()->setOption('main.list-'.$this->id, json_encode($this->userParam));
 
         foreach($parameters as $name) {
             if(!empty($this->userParam[$name])) {
@@ -585,29 +590,27 @@ class ItemList {
             $param = array();
             $this->recordNumber = 0;
 
-            if($this->refresh) {
-                // Get the data to display
-                $this->get();
+            // Get the data to display
+            $this->get();
 
-                // Get the total number of pages
-                $pages = (ceil($this->recordNumber / $this->lines) > 0) ? ceil($this->recordNumber / $this->lines) : 1;
+            // Get the total number of pages
+            $pages = (ceil($this->recordNumber / $this->lines) > 0) ? ceil($this->recordNumber / $this->lines) : 1;
 
-                // At least one result to display
-                $data  = array();
-                $param = array();
-                if(is_array($this->results)) {
-                    foreach($this->results as $id => $line){
-                        $data[$id]  = array();
-                        $param[$id] = array('class' => '');
+            // At least one result to display
+            $data  = array();
+            $param = array();
+            if(is_array($this->results)) {
+                foreach($this->results as $id => $line){
+                    $data[$id]  = array();
+                    $param[$id] = array('class' => '');
 
-                        if($this->lineClass) {
-                            $function = $this->lineClass;
-                            $param[$id]['class'] .= $function($line);
-                        }
+                    if($this->lineClass) {
+                        $function = $this->lineClass;
+                        $param[$id]['class'] .= $function($line);
+                    }
 
-                        foreach($this->fields as $name => $field){
-                            $data[$id][$name] = $field->displayCell($id);
-                        }
+                    foreach($this->fields as $name => $field){
+                        $data[$id][$name] = $field->displayCell($id);
                     }
                 }
             }
@@ -615,8 +618,27 @@ class ItemList {
             // Get the list views files
             $this->getViews();
 
+            $content = View::make($this->resultTpl, array(
+                'list' => $this,
+                'data' => $data,
+                'linesParameters' => $param,
+                'pages' => $pages,
+            ));
+
+            $content = str_replace(array("\r", "\n"), '', $content);
+
+            if($this->refresh) {
+                App::response()->setContentType('json');
+
+                return array(
+                    'htmlResult' => $content,
+                    'maxPages' => $pages,
+                    'recordNumber' => $this->recordNumber
+                );
+            }
+
             return
-            View::make($this->refresh ? $this->resultTpl : $this->tpl, array(
+            View::make($this->tpl, array(
                 'list' => $this,
                 'data' => $data,
                 'linesParameters' => $param,
@@ -624,7 +646,9 @@ class ItemList {
             )) .
             View::make(Plugin::get('main')->getView('list.js.tpl'), array(
                 'list' => $this,
-                'pages' => $pages
+                'pages' => $pages,
+                'htmlResult' => addslashes($content),
+                'maxPages' => $pages
             ));
         }
         catch(\Exception $e){

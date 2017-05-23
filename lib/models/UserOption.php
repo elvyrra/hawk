@@ -32,7 +32,7 @@ class UserOption extends Model{
     /**
      * The primary column
      */
-    protected static $primaryColumn = null;
+    protected static $primaryColumn = 'id';
 
     /**
      * The model fields
@@ -42,9 +42,6 @@ class UserOption extends Model{
     protected static $fields = array(
         'userId' => array(
             'type' => 'INT(11)'
-        ),
-        'userIp' => array(
-            'type' => 'VARCHAR(15)'
         ),
         'plugin' => array(
             'type' => 'VARCHAR(32)'
@@ -67,14 +64,6 @@ class UserOption extends Model{
             'type' => 'unique',
             'fields' => array(
                 'userId',
-                'plugin',
-                'key'
-            )
-        ),
-        'userIp' => array(
-            'type' => 'unique',
-            'fields' => array(
-                'userIp',
                 'plugin',
                 'key'
             )

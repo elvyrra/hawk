@@ -268,11 +268,16 @@ class User extends Model{
      *
      * @return mixed The value for the option $name, or the array contaning all the user options
      */
-    public function getOptions($name = ''){
+    public function getOptions($name = '') {
         if(!isset($this->options)) {
-            $example = $this->isLogged() ? array('userId' => $this->id) : array('userIp' => App::request()->clientIp());
-
-            $options = UserOption::getListByExample(new DBExample($example));
+            if(!$this->id) {
+                $options = array();
+            }
+            else {
+                $options = UserOption::getListByExample(new DBExample(array(
+                    'userId' => $this->id
+                )));
+            }
 
             $this->options = array();
             foreach($options as $option){
@@ -296,25 +301,40 @@ class User extends Model{
      * @param string $name  The option name, formatted as '<plugin>.<key>'
      * @param mixed  $value The value to set to the option
      */
-    public function setOption($name, $value){
+    public function setOption($name, $value) {
+        if(!$this->id) {
+            return;
+        }
+
         $this->getOptions();
+        $new = !isset($this->options[$name]);
         $this->options[$name] = $value;
 
         list($plugin, $key) = explode('.', $name, 2);
-        $data = array(
-            'plugin' => $plugin,
-            'key' => $key,
-            'value' => $value
-        );
 
-        if($this->isLogged()) {
-            $data['userId'] = $this->id;
+        if($new) {
+            // new option
+            UserOption::getDbInstance()->insert(UserOption::getTable(), array(
+                'userId' => $this->id,
+                'plugin' => $plugin,
+                'key' => $key,
+                'value' => $value
+            ));
         }
-        else{
-            $data['userIp'] = App::request()->clientIp();
+        else {
+            // Option updation
+            UserOption::getDbInstance()->update(
+                UserOption::getTable(),
+                new DBExample(array(
+                    'userId' => $this->id,
+                    'plugin' => $plugin,
+                    'key' => $key
+                )),
+                array(
+                    'value' => $value
+                )
+            );
         }
-
-        UserOption::getDbInstance()->replace(UserOption::getTable(), $data);
     }
 
 
