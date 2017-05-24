@@ -295,13 +295,13 @@ class Form{
 
         self::$instances[$this->id] = $this;
 
-
-        $event = new Event(
-            'form.' . $this->id . '.instanciated', array(
+        App::getInstance()->trigger('form.instanciated', array(
             'form' => $this
-            )
-        );
-        $event->trigger();
+        ));
+
+        App::getInstance()->trigger('form.' . $this->id . '.instanciated', array(
+            'form' => $this
+        ));
     }
 
 

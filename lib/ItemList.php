@@ -347,8 +347,13 @@ class ItemList {
             }
         }
 
-        $event = new Event('list.'.$this->id.'.instanciated', array('list' => $this));
-        $event->trigger();
+        App::getInstance()->trigger('list.instanciated', array(
+            'list' => $this
+        ));
+
+        App::getInstance()->trigger('list.' . $this->id . '.instanciated', array(
+            'list' => $this
+        ));
     }
 
 
