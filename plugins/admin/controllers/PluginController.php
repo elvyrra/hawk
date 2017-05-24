@@ -536,7 +536,21 @@ class PluginController extends Controller{
                         throw new \Exception('Impossible to create the directory ' . $dir);
                     }
 
-                    foreach(array('controllers', 'models', 'lib', 'lang', 'views', 'static', 'static/less', 'static/js', 'static/img', 'widgets') as $subdir){
+                    $subdirs = array(
+                        'controllers',
+                        'crons',
+                        'models',
+                        'lib',
+                        'lang',
+                        'views',
+                        'static',
+                        'static/less',
+                        'static/js',
+                        'static/img',
+                        'widgets'
+                    );
+
+                    foreach($subdirs as $subdir){
                         if(!mkdir($dir . $subdir, 0755, true)) {
                             throw new \Exception('Impossible to create the directory ' . $dir . $subdir);
                         }

@@ -735,6 +735,25 @@ class Plugin{
 
 
     /**
+     * Get the directory containing the plugin cron jobs
+     * @return string The directory containing the plugin cron jobs
+     */
+    public function getCronDir() {
+        return $this->getRootDir() . 'crons/';
+    }
+
+
+    /**
+     * Get the full path of cron script in the plugin
+     * @param  string $filename The script filename
+     * @return string           The fullpath of the script
+     */
+    public function getCronFile($filename) {
+        return $this->getCronDir() . $filename;
+    }
+
+
+    /**
      * Check if the plugin is installed. The plugin is installed if it appears in the database
      *
      * @return boolean True if the plugin is installed, False else
