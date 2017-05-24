@@ -52,7 +52,7 @@ class Mail{
      *
      * @param array $param The parameters to pass to PHPMailer
      */
-    public function __construct($param = array()){
+    public function __construct($param = array()) {
         $this->mailer = new \PHPMailer;
 
         $param['Mailer'] = Option::get('main.mailer-type') ? Option::get('main.mailer-type') : self::DEFAULT_MAILER;

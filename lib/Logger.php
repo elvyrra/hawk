@@ -101,7 +101,7 @@ final class Logger extends Singleton{
 
             $method = 'NA';
             $ip = 'cron';
-            $uri = $argv[2];
+            $uri = $argv[1];
             $uid = $app->uid;
         }
 

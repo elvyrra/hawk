@@ -158,10 +158,16 @@ final class App extends Singleton{
             }
         }
         catch(HTTPException $err) {
-            try {
-                $this->errorHandler->manageHttpError($err, $req, $res);
+            if(!$this->isCron) {
+                try {
+                    $this->errorHandler->manageHttpError($err, $req, $res);
+                }
+                catch(AppStopException $err){}
             }
-            catch(AppStopException $err){}
+            else {
+                echo $err->getMessage();
+                exit;
+            }
         }
         catch(\Hawk\AppStopException $err) {
         }
