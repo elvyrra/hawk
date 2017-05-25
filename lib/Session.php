@@ -51,18 +51,18 @@ class Session extends Singleton{
      * Initialize the session user
      */
     public function init() {
-        $lifetime = App::conf()->get('session.lifetime');
-        $path =  App::conf()->get('session.path');
-        $domain =  App::conf()->get('session.domain');
-        $secure =  App::conf()->get('session.secure');
-        $httpOnly =  App::conf()->get('session.httponly');
+        $lifetime = App::conf()->get('session.lifetime') ? (int)App::conf()->get('session.lifetime') : 0;
+        $path =  App::conf()->get('session.path') ? App::conf()->get('session.path') : '/';
+        $domain =  App::conf()->get('session.domain') ? App::conf()->get('session.domain') : '';
+        $secure =  App::conf()->get('session.secure') ? App::conf()->get('session.secure') : false;
+        $httpOnly =  App::conf()->get('session.httponly') ? App::conf()->get('session.httponly') : false;
 
         session_set_cookie_params(
-            $lifetime ? (int) $lifetime : 0,
-            $path ? $path : '/',
-            $domain ? $domain : getenv('http_host'),
-            $secure ? $secure : false,
-            $httpOnly ? $httpOnly : false
+            $lifetime,
+            $path,
+            $domain,
+            $secure,
+            $httpOnly
         );
         session_start();
 
@@ -86,6 +86,18 @@ class Session extends Singleton{
         }
 
         $this->logged = $this->user->isLogged();
+
+        if($lifetime) {
+            setcookie(
+                session_name(),
+                session_id(),
+                $lifetime ? time() + $lifetime : 0,
+                $path,
+                $domain,
+                $secure,
+                $httpOnly
+            );
+        }
     }
 
     /**
