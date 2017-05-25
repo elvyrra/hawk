@@ -771,7 +771,19 @@ class Model{
         $definition .= $properties['null'] ? ' NULL' : ' NOT NULL';
 
         if(isset($properties['default'])) {
-            $default = $properties['default'] === null ? 'NULL' : App::db()->quote($properties['default']);
+            switch($properties['default']) {
+                case null :
+                    $default = 'NULL';
+                    break;
+
+                case 'CURRENT_TIMESTAMP' :
+                    $default = 'CURRENT_TIMESTAMP';
+                    break;
+
+                default :
+                    $default = App::db()->quote($properties['default']);
+            }
+
             $definition .= ' DEFAULT ' . $default;
         }
 
