@@ -293,15 +293,15 @@ class MenuItem extends Model{
     public function isVisible($user) {
         $route = App::router()->getRouteByName($this->action);
 
-        if($this->actionParameters) {
-            $data = json_decode($this->actionParameters, true);
-
-            foreach($data as $key => $value) {
-                $route->setData($key, $value);
-            }
-        }
-
         if($route) {
+            if($this->actionParameters) {
+                $data = json_decode($this->actionParameters, true);
+
+                foreach($data as $key => $value) {
+                    $route->setData($key, $value);
+                }
+            }
+
             return $route->isAccessible();
         }
 

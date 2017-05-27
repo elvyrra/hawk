@@ -1,6 +1,6 @@
 {
   "name": "hawk",
-  "version": "2.1.7",
+  "version": "2.1.8",
   "description": "Hawk engine",
   "main": "index.js",
   "scripts": {
