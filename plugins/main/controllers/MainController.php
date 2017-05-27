@@ -209,7 +209,7 @@ class MainController extends Controller {
                 $item->label = $user->getUsername();
             }
 
-            if(in_array($item->plugin, PLugin::$mainPlugins)) {
+            if(in_array($item->plugin, Plugin::$mainPlugins)) {
                 $menus['settings'][] = $item;
             }
             else{

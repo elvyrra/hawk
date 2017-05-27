@@ -220,7 +220,6 @@ class LoginController extends Controller{
         foreach($questions as $question){
             $field = json_decode($question->parameters, true);
 
-            //if(!empty($field->roles) && in_array(Option::get('roles.default-role'), $field->roles)) {
             if($question->isAllowedForRole(Option::get('roles.default-role'))) {
                 $classname = 'Hawk\\' . ucwords($question->type) . 'Input';
                 $field['name'] = $question->name;
@@ -232,6 +231,12 @@ class LoginController extends Controller{
                 $param['fieldsets']['profile'][] = new $classname($field);
             }
         }
+
+        if(count($param['fieldsets']['profile']) === 1) {
+            unset($param['fieldsets']['profile']);
+        }
+
+
 
         $form = new Form($param);
         if(!$form->submitted()) {
