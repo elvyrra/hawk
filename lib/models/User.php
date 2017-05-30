@@ -238,7 +238,9 @@ class User extends Model{
      * @param string $prop  The property name to set
      * @param string $value The value to set
      */
-    public function setProfileData($prop, $value){
+    public function setProfileData($prop, $value) {
+        $this->getProfileData();
+
         $this->profile[$prop] = $value;
     }
 
@@ -246,16 +248,17 @@ class User extends Model{
     /**
      * Save the user's profile in the database
      */
-    public function saveProfile(){
-        foreach($this->profile as $prop => $value){
-            $questionValue = new ProfileQuestionValue(
-                array(
-                'question' => $prop,
-                'userId' => $this->id,
-                'value' => $value
-                )
-            );
-            $questionValue->save();
+    public function saveProfile() {
+        if($this->profile) {
+            foreach($this->profile as $prop => $value){
+                $questionValue = new ProfileQuestionValue(array(
+                    'question' => $prop,
+                    'userId' => $this->id,
+                    'value' => $value
+                ));
+
+                $questionValue->save();
+            }
         }
     }
 

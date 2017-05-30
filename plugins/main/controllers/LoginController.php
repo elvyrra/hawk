@@ -255,7 +255,7 @@ class LoginController extends Controller{
                         'email' => $form->inputs['email']->dbvalue(),
                         'password' => $form->inputs['password']->dbvalue(),
                         'active' => Option::get($this->_plugin . '.confirm-register-email') ? 0 : 1,
-                        'createTime' => DB::sqlExpression('UNIX_TIMESTAMP()'),
+                        'createTime' => time(),
                         'createIp' => App::request()->clientIp(),
                         'roleId' => Option::get('roles.default-role'),
                     ));
