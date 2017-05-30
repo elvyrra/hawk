@@ -52,14 +52,14 @@ class QuestionController extends Controller{
         foreach($questions as $question){
             // Add the input to display in register form
             $param['fieldsets']['form'][] = new CheckboxInput(array(
-                'name' => "register-display-$question->name",
+                'name' => 'register-display[' . $question->name . ']',
                 'default' => $question->displayInRegister,
                 'nl' => false
             ));
 
             // Add the input to display in the user profile
             $param['fieldsets']['form'][] = new CheckboxInput(array(
-                'name' => "profile-display-$question->name",
+                'name' => 'profile-display[' . $question->name . ']',
                 'default' => $question->displayInProfile,
                 'nl' => false
             ));
@@ -71,7 +71,7 @@ class QuestionController extends Controller{
             foreach($roles as $role){
                 // Add the input to display in the user profile
                 $param['fieldsets']['form'][] = new CheckboxInput(array(
-                    'name' => "role-$role->name-question-$question->name",
+                    'name' => 'role[' . $question->name . '][' . $role->name . ']',
                     'default' => in_array($role->id, $attributesRoles) ? 1 : 0,
                     'nl' => false
                 ));
@@ -136,7 +136,7 @@ class QuestionController extends Controller{
                     'sort' => false,
                     'search' => false,
                     'display' => function ($value, $field, $line) use ($form) {
-                        return $form->inputs["register-display-$line->name"];
+                        return $form->inputs['register-display[' . $line->name . ']'];
                     }
                 ),
                 'displayInProfile' => array(
@@ -144,7 +144,7 @@ class QuestionController extends Controller{
                     'sort' => false,
                     'search' => false,
                     'display' => function ($value, $field, $line) use ($form) {
-                        return $form->inputs["profile-display-$line->name"];
+                        return $form->inputs['profile-display[' . $line->name . ']'];
                     }
                 )
             ),
@@ -159,7 +159,7 @@ class QuestionController extends Controller{
                 'search' => false,
                 'sort' => false,
                 'display' => function ($value, $field, $line) use ($form) {
-                    return $form->inputs["role-$field->name-question-$line->name"];
+                    return $form->inputs['role[' . $line->name . '][' . $field->name . ']'];
                 },
             );
         }
@@ -186,45 +186,22 @@ class QuestionController extends Controller{
         $roles = Role::getAll('name');
         $save = array();
 
-        foreach($form->inputs as $name => $field){
-            // Manage displayInRegister and displayInProfile
-            if(preg_match("/^(register|profile)\-display\-(\w+)$/", $name, $match)) {
-                $qname = $match[2];
-                $func = $match[1] == "register" ? 'displayInRegister' : 'displayInProfile';
-                if(!isset($save[$qname])) {
-                    $save[$qname] = new ProfileQuestion();
-                    $save[$qname]->set('name', $qname);
+        foreach($questions as $question) {
+            $question->displayInRegister = (bool) $form->inputs['register-display[' . $question->name . ']']->value;
+
+            $question->displayInProfile = (bool) $form->inputs['profile-display[' . $question->name . ']']->value;
+
+            $params = json_decode($question->parameters);
+            $params->roles = array();
+
+            foreach($roles as $role) {
+                if($form->inputs['role[' . $question->name . '][' . $role->name . ']']->value) {
+                    $params->roles[] = $role->id;
                 }
-                $save[$qname]->set($func, (int) App::request()->getBody($name));
             }
-            // Manage roles
-            else if(preg_match("/^role\-(\w+)\-question\-(\w+)$/", $name, $match)) {
-                $qname = $match[2];
-                $roleName = $match[1];
 
-                // If tab doesn't exit create it to avoid exception
-                if(!isset($listRoles[$qname]))
-                    $listRoles[$qname] = array();
+            $question->parameters = json_encode($params);
 
-                $role = $roles[$roleName];
-
-                // If checkbox is tag, add roleId
-                if($field->dbvalue())
-                    array_push($listRoles[$qname], intval($role->id));
-            }
-        }
-
-        foreach($save as $question){
-            $question->update();
-        }
-
-        // Save each ProfileQuestions
-        foreach($questions as $question){
-            $params = json_decode($question->parameters, true);
-
-            $params['roles'] = $listRoles[$question->name];
-
-            $question->set('parameters', json_encode($params));
             $question->update();
         }
 
