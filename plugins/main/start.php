@@ -85,3 +85,13 @@ App::router()->get('js-conf', '/conf.js', array('action' => 'MainController.jsCo
 App::router()->auth(DEV_MODE, function () {
     App::router()->get('clear-cache', '/clear-cache', array('action' => 'MainController.clearCache'));
 });
+
+
+// Redirect to index when the registration is OK
+App::getInstance()->on('main.LoginController.validateRegister.after', function(\Hawk\Event $event) {
+    $result = $event->getData('result');
+
+    App::session()->setData('notification', $result);
+
+    App::response()->redirectToRoute('index');
+});

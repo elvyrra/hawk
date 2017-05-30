@@ -364,12 +364,10 @@ class LoginController extends Controller{
             }
         }
 
-        App::session()->setData('notification', array(
+        return array(
             'status' => $status,
             'message' => Lang::get($messageKey)
-        ));
-
-        App::response()->redirectToRoute('index');
+        );
     }
 
     /**

@@ -183,8 +183,8 @@ final class App extends Singleton{
      * @param  callable $handler The action to execute when the event is triggered. This function gets one parameter,
      *                           the event itself
      */
-    public function on($name, $handler) {
-        Event::on($name, $handler);
+    public function on($name, $handler, $order = Event::ORDER_LAST) {
+        Event::on($name, $handler, $order);
     }
 
     /**
