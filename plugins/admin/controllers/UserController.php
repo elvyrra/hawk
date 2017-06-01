@@ -120,15 +120,15 @@ class UserController extends Controller{
                         'type' => 'select',
                         'options' => call_user_func(function () {
                             $options = array();
-                            foreach(Role::getAll('id', array('id')) as $id => $role){
-                                $options[$id] = Lang::get('roles.role-' . $id . '-label');
+                            foreach(Role::getAll('id') as $id => $role){
+                                $options[$id] = $role->getLabel();
                             }
                             return $options;
                         }),
                         'invitation' => Lang::get($this->_plugin . '.user-filter-status-all')
                     ),
                     'display' => function ($value) {
-                        return Lang::get('roles.role-' . $value . '-label');
+                        return Role::getById($value)->getLabel();
                     }
                 ),
 

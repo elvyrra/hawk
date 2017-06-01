@@ -155,7 +155,7 @@ class QuestionController extends Controller{
             // Add the input to display in register form
             $paramList['fields'][$role->name] = array(
                 'independant' => true,
-                'label' => Lang::get("roles.role-{$role->id}-label"),
+                'label' => $role->getLabel(),
                 'search' => false,
                 'sort' => false,
                 'display' => function ($value, $field, $line) use ($form) {

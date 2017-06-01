@@ -10,7 +10,7 @@
 		<tr>
 			<td></td>
 			{foreach($roles as $role)}
-				<td>{text key="{'roles.role-' . $role->id . '-label'}"}</td>
+				<td>{{ $role->getLabel() }}</td>
 			{/foreach}
 		</tr>
 

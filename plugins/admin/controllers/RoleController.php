@@ -88,10 +88,9 @@ class RoleController extends Controller{
                 ),
 
                 'name' => array(
-                    'independant' => true,
                     'label' => Lang::get('roles.list-name-label'),
                     'display' => function ($value, $field, $line) {
-                        return "<span style='color:{$line->color}'>" . Lang::get("roles.role-{$line->id}-label") . "</span>";
+                        return "<span style='color:{$line->color}'>" . $line->getLabel() . "</span>";
                     }
                 ),
 
@@ -131,7 +130,9 @@ class RoleController extends Controller{
     /**
      * Edit a role
      */
-    public function edit(){
+    public function edit() {
+        $role = Role::getById($this->roleId);
+
         $param = array(
             'id' => 'edit-role-form',
             'model' => 'Role',
@@ -169,7 +170,7 @@ class RoleController extends Controller{
                     new DeleteInput(array(
                         'name' => 'delete',
                         'value' => Lang::get('main.delete-button'),
-                        'notDisplayed' => $this->roleId == -1
+                        'notDisplayed' => $role
                     )),
 
                     new ButtonInput(array(
@@ -185,12 +186,11 @@ class RoleController extends Controller{
 
         foreach(Language::getAll() as $language){
             $param['fieldsets']['form'][] = new TextInput(array(
-                'name' => "translation[{$language->tag}]",
-                "independant" => true,
+                'name' => 'translation[' . $language->tag . ']',
+                'independant' => true,
                 'required' => $language->tag == LANGUAGE,
-                "label" => Lang::get("roles.role-label-label", array('lang' => $language->tag)),
-                "default" => Lang::exists("roles.role-" . $this->roleId . "-label") ?
-                    Lang::get("roles.role-" . $this->roleId . "-label", array(), 0, $language->tag) : ''
+                'label' => Lang::get('roles.role-label-label', array('lang' => $language->tag)),
+                'default' => $role ? $role->getLabel($language->tag) : '',
             ));
         }
 

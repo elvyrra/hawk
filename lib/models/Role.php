@@ -103,8 +103,10 @@ class Role extends Model{
      *
      * @return string
      */
-    public function getLabel(){
-        return Lang::get('roles.role-' . $this->id . '-label');
+    public function getLabel($language = LANGUAGE) {
+        $labelKey = 'roles.role-' . $this->id . '-label';
+
+        return Lang::exists($labelKey) ? Lang::get($labelKey, array(), 0, $language) : $this->name;
     }
 
     /**
