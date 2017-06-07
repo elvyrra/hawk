@@ -190,6 +190,19 @@ define('list', ['jquery', 'emv'], function($, EMV) {
             });
         }
 
+
+        /**
+         * Reload the list
+         */
+        rebuild() {
+            app.load(this.action, {
+                query : {
+                    rebuild : 1
+                },
+                selector : this.$rootElement
+            });
+        }
+
         /**
          * Get the node contaning the list
          * @returns {n.init} The node containing the list

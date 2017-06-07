@@ -162,3 +162,9 @@ reset-pwd-form-confirmation-label = "Type it again"
 reset-pwd-form-success = "Your password was successfully reset. You can now connect with this new password"
 reset-pwd-form-error = "An error occured while reseting your password. Please try again later."
 reset-pwd-form-bad-verification-code = "This code is incorrect"
+
+; List customization
+customize-list-title = "Customize the list"
+customize-list-description = "Drag and drop on the right panel the fields you want to display on the list, on the left the ones you don't want to display."
+customize-list-not-displayed-title = "Do not display : "
+customize-list-displayed-title = "Fields to display :"

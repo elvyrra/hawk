@@ -209,7 +209,21 @@ class ItemList {
      *
      * @var boolean
      */
-    $selectableLines = false;
+    $selectableLines = false,
+
+
+    /**
+     * If not empty, defines the list can be customized, and contains the customization parameters
+     * @var array
+     */
+    $customize = array(),
+
+    /**
+     * Define if the list is reloading
+     *
+     * @var boolean
+     */
+    $rebuild = false;
 
 
     /**
@@ -227,6 +241,7 @@ class ItemList {
     $refresh = false;
 
 
+
     /**
      * Constructor
      *
@@ -235,8 +250,9 @@ class ItemList {
     public function __construct($params) {
         // Default values
         $this->emptyMessage = Lang::get('main.list-no-result');
-        $this->action = getenv('REQUEST_URI');
+        $this->action = str_replace('?' . getenv('QUERY_STRING'), '', getenv('REQUEST_URI'));
         $this->refresh = !!App::request()->getParams('refresh');
+        $this->rebuild = !!App::request()->getParams('rebuild');
 
         // Get the values from the parameters array
         $this->map($params);
@@ -306,6 +322,7 @@ class ItemList {
             'sorts',
             'lines',
             'page',
+            'displayedFields'
         );
 
         $this->userParam = json_decode(App::session()->getUser()->getOptions('main.list-'.$this->id), true);
@@ -601,6 +618,50 @@ class ItemList {
             // Get the total number of pages
             $pages = (ceil($this->recordNumber / $this->lines) > 0) ? ceil($this->recordNumber / $this->lines) : 1;
 
+            if(!empty($this->customize)) {
+                $displayedFields = !empty($this->userParam['displayedFields']) ?
+                    $this->userParam['displayedFields'] :
+                    $this->customize['default'];
+
+                $controlFields = array();
+                foreach($this->fields as $name => $field) {
+                    $controlFields[] = array(
+                        'name' => $name,
+                        'label' => $field->label ? $field->label : $name
+                    );
+                    if(!in_array($name, $displayedFields)) {
+                        $field->hidden = true;
+                    }
+                }
+
+                // Add control button
+                $this->controls[] = array(
+                    'icon' => 'cogs',
+                    'class' => 'btn-default',
+                    'href' => App::router()->getUri(
+                        'customize-list',
+                        array(
+                            'id' => $this->id
+                        ),
+                        array(
+                            'fields' => json_encode($controlFields),
+                            'displayed' => json_encode($displayedFields)
+                        )
+                    ),
+                    'target' => 'dialog'
+                );
+
+                $tmp = $this->fields;
+                $this->fields = array();
+
+                foreach($displayedFields as $field) {
+                    if(isset($tmp[$field])) {
+                        $this->fields[$field] = $tmp[$field];
+                    }
+                }
+            }
+
+
             // At least one result to display
             $data  = array();
             $param = array();
@@ -632,7 +693,7 @@ class ItemList {
 
             $content = str_replace(array("\r", "\n"), '', $content);
 
-            if($this->refresh) {
+            if($this->refresh && !$this->rebuild) {
                 App::response()->setContentType('json');
 
                 return array(
@@ -642,8 +703,7 @@ class ItemList {
                 );
             }
 
-            return
-            View::make($this->tpl, array(
+            $result = View::make($this->tpl, array(
                 'list' => $this,
                 'data' => $data,
                 'linesParameters' => $param,
@@ -655,6 +715,13 @@ class ItemList {
                 'htmlResult' => addslashes($content),
                 'maxPages' => $pages
             ));
+
+            if($this->rebuild) {
+                App::response()->end($result);
+            }
+            else {
+                return $result;
+            }
         }
         catch(\Exception $e){
             App::errorHandler()->exception($e);

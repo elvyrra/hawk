@@ -2,3 +2,5 @@ themes/*
 plugins/*/
 plugins/main/userfiles
 !plugins/main/
+plugins/main/css/
+plugins/main/js/customize-list.js

@@ -86,6 +86,14 @@ App::router()->auth(DEV_MODE, function () {
     App::router()->get('clear-cache', '/clear-cache', array('action' => 'MainController.clearCache'));
 });
 
+// Customize a list
+App::router()->any('customize-list', '/customize-list/{id}', array(
+    'where' => array(
+        'id' => '[\w\-]+'
+    ),
+    'action' => 'CustomListController.customize'
+));
+
 
 // Redirect to index when the registration is OK
 App::getInstance()->on('main.LoginController.validateRegister.after', function(\Hawk\Event $event) {
@@ -95,3 +103,4 @@ App::getInstance()->on('main.LoginController.validateRegister.after', function(\
 
     App::response()->redirectToRoute('index');
 });
+

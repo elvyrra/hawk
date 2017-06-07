@@ -162,3 +162,9 @@ reset-pwd-form-confirmation-label = "Tapez-le à nouveau"
 reset-pwd-form-success = "Votre mot de passe a été réinitialisé avec succès. Vous pouvez dès maintenant vous connecter avec votre nouveau mot de passe"
 reset-pwd-form-error = "Une erreur est survenue pendant la réinitialisation de votre mot de passe. Veuillez ressayer ultérieurement."
 reset-pwd-form-bad-verification-code = "Le code de vérification est incorrect"
+
+; List customization
+customize-list-title = "Personnalisez la liste"
+customize-list-description = "Glissez sur la droite les champs que vous voulez voir afficher dans la liste, à gauche, ceux que vous ne voulez pas voir apparaître."
+customize-list-not-displayed-title = "Ne pas afficher : "
+customize-list-displayed-title = "Champs à afficher :"
