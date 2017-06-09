@@ -392,6 +392,9 @@ class DB{
             return self::formatField($group);
         }, $query->group)) : "";
 
+        if(isset($query->having) && $query->having instanceof DBExample) {
+            $query->having = $query->having->parse($query->binds);
+        }
         $having = !empty($query->having) ? "HAVING $query->having" : '';
 
         if(!empty($query->orderby)) {
