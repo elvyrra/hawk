@@ -420,9 +420,25 @@ class Form{
      * Add a fieldset to the form
      *
      * @param FormFieldset $fieldset The fieldset to add to the form
+     * @param string       $before   The existing fielset to place the new one before
      */
-    public function addFieldset(FormFieldset $fieldset){
-        $this->fieldsets[$fieldset->name] = $fieldset;
+    public function addFieldset(FormFieldset $fieldset, $before = null) {
+        $position = false;
+        if($before) {
+            $position = array_search($before, array_keys($this->fieldsets));
+        }
+
+        if($position === false) {
+            $this->fieldsets[$fieldset->name] = &$fieldset;
+        }
+        elseif($position === 0) {
+            $this->fieldsets = array($fieldset->name => $fieldset) + $this->fieldsets;
+        }
+        else {
+            $this->fieldsets = array_slice($this->fieldsets, 0, $position - 1, true) +
+                            array($fieldset->name => $fieldset) +
+                            array_slice($this->fieldsets, $position, null, true);
+        }
     }
 
     /**
@@ -431,8 +447,10 @@ class Form{
      * @param FormInput $input    The input to insert in the form
      * @param string    $fieldset (optionnal) The fieldset where to insert the input.
      *                            If not set, the input will be just included in $form->inputs, out of any fieldset
+     * @param string    $before   If set, defines the existing field to place the new one before.
+     *                            It not set, the field will be appended to the list of existing fields
      */
-    public function addInput(FormInput $input, $fieldset = ''){
+    public function addInput(FormInput $input, $fieldset = '', $before = null){
         if($input::INDEPENDANT) {
             // This field is independant from the database
             $input->independant = true;
@@ -447,9 +465,44 @@ class Form{
         }
         $input->labelWidth = $labelWidth;
 
-        $this->inputs[$input->name] = &$input;
+        $position = false;
+        if($before) {
+            $position = array_search($before, array_keys($this->inputs));
+        }
+
+        if($position === false) {
+            $this->inputs[$input->name] = &$input;
+        }
+        elseif($position === 0) {
+            $this->inputs = array($input->name => $input) + $this->inputs;
+        }
+        else {
+            $this->inputs = array_slice($this->inputs, 0, $position - 1, true) +
+                            array($input->name => $input) +
+                            array_slice($this->inputs, $position, null, true);
+        }
+
 
         if($fieldset) {
+            $positionInFieldset = false;
+
+            if($before) {
+                $positionInFieldset = array_search($before, array_keys($this->inputs));
+            }
+
+            if($positionInFieldset === false) {
+                $this->fieldsets[$fieldset]->inputs[$input->name] = &$input;
+            }
+            elseif($positionInFieldset === 0) {
+                $this->fieldsets[$fieldset]->inputs = array($input->name => $input) + $this->fieldsets[$fieldset]->inputs;
+            }
+            else {
+                $this->fieldsets[$fieldset]->inputs =
+                    array_slice($this->fieldsets[$fieldset]->inputs, 0, $positionInFieldset - 1, true) +
+                    array($input->name => $input) +
+                    array_slice($this->fieldsets[$fieldset]->inputs, $positionInFieldset, null, true);
+            }
+
             $this->fieldsets[$fieldset]->inputs[$input->name] = &$input;
         }
     }

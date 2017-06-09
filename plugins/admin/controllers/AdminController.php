@@ -27,8 +27,8 @@ class AdminController extends Controller{
             'id' => array('$ne' => 0)
         )), 'id');
         $roles = array();
-        foreach($roleObjects as $role){
-            $roles[$role->id] = Lang::get("roles.role-$role->id-label");
+        foreach($roleObjects as $role) {
+            $roles[$role->id] = $role->getLabel();
         }
 
         $items = MenuItem::getAvailableItems();
