@@ -46,7 +46,6 @@ $app->addMiddleware(new \Hawk\Middlewares\Configuration)
     ->addMiddleware(new \Hawk\Middlewares\StartPlugins)
     ->addMiddleware(new \Hawk\Middlewares\StartTheme)
     ->addMiddleware(new \Hawk\Middlewares\Route)
-    ->addMiddleware(new \Hawk\Middlewares\CheckRequestMethod)
     ->addMiddleware(new \Hawk\Middlewares\CheckRequestAccess)
     ->addMiddleware(new \Hawk\Middlewares\ExecuteController);
 

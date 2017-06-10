@@ -43,7 +43,13 @@ App::router()->auth(App::session()->isLogged(), function () {
  */
 App::router()->auth(!App::session()->isLogged(), function () {
     //Login
-    App::router()->any('login', '/login', array('action' => 'LoginController.login'));
+    App::router()->define('login', '/login', array(
+        'methods' => array(
+            'get',
+            'post'
+        ),
+        'action' => 'LoginController.login'
+    ));
 
     // Register
     App::router()->auth(Option::get('main.open-register'), function () {

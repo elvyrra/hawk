@@ -74,7 +74,7 @@ final class Router extends Singleton{
      *                           </li>
      *                       </ul>
      */
-    public function add($methods, $name, $uri, $param) {
+    private function add($methods, $name, $uri, $param) {
         if(isset($param['auth'])) {
             $auth = $param['auth'];
             $param['auth'] = $this->auth;
@@ -325,7 +325,37 @@ final class Router extends Singleton{
      *                       </ul>
      */
     public function any($name, $path, $param){
-        $this->add(Route::$$SUPPORTED_METHODS, $name, $path, $param);
+        $this->add(Route::$SUPPORTED_METHODS, $name, $path, $param);
+    }
+
+
+
+    /**
+     * Defines a route, and choose the methods the route is accessible
+     *
+     * @param string $name  The route name. This name must be unique for each route
+     * @param string $path  The route path, defined like : /path/{param1}/to/{param2}
+     * @param array  $param The route parameters. This array can have the following data :
+     *                      * 'methods' array : The methods the route is accessible
+     *                      * 'action' string (required) : The controller method to call when the route is matched,
+     *                               formatted like this : 'ControllerClass.method'     *
+     *                      * 'where' array (optionnal) : An array defining each parameter pattern,
+     *                               where keys are the names of the route parameters,
+     *                               and values are the regular expression to match (without delimiters).
+     *                      * 'default' array (optionnal) : An array defining the default values of parameters.
+     *                               This is useful to generate a URI from a route name (method getUri),
+     *                               without giving all parameters values
+     */
+    public function define($name, $path, $param) {
+        if(isset($param['methods'])) {
+            $methods = $param['methods'];
+            unset($param['methods']);
+        }
+        else {
+            $methods = Route::$SUPPORTED_METHODS;
+        }
+
+        $this->add($methods, $name, $path, $param);
     }
 
     /**

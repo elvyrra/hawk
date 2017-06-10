@@ -18,11 +18,22 @@ class Route extends \Hawk\Middleware {
 	public function execute($req, $res) {
 		$path = str_replace(BASE_PATH, '', parse_url($req->getUri(), PHP_URL_PATH));
         $route = $this->app->router->route($path);
+        $matchingRoutes = array();
 
         if($route) {
-            $req->route = $route;
+            if($route->isCallableBy($req->getMethod())) {
+                $req->route = $route;
 
-            return;
+                return;
+            }
+            else {
+                $matchingRoutes[] = $route;
+            }
+        }
+
+        if(!empty($matchingRoutes)) {
+            // The path matches at least a route, but not with the current method
+            throw new BadMethodException($req->uri, $req->getMethod());
         }
 
         // No matching route
