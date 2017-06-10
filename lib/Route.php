@@ -90,7 +90,7 @@ class Route{
     $methods = [];
 
 
-    private static $SUPPORTED_METHODS = array(
+    public static $SUPPORTED_METHODS = array(
         'get',
         'post',
         'patch',

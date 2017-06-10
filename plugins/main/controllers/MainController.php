@@ -206,7 +206,7 @@ class MainController extends Controller {
 
         foreach($items as $id => $item) {
             if($item->labelKey === 'user.username') {
-                $item->label = $user->getUsername();
+                $item->label = $user->getDisplayName();
             }
 
             if(in_array($item->plugin, Plugin::$mainPlugins)) {

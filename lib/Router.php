@@ -74,7 +74,7 @@ final class Router extends Singleton{
      *                           </li>
      *                       </ul>
      */
-    private function add($method, $name, $uri, $param) {
+    public function add($methods, $name, $uri, $param) {
         if(isset($param['auth'])) {
             $auth = $param['auth'];
             $param['auth'] = $this->auth;
@@ -103,8 +103,6 @@ final class Router extends Singleton{
             trigger_error("The route named '$name' already exists", E_USER_WARNING);
         }
         else {
-            $methods = $method === 'any' ? [] : [$method];
-
             $route = new Route($name, $uri, $methods, $param);
 
             $this->routes[$name] = &$route;
@@ -203,7 +201,7 @@ final class Router extends Singleton{
      *                       </ul>
      */
     public function get($name, $path, $param){
-        $this->add('get', $name, $path, $param);
+        $this->add(['get'], $name, $path, $param);
     }
 
 
@@ -228,7 +226,7 @@ final class Router extends Singleton{
      *                       </ul>
      */
     public function post($name, $path, $param){
-        $this->add('post', $name, $path, $param);
+        $this->add(['post'], $name, $path, $param);
     }
 
 
@@ -253,7 +251,7 @@ final class Router extends Singleton{
      *                       </ul>
      */
     public function put($name, $path, $param){
-        $this->add('put', $name, $path, $param);
+        $this->add(['put'], $name, $path, $param);
     }
 
 
@@ -278,7 +276,7 @@ final class Router extends Singleton{
      *                       </ul>
      */
     public function delete($name, $path, $param){
-        $this->add('delete', $name, $path, $param);
+        $this->add(['delete'], $name, $path, $param);
     }
 
 
@@ -303,7 +301,7 @@ final class Router extends Singleton{
      *                       </ul>
      */
     public function patch($name, $path, $param){
-        $this->add('patch', $name, $path, $param);
+        $this->add(['patch'], $name, $path, $param);
     }
 
     /**
@@ -327,9 +325,8 @@ final class Router extends Singleton{
      *                       </ul>
      */
     public function any($name, $path, $param){
-        $this->add('any', $name, $path, $param);
+        $this->add(Route::$$SUPPORTED_METHODS, $name, $path, $param);
     }
-
 
     /**
      * Compute the routing, and execute the controller method associated to the URI

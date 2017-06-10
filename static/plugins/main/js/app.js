@@ -663,7 +663,7 @@ define(
                 }
 
                 return this.conf.basePath + url;
-            };
+            }
 
             /**
              * Get the route name corresponding to an URI
@@ -685,7 +685,7 @@ define(
                 }
 
                 return null;
-            };
+            }
 
             /**
              * Get the route corresponding to an URI. This method turns the route name and the path parameters
