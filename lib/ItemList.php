@@ -625,12 +625,11 @@ class ItemList {
 
                 $controlFields = array();
                 foreach($this->fields as $name => $field) {
-                    $controlFields[] = array(
-                        'name' => $name,
-                        'label' => $field->label ? $field->label : $name
-                    );
-                    if(!in_array($name, $displayedFields)) {
-                        $field->hidden = true;
+                    if(!$field->hidden) {
+                        $controlFields[] = array(
+                            'name' => $name,
+                            'label' => $field->label ? $field->label : $name
+                        );
                     }
                 }
 
