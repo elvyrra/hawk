@@ -644,7 +644,10 @@ class ItemList {
                         ),
                         array(
                             'fields' => json_encode($controlFields),
-                            'displayed' => json_encode($displayedFields)
+                            'displayed' => json_encode($displayedFields),
+                            'immutable' => json_encode(
+                                isset($this->customize['immutable']) ? $this->customize['immutable'] : array()
+                            )
                         )
                     ),
                     'target' => 'dialog'

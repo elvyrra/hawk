@@ -4,7 +4,6 @@ require(['app', 'emv', 'jquery'], (app, EMV, $) => {
     const form = app.forms['customize-list'];
     const allFields = JSON.parse(form.inputs.allFields.val());
     const displayedFields = JSON.parse(form.inputs.displayedFields.val());
-
     const model = new EMV({
         data : {
             allFields : allFields.map((field) => {
@@ -47,6 +46,8 @@ require(['app', 'emv', 'jquery'], (app, EMV, $) => {
         }
     });
 
+    model.immutableFields = JSON.parse(form.inputs.immutableFields.val());
+
     model.displayedFilter = (field) => {
         return field.displayed;
     };
@@ -60,7 +61,7 @@ require(['app', 'emv', 'jquery'], (app, EMV, $) => {
             // handle: '.drag-handle',
             placeholderClass : 'placeholder',
             group : EMV.utils.uid(),
-
+            exclude : '.immutable',
             onDrop: ($item, container, _super) => {
                 _super($item, container);
 

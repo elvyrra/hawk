@@ -9,6 +9,7 @@ class CustomListController extends Controller {
     public function customize() {
         $allFields = App::request()->getParams('fields');
         $displayedFields = App::request()->getParams('displayed');
+        $immutableFields = App::request()->getParams('immutable');
 
         $form = new Form(array(
             'id' => 'customize-list',
@@ -20,6 +21,11 @@ class CustomListController extends Controller {
                         'attributes' => array(
                             'e-value' => 'displayedFields.toString()'
                         )
+                    )),
+
+                    new HiddenInput(array(
+                        'name' => 'immutableFields',
+                        'default' => $immutableFields
                     )),
 
                     new HiddenInput(array(
