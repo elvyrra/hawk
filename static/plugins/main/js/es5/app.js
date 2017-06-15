@@ -668,9 +668,6 @@ define('app', ['jquery', 'emv', 'tab', 'tabs', 'form', 'list', 'lang', 'cookie',
 
                 return this.conf.basePath + url;
             }
-        }, {
-            key: 'getRouteFromUri',
-
 
             /**
              * Get the route name corresponding to an URI
@@ -678,6 +675,9 @@ define('app', ['jquery', 'emv', 'tab', 'tabs', 'form', 'list', 'lang', 'cookie',
              * @param    {string} uri - The uri to look the corresponding route for
              * @returns   {Object} The found route
              */
+
+        }, {
+            key: 'getRouteFromUri',
             value: function getRouteFromUri(uri) {
                 var path = uri.replace(/\/?\?.*$/, '');
 
@@ -693,15 +693,15 @@ define('app', ['jquery', 'emv', 'tab', 'tabs', 'form', 'list', 'lang', 'cookie',
 
                 return null;
             }
-        }, {
-            key: 'getRouteInformationFromUri',
-
 
             /**
              * Get the route corresponding to an URI. This method turns the route name and the path parameters
              * @param   {string} uri The uri to look the corresponding route for
              * @returns {Object}     The found route parameters, or null
              */
+
+        }, {
+            key: 'getRouteInformationFromUri',
             value: function getRouteInformationFromUri(uri) {
                 var _this5 = this;
 

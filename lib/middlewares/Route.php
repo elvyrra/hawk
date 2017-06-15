@@ -3,31 +3,34 @@
 namespace Hawk\Middlewares;
 
 use \Hawk\PageNotFoundException as PageNotFoundException;
+use \Hawk\BadMethodException as BadMethodException;
 
 /**
  * This middleware initialize and configure the application
  */
 class Route extends \Hawk\Middleware {
-	const NAME = 'route';
+    const NAME = 'route';
 
-	/**
-	 * Execute the middleware
-	 * @param  Request $req  The HTTP request
-	 * @param  Response $res  The HTTP response
-	 */
-	public function execute($req, $res) {
-		$path = str_replace(BASE_PATH, '', parse_url($req->getUri(), PHP_URL_PATH));
+    /**
+     * Execute the middleware
+     * @param  Request $req  The HTTP request
+     * @param  Response $res  The HTTP response
+     */
+    public function execute($req, $res) {
+        $path = str_replace(BASE_PATH, '', parse_url($req->getUri(), PHP_URL_PATH));
         $route = $this->app->router->route($path);
         $matchingRoutes = array();
 
-        if($route) {
-            if($route->isCallableBy($req->getMethod())) {
-                $req->route = $route;
+        foreach($this->app->router->getRoutes() as $route) {
+            if($route->match($path)) {
+                if($route->isCallableBy($req->getMethod())) {
+                    $req->route = $route;
 
-                return;
-            }
-            else {
-                $matchingRoutes[] = $route;
+                    return;
+                }
+                else {
+                    $matchingRoutes[] = $route;
+                }
             }
         }
 
@@ -40,5 +43,5 @@ class Route extends \Hawk\Middleware {
         $this->app->logger->warning('The URI ' . $req->getUri() . ' has not been routed');
 
         throw new PageNotFoundException();
-	}
+    }
 }

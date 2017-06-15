@@ -421,7 +421,7 @@ class ItemListField {
         }
 
         // Add a unit to the displayed value
-        if($cell->unit && !$cell->content) {
+        if($cell->unit && $cell->content) {
             $cell->content .= ' ' . $cell->unit;
         }
 

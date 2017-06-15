@@ -378,7 +378,7 @@ define('form', ['jquery', 'moment'], function ($, moment) {
                     // Send an Ajax request to submit the form
                     var data;
 
-                    if (this.method === 'get') {
+                    if (this.method === 'get' || this.method === 'delete') {
                         data = $(this.node).serialize();
                     } else {
                         data = new FormData(this.node.get(0));
