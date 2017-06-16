@@ -461,14 +461,21 @@ class Plugin{
         }
         else{
             $privateFilename = $this->getStaticDir() . $basename;
+            $isJsFile = preg_match('/\.js$/', $basename);
+
+            if(is_file($privateFilename) && $isJsFile && App::conf()->get('js.mode') === 'es5') {
+                $basename = preg_replace('/\.js$/', '.es5.js', $basename);
+            }
+
             $publicFilename = $this->getPublicStaticDir() . $basename;
+
 
             if(is_file($privateFilename) && (!is_file($publicFilename) || filemtime($privateFilename) > filemtime($publicFilename))) {
                 if(!is_dir(dirname($publicFilename))) {
                     mkdir(dirname($publicFilename), 0755, true);
                 }
 
-                if(preg_match('/\.js$/', $privateFilename) && App::conf()->get('js.mode') === 'es5') {
+                if($isJsFile && App::conf()->get('js.mode') === 'es5') {
                     // transpile the js file into ES5
                     App::system()->cmd('npm run build-es5-file -- ' . $privateFilename . ' --out-file ' . $publicFilename);
                 }

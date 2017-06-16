@@ -281,17 +281,32 @@ class Theme{
      */
     public function getFileUrl($file){
         $privateFile = $this->getRootDir() . $file;
-        $publicFile = $this->getStaticDir() . $file;
 
         if(!is_file($privateFile)) {
             throw new \Exception('Impossible to get the URL for the file ' . $privateFile . ' : No such file or directory');
         }
 
-        if(!is_file($publicFile) || filemtime($publicFile) < filemtime($privateFile)) {
+        $isJsFile = preg_match('/\.js$/', $file);
+
+        if($isJsFile && App::conf()->get('js.mode') === 'es5') {
+            $file = preg_replace('/\.js$/', '.es5.js', $file);
+        }
+
+        $publicFile = $this->getStaticDir() . $file;
+
+
+        if(!is_file($publicFile) || filemtime($privateFile) > filemtime($publicFile)) {
             if(!is_dir(dirname($publicFile))) {
                 mkdir(dirname($publicFile), 0755, true);
             }
-            App::fs()->copy($privateFile, $publicFile);
+
+            if($isJsFile && App::conf()->get('js.mode') === 'es5') {
+                // transpile the js file into ES5
+                App::system()->cmd('npm run build-es5-file -- ' . $privateFile . ' --out-file ' . $publicFile);
+            }
+            else {
+                copy($publicFile, $publicFile);
+            }
         }
 
         return $this->getRootUrl() . $file;

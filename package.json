@@ -1,6 +1,6 @@
 {
   "name": "hawk",
-  "version": "2.2.2",
+  "version": "2.3.0",
   "description": "Hawk engine",
   "main": "index.js",
   "scripts": {
@@ -22,6 +22,8 @@
     "babel": "cd ./static/plugins/main/js && babel *.js -d es5 --presets=latest",
     "clean-main" : "rm ./static/plugins/main/js/es5/main.js",
     "build-es5": "npm run clean && npm run babel && npm run clean-main",
-    "build-es5-file" : "babel --presets=latest"
+    "build-es5-file" : "babel --presets=latest",
+    "minify" : "r.js -o minify.js",
+    "build-js" : "npm run minify && npm run build-es5"
   }
 }

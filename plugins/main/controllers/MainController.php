@@ -37,6 +37,16 @@ class MainController extends Controller {
             $routes[$name] = $data;
         }
 
+        $mainJsFile = 'main.js';
+        if(App::conf()->get('js.minified')) {
+            if(App::conf()->get('js.mode') === 'es5') {
+                $mainJsFile = 'es5/main.min.js';
+            }
+            else {
+                $mainJsFile = 'main.min.js';
+            }
+        }
+
 
         return View::make(Plugin::current()->getView('html-document.tpl'), array(
             'title' => $title,
@@ -44,7 +54,7 @@ class MainController extends Controller {
             'keywords' => $keywords,
             'body' => $body,
             'favicon' => $this->getFaviconUrl(),
-            'appUrl' => $this->getPlugin()->getJsUrl('main.js'),
+            'mainJsUrl' => $this->getPlugin()->getJsUrl($mainJsFile),
             'polyfillUrl' => $this->getPlugin()->getjsUrl('ext/ie-polyfills.js')
         ));
     }

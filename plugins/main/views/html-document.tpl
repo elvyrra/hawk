@@ -23,7 +23,7 @@
 
 		<script type="text/javascript" src="{{ $polyfillUrl }}" ></script>
 		<script type="text/javascript" src="{{ Plugin::get('main')->getJsUrl('ext/require.js') }}" ></script>
-		<script type="text/javascript" src="{{ $appUrl }}" id="app-main-script"></script>
+		<script type="text/javascript" src="{{ $mainJsUrl }}" id="app-main-script"></script>
 	</head>
 
 	<body>
