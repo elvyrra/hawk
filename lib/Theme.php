@@ -305,7 +305,7 @@ class Theme{
                 App::system()->cmd('npm run build-es5-file -- ' . $privateFile . ' --out-file ' . $publicFile);
             }
             else {
-                copy($publicFile, $publicFile);
+                copy($privateFile, $publicFile);
             }
         }
 

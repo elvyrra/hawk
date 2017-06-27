@@ -16,7 +16,9 @@
 {if($input->mask)}
 	<script type="text/javascript">
 		require(['app'], function() {
-			$('#{{$input->id}}').mask('{{$input->mask}}');
+			$('#{{$input->id}}').mask('{{$input->mask}}', {
+				placeholder : '{{ str_replace(array("0", "9", "S", "#", "A"), "_", $input->mask) }}'
+			});
 		});
 	</script>
 {/if}
