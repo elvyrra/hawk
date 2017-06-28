@@ -1,8 +1,8 @@
-/* global app, Lang */
+/* global app, Lang, moment */
 
 'use strict';
 
-define('form', ['jquery', 'moment'], function($, moment) {
+define('form', ['jquery'], function($) {
     /**
      * Class FormInput, represents any input in a form
      *

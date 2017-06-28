@@ -22,6 +22,9 @@
 		<link rel="stylesheet" href="{{ Theme::getSelected()->getCustomCssUrl() }}" id="theme-custom-stylesheet"/>
 
 		<script type="text/javascript" src="{{ $polyfillUrl }}" ></script>
+		<script type="text/javascript" src="{{ $momentUrl }}" ></script>
+		<script type="text/javascript" src="{{ $aceUrl }}" ></script>
+		<script type="text/javascript" src="{{ $ckeditorUrl }}" ></script>
 		<script type="text/javascript" src="{{ Plugin::get('main')->getJsUrl('ext/require.js') }}" ></script>
 		<script type="text/javascript" src="{{ $mainJsUrl }}" id="app-main-script"></script>
 	</head>

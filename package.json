@@ -10,7 +10,8 @@
     "build-es5": "npm run clean && npm run babel && npm run clean-main",
     "build-es5-file": "babel --presets=latest",
     "minify": "r.js -o minify.js",
-    "build-js": "npm run minify && npm run build-es5"
+    "uglify" : "uglifyjs --compress --output=./static/plugins/main/js/main.min.js ./static/plugins/main/js/main.min.js",
+    "build-js": "npm run minify && npm run uglify && npm run build-es5"
   },
   "repository": {
     "type": "git",

@@ -1,8 +1,8 @@
-/* global app */
+/* global app, ace, CKEDITOR */
 
 'use strict';
 
-define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, ace, CKEDITOR) {
+define('emv-directives', ['jquery', 'emv'], function($, EMV) {
     /**
      * Custom binding for autocomplete.
      * To enable an autocomplete on a text input, apply the attribute ko-autocomplete like this :
@@ -213,7 +213,7 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
                         // Affect element data
                         element.$autocompleteData = data;
                         element.value = data[this.options.value];
-                        element.blur();
+                        element.onchange();
                     }
 
                     /**
@@ -353,18 +353,11 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
                     model.search(this.value);
                 };
 
-                /**
-                 * Compute research when entering in the input
+
+                /*
+                 * Change the input value
                  */
-                element.onfocus = function() {
-                    model.search(this.value);
-                };
-
-
-                    /*
-                     * Blur the input
-                     */
-                element.onblur = function() {
+                element.onchange = function() {
                     if (!this.$autocompleteData || this.$autocompleteData !== model.selectedItem) {
                         model.selectedItem = null;
                         this.$autocompleteData = null;
@@ -396,14 +389,8 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
 
                             // Tab key
                             case keyCode.TAB :
-                                if (event.shiftKey) {
-                                    // Go preivous element
-                                    model.previous();
-                                }
-                                else {
-                                    model.next();
-                                }
-                                break;
+                                model.result = [];
+                                return true;
 
                             // Select item
                             case keyCode.ENTER :
@@ -424,6 +411,13 @@ define('emv-directives', ['jquery', 'emv', 'ace', 'ckeditor'], function($, EMV, 
                         }
 
                         return false;
+                    }
+                    else {
+                        switch (event.keyCode) {
+                            case keyCode.DOWN :
+                            case keyCode.UP :
+                                model.search(element.value);
+                        }
                     }
 
                     return true;

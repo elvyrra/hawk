@@ -2,6 +2,8 @@
 
 <script type="text/javascript">
     require(['jquery'], function($) {
-        $('#{{ $input->id }}').datepicker({{ $input->picker }});
+        setTimeout(function() {
+            $('#{{ $input->id }}').datepicker({{ $input->picker }});
+        });
     });
 </script>

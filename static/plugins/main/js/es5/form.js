@@ -1,4 +1,4 @@
-/* global app, Lang */
+/* global app, Lang, moment */
 
 'use strict';
 
@@ -8,7 +8,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-define('form', ['jquery', 'moment'], function ($, moment) {
+define('form', ['jquery'], function ($) {
     /**
      * Class FormInput, represents any input in a form
      *

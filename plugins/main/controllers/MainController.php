@@ -47,7 +47,6 @@ class MainController extends Controller {
             }
         }
 
-
         return View::make(Plugin::current()->getView('html-document.tpl'), array(
             'title' => $title,
             'description' => $description,
@@ -55,6 +54,9 @@ class MainController extends Controller {
             'body' => $body,
             'favicon' => $this->getFaviconUrl(),
             'mainJsUrl' => $this->getPlugin()->getJsUrl($mainJsFile),
+            'aceUrl' => $this->getPlugin()->getJsUrl('ext/ace/ace.js'),
+            'ckeditorUrl' => $this->getPlugin()->getJsUrl('ext/ckeditor/ckeditor.js'),
+            'momentUrl' => $this->getPlugin()->getJsUrl('ext/moment.min.js'),
             'polyfillUrl' => $this->getPlugin()->getjsUrl('ext/ie-polyfills.js')
         ));
     }
