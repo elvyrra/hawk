@@ -13,9 +13,10 @@ namespace Hawk;
  *
  * @package Exceptions
  */
-class DBException extends InternalErrorException{
+class DBException extends \Exception {
     const CONNECTION_ERROR = 1;
     const QUERY_ERROR = 2;
+    const CONSTRAINT_ERROR = 3;
 
     /**
      * Constructor
@@ -25,7 +26,7 @@ class DBException extends InternalErrorException{
      * @param string    $value    The exception content
      * @param Exception $previous The previous exception that throwed that one
      */
-    public function __construct($message, $code, $value, $previous = null){
+    public function __construct($message, $code, $value, $previous = null) {
         switch($code){
             case self::CONNECTION_ERROR :
                 $message = "Impossible to connect to Database Server : $value, $message";
@@ -35,15 +36,15 @@ class DBException extends InternalErrorException{
                 break;
 
             case self::QUERY_ERROR:
+            case self::CONSTRAINT_ERROR :
                 $message = "An error was detected : $message in the Database Query : $value";
                 $details = array(
                     'query' => $value
                 );
                 App::logger()->error($message);
                 break;
-
         }
 
-        parent::__construct($message, $details);
+        parent::__construct($message, $code);
     }
 }

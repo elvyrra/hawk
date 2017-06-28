@@ -4,6 +4,7 @@ http-error-401-message = "Vous devez être authentifié pour accéder à cette f
 http-error-403-message = "Vous n'avez pas les droits nécessaires pour accéder à cette fonctionnalité"
 http-error-404-message = "La page que vous demandez : {url} n'existe pas"
 http-error-405-message = "La page {path} n'est pas accessible la méthode {method}"
+http-error-409-message = "L'enregistrement de cette donnée entraîne des conflits"
 http-error-500-message = "Une erreur interne est survenue."
 
 403-message = "Vous n'avez pas les droits nécessaires pour accéder à cette fonctionnalité"

@@ -4,6 +4,7 @@ http-error-401-message = "You must be authenticated to access this feature"
 http-error-403-message = "You don't have necessary privileges to access this feature"
 http-error-404-message = "The page you're expected : {url} does not exists"
 http-error-405-message = "The page {path} is not accessible with the method {method}"
+http-error-409-message = "The registration of this records implies conflicts in data."
 http-error-500-message = "Internal server error"
 
 403-message = "You don't have necessary privileges to access this feature"

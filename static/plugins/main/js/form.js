@@ -386,6 +386,7 @@ define('form', ['jquery', 'moment'], function($, moment) {
                                 this.displayErrors(response.details);
                                 break;
 
+                            case 409 :
                             case 500 :
                                 // An error occured in the form treatment
                                 this.displayErrorMessage(response.message);

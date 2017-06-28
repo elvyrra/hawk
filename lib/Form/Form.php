@@ -25,6 +25,7 @@ class Form{
     const STATUS_SUCCESS = 'success';
     const STATUS_ERROR = 'error';
     const STATUS_CHECK_ERROR = 'check-error';
+    const STATUS_CONFLICT_ERROR = 'conflict-error';
 
     // Submission return codes
     const HTTP_CODE_SUCCESS = 200; // OK
@@ -708,11 +709,19 @@ class Form{
             }
             return $this->object->$id;
         }
-        catch(DBException $e){
-            $this->status = self::STATUS_ERROR;
+        catch(DBException $e) {
+            if($e->getCode() === DBException::CONSTRAINT_ERROR) {
+                $this->status = self::STATUS_CONFLICT_ERROR;
+                $defaultMessage = Lang::get('form.error-register-conflict');
+            }
+            else {
+                $this->status = self::STATUS_ERROR;
+                $defaultMessage = Lang::get('form.error-register');
+            }
+
             App::logger()->error('An error occured while registering data on the form ' . $this->id . ' : ' . $e->getMessage());
             if($exit) {
-                return $this->response(self::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : ($error ? $error : Lang::get('form.error-register')));
+                return $this->response($this->status, DEBUG_MODE ? $e->getMessage() : ($error ? $error : $defaultMessage));
             }
             throw $e;
         }
@@ -759,11 +768,19 @@ class Form{
             return $this->object->$id;
         }
         catch(DBException $e){
-            $this->status = self::STATUS_ERROR;
+            if($e->getCode() === DBException::CONSTRAINT_ERROR) {
+                $this->status = self::STATUS_CONFLICT_ERROR;
+                $defaultMessage = Lang::get('form.error-delete-conflict');
+            }
+            else {
+                $this->status = self::STATUS_ERROR;
+                $defaultMessage = Lang::get('form.error-delete');
+            }
+
             App::logger()->error('An error occured while deleting the element of the form ' . $this->id . ' : ' . $e->getMessage());
 
             if($exit) {
-                return $this->response(self::STATUS_ERROR, DEBUG_MODE ? $e->getMessage() : ($error ? $error : Lang::get('form.error-delete')));
+                return $this->response($this->status, DEBUG_MODE ? $e->getMessage() : ($error ? $error : $defaultMessage));
             }
             throw $e;
         }
@@ -827,6 +844,10 @@ class Form{
             case self::STATUS_CHECK_ERROR :
                 // An error occured while checking field syntaxes
                 throw new BadRequestException($message ? $message : Lang::get('form.error-fill'), $this->errors);
+
+            case self::STATUS_CONFLICT_ERROR :
+                // A conflict error occured
+                throw new ConflictException($message ? $message : Lang::get('form.' . $status . '-' . $this->dbaction . '-conflict'), $this->errors);
 
 
             case self::STATUS_ERROR :

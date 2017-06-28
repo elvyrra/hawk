@@ -322,7 +322,10 @@ class DB{
         }
         catch(\PDOException $e) {
             $this->addLog($log, 'query failed', $start, microtime(true));
-            throw new DBException($e->getMessage(), DBException::QUERY_ERROR, $sql);
+
+            $code = $e->getCode() === '23000' ? DBException::CONSTRAINT_ERROR : DBException::QUERY_ERROR;
+
+            throw new DBException($e->getMessage(), $code, $sql);
         }
     }
 
