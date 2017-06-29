@@ -32,9 +32,24 @@ class DatetimeInput extends TextInput {
     /**
      * The format for database
      */
-    $dbformat = 'Y-m-d';
+    $dbformat = 'Y-m-d',
+
+    /**
+     * The datepicker options
+     */
+    $picker = array(
+        'orientation' => 'right',
+        'todayBtn' => 'linked'
+    ),
+
+    /**
+     * Display an interval ?
+     */
+    $interval = false;
 
     const TYPE = 'date';
+
+    const INTERVAL_SEPARATOR = ' - ';
 
     /**
      * Constructor
@@ -78,21 +93,46 @@ class DatetimeInput extends TextInput {
         $this->class .= ' datetime';
 
         /*** Format the value ***/
-        $picker = array(
-            'format' => Lang::get('main.date-mask'),
-            'orientation' => 'right'
-        );
+        $this->picker['format'] = Lang::get('main.date-mask');
 
         if($this->max) {
-            $picker['endDate'] = $this->max;
+            $this->picker['endDate'] = $this->max;
         }
         if($this->min) {
-            $picker['startDate'] = $this->min;
+            $this->picker['startDate'] = $this->min;
+        }
+        if($this->interval) {
+            $this->picker['multidate'] = 2;
+            $this->picker['multidateSeparator'] = self::INTERVAL_SEPARATOR;
+        }
+        else {
+            $this->picker['autoclose'] = true;
         }
 
-        $this->picker = json_encode($picker);
-
         return parent::display();
+    }
+
+
+    /**
+     * Check the format and the validity of a date
+     * @param   string $date  The date to check
+     * @param   Form   &$form The form to apply the potential errors
+     * @return  bool          The check status
+     */
+    private function checkDate($date, &$form) {
+        $tmp = date_parse_from_format($this->format, trim($date));
+
+        if(empty($tmp)) {
+            $form->error($this->errorAt, Lang::get('form.date-format'));
+            return false;
+        }
+        // Check the date is valid
+        if(!checkdate($tmp['month'], $tmp['day'], $tmp['year'])) {
+            $form->error($this->errorAt, Lang::get('form.invalid-date'));
+            return false;
+        }
+
+        return true;
     }
 
 
@@ -109,41 +149,58 @@ class DatetimeInput extends TextInput {
             return false;
         }
 
-        if($this->value!="") {
-            // Check the format of the given date
-            $tmp = date_parse_from_format($this->format, $this->value);
+        if($this->value != '') {
+            if($this->interval) {
+                $dates = explode(self::INTERVAL_SEPARATOR, $this->value);
 
-            if(empty($tmp)) {
-                $form->error($this->errorAt, Lang::get('form.date-format'));
-                return false;
+                foreach($dates as $date) {
+                    if(! $this->checkDate($date, $form)) {
+                        return false;
+                    }
+                }
             }
-            // Check the date is valid
-            if(!checkdate($tmp['month'], $tmp['day'], $tmp['year'])) {
-                $form->error($this->errorAt, Lang::get('form.invalid-date'));
-                return false;
+            else {
+                return $this->checkDate($this->value, $form);
             }
-
         }
+
         return true;
     }
 
+
+    /**
+     * Method that convert a sent value to the format for the datavase
+     * @param  string $dateStr The date to format
+     * @return mixed           The formatted value
+     */
+    private function formatDateToDb($dateStr) {
+        $date = \DateTime::createFromFormat($this->format, $dateStr);
+
+        if($this->dataType == 'int') {
+            return $date->getTimestamp();
+        }
+        elseif($this->value == '') {
+            return '';
+        }
+        else {
+            return $date->format($this->dbformat);
+        }
+    }
 
     /**
      * Return the input value in the database format
      *
      * @return string The formatted value
      */
-    public function dbvalue(){
-        $date = \DateTime::createFromFormat($this->format, $this->value);
+    public function dbvalue() {
+        if($this->interval) {
+            $dates = explode(self::INTERVAL_SEPARATOR, $this->value);
 
-        if($this->dataType == 'int') {
-            return $date->getTimestamp();
+            return array_map(function($date) {
+                return $this->formatDateToDb($date);
+            }, $dates);
         }
-        elseif($this->value == "") {
-            return '';
-        }
-        else {
-            return $date->format($this->dbformat);
-        }
+
+        return $this->formatDateToDb($this->value);
     }
 }

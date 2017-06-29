@@ -215,23 +215,63 @@ class ItemListField {
      */
     public function getSearchCondition(&$binds) {
         if($this->searchValue !== null) {
-            if($this->search['type'] === 'select') {
-                return DBExample::make(
-                    array(
-                        $this->field => $this->getInput()->dbvalue()
-                    ),
-                    $binds
-                );
-            }
+            switch($this->search['type']) {
+                case 'select' :
+                    return DBExample::make(
+                        array(
+                            $this->field => $this->getInput()->dbvalue()
+                        ),
+                        $binds
+                    );
 
-            return DBExample::make(
-                array(
-                    $this->field => array(
-                        '$like' => '%' . $this->getInput()->dbvalue() . '%'
-                    )
-                ),
-                $binds
-            );
+                case 'date' :
+                    return DBExample::make(
+                        array(
+                            'DATE(' . $this->field . ')' => $this->getInput()->dbvalue()
+                        ),
+                        $binds
+                    );
+
+                case 'date-interval' :
+                    $values = $this->getInput()->dbvalue();
+                    switch(count($values)) {
+                        case 0 :
+                            return '';
+
+                        case 1 :
+                            return DBExample::make(
+                                array(
+                                    'DATE(' . $this->field . ')' => $values[0]
+                                ),
+                                $binds
+                            );
+
+                        default :
+                            return DBExample::make(
+                                array(
+                                    'DATE(' . $this->field . ')' => array(
+                                        '$between' => array(
+                                            min($values),
+                                            max($values)
+                                        )
+                                    )
+                                ),
+                                $binds
+                            );
+
+                    }
+
+
+                default :
+                    return DBExample::make(
+                        array(
+                            $this->field => array(
+                                '$like' => '%' . $this->getInput()->dbvalue() . '%'
+                            )
+                        ),
+                        $binds
+                    );
+            }
         }
 
         return '';
@@ -284,6 +324,23 @@ class ItemListField {
                         'e-value' => 'search',
                         'e-class' => "search ? 'alert-info not-empty' : 'empty'"
                     ),
+                ));
+                break;
+
+            case 'date-interval' :
+                $input = new DatetimeInput(array(
+                    'id' => uniqid(),
+                    'after' => Icon::make(array(
+                        'icon' => 'times-circle',
+                        'class' => 'clean-search',
+                        'e-click' => 'function(){ search = null; }',
+                        'e-show' => 'search'
+                    )),
+                    'attributes' => array(
+                        'e-value' => 'search',
+                        'e-class' => "search ? 'alert-info not-empty' : 'empty'"
+                    ),
+                    'interval' => true
                 ));
                 break;
 
