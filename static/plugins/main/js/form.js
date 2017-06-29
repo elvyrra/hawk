@@ -334,7 +334,7 @@ define('form', ['jquery'], function($) {
             // Remove all Errors on this form
             this.removeErrors();
 
-            if (this.objectAction === 'delete' || this.isValid()) {
+            if (this.method === 'delete' || this.isValid()) {
                 app.loading.start();
 
                 // Send an Ajax request to submit the form
