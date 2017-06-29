@@ -27,10 +27,7 @@ require.config({
         bootstrap   : extPrefix + 'bootstrap.min',
         colorpicker : extPrefix + 'bootstrap-colorpicker.min',
         datepicker  : extPrefix + 'bootstrap-datepicker.min',
-        ckeditor    : extPrefix + 'ckeditor/ckeditor',
-        ace         : extPrefix + 'ace/ace',
         less        : extPrefix + 'less',
-        moment      : extPrefix + 'moment.min',
         emv         : 'emv.min'
     },
     shim : {
@@ -61,19 +58,8 @@ require.config({
         'emv-directives' : {
             deps : ['emv']
         },
-        ace : {
-            exports : 'ace'
-        },
-        ckeditor : {
-            exports : 'CKEDITOR'
-        },
-        moment : {
-            exports : 'moment'
-        },
-        shim : {
-            emv : {
-                exports : 'EMV'
-            }
+        emv : {
+            exports : 'EMV'
         }
     }
 });

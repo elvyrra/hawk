@@ -1,8 +1,8 @@
-/* global app, Lang */
+/* global app, Lang, moment */
 
 'use strict';
 
-define('form', ['jquery', 'moment'], function($, moment) {
+define('form', ['jquery'], function($) {
     /**
      * Class FormInput, represents any input in a form
      *
@@ -334,7 +334,7 @@ define('form', ['jquery', 'moment'], function($, moment) {
             // Remove all Errors on this form
             this.removeErrors();
 
-            if (this.objectAction === 'delete' || this.isValid()) {
+            if (this.method === 'delete' || this.isValid()) {
                 app.loading.start();
 
                 // Send an Ajax request to submit the form
