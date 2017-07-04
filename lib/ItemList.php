@@ -737,4 +737,125 @@ class ItemList {
     public function isRefreshing() {
         return $this->refresh;
     }
+
+    /**
+     * Export the list data as CSV file
+     * @param  string $format The exporation format (csv, json, xml)
+     * @param  bool $pretty Prettify the output (available for json and xml formats)
+     * @return string Th CSV content
+     */
+    public function export($format, $pretty = false) {
+        $outFilename = $this->id . '.' . $format;
+
+        $response = App::response();
+        $response->setContentType('application/octet-stream; charset=utf-8');
+        $response->header('Content-Transfer-Encoding', 'Binary');
+        $response->header('Content-Disposition', 'attachment; filename="' . $outFilename . '"');
+
+        $this->lines = self::ALL_LINES;
+
+        $this->get();
+
+        if(!empty($this->customize)) {
+            $displayedFields = !empty($this->userParam['displayedFields']) ?
+                $this->userParam['displayedFields'] :
+                $this->customize['default'];
+
+            $tmp = $this->fields;
+            $this->fields = array();
+
+            foreach($displayedFields as $field) {
+                if(isset($tmp[$field])) {
+                    $this->fields[$field] = $tmp[$field];
+                }
+            }
+        }
+
+        $output = fopen('php://output', 'w');
+        switch($format) {
+            case 'csv' :
+
+                // Write the first line with the columns names
+                fputcsv(
+                    $output,
+                    array_map(function($field) {
+                        return $field->label;
+                    }, $this->fields),
+                    ';'
+                );
+
+
+                if(is_array($this->results)) {
+                    foreach($this->results as $id => $line){
+                        $line = array();
+
+                        foreach($this->fields as $name => $field) {
+                            $line[] = trim(strip_tags($field->displayCell($id)));
+                        }
+
+                        fputcsv($output, $line, ';');
+                    }
+                }
+                break;
+
+
+            case 'json' :
+                $data = array();
+
+                if(is_array($this->results)) {
+                    foreach($this->results as $id => $line){
+                        $line = array();
+
+                        foreach($this->fields as $name => $field) {
+                            $line[$name] = trim(strip_tags($field->displayCell($id)));
+                        }
+
+                        $data[] = $line;
+                    }
+                }
+
+                $flag = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES;
+
+                if($pretty) {
+                    $flag = $flag | JSON_PRETTY_PRINT;
+                }
+
+                fputs($output, json_encode($data, $flag));
+                break;
+
+            case 'xml' :
+                $list = new \SimpleXMLElement('<list />');
+                $list->addAttribute('id', $this->id);
+
+                if(is_array($this->results)) {
+                    foreach($this->results as $id => $line){
+                        $line = $list->addChild('element');
+
+                        foreach($this->fields as $name => $field) {
+                            $line->addChild($name, trim(strip_tags($field->displayCell($id))));
+                        }
+                    }
+                }
+
+                if($pretty) {
+                    $dom = dom_import_simplexml($list)->ownerDocument;
+                    $dom->formatOutput = true;
+
+                    $content = $dom->saveXml();
+                }
+                else {
+                    $content = $list->asXML();
+                }
+
+                fputs($output, $content);
+                break;
+
+
+            default :
+                break;
+        }
+
+
+        $response->end();
+    }
 }

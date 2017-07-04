@@ -92,6 +92,7 @@ App::router()->auth(DEV_MODE, function () {
     App::router()->get('clear-cache', '/clear-cache', array('action' => 'MainController.clearCache'));
 });
 
+
 // Customize a list
 App::router()->any('customize-list', '/customize-list/{id}', array(
     'where' => array(

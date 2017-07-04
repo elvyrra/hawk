@@ -1,6 +1,7 @@
 {assign name="formContent"}
     {{ $form->inputs['displayedFields'] }}
     {{ $form->inputs['allFields'] }}
+    {{ $form->inputs['immutableFields'] }}
 
     <template id="customize-list-item">
         ${label}
