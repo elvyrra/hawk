@@ -317,7 +317,7 @@ class User extends Model{
 
         if($new) {
             // new option
-            UserOption::getDbInstance()->insert(UserOption::getTable(), array(
+            UserOption::getDbInstance('master')->insert(UserOption::getTable(), array(
                 'userId' => $this->id,
                 'plugin' => $plugin,
                 'key' => $key,
@@ -326,7 +326,7 @@ class User extends Model{
         }
         else {
             // Option updation
-            UserOption::getDbInstance()->update(
+            UserOption::getDbInstance('master')->update(
                 UserOption::getTable(),
                 new DBExample(array(
                     'userId' => $this->id,

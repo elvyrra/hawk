@@ -241,13 +241,21 @@ class RoleController extends Controller{
     /**
      * Remove a role
      */
-    public function remove(){
+    public function remove() {
         $role = Role::getById($this->roleId);
+
         if($role && $role->isRemovable()) {
-            User::getDbInstance()->update(User::getTable(), new DBExample(array('roleId' => $role->id)), array('roleId' => Option::get('roles.default-role')));
+            User::getDbInstance()->update(
+                User::getTable(),
+                new DBExample(array(
+                    'roleId' => $role->id
+                )),
+                array(
+                    'roleId' => Option::get('roles.default-role')
+                )
+            );
 
             $role->delete();
-
         }
     }
 }

@@ -81,7 +81,7 @@ class Permission extends Model{
      *
      * @return array The list of permissions, indexed by the plugins names, where each element is an array contaning the plugin permissions
      */
-    public static function getAllGroupByPlugin(){
+    public static function getAllGroupByPlugin() {
         $permissions = self::getAll();
         $groups = array();
         foreach($permissions as $permission){
@@ -103,8 +103,10 @@ class Permission extends Model{
      *
      * @return array The list of found permissions
      */
-    public static function getPluginPermissions($plugin){
-        return self::getListByExample(new DBExample(array('plugin' => $plugin)));
+    public static function getPluginPermissions($plugin) {
+        return self::getListByExample(new DBExample(array(
+            'plugin' => $plugin
+        )));
     }
 
 
@@ -118,7 +120,10 @@ class Permission extends Model{
     public static function getByName($name){
         list($plugin, $key) = explode('.', $name);
 
-        return self::getByExample(new DBExample(array('plugin' => $plugin, 'key' => $key)));
+        return self::getByExample(new DBExample(array(
+            'plugin' => $plugin,
+            'key' => $key
+        )));
     }
 
 
@@ -131,7 +136,7 @@ class Permission extends Model{
      *
      * @return Permission The created permission
      */
-    public static function add($name, $default = 1, $availableForGuests = 0){
+    public static function add($name, $default = 1, $availableForGuests = 0) {
         list($plugin, $key) = explode('.', $name);
         $permission = parent::add(array(
             'plugin' => $plugin,
@@ -140,7 +145,7 @@ class Permission extends Model{
         ));
 
         $roles = Role::getAll();
-        foreach($roles as $role){
+        foreach($roles as $role) {
             $value = $role->id == Role::GUEST_ROLE_ID ? ($availableForGuests ? $default : 0) : $default;
             RolePermission::add(array(
                 'roleId' => $role->id,

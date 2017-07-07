@@ -81,13 +81,10 @@ class Language extends Model{
      * @return array The list of language instances
      */
     public static function getAllActive(){
-        return self::getListByExample(
-            new DBExample(
-                array(
-                'active' => 1
-                )
+        return self::getListByExample(new DBExample(array(
+            'active' => 1
             )
-        );
+        ));
     }
 
     /**
@@ -102,8 +99,13 @@ class Language extends Model{
     /**
      * Set the language as the default one for the application
      */
-    public function setDefault(){
-        $this->dbo->query('UPDATE '. self::getTable() . ' SET isDefault = CASE WHEN `tag` = :tag THEN 1 ELSE 0 END', array('tag' => $this->tag));
+    public function setDefault() {
+        self::getDbInstance('master')->query(
+            'UPDATE '. self::getTable() . ' SET isDefault = CASE WHEN `tag` = :tag THEN 1 ELSE 0 END',
+            array(
+                'tag' => $this->tag
+            )
+        );
     }
 
 

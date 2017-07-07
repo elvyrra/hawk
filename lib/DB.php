@@ -142,36 +142,45 @@ class DB{
      * Get the open connection, or open it if not already open.
      * This method manages master / slaves connections
      *
-     * @param String $name The name of the instance
+     * @param string $name     The name of the instance
+     * @param string $replication The master or slave replication
      *
      * @return DB the connected instance
      */
-    public static function get($name){
-        if(isset(self::$instances[$name])) {
-            return self::$instances[$name];
-        }
+    public static function get($name, $replication = 'master') {
+        if(!isset(self::$instances[$name][$replication])) {
+            $servers = self::$servers[$name];
 
-        $servers = self::$servers[$name];
-        foreach($servers as $i => $server){
-            try{
-                self::$instances[$name] = new self($server);
-                App::logger()->debug('Connection to db ' . $name . ' successfull');
-                // The connection succeed
-                break;
+            if(isset($servers[$replication])) {
+                $server = $servers[$replication];
             }
-            catch(DBException $e){
-                $log = 'Impossible to connect to db ' . $name . ' on instance ' . $i . ' : ' . $e->getMessage();
-                App::logger()->warning($log);
-                // The connection failed, try to connect to the next slave
-                if(!isset($servers[$i+1])) {
-                    // the last slave connection failed
-                    App::logger()->error('Impossible to connect to db ' . $name . ' : ' . $e->getMessage());
-                    throw $e;
+            else {
+                if($replication === 'master') {
+                    $server = reset($servers);
+                }
+                else {
+                    $server = end($servers);
                 }
             }
+
+            if(!isset(self::$instances[$name])) {
+                self::$instances[$name] = array();
+            }
+
+            try {
+                self::$instances[$name][$replication] = new self($server);
+                // The connection succeed
+                App::logger()->debug('Connection to db ' . $name . ' successfull');
+            }
+            catch(DBException $e){
+                // The connection failed
+
+                App::logger()->error('Impossible to connect to db ' . $name . ' : ' . $e->getMessage());
+                throw $e;
+            }
         }
 
-        return self::$instances[$name];
+        return self::$instances[$name][$replication];
     }
 
     /**

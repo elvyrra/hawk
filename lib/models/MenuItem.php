@@ -239,14 +239,10 @@ class MenuItem extends Model{
         else{
             list($plugin, $name) = explode('.', $name, 2);
 
-            return self::getByExample(
-                new DBExample(
-                    array(
-                    'plugin' => $plugin,
-                    'name' => $name
-                    )
-                )
-            );
+            return self::getByExample(new DBExample(array(
+                'plugin' => $plugin,
+                'name' => $name
+            )));
         }
     }
 
@@ -268,8 +264,8 @@ class MenuItem extends Model{
     /**
      * Delete the menu item
      */
-    public function delete(){
-        App::db()->update(
+    public function delete() {
+        self::getDnInstance('master')->update(
             self::getTable(),
             new DBExample(array(
                 'parentId' => $this->id

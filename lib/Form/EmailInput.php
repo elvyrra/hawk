@@ -22,7 +22,7 @@ class EmailInput extends TextInput{
      */
     public function __construct($param){
         parent::__construct($param);
-        $this->pattern = "/^[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]{2,}\.[a-z]{2,4}$/";
+        $this->pattern = "/^[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]{2,}\.[a-z]{2,}$/";
     }
 
 

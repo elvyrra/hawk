@@ -290,7 +290,7 @@ class ItemList {
             $this->refAlias = is_array($this->reference) ? reset($this->reference) : $this->reference;
             $this->refField = is_array($this->reference) ? reset(array_keys($this->reference)) : $this->reference;
 
-            $this->dbo = DB::get($this->dbname);
+            $this->dbo = DB::get($this->dbname, 'slave');
         }
 
         // initialize controls
