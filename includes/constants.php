@@ -111,3 +111,10 @@ define('DEFAULT_TIMEZONE', date_default_timezone_get());
  */
 $package = json_decode(file_get_contents(ROOT_DIR . 'package.json'));
 define('HAWK_VERSION', $package->version);
+
+
+/**
+ * The constants for hashing passwords
+ */
+define('HASH_ALGO', 5); // SHA256
+define('HASH_SALT_LENGTH', 8);

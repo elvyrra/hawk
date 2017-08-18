@@ -200,7 +200,7 @@ class InstallController extends Controller{
                         '{{ $title }}' => Db::get('tmp')->quote($form->getData('title')),
                         '{{ $email }}' => Db::get('tmp')->quote($form->getData('admin[email]')),
                         '{{ $login }}' => Db::get('tmp')->quote($form->getData('admin[login]')),
-                        '{{ $password }}' => Db::get('tmp')->quote(Crypto::saltHash($form->getData('admin[password]'), $salt)),
+                        '{{ $password }}' => Db::get('tmp')->quote(Crypto::hashPassword($form->getData('admin[password]'), $salt)),
                         '{{ $ip }}' => Db::get('tmp')->quote(App::request()->clientIp())
                     );
                     $sql = strtr(file_get_contents(Plugin::current()->getRootDir() . 'templates/install.sql.tpl'), $param);

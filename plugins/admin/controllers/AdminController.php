@@ -18,7 +18,7 @@ class AdminController extends Controller{
     /**
      * Display and treat application settings
      */
-    public function settings(){
+    public function settings() {
         $languages = array_map(function ($language) {
             return $language->label;
         }, Language::getAll('tag'));
@@ -304,6 +304,7 @@ class AdminController extends Controller{
                         'get' => true,
                         'default' => Option::get('main.mailer-password'),
                         'label' => Lang::get('admin.settings-mailer-password-label'),
+                        'pattern' => '/.*/'
                     )),
 
                     new SelectInput(array(

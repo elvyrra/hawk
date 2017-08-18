@@ -54,13 +54,32 @@ class Crypto{
     /**
      * Hash a string with a salt
      *
+     * @deprecated 2.4.1
      * @param string $data The data to hash
      * @param string $salt The salt to use before hashing
      *
      * @return string The hashed data
      */
-    public static function saltHash($data, $salt = CRYPTO_SALT){
+    public static function saltHash($data, $salt = CRYPTO_SALT) {
         return sha1($salt . $data . $salt);
+    }
+
+
+    /**
+     * Hash a string with a salt
+     *
+     * @param string $data The data to hash
+     * @param string $salt The salt to use before hashing
+     *
+     * @return string The hashed data
+     */
+    public static function hashPassword($data) {
+        $salt = substr(md5(mcrypt_create_iv(HASH_SALT_LENGTH, MCRYPT_RAND)), 0, HASH_SALT_LENGTH);
+        $algos = hash_algos();
+        $algo = $algos[HASH_ALGO];
+        $hash = hash($algo, $salt . $data);
+
+        return HASH_ALGO . '$' . $salt . '$' . $hash;
     }
 
 

@@ -20,30 +20,30 @@ class LoginController extends Controller{
     private function form(){
         /*** Get the registrered login and passwords ***/
         $param = array(
-            "id" => "login-form",
-            "method" => "post",
-            "autocomplete" => false,
-            "fieldsets" => array(
-                "form" => array(
-
+            'id' => 'login-form',
+            'method' => 'post',
+            'autocomplete' => false,
+            'fieldsets' => array(
+                'form' => array(
                     new EmailInput(array(
-                        "field" => "login",
-                        "required" => true,
-                        "label" => Lang::get($this->_plugin . '.login-label'),
+                        'field' => 'login',
+                        'required' => true,
+                        'label' => Lang::get($this->_plugin . '.login-label'),
                     )),
 
                     new PasswordInput(array(
-                        "field" => "password",
-                        "required" => true,
-                        "get" => true,
-                        "label" => Lang::get($this->_plugin . '.login-password-label'),
+                        'field' => 'password',
+                        'required' => true,
+                        'get' => true,
+                        'label' => Lang::get($this->_plugin . '.login-password-label'),
+                        'pattern' => PasswordInput::LEAK_PATTERN
                     )),
                 ),
 
-                "_submits" => array(
+                'submits' => array(
                     new SubmitInput(array(
-                        "name" => "connect",
-                        "value" => Lang::get($this->_plugin . '.connect-button'),
+                        'name' => 'connect',
+                        'value' => Lang::get($this->_plugin . '.connect-button'),
                         'icon' => 'sign-in'
                     )),
 
@@ -80,7 +80,7 @@ class LoginController extends Controller{
     /**
      * Display the login page
      */
-    public function login(){
+    public function login() {
         $form = $this->form();
         if(!$form->submitted()) {
             if(App::request()->getParams('code') == 401) {
@@ -92,23 +92,24 @@ class LoginController extends Controller{
                 'page' => $form->__toString(),
                 'icon' => 'sign-in',
                 'title' => Lang::get($this->_plugin . '.login-form-title'),
-                // 'width' => '40rem',
             ));
         }
         else{
             if($form->check()) {
-                $hash = Crypto::saltHash($form->getData('password'));
-
-                $example = new DBExample(array(
-                    '$and' => array(
-                        array('email' => $form->getData('login')),
-                        array('password' => $hash),
-                    )
-                ));
-
-                $user = User::getByExample($example);
+                $user = User::getByEmail($form->getData('login'));
 
                 if($user) {
+                    if(!$user->checkPassword($form->getData('password'))) {
+                        if($user->password === Crypto::saltHash($form->getData('password'))) {
+                            // Update the user password with the new hash system
+                            $user->password = Crypto::hashPassword($form->getData('password'));
+                            $user->save();
+                        }
+                        else {
+                            return $form->response(Form::STATUS_ERROR, Lang::get($this->_plugin . '.login-error-authentication'));
+                        }
+                    }
+
                     if(!$user->active) {
                         // The user is not active
                         return $form->response(Form::STATUS_ERROR, Lang::get($this->_plugin . '.login-error-inactive-user'));
@@ -139,7 +140,7 @@ class LoginController extends Controller{
     /**
      * Register a new user
      */
-    public function register(){
+    public function register() {
         $param = array(
             'id' => 'register-form',
             'model' => 'User',
@@ -166,7 +167,7 @@ class LoginController extends Controller{
                     new PasswordInput(array(
                         'name' => 'password',
                         'required' => true,
-                        'encrypt' => array('\Hawk\Crypto', 'saltHash'),
+                        'encrypt' => array('\Hawk\Crypto', 'hashPassword'),
                         'label' => Lang::get($this->_plugin . '.register-password-label')
                     )),
 
@@ -474,7 +475,7 @@ class LoginController extends Controller{
     /**
      * Display and treat the form to reset the user's password
      */
-    public function resetPassword(){
+    public function resetPassword() {
         $form = new Form(array(
             'id' => 'reset-password-form',
             'fieldsets' => array(
@@ -488,7 +489,7 @@ class LoginController extends Controller{
                         'name' => 'password',
                         'required' => true,
                         'label' => Lang::get($this->_plugin . '.reset-pwd-form-password-label'),
-                        'encrypt' => array('\Hawk\Crypto', 'saltHash')
+                        'encrypt' => array('\Hawk\Crypto', 'hashPassword')
                     )),
                     new PasswordInput(array(
                         'name' => 'confirmation',

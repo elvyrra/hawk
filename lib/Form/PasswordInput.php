@@ -16,6 +16,11 @@ namespace Hawk;
 class PasswordInput extends FormInput{
     const TYPE = "password";
 
+
+    const LEAK_PATTERN = '/^(?=.*\d)(?=.*[a-zA-Z]).{6,}$/';
+
+    const STRONG_PATTERN = '/^(?=.*[A-Za-z])(?=.*\d)(?=.*[^\w\s])[^\s]{6,}$/';
+
     /**
      * Variable that has to be got from the database for displaying
      *
@@ -42,7 +47,7 @@ class PasswordInput extends FormInput{
      *
      * @var string
      */
-    $pattern = '/^(?=.*\d)(?=.*[a-zA-Z]).{6,16}$/';
+    $pattern = self::STRONG_PATTERN;
 
     /**
      * Display the input
