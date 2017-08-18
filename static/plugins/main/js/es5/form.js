@@ -372,7 +372,7 @@ define('form', ['jquery'], function ($) {
                 // Remove all Errors on this form
                 this.removeErrors();
 
-                if (this.objectAction === 'delete' || this.isValid()) {
+                if (this.method === 'delete' || this.isValid()) {
                     app.loading.start();
 
                     // Send an Ajax request to submit the form
@@ -418,6 +418,7 @@ define('form', ['jquery'], function ($) {
                                     _this3.displayErrors(response.details);
                                     break;
 
+                                case 409:
                                 case 500:
                                     // An error occured in the form treatment
                                     _this3.displayErrorMessage(response.message);

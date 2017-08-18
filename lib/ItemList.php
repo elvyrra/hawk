@@ -223,7 +223,13 @@ class ItemList {
      *
      * @var boolean
      */
-    $rebuild = false;
+    $rebuild = false,
+
+    /**
+     * The list filters
+     * @var array
+     */
+    $filterWidget = array();
 
 
     /**
@@ -327,7 +333,7 @@ class ItemList {
 
         $this->userParam = json_decode(App::session()->getUser()->getOptions('main.list-'.$this->id), true);
 
-        $sentParam = json_decode(App::request()->getHeaders('X-List-Filter-'.$this->id), true);
+        $sentParam = json_decode(App::request()->getHeaders('X-List-Data-'.$this->id), true);
 
         foreach($parameters as $paramName) {
             if(isset($sentParam[$paramName])) {
@@ -399,6 +405,36 @@ class ItemList {
         $fields = array();
 
         $where = array();
+
+        if(!empty($this->filterForm)) {
+            $filters = $this->getFilterFormValue();
+
+            foreach($this->filterForm as $name => $field) {
+                if(isset($filters[$name]) && $filters[$name] !== '') {
+                    switch($field['type']) {
+                        case 'checkbox' :
+                            $values = array_filter($filters[$name]);
+
+                            if(!empty($values)) {
+                                $where[] = DBExample::make(array(
+                                    $name => array(
+                                        '$in' => array_keys($values)
+                                    )
+                                ), $this->binds);
+                            }
+                            break;
+
+                        default :
+                            $where[] = DBExample::make(array(
+                                $name => $filters[$name]
+                            ), $this->binds);
+                            break;
+                    }
+                }
+            }
+        }
+
+
         if(!empty($this->filter)) {
             if($this->filter instanceof DBExample) {
                 $where[] = $this->filter->parse($this->binds);
@@ -441,6 +477,8 @@ class ItemList {
         try{
             $where = implode(' AND ', $where);
 
+            // Utils::debug($where);
+
             $model = $this->model;
             $this->recordNumber = $this->dbo->count($this->table, $where, $this->binds, $this->refField, $this->group);
 
@@ -453,7 +491,7 @@ class ItemList {
                 $this->page = (ceil($this->recordNumber / $this->lines) > 0) ? ceil($this->recordNumber / $this->lines) : 1;
             }
 
-            $this->start = (($this->page - 1) * $this->lines);
+            $this->start = ($this->page - 1) * $this->lines;
 
             // Get the data from the database
             $request = array(
@@ -857,5 +895,88 @@ class ItemList {
 
 
         $response->end();
+    }
+
+
+    /**
+     * Get the filter form values
+     * @returns Object The filter form data
+     */
+    private function getFilterFormValue() {
+        if(App::request()->getHeaders('X-List-Filter-' . $this->id)) {
+            App::session()->getUser()->setOption('main.list-filter-' . $this->id, App::request()->getHeaders('X-List-Filter-' . $this->id));
+
+            $result = json_decode(App::request()->getHeaders('X-List-Filter-' . $this->id), true);
+        }
+        elseif(App::session()->getUser()->getOptions('main.list-filter-' . $this->id)) {
+            $result = json_decode(App::session()->getUser()->getOptions('main.list-filter-' . $this->id), true);
+        }
+        else {
+            $result = array();
+        }
+
+        return $result;
+    }
+
+
+    /**
+     * Get the filter form
+     * @returns Form The form to display to filter the item list
+     */
+    public function getFilterForm() {
+        $param = array(
+            'id' => $this->id . '-filter-form',
+            'attributes' => array(
+                'onchange'  => 'app.lists["' . $this->id . '"].setFilter(app.forms["' . $this->id . '-filter-form"].valueOf())'
+            ),
+            'fieldsets' => array()
+        );
+
+        $filters = $this->getFilterFormValue();
+
+        foreach($this->filterForm as $name => $field) {
+            $param['fieldsets'][$name] = array();
+
+            if(isset($field['legend'])) {
+                $param['fieldsets'][$name]['legend'] = $field['legend'];
+            }
+
+            switch($field['type']) {
+                case 'checkbox' :
+                    foreach($field['options'] as $value => $label) {
+                        $param['fieldsets'][$name][] = new CheckboxInput(array(
+                            'name' => $name.'[' . $value . ']',
+                            'value' => !empty($filters[$name][$value]),
+                            'label' => $label,
+                            'beforeLabel' => true,
+                            'labelWidth'  => 'auto',
+                        ));
+                    }
+                    break;
+
+                case 'radio' :
+                    $param['fieldsets'][$name][] = new RadioInput(array(
+                        'name' => $name,
+                        'value' => isset($filters[$name]) ? $filters[$name] : '',
+                        'options' => $field['options'],
+                        'layout' => isset($field['layout']) ? $field['layout'] : 'vertical'
+                    ));
+                    break;
+
+                case 'select' :
+                    $param['fieldsets'][$name][] = new SelectInput(array(
+                        'name' => $name,
+                        'value' => isset($filters[$name]) ? $filters[$name] : '',
+                        'options' => $field['options'],
+                        'invitation' => isset($field['invitation']) ? $field['invitation'] : null
+                    ));
+                    break;
+
+                default :
+                    break;
+            }
+        }
+
+        return new Form($param);
     }
 }
