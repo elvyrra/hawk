@@ -164,7 +164,7 @@ define('list', ['jquery', 'emv'], function($, EMV) {
 
             var headers = options && options.headers || {};
 
-            headers['X-List-Filter-' + this.id] = JSON.stringify(data);
+            headers['X-List-Data-' + this.id] = JSON.stringify(data);
 
             // Send the list is refreshing to the server
             var get = {
@@ -187,6 +187,19 @@ define('list', ['jquery', 'emv'], function($, EMV) {
 
             .fail(function() {
                 app.notify('error', Lang.get('main.refresh-list-error'));
+            });
+        }
+
+
+        /**
+         * Refresh the list with filters
+         * @param {Object} data The filter values
+         */
+        setFilter(data) {
+            this.refresh({
+                headers : {
+                    ['X-List-Filter-' + this.id] : JSON.stringify(data)
+                }
             });
         }
 

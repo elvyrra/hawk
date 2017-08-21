@@ -3,6 +3,7 @@ plugins/*/
 plugins/main/userfiles
 !plugins/main/
 plugins/main/css/
+plugins/main/js/customize-list.es5.js
 plugins/main/js/customize-list.js
+plugins/main/js/es5/customize-list.es5.js
 plugins/main/js/es5/customize-list.js
-

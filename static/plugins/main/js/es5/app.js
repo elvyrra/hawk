@@ -465,7 +465,7 @@ define('app', ['jquery', 'emv', 'tab', 'tabs', 'form', 'list', 'lang', 'cookie',
 
                         if (code === 401) {
                             // The user is not connected, display the login form
-                            this.dialog(this.getUri('login', {}, {
+                            this.dialog(this.getUri('login-form', {}, {
                                 redirect: url,
                                 code: code
                             }));

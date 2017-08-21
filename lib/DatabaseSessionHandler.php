@@ -77,6 +77,9 @@ class DatabaseSessionHandler implements \SessionHandlerInterface{
         $app = App::getInstance();
         $req = isset($app->request) ? $app->request : null;
 
+        // Clean expired sessions
+        $this->gc(0);
+
         // Update the session mtime
         if($req && $req->getCookies($name)) {
             SessionModel::getDbInstance()->update(
@@ -89,9 +92,6 @@ class DatabaseSessionHandler implements \SessionHandlerInterface{
                 )
             );
         }
-
-        // Clean expired sessions
-        $this->gc(0);
     }
 
 

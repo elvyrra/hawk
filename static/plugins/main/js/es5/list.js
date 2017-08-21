@@ -4,6 +4,8 @@
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -176,7 +178,7 @@ define('list', ['jquery', 'emv'], function ($, EMV) {
 
                 var headers = options && options.headers || {};
 
-                headers['X-List-Filter-' + this.id] = JSON.stringify(data);
+                headers['X-List-Data-' + this.id] = JSON.stringify(data);
 
                 // Send the list is refreshing to the server
                 var get = {
@@ -196,6 +198,19 @@ define('list', ['jquery', 'emv'], function ($, EMV) {
                     });
                 }).fail(function () {
                     app.notify('error', Lang.get('main.refresh-list-error'));
+                });
+            }
+
+            /**
+             * Refresh the list with filters
+             * @param {Object} data The filter values
+             */
+
+        }, {
+            key: 'setFilter',
+            value: function setFilter(data) {
+                this.refresh({
+                    headers: _defineProperty({}, 'X-List-Filter-' + this.id, JSON.stringify(data))
                 });
             }
 

@@ -38,6 +38,11 @@ App::router()->auth(App::session()->isLogged(), function () {
 });
 
 
+// Hack to open login form by javascript when a session expired. The route must be accessible from anyone
+App::router()->get('login-form', '/login', array(
+    'action' => 'LoginController.login'
+));
+
 /**
  * The pages available only if not logged
  */

@@ -99,7 +99,7 @@ final class Router extends Singleton{
         }
 
 
-        if(isset($this->routes[$name])) {
+        if(isset($this->routes[$name]) && empty($param['overwrite'])) {
             trigger_error("The route named '$name' already exists", E_USER_WARNING);
         }
         else {
