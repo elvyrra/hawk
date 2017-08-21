@@ -83,8 +83,7 @@ class Language extends Model{
     public static function getAllActive(){
         return self::getListByExample(new DBExample(array(
             'active' => 1
-            )
-        ));
+        )));
     }
 
     /**
