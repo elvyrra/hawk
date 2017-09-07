@@ -224,7 +224,7 @@ class UserController extends Controller{
                         'name' => 'password',
                         'required' => true,
                         'label' => Lang::get($this->_plugin . '.user-form-password-label'),
-                        'encrypt' => array('Hawk\\Crypto', 'saltHash')
+                        'encrypt' => array('Hawk\\Crypto', 'hashPassword')
                     )),
 
                     $user ? null :

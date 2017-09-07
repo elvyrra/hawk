@@ -153,7 +153,9 @@ class User extends Model{
      * @return User
      */
     public static function getByUsername($username){
-        return self::getByExample(new DBExample(array('username' => $username)));
+        return self::getByExample(new DBExample(array(
+            'username' => $username
+        )));
     }
 
 
@@ -165,7 +167,9 @@ class User extends Model{
      * @return User
      */
     public static function getByEmail($email){
-        return self::getByExample(new DBExample(array('email' => $email)));
+        return self::getByExample(new DBExample(array(
+            'email' => $email
+        )));
     }
 
     /**
@@ -429,5 +433,27 @@ class User extends Model{
         return  $this->id != App::session()->getUser()->id &&
                 $this->id != self::ROOT_USER_ID &&
                 $this->id != self::GUEST_USER_ID;
+    }
+
+
+
+    /**
+     * Check the user password
+     * @param   string $password The password to check
+     * @return  boolean          True if the password is correct, else false
+     */
+    public function checkPassword($password) {
+        $data = explode('$', $this->password);
+
+        if(count($data) !== 3) {
+            return false;
+        }
+
+        list($algoId, $salt, $hash) = $data;
+
+        $algos = hash_algos();
+        $algo = $algos[$algoId];
+
+        return hash($algo, $salt . $password) === $hash;
     }
 }

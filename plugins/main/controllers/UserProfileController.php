@@ -264,6 +264,7 @@ class UserProfileController extends Controller{
                         'name' => 'current-password',
                         'label' => Lang::get($this->_plugin . '.update-password-current-password-label'),
                         'required' => true,
+                        'pattern' => PasswordInput::LEAK_PATTERN
                     )),
 
                     new PasswordInput(array(
@@ -309,11 +310,11 @@ class UserProfileController extends Controller{
         else{
             if($form->check()) {
                 $me = App::session()->getUser();
-                if($me->password != Crypto::saltHash($form->getData('current-password'))) {
+                if(!$me->checkPassword($form->getData('current-password'))) {
                     return $form->response(Form::STATUS_ERROR, Lang::get($this->_plugin . '.update-password-bad-current-password'));
                 }
                 try{
-                    $me->set('password', Crypto::saltHash($form->getData('new-password')));
+                    $me->set('password', Crypto::hashPassword($form->getData('new-password')));
                     $me->save();
 
                     return $form->response(Form::STATUS_SUCCESS, Lang::get($this->_plugin . '.update-password-success'));
