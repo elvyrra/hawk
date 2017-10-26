@@ -25,10 +25,10 @@ class UserController extends Controller{
             'questions' => QuestionController::getInstance()->listQuestions()
         );
 
-        $this->addCss(Plugin::current()->getCssUrl('users.less'));
-        $this->addJavaScript(Plugin::current()->getJsUrl('users.js'));
+        $this->addCss($this->getPlugin()->getCssUrl('users.less'));
+        $this->addJavaScript($this->getPlugin()->getJsUrl('users.js'));
 
-        $page = View::make(Plugin::current()->getViewsDir() . 'users.tpl', array(
+        $page = View::make($this->getPlugin()->getViewsDir() . 'users.tpl', array(
             'tabs' => $tabs,
         ));
 
@@ -45,14 +45,13 @@ class UserController extends Controller{
     /**
      * Display the list of the users
      */
-    public function listUsers(){
+    public function listUsers() {
         $example = array('id' => array('$ne' => User::GUEST_USER_ID));
         $filters = UserFilterWidget::getInstance()->getFilters();
 
         if(isset($filters['status']) && $filters['status'] != -1) {
             $example['active'] = $filters['status'];
         }
-
 
         $param = array(
             'id' => 'admin-users-list',
@@ -161,7 +160,7 @@ class UserController extends Controller{
         }
         else{
             $this->addKeysToJavaScript("admin.user-delete-confirmation");
-            return View::make(Plugin::current()->getView("users-list.tpl"), array(
+            return View::make($this->getPlugin()->getView("users-list.tpl"), array(
                 'list' => $list,
             ));
         }
@@ -172,10 +171,9 @@ class UserController extends Controller{
 
 
     /**
-     * Create or edit an user
+     * Create / Edit / Delete an user
      */
-    public function edit(){
-
+    public function edit() {
         $roles = array_map(function ($role) {
             return $role->getLabel();
         }, Role::getAll('id'));
@@ -197,6 +195,7 @@ class UserController extends Controller{
                         'readonly' => $user && $user->id !== App::session()->getUser()->id,
                         'insert' => ! $user || $user->id === App::session()->getUser()->id,
                         'label' => Lang::get($this->_plugin . '.user-form-username-label'),
+                        'default' => uniqid()
                     )),
 
                     new EmailInput(array(
@@ -211,6 +210,8 @@ class UserController extends Controller{
                     new CheckboxInput(array(
                         'name' => 'active',
                         'label' => Lang::get($this->_plugin . '.user-form-active-label'),
+                        'default' => 0,
+                        'notDisplayed' => !$user
                     )),
 
                     new SelectInput(array(
@@ -219,26 +220,18 @@ class UserController extends Controller{
                         'label' => Lang::get($this->_plugin . '.user-form-roleId-label')
                     )),
 
-                    $user ? null :
-                    new PasswordInput(array(
-                        'name' => 'password',
-                        'required' => true,
-                        'label' => Lang::get($this->_plugin . '.user-form-password-label'),
-                        'encrypt' => array('Hawk\\Crypto', 'hashPassword')
-                    )),
-
-                    $user ? null :
-                    new PasswordInput(array(
-                        'name' => 'passagain',
-                        'label' => Lang::get($this->_plugin . '.user-form-passagain-label'),
-                        'required' => true,
-                        'compare' => 'password',
-                        'independant' => true,
-                    )),
-
                     new HiddenInput(array(
                         'name' => 'createTime',
                         'default' => time(),
+                        'independant' => $user,
+                        'notDisplayed' => $user
+                    )),
+
+                    new HiddenInput(array(
+                        'name' => 'createIp',
+                        'default' => App::request()->clientIp(),
+                        'independant' => $user,
+                        'notDisplayed' => $user
                     ))
                 ),
 
@@ -275,12 +268,53 @@ class UserController extends Controller{
             ));
         }
         else{
-            if($form->submitted() == "delete") {
+            if($form->submitted() === 'delete') {
                 $this->remove();
             }
-            else{
+            else {
                 if($form->check()) {
-                    return $form->register();
+                    if(!$user) {
+                        // Creating a new user
+                        $form->register(false);
+                        $user = $form->object;
+
+                        // Send an email to the new user to validate the registration
+                        $tokenData = array(
+                            'username' => $user->username,
+                            'email' => $user->email,
+                            'createTime' => $user->createTime,
+                            'createIp' => $user->createIp
+                        );
+                        $token = Crypto::aes256Encode(json_encode($tokenData));
+                        $url = App::router()->getUrl('validate-third-registration', array('token' => $token));
+
+
+                        $data = array(
+                            'themeBaseCss' => Theme::getSelected()->getBaseCssUrl(),
+                            'themeCustomCss' => Theme::getSelected()->getCustomCssUrl(),
+                            'logoUrl' =>  Option::get('main.logo') ?
+                                Plugin::get('main')->getUserfilesUrl(Option::get('main.logo')) :
+                                Plugin::get('main')->getStaticUrl('img/hawk-logo.png'),
+                            'sitename' => Option::get('main.sitename'),
+                            'url' => $url
+                        );
+
+                        $mailContent = View::make(Plugin::get('main')->getView('admin-registration-validation-email.tpl'), $data);
+
+                        $mail = new Mail();
+                        $mail->from(Option::get('main.mailer-from'))
+                            ->fromName(Option::get('main.mailer-from-name'))
+                            ->to($user->email)
+                            ->title(Lang::get('main.register-email-title', array('sitename' => Option::get('main.sitename'))))
+                            ->content($mailContent)
+                            ->subject(Lang::get('main.register-email-title', array('sitename' => Option::get('main.sitename'))))
+                            ->send();
+
+                        return $form->response(Form::STATUS_SUCCESS, Lang::get('main.register-send-email-success'));
+                    }
+                    else {
+                        return $form->register();
+                    }
                 }
             }
         }

@@ -1,14 +1,19 @@
-{import file="form-input.tpl"}
-<label for="{{$input->id}}" class="input-file-invitation" e-class="{filled : value}">
+{import file="../../../hawk/views/form/form-input.tpl"}
+<label for="{{$input->id}}" class="input-file-invitation">
     <span class="input-file-invitation-text">{text key="main.input-file-invitation"}</span>
     {icon icon="check" class="file-chosen-icon"}
 </label>
 <script type="text/javascript">
     require(['emv', 'jquery'], function(EMV, $) {
-        const model = new EMV({
-            value : ''
-        });
+        $('[id="{{ $input->id }}"]').change(function(event) {
+            var files = event.target.files || event.originalEvent.target.files;
 
-        model.$apply($('[id="{{ $input->id }}"]').parent().get(0));
+            if(files && files.length) {
+                $(this).next('label').addClass('filled');
+            }
+            else {
+                $(this).next('label').removeClass('filled');
+            }
+        });
     });
 </script>

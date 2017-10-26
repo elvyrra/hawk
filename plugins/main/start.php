@@ -58,14 +58,23 @@ App::router()->auth(!App::session()->isLogged(), function () {
 
     // Register
     App::router()->auth(Option::get('main.open-register'), function () {
-        App::router()->any('register', '/register', array('action' => 'LoginController.register'));
+        App::router()->any('register', '/register', array('action' => 'RegisterController.register'));
 
-        App::router()->get('validate-registration', '/register/{token}', array(
+        App::router()->define('validate-third-registration', '/validate-admin-registration/{token}', array(
+            'methods' => array('get', 'post'),
             'where' => array(
                 'token' => '[^\s]+'
             ),
-            'action' => 'LoginController.validateRegister'
+            'action' => 'RegisterController.validateAdminRegistration'
         ));
+
+        App::router()->get('validate-registration', '/validate-registration/{token}', array(
+            'where' => array(
+                'token' => '[^\s]+'
+            ),
+            'action' => 'RegisterController.validateRegistration'
+        ));
+
     });
 
     // Ask for a new password

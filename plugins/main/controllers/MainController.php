@@ -111,6 +111,21 @@ class MainController extends Controller {
             App::session()->removeData('notification');
         }
 
+        /**
+         * Open dialog box
+         */
+        if(App::session()->getData('dialog')) {
+            $dialogUrl = App::session()->getData('dialog');
+
+            $this->addJavaScriptInline('
+                require(["app"], function(){
+                    app.dialog("' . $dialogUrl . '");
+                });'
+            );
+
+            App::session()->removeData('dialog');
+        }
+
         return $this->index($body, $title, $description, $keywords);
     }
 

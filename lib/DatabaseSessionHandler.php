@@ -47,6 +47,8 @@ class DatabaseSessionHandler implements \SessionHandlerInterface{
         SessionModel::deleteByExample(new DBExample(array(
             'id' => $sessionId
         )));
+
+        return true;
     }
 
     /**
@@ -92,6 +94,8 @@ class DatabaseSessionHandler implements \SessionHandlerInterface{
                 )
             );
         }
+
+        return true;
     }
 
 
@@ -124,5 +128,7 @@ class DatabaseSessionHandler implements \SessionHandlerInterface{
                 'mtime' => DB::sqlExpression('UNIX_TIMESTAMP()')
             )
         );
+
+        return true;
     }
 }

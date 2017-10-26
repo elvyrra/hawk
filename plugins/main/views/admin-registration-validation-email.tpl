@@ -1,0 +1,1 @@
+<p>{text key="main.admin-register-email-content" url="{$url}" sitename="{$sitename}"}</p>

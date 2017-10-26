@@ -119,6 +119,7 @@ validate-registration-error = "Une erreur est survenue pendant l'activation de v
 register-terms-label = "J'ai lu et j'accepte <a href=\"{uri}\"  target="_blank">les conditions générales d'utilisation</a> de l'application"
 register-email-title = "Validez votre inscription sur {sitename}"
 register-email-content = "<p>Vous venez de vous inscire sur {sitename}, et nous vous en remercions. </p><p>Pour valider votre inscription, cliquez sur le lien ci-dessous ou copiez-collez le dans la barre URL de votre navigateur :</p><a href=\"{url}\">{url}</a><p> Nous espérons vous voir rapidement sur {sitename} </p><p> L'équipe {sitename}. </p>"
+admin-register-email-content = "<p>Un compte vient de vous être créé sur {sitename}. </p><p>Pour valider votre inscription, cliquez sur le lien ci-dessous ou copiez-collez le dans la barre URL de votre navigateur :</p><a href=\"{url}\">{url}</a><p> Nous espérons vous voir rapidement sur {sitename} </p><p> L'équipe {sitename}. </p>"
 
 ; Update password form
 update-password-title = "Modifier mon mot de passe"
@@ -169,3 +170,10 @@ customize-list-title = "Personnalisez la liste"
 customize-list-description = "Glissez sur la droite les champs que vous voulez voir afficher dans la liste, à gauche, ceux que vous ne voulez pas voir apparaître."
 customize-list-not-displayed-title = "Ne pas afficher : "
 customize-list-displayed-title = "Champs à afficher :"
+
+; Set the first password
+set-first-pwd-form-title = "Je saisis mon mot de passe"
+set-first-pwd-form-password-label = "Votre mot de passe"
+set-first-pwd-form-confirmation-label = "Tapez-le à nouveau"
+set-first-pwd-form-success = "Votre mot de passe a été créé avec succès. Vous pouvez dès maintenant vous connecter avec votre nouveau mot de passe."
+set-first-pwd-form-error = "Une erreur est survenue pendant la réinitialisation de votre mot de passe. Veuillez ressayer ultérieurement."

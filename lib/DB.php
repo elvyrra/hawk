@@ -709,7 +709,7 @@ class DB{
      */
     public static function sqlExpression($expression) {
         if(!self::$sqlExpressionSalt) {
-            self::$sqlExpressionSalt = mcrypt_create_iv(8, MCRYPT_RAND);
+            self::$sqlExpressionSalt = PHP_VERSION_ID < 70000 ? mcrypt_create_iv(8, MCRYPT_RAND) : random_bytes(8);
         }
 
         $hash = md5(self::$sqlExpressionSalt . $expression);

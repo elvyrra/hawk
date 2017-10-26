@@ -119,6 +119,8 @@ validate-registration-error = "An error occured while activating your account"
 register-terms-label = "I read and accept the <a href=\"{uri}\" target="_blank">terms and conditions</a> of the application"
 register-email-title = "Validate your registration on {sitename}"
 register-email-content = "<p>You have just registered on {sitename}, and we thank you for that. </p><p>To validate your registration, please click on the link below :</p><a href=\"{url}\">{url}</a><p> We hope to see you soon on {sitename} </p><p> The {sitename} team. </p>"
+admin-register-email-content = "<p>An account has been created for you on {sitename}.</p><p>To validate your registration, please click on the link below :</p><a href=\"{url}\">{url}</a><p> We hope to see you soon on {sitename} </p><p> The {sitename} team. </p>"
+
 
 ; Update password form
 update-password-title = "Change my password"
@@ -169,3 +171,10 @@ customize-list-title = "Customize the list"
 customize-list-description = "Drag and drop on the right panel the fields you want to display on the list, on the left the ones you don't want to display."
 customize-list-not-displayed-title = "Do not display : "
 customize-list-displayed-title = "Fields to display :"
+
+; Set the first user password
+set-first-pwd-form-title = "I set my password"
+set-first-pwd-form-password-label = "Set your password"
+set-first-pwd-form-confirmation-label = "Type it again"
+set-first-pwd-form-success = "Your password was successfully set. You can now connect with this new password"
+set-first-pwd-form-error = "An error occured while setting your password. Please try again later."
