@@ -173,6 +173,7 @@ customize-list-displayed-title = "Champs à afficher :"
 
 ; Set the first password
 set-first-pwd-form-title = "Je saisis mon mot de passe"
+set-first-password-intro = "Pour valider votre inscription, veuillez choisir un mot de passe de connexion."
 set-first-pwd-form-password-label = "Votre mot de passe"
 set-first-pwd-form-confirmation-label = "Tapez-le à nouveau"
 set-first-pwd-form-success = "Votre mot de passe a été créé avec succès. Vous pouvez dès maintenant vous connecter avec votre nouveau mot de passe."

@@ -25,7 +25,7 @@ class LoginController extends Controller{
             'autocomplete' => false,
             'fieldsets' => array(
                 'form' => array(
-                    new EmailInput(array(
+                    new TextInput(array(
                         'field' => 'login',
                         'required' => true,
                         'label' => Lang::get($this->_plugin . '.login-label'),
@@ -93,6 +93,10 @@ class LoginController extends Controller{
         else{
             if($form->check()) {
                 $user = User::getByEmail($form->getData('login'));
+
+                if(!$user) {
+                    $user = User::getByUsername($form->getData('login'));
+                }
 
                 if($user) {
                     if(!$user->checkPassword($form->getData('password'))) {

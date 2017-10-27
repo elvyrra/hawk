@@ -192,6 +192,9 @@ class QuestionController extends Controller{
             $question->displayInProfile = (bool) $form->inputs['profile-display[' . $question->name . ']']->value;
 
             $params = json_decode($question->parameters);
+            if(!$params) {
+                $params = new \stdClass;
+            }
             $params->roles = array();
 
             foreach($roles as $role) {

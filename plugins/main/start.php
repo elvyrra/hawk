@@ -60,13 +60,6 @@ App::router()->auth(!App::session()->isLogged(), function () {
     App::router()->auth(Option::get('main.open-register'), function () {
         App::router()->any('register', '/register', array('action' => 'RegisterController.register'));
 
-        App::router()->define('validate-third-registration', '/validate-admin-registration/{token}', array(
-            'methods' => array('get', 'post'),
-            'where' => array(
-                'token' => '[^\s]+'
-            ),
-            'action' => 'RegisterController.validateAdminRegistration'
-        ));
 
         App::router()->get('validate-registration', '/validate-registration/{token}', array(
             'where' => array(
@@ -74,8 +67,16 @@ App::router()->auth(!App::session()->isLogged(), function () {
             ),
             'action' => 'RegisterController.validateRegistration'
         ));
-
     });
+
+    // Validate the registration that has been done by an admin
+    App::router()->define('validate-third-registration', '/validate-admin-registration/{token}', array(
+        'methods' => array('get', 'post'),
+        'where' => array(
+            'token' => '[^\s]+'
+        ),
+        'action' => 'RegisterController.validateAdminRegistration'
+    ));
 
     // Ask for a new password
     App::router()->any('forgotten-password', '/forgotten-password', array('action' => 'LoginController.forgottenPassword'));

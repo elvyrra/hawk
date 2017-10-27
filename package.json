@@ -1,6 +1,6 @@
 {
   "name": "hawk",
-  "version": "2.4.2",
+  "version": "2.4.3",
   "description": "Hawk engine",
   "main": "index.js",
   "scripts": {
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "devs@manager.elvyrra.fr:/home/devs/hawk"
+    "url": "https://github.com/elvyrra/hawk.git"
   },
   "author": "Elvyrra S.A.S",
   "license": "MIT",

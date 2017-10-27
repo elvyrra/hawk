@@ -256,22 +256,15 @@ class RegisterController extends Controller {
             $error = Lang::get($this->_plugin . '.validate-registration-unknown-error');
         }
 
-        if(!App::request()->isAjax()) {
-            if($error) {
-                App::session()->setData('notification', array(
-                    'status' => 'error',
-                    'message' => $error
-                ));
-            }
-            else {
-                App::session()->setData('dialog', App::request()->getFullUrl());
-            }
+        if($error && App::request()->method() === 'get') {
+            App::session()->setData('notification', array(
+                'status' => 'error',
+                'message' => $error
+            ));
 
             App::response()->redirectToRoute('index');
-
             return;
         }
-
 
         // The page is open in a dialog box
         $form = new Form(array(
@@ -304,15 +297,16 @@ class RegisterController extends Controller {
                     ))
                 )
             ),
-            'onsuccess' => 'app.dialog(app.getUri("login"));'
+            'onsuccess' => 'location = app.getUri("index");'
         ));
 
         if(!$form->submitted()) {
-            return Dialogbox::make(array(
-                'title' => Lang::get($this->_plugin . '.set-first-pwd-form-title'),
-                'page' => $form->display(),
-                'icon' => 'sign-in'
+            $page = View::make($this->getPlugin()->getView('set-first-password.tpl'), array(
+                'form' => $form
             ));
+
+
+            return MainController::getInstance()->main($page);
         }
         else {
             if($error) {
@@ -324,6 +318,14 @@ class RegisterController extends Controller {
                     $user->password = $form->inputs['password']->dbvalue();
                     $user->active = 1;
                     $user->save();
+
+                    // Create a connection for the new user
+                    App::session()->setData('user', array(
+                        'id' => $user->id,
+                        'email' => $user->email,
+                        'username' => $user->getUsername(),
+                        'ip' => App::request()->clientIp()
+                    ));
 
                     return $form->response(Form::STATUS_SUCCESS, Lang::get($this->_plugin . '.set-first-pwd-form-success'));
                 }

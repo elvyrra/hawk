@@ -73,6 +73,7 @@ class Session extends Singleton{
         if (App::conf()->has('db')) {
             // Get the user from the database
             $this->user = User::getById($this->getData('user.id'));
+            $this->logged = $this->user->isLogged();
         }
         else {
             // The database does not exists yet. Create a 'fake' guest user
@@ -85,7 +86,6 @@ class Session extends Singleton{
             $this->logged = false;
         }
 
-        $this->logged = $this->user->isLogged();
 
         if($lifetime) {
             setcookie(
