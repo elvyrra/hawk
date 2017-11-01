@@ -292,8 +292,13 @@ define(
                  * Open the last tabs
                  */
                 const route = this.getRouteFromUri(location.pathname);
+                const finalRoutes = [
+                    'install',
+                    'install-settings',
+                    'validate-third-registration'
+                ];
 
-                if(route === 'install' || route === 'install-settings') {
+                if(finalRoutes.indexOf(route) !== -1) {
                     // Do not load any new page in installation pages
                     return;
                 }

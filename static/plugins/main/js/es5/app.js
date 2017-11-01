@@ -291,8 +291,9 @@ define('app', ['jquery', 'emv', 'tab', 'tabs', 'form', 'list', 'lang', 'cookie',
                  * Open the last tabs
                  */
                 var route = this.getRouteFromUri(location.pathname);
+                var finalRoutes = ['install', 'install-settings', 'validate-third-registration'];
 
-                if (route === 'install' || route === 'install-settings') {
+                if (finalRoutes.indexOf(route) !== -1) {
                     // Do not load any new page in installation pages
                     return;
                 }

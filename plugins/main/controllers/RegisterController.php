@@ -288,12 +288,6 @@ class RegisterController extends Controller {
                     new SubmitInput(array(
                         'name' => 'valid',
                         'label' => Lang::get($this->_plugin . '.valid-button')
-                    )),
-                    new ButtonInput(array(
-                        'name' => 'cancel',
-                        'label' => Lang::get($this->_plugin . '.cancel-button'),
-                        'href' => App::router()->getUri('login'),
-                        'target' => 'dialog'
                     ))
                 )
             ),
