@@ -19,7 +19,7 @@
         <div class="col-xs-6">
             <h4>{text key="main.customize-list-displayed-title"}</h4>
             <ol class="sortable displayed-fields">
-                <li e-each="{$data : allFields, $filter : displayedFilter, $sort : 'order'}" class="alert-success" e-template="'customize-list-item'"></li>
+                <li e-each="{$data : allFields, $filter : displayedFilter, $sort : 'order'}" class="alert-success" e-template="'customize-list-item'" e-class="{immutable : immutable}"></li>
             </ol>
         </div>
     </div>
