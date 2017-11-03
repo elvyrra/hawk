@@ -300,7 +300,7 @@ define('app', ['jquery', 'emv', 'tab', 'tabs', 'form', 'list', 'lang', 'cookie',
 
                 var hash = location.hash.replace(/^#\!/, '');
 
-                if (hash) {
+                if (hash && hash !== 'undefined') {
                     var index = this.conf.tabs.open.indexOf(hash);
 
                     if (index === -1) {

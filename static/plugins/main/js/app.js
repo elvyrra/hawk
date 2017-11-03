@@ -305,7 +305,7 @@ define(
 
                 const hash = location.hash.replace(/^#\!/, '');
 
-                if (hash) {
+                if (hash && hash !== 'undefined') {
                     var index = this.conf.tabs.open.indexOf(hash);
 
                     if (index === -1) {
