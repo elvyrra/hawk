@@ -31,24 +31,9 @@ define('tabs', ['jquery', 'emv', 'tab'], ($, EMV, Tab) => {
             });
 
             this.$watch('activeTab', (tab, oldTab) => {
-                let onhide = Promise.resolve();
-
-                if(oldTab) {
-                    // Trigger the 'hide' event on the old displayed tab
-                    onhide = oldTab.trigger('after.hide');
+                if(tab.history) {
+                    window.history.replaceState({}, '', '#!' + tab.history[tab.history.length - 1]);
                 }
-
-                onhide
-
-                .then(() => {
-                    tab.trigger('after.show');
-                })
-
-                .then(() => {
-                    if(tab.history) {
-                        window.history.replaceState({}, '', '#!' + tab.history[tab.history.length - 1]);
-                    }
-                });
             });
         }
 
@@ -122,11 +107,7 @@ define('tabs', ['jquery', 'emv', 'tab'], ($, EMV, Tab) => {
                 this.remove(tab);
             }
             else {
-                this.activeTab.trigger('before.hide')
-
-                .then(() => {
-                    this.activeTab = tab;
-                });
+                this.activeTab = tab;
             }
             return false;
         }
