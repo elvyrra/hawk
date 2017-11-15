@@ -4,13 +4,13 @@
   "description": "Hawk engine",
   "main": "index.js",
   "scripts": {
-    "clean": "rm -r ./static/plugins/main/js/es5",
+    "clean": "rm -rf ./static/plugins/main/js/es5",
     "babel": "cd ./static/plugins/main/js && babel *.js -d es5 --presets=latest",
-    "clean-main": "rm ./static/plugins/main/js/es5/main.js",
+    "clean-main": "rm -f ./static/plugins/main/js/es5/main.js",
     "build-es5": "npm run clean && npm run babel && npm run clean-main",
     "build-es5-file": "babel --presets=latest",
     "minify": "r.js -o minify.js",
-    "uglify" : "uglifyjs --compress --output=./static/plugins/main/js/main.min.js ./static/plugins/main/js/main.min.js",
+    "uglify": "uglifyjs --compress --output=./static/plugins/main/js/main.min.js ./static/plugins/main/js/main.min.js",
     "build-js": "npm run minify && npm run uglify && npm run build-es5"
   },
   "repository": {

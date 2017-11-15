@@ -1,5 +1,3 @@
-/* global app */
-
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -46,10 +44,21 @@ define('tabs', ['jquery', 'emv', 'tab'], function ($, EMV, Tab) {
                 }
             }));
 
-            _this.$watch('activeTab', function (tab) {
-                if (tab.history) {
-                    window.history.replaceState({}, '', '#!' + tab.history[tab.history.length - 1]);
+            _this.$watch('activeTab', function (tab, oldTab) {
+                var onhide = Promise.resolve();
+
+                if (oldTab) {
+                    // Trigger the 'hide' event on the old displayed tab
+                    onhide = oldTab.trigger('after.hide');
                 }
+
+                onhide.then(function () {
+                    return tab.trigger('after.show');
+                }).then(function () {
+                    if (tab.history) {
+                        window.history.replaceState({}, '', '#!' + tab.history[tab.history.length - 1]);
+                    }
+                });
             });
             return _this;
         }
@@ -74,11 +83,14 @@ define('tabs', ['jquery', 'emv', 'tab'], function ($, EMV, Tab) {
              * Remove a tab by it index in the tabset
              *
              * @param {Tab} tab The tab to remove
+             * @returns {Promise} resolved if the tab is successfully closed
              */
 
         }, {
             key: 'remove',
             value: function remove(tab) {
+                var _this3 = this;
+
                 var index = this.tabs.indexOf(tab);
 
                 if (this.tabs.length > 1) {
@@ -91,16 +103,18 @@ define('tabs', ['jquery', 'emv', 'tab'], function ($, EMV, Tab) {
                         }
                     }
 
-                    if (tab.onclose) {
-                        tab.onclose.call(tab);
-                    }
+                    return tab.trigger('before.close').then(function () {
+                        // Delete the tab nodes
+                        _this3.tabs.splice(index, 1);
 
-                    // Delete the tab nodes
-                    this.tabs.splice(index, 1);
-
-                    // Register the new list of tabs
-                    this.registerTabs();
+                        // Register the new list of tabs
+                        _this3.registerTabs();
+                    }).then(function () {
+                        return tab.trigger('after.close');
+                    });
                 }
+
+                return Promise.resolve();
             }
 
             /**

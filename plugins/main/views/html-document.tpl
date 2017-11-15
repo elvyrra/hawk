@@ -22,6 +22,7 @@
 		<link rel="stylesheet" href="{{ Theme::getSelected()->getCustomCssUrl() }}" id="theme-custom-stylesheet"/>
 
 		<script type="text/javascript" src="{{ $polyfillUrl }}" ></script>
+		<script type="text/javascript" src="{{ $bluebirdUrl }}" ></script>
 		<script type="text/javascript" src="{{ $momentUrl }}" ></script>
 		<script type="text/javascript" src="{{ $aceUrl }}" ></script>
 		<script type="text/javascript" src="{{ $ckeditorUrl }}" ></script>

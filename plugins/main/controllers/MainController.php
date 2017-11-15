@@ -57,7 +57,8 @@ class MainController extends Controller {
             'aceUrl' => $this->getPlugin()->getJsUrl('ext/ace/ace.js'),
             'ckeditorUrl' => $this->getPlugin()->getJsUrl('ext/ckeditor/ckeditor.js'),
             'momentUrl' => $this->getPlugin()->getJsUrl('ext/moment.min.js'),
-            'polyfillUrl' => $this->getPlugin()->getjsUrl('ext/ie-polyfills.js')
+            'polyfillUrl' => $this->getPlugin()->getjsUrl('ext/ie-polyfills.js'),
+            'bluebirdUrl' => $this->getPlugin()->getjsUrl('ext/bluebird.min.js'),
         ));
     }
 

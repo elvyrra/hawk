@@ -333,6 +333,14 @@ class ItemList {
 
         $this->userParam = json_decode(App::session()->getUser()->getOptions('main.list-'.$this->id), true);
 
+        if($this->searches && empty($this->userParam['searches'])) {
+            $this->userParam['searches'] = $this->searches;
+        }
+
+        if($this->sorts && empty($this->userParam['sorts'])) {
+            $this->userParam['sorts'] = $this->sorts;
+        }
+
         $sentParam = json_decode(App::request()->getHeaders('X-List-Data-'.$this->id), true);
 
         foreach($parameters as $paramName) {

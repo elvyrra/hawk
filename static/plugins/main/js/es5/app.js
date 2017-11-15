@@ -333,7 +333,9 @@ define('app', ['jquery', 'emv', 'tab', 'tabs', 'form', 'list', 'lang', 'cookie',
 
         }, {
             key: 'load',
-            value: function load(url, data) {
+            value: function load(uri, data) {
+                var _this3 = this;
+
                 /**
                  * Default options
                  */
@@ -344,6 +346,7 @@ define('app', ['jquery', 'emv', 'tab', 'tabs', 'form', 'list', 'lang', 'cookie',
                     selector: null,
                     headers: {}
                 };
+                var url = uri;
 
                 if (data) {
                     Object.keys(data).forEach(function (key) {
@@ -352,133 +355,147 @@ define('app', ['jquery', 'emv', 'tab', 'tabs', 'form', 'list', 'lang', 'cookie',
                 }
 
                 if (url) {
-                    /**
-                     * We first check that page does not already exist in a tab
-                     */
-                    var route = this.getRouteFromUri(url);
+                    var params;
 
-                    if (route === 'new-tab') {
-                        url = this.conf.tabs.new.url;
-                    }
-
-                    for (var j = 0; j < this.tabset.tabs.length; j++) {
-                        var tab = this.tabset.tabs[j];
-
-                        if (tab.uri === url || tab.route === route && !this.routes[route].duplicable) {
-                            if (tab !== this.tabset.activeTab) {
-                                this.tabset.activeTab = tab;
-                                return new $.Deferred();
-                            }
-
-                            options.newtab = false;
-                            break;
-                        }
-                    }
-
-                    this.loading.start();
-
-                    /**
-                     * A new tab has been asked
-                     */
-                    if (options.newtab) {
-                        this.tabset.push();
-                    }
-
-                    // Get the element the page will be loaded in
-                    var element = options.selector ? $(options.selector).get(0) : this.tabset.activeTab;
-
-                    if (!element) {
+                    var _ret = function () {
                         /**
-                         * The selector to home the loaded url doesn't exist
+                         * We first check that page does not already exist in a tab
                          */
-                        this.loading.stop();
-                        this.notify('danger', Lang.get('main.loading-page-selector-not-exists'));
+                        var route = _this3.getRouteFromUri(url);
 
-                        return new $.Deferred();
-                    }
+                        if (route === 'new-tab') {
+                            url = _this3.conf.tabs.new.url;
+                        }
 
-                    // Load the page
-                    var query = '';
+                        for (var j = 0; j < _this3.tabset.tabs.length; j++) {
+                            var tab = _this3.tabset.tabs[j];
 
-                    if (options.query) {
-                        var params = [];
-
-                        Object.keys(options.query).forEach(function (param) {
-                            params.push(param + '=' + encodeURIComponent(options.query[param]));
-                        });
-
-                        query = '?' + params.join('&');
-
-                        url = url + query;
-                    }
-
-                    return $.ajax({
-                        xhr: this.xhr,
-                        url: url,
-                        type: options.post ? 'post' : 'get',
-                        data: options.post,
-                        dataType: 'text',
-                        headers: options.headers
-                    }).done(function (response) {
-                        this.loading.stop();
-
-                        if (element instanceof Tab) {
-                            // The page has been loaded in a whole tab
-                            // Register the tab url
-                            element.uri = url;
-                            element.route = route;
-
-                            element.content = response;
-
-                            // Regiter the tabs in the cookie
-                            if (this.isLogged) {
-                                this.tabset.registerTabs();
+                            if (tab.uri === url || tab.route === route && !_this3.routes[route].duplicable) {
+                                _this3.tabset.activeTab = tab;
+                                options.newtab = false;
+                                break;
                             }
-
-                            // register the url in the tab history
-                            element.history.push(url);
-
-                            history.pushState({}, '', '#!' + url);
-                        } else {
-                            $(element).html(response);
                         }
 
-                        if (options.onload) {
+                        _this3.loading.start();
+
+                        /**
+                         * A new tab has been asked
+                         */
+                        if (options.newtab) {
+                            _this3.tabset.push();
+                        }
+
+                        // Get the element the page will be loaded in
+                        var element = options.selector ? $(options.selector).get(0) : _this3.tabset.activeTab;
+
+                        if (!element) {
                             /**
-                             * A 'onload' callback has been asked
+                             * The selector to home the loaded url doesn't exist
                              */
-                            options.onload();
-                        }
-                    }.bind(this)).fail(function (xhr) {
-                        this.loading.stop();
-                        var code = xhr.status;
+                            _this3.loading.stop();
+                            _this3.notify('danger', Lang.get('main.loading-page-selector-not-exists'));
 
-                        // The page is not accessible for the user
-                        var response;
-
-                        try {
-                            response = JSON.parse(xhr.responseText);
-                        } catch (e) {
-                            response = {
-                                message: xhr.responseText
+                            return {
+                                v: new $.Deferred()
                             };
                         }
 
-                        if (code === 401) {
-                            // The user is not connected, display the login form
-                            this.dialog(this.getUri('login-form', {}, {
-                                redirect: url,
-                                code: code
-                            }));
+                        // Load the page
+                        var query = '';
 
-                            return;
+                        if (options.query) {
+                            params = [];
+
+
+                            Object.keys(options.query).forEach(function (param) {
+                                params.push(param + '=' + encodeURIComponent(options.query[param]));
+                            });
+
+                            query = '?' + params.join('&');
+
+                            url = url + query;
                         }
 
-                        this.notify('danger', response.message);
-                    }.bind(this));
+                        var beforeChange = Promise.resolve();
+
+                        if (element instanceof Tab) {
+                            beforeChange = element.trigger('before.change', url);
+                        }
+
+                        return {
+                            v: beforeChange.then(function () {
+                                return $.ajax({
+                                    xhr: _this3.xhr,
+                                    url: url,
+                                    type: options.post ? 'post' : 'get',
+                                    data: options.post,
+                                    dataType: 'text',
+                                    headers: options.headers
+                                }).then(function (response) {
+                                    _this3.loading.stop();
+
+                                    if (element instanceof Tab) {
+                                        // The page has been loaded in a whole tab
+                                        // Register the tab url
+                                        element.uri = url;
+                                        element.route = route;
+
+                                        element.content = response;
+
+                                        // Regiter the tabs in the cookie
+                                        if (_this3.isLogged) {
+                                            _this3.tabset.registerTabs();
+                                        }
+
+                                        // register the url in the tab history
+                                        element.history.push(url);
+
+                                        history.pushState({}, '', '#!' + url);
+
+                                        return element.trigger('after.change');
+                                    }
+
+                                    $(element).html(response);
+
+                                    return true;
+                                }).catch(function (xhr) {
+                                    _this3.loading.stop();
+                                    var code = xhr.status;
+
+                                    // The page is not accessible for the user
+                                    var response;
+
+                                    try {
+                                        response = JSON.parse(xhr.responseText);
+                                    } catch (e) {
+                                        response = {
+                                            message: xhr.responseText
+                                        };
+                                    }
+
+                                    if (code === 401) {
+                                        // The user is not connected, display the login form
+                                        _this3.dialog(_this3.getUri('login-form', {}, {
+                                            redirect: url,
+                                            code: code
+                                        }));
+
+                                        return Promise.reject(new Error(response.message));
+                                    }
+
+                                    _this3.notify('danger', response.message);
+
+                                    return Promise.reject(new Error(response.message));
+                                });
+                            })
+                        };
+                    }();
+
+                    if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
                 }
 
-                return new $.Deferred();
+                return Promise.reject();
             }
 
             /**
@@ -492,16 +509,16 @@ define('app', ['jquery', 'emv', 'tab', 'tabs', 'form', 'list', 'lang', 'cookie',
         }, {
             key: 'openLastTabs',
             value: function openLastTabs(uris) {
-                var _this3 = this;
+                var _this4 = this;
 
                 // var loaded = 0;
 
                 return $.when.apply(this, uris.map(function (uri) {
-                    return _this3.load(uri, {
+                    return _this4.load(uri, {
                         newtab: true
                     });
                 })).done(function () {
-                    _this3.loading.stop();
+                    _this4.loading.stop();
 
                     return uris;
                 });
@@ -574,7 +591,7 @@ define('app', ['jquery', 'emv', 'tab', 'tabs', 'form', 'list', 'lang', 'cookie',
         }, {
             key: 'dialog',
             value: function dialog(action, options) {
-                var _this4 = this;
+                var _this5 = this;
 
                 options = options || {};
 
@@ -595,11 +612,11 @@ define('app', ['jquery', 'emv', 'tab', 'tabs', 'form', 'list', 'lang', 'cookie',
                         _dialog: true
                     }
                 }).done(function (content) {
-                    _this4.loading.stop();
+                    _this5.loading.stop();
 
                     // Page successfully loaded
-                    _this4.dialogbox.display = true;
-                    _this4.dialogbox.content = content;
+                    _this5.dialogbox.display = true;
+                    _this5.dialogbox.content = content;
 
                     if (options.onload) {
                         options.onload();
@@ -609,7 +626,7 @@ define('app', ['jquery', 'emv', 'tab', 'tabs', 'form', 'list', 'lang', 'cookie',
                 }).fail(function (xhr) {
                     // Page load failed
                     var response;
-                    _this4.loading.stop();
+                    _this5.loading.stop();
 
                     try {
                         response = JSON.parse(xhr.responseText);
@@ -619,7 +636,7 @@ define('app', ['jquery', 'emv', 'tab', 'tabs', 'form', 'list', 'lang', 'cookie',
                         };
                     }
 
-                    _this4.notify('danger', response.message);
+                    _this5.notify('danger', response.message);
                 });
             }
 
@@ -704,24 +721,24 @@ define('app', ['jquery', 'emv', 'tab', 'tabs', 'form', 'list', 'lang', 'cookie',
         }, {
             key: 'getRouteInformationFromUri',
             value: function getRouteInformationFromUri(uri) {
-                var _this5 = this;
+                var _this6 = this;
 
                 var path = uri.replace(/\/?\?.*$/, '');
 
                 for (var i in this.routes) {
                     if (this.routes.hasOwnProperty(i)) {
-                        var _ret = function () {
-                            var regex = new RegExp('^' + _this5.routes[i].pattern + '$');
+                        var _ret2 = function () {
+                            var regex = new RegExp('^' + _this6.routes[i].pattern + '$');
                             var match = path.match(regex);
 
                             if (path.match(regex)) {
-                                var _ret2 = function () {
+                                var _ret3 = function () {
                                     var result = {
                                         name: i,
                                         data: {}
                                     };
 
-                                    Object.keys(_this5.routes[i].where).forEach(function (key, index) {
+                                    Object.keys(_this6.routes[i].where).forEach(function (key, index) {
                                         result.data[key] = match[index + 1];
                                     });
 
@@ -732,11 +749,11 @@ define('app', ['jquery', 'emv', 'tab', 'tabs', 'form', 'list', 'lang', 'cookie',
                                     };
                                 }();
 
-                                if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
+                                if ((typeof _ret3 === 'undefined' ? 'undefined' : _typeof(_ret3)) === "object") return _ret3.v;
                             }
                         }();
 
-                        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+                        if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
                     }
                 }
 
@@ -786,12 +803,12 @@ define('app', ['jquery', 'emv', 'tab', 'tabs', 'form', 'list', 'lang', 'cookie',
         }, {
             key: 'refreshMenu',
             value: function refreshMenu() {
-                var _this6 = this;
+                var _this7 = this;
 
                 $.get(this.getUri('refresh-menu'), function (response) {
-                    _this6.menu.items = response;
+                    _this7.menu.items = response;
 
-                    _this6.notify('warning', Lang.get('main.main-menu-changed'));
+                    _this7.notify('warning', Lang.get('main.main-menu-changed'));
                 });
             }
 
@@ -842,10 +859,10 @@ define('app', ['jquery', 'emv', 'tab', 'tabs', 'form', 'list', 'lang', 'cookie',
         }, {
             key: 'reloadRoutes',
             value: function reloadRoutes() {
-                var _this7 = this;
+                var _this8 = this;
 
                 return $.getJSON(this.getUri('all-routes')).done(function (routes) {
-                    _this7.setRoutes(routes);
+                    _this8.setRoutes(routes);
                 });
             }
         }]);

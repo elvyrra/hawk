@@ -1,8 +1,6 @@
-/* global app */
-
 'use strict';
 
-define('tabs', ['jquery', 'emv', 'tab'], function($, EMV, Tab) {
+define('tabs', ['jquery', 'emv', 'tab'], ($, EMV, Tab) => {
     /**
      * This class is the tabs manager of the application. It is accessible by `app.tabset`
      */
@@ -32,10 +30,25 @@ define('tabs', ['jquery', 'emv', 'tab'], function($, EMV, Tab) {
                 }
             });
 
-            this.$watch('activeTab', (tab) => {
-                if(tab.history) {
-                    window.history.replaceState({}, '', '#!' + tab.history[tab.history.length - 1]);
+            this.$watch('activeTab', (tab, oldTab) => {
+                let onhide = Promise.resolve();
+
+                if(oldTab) {
+                    // Trigger the 'hide' event on the old displayed tab
+                    onhide = oldTab.trigger('after.hide');
                 }
+
+                onhide
+
+                .then(() => {
+                    tab.trigger('after.show');
+                })
+
+                .then(() => {
+                    if(tab.history) {
+                        window.history.replaceState({}, '', '#!' + tab.history[tab.history.length - 1]);
+                    }
+                });
             });
         }
 
@@ -55,6 +68,7 @@ define('tabs', ['jquery', 'emv', 'tab'], function($, EMV, Tab) {
          * Remove a tab by it index in the tabset
          *
          * @param {Tab} tab The tab to remove
+         * @returns {Promise} resolved if the tab is successfully closed
          */
         remove(tab) {
             const index = this.tabs.indexOf(tab);
@@ -69,16 +83,20 @@ define('tabs', ['jquery', 'emv', 'tab'], function($, EMV, Tab) {
                     }
                 }
 
-                if (tab.onclose) {
-                    tab.onclose.call(tab);
-                }
+                return tab.trigger('before.close')
 
-                // Delete the tab nodes
-                this.tabs.splice(index, 1);
+                .then(() => {
+                    // Delete the tab nodes
+                    this.tabs.splice(index, 1);
 
-                // Register the new list of tabs
-                this.registerTabs();
+                    // Register the new list of tabs
+                    this.registerTabs();
+                })
+
+                .then(() => tab.trigger('after.close'));
             }
+
+            return Promise.resolve();
         }
 
 
@@ -104,7 +122,11 @@ define('tabs', ['jquery', 'emv', 'tab'], function($, EMV, Tab) {
                 this.remove(tab);
             }
             else {
-                this.activeTab = tab;
+                this.activeTab.trigger('before.hide')
+
+                .then(() => {
+                    this.activeTab = tab;
+                });
             }
             return false;
         }

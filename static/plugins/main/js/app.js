@@ -328,25 +328,26 @@ define(
             /**
              * Load a page in the current tab, or a new tab, or a given html node
              *
-             * @param {string} url The url to load
-             * @param {Object} data, the options. This object can hasve the following data :
-             *     - newtab (default false) : if set to true, the page will be loaded in a new tab of the application
-             *    - onload (default null) : A callback function to execute when the page is loaded
-             *    - post (default null) : an object of POST data to send in the URL
+             * @param {string} uri  The url to load
+             * @param {Object} data The options. This object can hasve the following data :
+             *                           - newtab (default false) : if set to true, the page will be loaded in a new tab of the application
+             *                           - onload (default null) : A callback function to execute when the page is loaded
+             *                           - post (default null) : an object of POST data to send in the URL
              *
              * @returns {Promise} A promise resolved if the page is succesfully loaded
              */
-            load(url, data) {
+            load(uri, data) {
                 /**
                  * Default options
                  */
-                var options = {
+                const options = {
                     newtab : false,
                     onload : null,
                     post : null,
                     selector : null,
                     headers : {}
                 };
+                let url = uri;
 
                 if(data) {
                     Object.keys(data).forEach(function(key) {
@@ -358,21 +359,17 @@ define(
                     /**
                      * We first check that page does not already exist in a tab
                      */
-                    var route = this.getRouteFromUri(url);
+                    const route = this.getRouteFromUri(url);
 
                     if (route === 'new-tab') {
                         url = this.conf.tabs.new.url;
                     }
 
-                    for (var j = 0; j < this.tabset.tabs.length; j++) {
-                        var tab = this.tabset.tabs[j];
+                    for (let j = 0; j < this.tabset.tabs.length; j++) {
+                        const tab = this.tabset.tabs[j];
 
                         if (tab.uri === url || tab.route === route && !this.routes[route].duplicable) {
-                            if (tab !== this.tabset.activeTab) {
-                                this.tabset.activeTab = tab;
-                                return new $.Deferred();
-                            }
-
+                            this.tabset.activeTab = tab;
                             options.newtab = false;
                             break;
                         }
@@ -388,7 +385,7 @@ define(
                     }
 
                     // Get the element the page will be loaded in
-                    var element = options.selector ? $(options.selector).get(0) : this.tabset.activeTab;
+                    const element = options.selector ? $(options.selector).get(0) : this.tabset.activeTab;
 
                     if (!element) {
                         /**
@@ -401,7 +398,7 @@ define(
                     }
 
                     // Load the page
-                    var query = '';
+                    let query = '';
 
                     if (options.query) {
                         var params = [];
@@ -415,78 +412,91 @@ define(
                         url = url + query;
                     }
 
-                    return $.ajax({
-                        xhr : this.xhr,
-                        url : url,
-                        type : options.post ? 'post' : 'get',
-                        data : options.post,
-                        dataType : 'text',
-                        headers : options.headers
-                    })
-                    .done(function(response) {
-                        this.loading.stop();
+                    let beforeChange = Promise.resolve();
 
-                        if (element instanceof Tab) {
-                            // The page has been loaded in a whole tab
-                            // Register the tab url
-                            element.uri = url;
-                            element.route = route;
+                    if(element instanceof Tab) {
+                        beforeChange = element.trigger('before.change', url);
+                    }
 
-                            element.content = response;
+                    return beforeChange
 
-                            // Regiter the tabs in the cookie
-                            if (this.isLogged) {
-                                this.tabset.registerTabs();
+                    .then(() => {
+                        return $.ajax({
+                            xhr : this.xhr,
+                            url : url,
+                            type : options.post ? 'post' : 'get',
+                            data : options.post,
+                            dataType : 'text',
+                            headers : options.headers
+                        })
+
+                        .then((response) => {
+                            this.loading.stop();
+
+                            if (element instanceof Tab) {
+                                // The page has been loaded in a whole tab
+                                // Register the tab url
+                                element.uri = url;
+                                element.route = route;
+
+                                element.content = response;
+
+                                // Regiter the tabs in the cookie
+                                if (this.isLogged) {
+                                    this.tabset.registerTabs();
+                                }
+
+                                // register the url in the tab history
+                                element.history.push(url);
+
+                                history.pushState({}, '', '#!' + url);
+
+                                return element.trigger('after.change');
                             }
 
-                            // register the url in the tab history
-                            element.history.push(url);
-
-                            history.pushState({}, '', '#!' + url);
-                        }
-                        else {
                             $(element).html(response);
-                        }
 
-                        if (options.onload) {
-                            /**
-                             * A 'onload' callback has been asked
-                             */
-                            options.onload();
-                        }
-                    }.bind(this))
+                            return true;
+                        })
 
-                    .fail(function(xhr) {
+                        .catch((xhr) => {
+                            this.loading.stop();
+                            var code = xhr.status;
+
+                            // The page is not accessible for the user
+                            var response;
+
+                            try {
+                                response = JSON.parse(xhr.responseText);
+                            }
+                            catch (e) {
+                                response = {
+                                    message : xhr.responseText
+                                };
+                            }
+
+                            if (code === 401) {
+                                // The user is not connected, display the login form
+                                this.dialog(this.getUri('login-form', {}, {
+                                    redirect : url,
+                                    code : code
+                                }));
+
+                                return Promise.reject(new Error(response.message));
+                            }
+
+                            this.notify('danger', response.message);
+
+                            return Promise.reject(new Error(response.message));
+                        });
+                    })
+
+                    .catch(() => {
                         this.loading.stop();
-                        var code = xhr.status;
-
-                        // The page is not accessible for the user
-                        var response;
-
-                        try {
-                            response = JSON.parse(xhr.responseText);
-                        }
-                        catch (e) {
-                            response = {
-                                message : xhr.responseText
-                            };
-                        }
-
-                        if (code === 401) {
-                            // The user is not connected, display the login form
-                            this.dialog(this.getUri('login-form', {}, {
-                                redirect : url,
-                                code : code
-                            }));
-
-                            return;
-                        }
-
-                        this.notify('danger', response.message);
-                    }.bind(this));
+                    });
                 }
 
-                return new $.Deferred();
+                return Promise.reject();
             }
 
             /**

@@ -617,7 +617,7 @@ class DB{
 
         $sql = 'SELECT COUNT(' . $field . ') as counter FROM ' . $table .' ' . $where . ' ' . $group;
 
-        return $this->query($sql, $binds, array('return' => self::RETURN_OBJECT, 'onerow' => true))->counter;
+        return (int) $this->query($sql, $binds, array('return' => self::RETURN_OBJECT, 'onerow' => true))->counter;
     }
 
 

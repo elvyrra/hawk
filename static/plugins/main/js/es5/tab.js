@@ -27,14 +27,13 @@ define('tab', ['emv', 'jquery'], function (EMV, $) {
 
             var options = data || {};
 
-            return _possibleConstructorReturn(this, (Tab.__proto__ || Object.getPrototypeOf(Tab)).call(this, {
+            var _this = _possibleConstructorReturn(this, (Tab.__proto__ || Object.getPrototypeOf(Tab)).call(this, {
                 data: {
                     id: id,
                     uri: options.uri || '',
                     content: options.content || '',
                     route: options.route || '',
-                    history: [],
-                    onclose: null
+                    history: []
                 },
                 computed: {
                     title: function title() {
@@ -64,6 +63,9 @@ define('tab', ['emv', 'jquery'], function (EMV, $) {
                     }
                 }
             }));
+
+            _this.events = {};
+            return _this;
         }
 
         /**
@@ -76,6 +78,85 @@ define('tab', ['emv', 'jquery'], function (EMV, $) {
             key: 'reload',
             value: function reload() {
                 return app.load(this.uri);
+            }
+
+            /**
+             * Listen of an event. The callback must return a boolean or a promise. When the event is triggered,
+             * the scripts executions will stop if any callback returns false or a rejected promise.
+             * @param {string}   event       The event name
+             * @param {Function} callback    The method to call when the event is triggered.
+             * @param {integer}  occurrences The number of times the event is listened
+             */
+
+        }, {
+            key: 'on',
+            value: function on(event, callback, occurrences) {
+                if (!this.events[event]) {
+                    this.events[event] = [];
+                }
+
+                var number = occurrences !== undefined ? occurrences : Number.MAX_SAFE_INTEGER;
+
+                this.events[event].push({
+                    callback: callback,
+                    number: number
+                });
+            }
+
+            /**
+             * Listen an event only one time
+             * @param   {string}   event    The event to listen
+             * @param   {Function} callback The callback to execute
+             */
+
+        }, {
+            key: 'once',
+            value: function once(event, callback) {
+                this.on(event, callback, 1);
+            }
+
+            /**
+             * Trigger an event
+             * @param   {string} event The event name
+             * @returns {Promise}      Resolved if no callback return false or a rejected promise
+             */
+
+        }, {
+            key: 'trigger',
+            value: function trigger(event) {
+                var _this2 = this;
+
+                var actions = (this.events[event] || []).slice();
+                var param = Array.from(arguments).slice(1);
+                var triggerOne = function triggerOne() {
+                    if (!actions.length) {
+                        return Promise.resolve();
+                    }
+
+                    var action = actions.shift();
+                    var result = void 0;
+
+                    if (!action.number) {
+                        result = Promise.resolve();
+                    } else {
+                        action.number--;
+                        result = action.callback.apply(_this2, param);
+                    }
+
+                    if (result instanceof Promise) {
+                        return result.then(function () {
+                            return triggerOne();
+                        });
+                    }
+
+                    if (result === false) {
+                        return Promise.reject();
+                    }
+
+                    return triggerOne();
+                };
+
+                return triggerOne();
             }
         }]);
 
