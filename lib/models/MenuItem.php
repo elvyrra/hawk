@@ -265,7 +265,7 @@ class MenuItem extends Model{
      * Delete the menu item
      */
     public function delete() {
-        self::getDnInstance('master')->update(
+        self::getDbInstance('master')->update(
             self::getTable(),
             new DBExample(array(
                 'parentId' => $this->id
