@@ -683,13 +683,7 @@ class Form{
                 }
             }
 
-            if(!$this->new) {
-                $this->object->update();
-            }
-            else{
-                $this->object->save();
-            }
-
+            $this->object->save();
 
             $id = $this->object->getPrimaryColumn();
 

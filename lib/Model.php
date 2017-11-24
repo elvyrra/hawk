@@ -13,7 +13,7 @@ namespace Hawk;
  *
  * @package Core
  */
-class Model{
+class Model {
     use Utils;
 
     /**
@@ -64,8 +64,33 @@ class Model{
 
     /**
      * The model instances, by their id
+     * @var array
      */
     protected static $instancesById = array();
+
+
+    /**
+     * Defines the timestamp fields
+     * @var array
+     */
+    protected static $timestamps = array(
+        'ctime' => '',
+        'mtime' => ''
+    );
+
+
+    /**
+     * Defines if the model is a new model or an existing one, got from the database
+     * @var boolean
+     */
+    public $new = true;
+
+
+    /**
+     * The data errors
+     * @var array
+     */
+    public $errors = array();
 
 
     /**
@@ -73,7 +98,7 @@ class Model{
      *
      * @param array $data The initial data to set.
      */
-    public function __construct($data = array()){
+    public function __construct($data = array()) {
         $this->map($data);
     }
 
@@ -257,15 +282,11 @@ class Model{
 
 
     /**
-     * Prepare the data to save in the database
-     *
-     * @return array The data to be inserted for method save or update
+     * Get the model fields
      */
-    protected function prepareDatabaseData() {
-        // TODO using the model fields property
-        $fields = !empty(static::$fields) ?
-            static::$fields :
-            self::getDbInstance('slave')->query(
+    protected static function getFields() {
+        if(!static::$fields) {
+            static::$fields = self::getDbInstance('slave')->query(
                 'SHOW COLUMNS FROM ' . self::getTable(),
                 array(),
                 array(
@@ -273,8 +294,20 @@ class Model{
                     'return' => DB::RETURN_ARRAY
                 )
             );
+        }
 
+        return static::$fields;
+    }
+
+    /**
+     * Prepare the data to save in the database
+     *
+     * @return array The data to be inserted for method save or update
+     */
+    protected function prepareDatabaseData() {
+        $fields = static::getFields();
         $insert = array();
+
         foreach(get_object_vars($this) as $key => $value){
             if(isset($fields[$key])) {
                 $insert[$key] = $value;
@@ -286,33 +319,58 @@ class Model{
 
 
     /**
+     * Set the ctime field value
+     */
+    private function setCtime($time = null) {
+        if($time === null) {
+            $time = time();
+        }
+
+        if(!empty(static::$timestamps['ctime']) && isset(static::$fields[static::$timestamps['ctime']])) {
+            $field = static::$timestamps['ctime'];
+
+
+            $this->$field = $time;
+        }
+
+        $this->setMtime($time);
+    }
+
+
+    /**
+     * Set the mtime field value
+     */
+    private function setMtime($time = null) {
+        if($time === null) {
+            $time = time();
+        }
+
+        if(!empty(static::$timestamps['mtime']) && isset(static::$fields[static::$timestamps['mtime']])) {
+            $field = static::$timestamps['mtime'];
+
+            $this->$field = $time;
+        }
+    }
+
+
+    /**
      * This method save a new Model in the database or update it if it exists.
      * It is based on INSERT ... ON DUPLICATE KEY.
      * If a new element is saved, then the id (or the value of the primary key) is set on the instance corresponding property
      */
-    public function save(){
-        $insert = $this->prepareDatabaseData();
-        $duplicateUpdates = array_map(
-            function ($key) {
-                if($key == static::$primaryColumn) {
-                    return "`$key`=LAST_INSERT_ID(`$key`)";
-                }
-                else{
-                    return "`$key` = VALUES(`$key`)";
-                }
-            }, array_keys($insert)
-        );
+    public function save() {
+        if($this->new) {
+            $this->setCtime();
+            $insert = $this->prepareDatabaseData();
+            $lastid = self::getDbInstance('master')->insert(static::getTable(), $insert);
 
-        if(!isset($insert[static::$primaryColumn])) {
-            $key = static::$primaryColumn;
-            $duplicateUpdates[] = "`$key`=LAST_INSERT_ID(`$key`)";
+            if($lastid) {
+                $id = static::$primaryColumn;
+                $this->$id = $lastid;
+            }
         }
-        $onduplicate = implode(', ', $duplicateUpdates);
-
-        $lastid = self::getDbInstance('master')->insert(static::getTable(), $insert, '', $onduplicate);
-        if($lastid) {
-            $id = static::$primaryColumn;
-            $this->$id = $lastid;
+        else {
+            $this->update();
         }
     }
 
@@ -340,6 +398,7 @@ class Model{
      */
     public function addIfNotExists(){
         $id = static::$primaryColumn;
+        $this->setCtime();
         $insert = $this->prepareDatabaseData();
 
         $lastid = self::getDbInstance('master')->insert(static::getTable(), $insert, 'IGNORE');
@@ -352,7 +411,8 @@ class Model{
     /**
      * Update the model data in the database
      */
-    public function update(){
+    public function update() {
+        $this->setMtime();
         $update = $this->prepareDatabaseData();
         $id = static::$primaryColumn;
         self::getDbInstance('master')->update(static::getTable(), new DBExample(array($id => $this->$id)), $update);
@@ -364,7 +424,7 @@ class Model{
      *
      * @return true if the data has been sucessfully removed from the database, false in other cases
      */
-    public function delete(){
+    public function delete() {
         $class = get_called_class();
         $id = static::$primaryColumn;
         $deleted = self::getDbInstance('master')->delete(static::getTable(), new DBExample(array($id => $this->$id)));

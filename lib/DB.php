@@ -13,7 +13,7 @@ namespace Hawk;
  *
  * @package Core
  */
-class DB{
+class DB {
     use Utils;
 
     /**
@@ -302,24 +302,33 @@ class DB{
                         break;
                 }
             }
-            else{
+            else {
                 if($options['onerow']) {
                     // Return a model instance
                     $object = $stmt->fetchObject($options['return'], $options['args']);
+                    // Set the model as a non new model instance
+                    if($object) {
+                        $object->new = false;
+                    }
+
                     $result = $object !== false ? $object : null;
                 }
                 else{
                     // Return an array of model instances
                     $data = array();
-                    while($row = $stmt->fetchObject($options['return'], $options['args'])){
+                    while($object = $stmt->fetchObject($options['return'], $options['args'])){
+                        // Set the model as a non new model instance
+                        $object->new = false;
+
                         if($options['index']) {
                             $index = $options['index'];
-                            $data[$row->$index] = $row;
+                            $data[$object->$index] = $object;
                         }
-                        else{
-                            $data[] = $row;
+                        else {
+                            $data[] = $object;
                         }
                     }
+
                     $result = $data;
                 }
             }
